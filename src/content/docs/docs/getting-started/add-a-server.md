@@ -5,10 +5,6 @@ sidebar:
   order: 3
 ---
 
-:::note[Planned]
-This describes behaviour from the Nearhost design that is not in a release yet.
-:::
-
 A server is a remote machine you can reach with OpenSSH. Nearhost shells out to `ssh`, so it honours your whole `ssh_config`, including `Include`, `Match`, `ProxyJump` and `IdentityAgent`.
 
 The `local` server always exists, needs no configuration, and cannot be removed or renamed.

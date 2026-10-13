@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-Discovery takes a server and a path, reads the project's files and returns proposed routes with labels and roles, plus advisories. On a remote server the files are read over SFTP through the server's SSH master. No shell commands run on the remote machine. For `local` they are read from disk.
+Discovery takes a server and a path, reads the project's files and returns proposed routes with labels and roles, plus advisories. It saves typing. It is not a requirement, and a project it knows nothing about works once you enter its ports. On a remote server the files are read over SFTP through the server's SSH master. No shell commands run on the remote machine. For `local` they are read from disk.
 
 ## What is read, in order
 
@@ -16,9 +16,9 @@ Later sources override the labels of earlier ones.
 3. `vite.config.js`, `vite.config.ts`, `vite.config.mjs`, `vite.config.mts`.
 4. `package.json`. Only the presence of a `vite` dependency is used.
 
-## Sail variables
+## Framework presets
 
-These variables map to labels:
+Compose files and Vite configs cover most projects without any preset. Laravel Sail is the first framework with one. Its variables map to labels and roles:
 
 - `APP_PORT`
 - `VITE_PORT`
@@ -32,7 +32,7 @@ These variables map to labels:
 - `FORWARD_MINIO_CONSOLE_PORT`
 - `FORWARD_MONGODB_PORT`
 
-When a variable is absent but its service is present in Compose, the default from the Sail stubs applies.
+When a variable is absent but its service is present in Compose, the default from the Sail stubs applies. Outside Sail, a Compose port that reads a variable is labelled with the service and the variable name.
 
 ## Compose ports
 
@@ -44,6 +44,6 @@ The file is scanned with regular expressions for `server.port`, `server.hmr`, `s
 
 ## When nothing is found
 
-Anything unrecognised is still listed, with the role `ignore`. If discovery finds nothing at all, the add-project wizard in the TUI, once it ships, lets you enter ports by hand.
+Anything unrecognised is still listed, with the role `ignore`. If discovery finds nothing at all, the add-project wizard lets you enter ports by hand.
 
 Discovery also produces advisories, which are shown and never applied. See [Advisories](/docs/reference/advisories/).

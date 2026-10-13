@@ -1,0 +1,130 @@
+---
+---
+
+<section class="container compare">
+  <div class="intro">
+    <h2>How it compares to what you use now.</h2>
+    <p>
+      Nearhost is for your own machines and your own browser. It is the wrong tool for showing work
+      to someone else.
+    </p>
+  </div>
+  <div class="rows">
+    <div class="row">
+      <h3>
+        <code>ssh -L</code> by hand
+      </h3>
+      <p>
+        The same OpenSSH forwards, typed per port and retyped after every dropped connection, with
+        no hostname and no certificate.
+      </p>
+      <p class="diff">
+        Nearhost keeps one supervised SSH connection per server, adds and removes forwards while it
+        runs, and puts a trusted <code>https://name.test</code> in front.
+      </p>
+    </div>
+    <div class="row">
+      <h3>Editor port forwarding</h3>
+      <p>
+        Convenient while the editor window is open. You get <code>localhost:port</code> URLs, so
+        cookies and OAuth settings differ from a named HTTPS origin.
+      </p>
+      <p class="diff">
+        Nearhost runs in a terminal, independent of any editor, and each project keeps the same
+        HTTPS name every day.
+      </p>
+    </div>
+    <div class="row">
+      <h3>A VPN or mesh network</h3>
+      <p>
+        Makes the machine reachable, which means an agent on every machine and a dev server that
+        listens beyond <code>localhost</code>.
+      </p>
+      <p class="diff">
+        Nearhost installs nothing on the server. The dev server keeps listening on{' '}
+        <code>localhost</code> and is reached over SSH.
+      </p>
+    </div>
+    <div class="row">
+      <h3>A public tunnel service</h3>
+      <p>
+        Built for sharing. Your traffic goes through someone else's relay to a public URL, usually
+        behind an account.
+      </p>
+      <p class="diff">
+        Nearhost has no relay, no account and no public URL. Use a tunnel service when a client
+        needs to see the page.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .compare {
+    padding-block: var(--nh-section);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 720px;
+  }
+  h2 {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1.05;
+    letter-spacing: var(--nh-track-display);
+  }
+  .intro p {
+    margin: 0;
+    color: var(--nh-body);
+    font-size: 18px;
+  }
+  .rows {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--nh-line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(0, 1.2fr);
+    gap: 28px;
+    padding: 24px 28px;
+    border-top: 1px solid var(--nh-line);
+    align-items: start;
+  }
+  .row:first-child {
+    border-top: 0;
+  }
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .row p {
+    margin: 0;
+    color: var(--nh-muted);
+    font-size: 15.5px;
+  }
+  .row .diff {
+    color: var(--nh-text);
+  }
+  code {
+    font-family: var(--nh-font-mono);
+    font-size: 0.92em;
+  }
+  @media (max-width: 719px) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 20px;
+    }
+  }
+</style>

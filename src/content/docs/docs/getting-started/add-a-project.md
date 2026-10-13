@@ -5,11 +5,7 @@ sidebar:
   order: 4
 ---
 
-:::note[Planned]
-This describes behaviour from the Nearhost design that is not in a release yet.
-:::
-
-A project is a directory on a server that runs an HTTP service. Nearhost reads the project's own files to work out its ports, then serves it at a `.test` alias.
+A project is a directory on a server that runs an HTTP service. Nearhost reads the project's own files to work out its ports, then serves it at a `.test` alias. The service can be anything that listens on a port.
 
 ## From the TUI
 
@@ -26,21 +22,23 @@ Press `n` and choose **project**. The wizard replaces the main panel and keeps t
 The non-interactive form accepts discovery's defaults and prints the resulting routes.
 
 ```text
-$ nearhost add --server mini ~/Code/myapp
-discovering ports on mini:~/Code/myapp …
-  80     web       Laravel (APP_PORT)
-  5174   loopback  Vite (VITE_PORT)
-  3306   ignore    MySQL (FORWARD_DB_PORT)
+$ nearhost add --server mini ~/code/myapp
+discovering ports on mini:~/code/myapp …
+  5173   ignore    Vite (vite.config)
+  5432   ignore    db
+  8080   web       app
 added myapp → https://myapp.test
 ```
 
+Here a Compose service named `app` publishes `8080:80`, so it becomes the web route. The Vite port is listed but not forwarded. If your pages load scripts from `localhost:5173`, change that route to `loopback`. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/).
+
 ## Route roles
 
-| Role       | What happens                                                                           | Default for                                         |
-| ---------- | -------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| `web`      | Served at `https://<alias>` through the proxy. Exactly one per project.                | APP_PORT, else 80, else the first HTTP-looking port |
-| `loopback` | Raw forward to the same port on your laptop's `127.0.0.1`. Skipped for local projects. | VITE_PORT                                           |
-| `ignore`   | Listed, not forwarded.                                                                 | Databases, caches, everything else                  |
+| Role       | What happens                                                                           | Default for                                                   |
+| ---------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `web`      | Served at `https://<alias>` through the proxy. Exactly one per project.                | A port mapped to container port 80, else the Vite port        |
+| `loopback` | Raw forward to the same port on your laptop's `127.0.0.1`. Skipped for local projects. | A dev server port you choose, or VITE_PORT under Laravel Sail |
+| `ignore`   | Listed, not forwarded.                                                                 | Databases, caches, everything else                            |
 
 Advisories are shown, never applied. See [Advisories](/docs/reference/advisories/). Nothing on the remote machine is edited.
 
@@ -52,13 +50,13 @@ Every project lives in `~/.config/nearhost/config.yaml`. Hand edits and TUI edit
 projects:
   - name: myapp
     server: mini
-    path: /Users/ecs/Code/myapp
+    path: /home/dev/code/myapp
     alias: myapp.test
     enabled: true
     routes:
-      - { port: 80, role: web, label: 'Laravel (APP_PORT)' }
-      - { port: 5174, role: loopback, label: 'Vite (VITE_PORT)' }
-      - { port: 3306, role: ignore, label: 'MySQL (FORWARD_DB_PORT)' }
+      - { port: 8080, role: web, label: 'app' }
+      - { port: 5173, role: loopback, label: 'Vite (vite.config)' }
+      - { port: 5432, role: ignore, label: 'db' }
 ```
 
 See [config.yaml](/docs/reference/config/) for every key.

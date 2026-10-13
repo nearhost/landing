@@ -5,23 +5,19 @@ sidebar:
   order: 1
 ---
 
-:::note[Planned]
-This describes behaviour from the Nearhost design that is not in a release yet.
-:::
-
 Every failure attaches to the thing that failed and shows the underlying message plus one fix action. A failure in one project or server never affects another. `nearhost doctor` checks most of the causes below at once.
 
 ## Port 443 or 80 already in use
 
 The proxy refuses to start. Home names the port and, where available, the owning process.
 
-Stop whatever holds the port. Herd, Valet and nginx are the usual causes. On Linux, also check that the binary may bind low ports. See [Install](/docs/getting-started/install/).
+Stop whatever holds the port. Another local proxy is the usual cause: nginx, Caddy, Herd or Valet. On Linux, also check that the binary may bind low ports. See [Install](/docs/getting-started/install/).
 
 ## A loopback port is already bound
 
 The project enters `error` and shows the port and process. Its other routes still start.
 
-Stop the process, or give the project a distinct `VITE_PORT` in `.env` and edit the route.
+Stop the process, or move the project's dev server to a different port and edit the route. For Vite that is `server.port` in the Vite config, or `VITE_PORT` under Laravel Sail.
 
 ## Sudo declined
 

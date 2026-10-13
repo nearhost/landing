@@ -5,7 +5,10 @@ import svelte from '@astrojs/svelte';
 
 export default defineConfig({
   site: 'https://nearhost.dev',
-  redirects: { '/docs': '/docs/getting-started/install/' },
+  redirects: {
+    '/docs': '/docs/getting-started/introduction/',
+    '/docs/concepts/laravel-sail-and-vite': '/docs/concepts/dev-servers-and-hot-reload/',
+  },
   integrations: [
     starlight({
       title: 'Nearhost',
