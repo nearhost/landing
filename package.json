@@ -7,7 +7,13 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "check": "astro check && svelte-check --tsconfig ./tsconfig.json",
+    "verify": "npm run format:check && npm run lint && npm run check && npm run build",
+    "prepare": "simple-git-hooks"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.42.6",
@@ -18,5 +24,40 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "overrides": {
+    "eslint-plugin-jsx-a11y": {
+      "eslint": "$eslint"
+    }
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-astro": "^3.2.1",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-svelte": "^3.23.1",
+    "globals": "^17.13.0",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.1",
+    "prettier-plugin-svelte": "^4.1.1",
+    "simple-git-hooks": "^2.14.0",
+    "svelte-check": "^4.7.6",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.2"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,astro,svelte}": [
+      "prettier --write",
+      "eslint --fix"
+    ],
+    "*.{css,md,mdx,json,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }
