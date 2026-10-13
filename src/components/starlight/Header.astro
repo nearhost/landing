@@ -1,0 +1,57 @@
+---
+import SiteTitle from './SiteTitle.astro';
+import Search from '@astrojs/starlight/components/Search.astro';
+import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
+import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
+---
+
+<div class="header">
+  <div class="title-wrapper">
+    <SiteTitle />
+  </div>
+  <div class="middle">
+    <Search />
+  </div>
+  <div class="right">
+    <a href="/" class="home">
+      Home
+    </a>
+    <SocialIcons />
+    <ThemeSelect />
+  </div>
+</div>
+
+<style>
+  .header {
+    display: flex;
+    gap: var(--sl-nav-gap);
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+  }
+  .title-wrapper {
+    overflow: clip;
+    min-width: 0;
+  }
+  .middle {
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: center;
+  }
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .home {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+  }
+  @media (max-width: 50rem) {
+    .home {
+      display: none;
+    }
+  }
+</style>
