@@ -1,0 +1,117 @@
+---
+---
+
+<section id="how" class="how">
+  <div class="container inner">
+    <div class="intro">
+      <h2>Set up in three steps without touching the server.</h2>
+      <p>
+        If <code>ssh mini</code> works in your terminal, Nearhost works. It reuses your SSH config,
+        including ProxyJump, agents and keychain identities, and writes nothing to the remote
+        machine.
+      </p>
+    </div>
+
+    <div class="steps">
+      <div class="card">
+        <div class="num">01</div>
+        <h3>Add a server</h3>
+        <p>
+          Pick a host alias from <code>~/.ssh/config</code> or type <code>user@host</code>. Nearhost
+          checks that it connects without a prompt and shows OpenSSH's own output if it doesn't.
+        </p>
+      </div>
+      <div class="card">
+        <div class="num">02</div>
+        <h3>Add a project</h3>
+        <p>
+          Point at a path. Nearhost reads <code>.env</code>, Compose and Vite config over SFTP and
+          proposes the ports: which one is the web app, which ones need a loopback forward, which to
+          ignore.
+        </p>
+      </div>
+      <div class="card">
+        <div class="num">03</div>
+        <h3>Open it</h3>
+        <p>
+          Press <code>o</code>. Nearhost adds a hosts entry, issues a certificate from its local CA
+          and routes <code>https://myapp.test</code> through the SSH tunnel. WebSockets and Vite HMR
+          pass through the same tunnel.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .how {
+    border-top: 1px solid var(--nh-line);
+    background: color-mix(in srgb, var(--nh-ground) 92%, var(--nh-surface));
+  }
+  .inner {
+    padding-block: 96px 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+  }
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 720px;
+  }
+  h2 {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1.05;
+    letter-spacing: var(--nh-track-display);
+  }
+  .intro p {
+    margin: 0;
+    color: var(--nh-body);
+    font-size: 18px;
+  }
+  code {
+    font-family: var(--nh-font-mono);
+    font-size: 0.92em;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 28px;
+    background: var(--nh-ground);
+    border: 1px solid var(--nh-line);
+    border-radius: 12px;
+    min-width: 0;
+  }
+  .num {
+    font-family: var(--nh-font-mono);
+    font-size: 13px;
+    color: var(--nh-faint);
+  }
+  h3 {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+  }
+  .card p {
+    margin: 0;
+    color: var(--nh-muted);
+    font-size: 16px;
+  }
+  @media (max-width: 719px) {
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
