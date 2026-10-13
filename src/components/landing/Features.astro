@@ -23,8 +23,10 @@
       </svg>
       <h3>Real HTTPS, trusted once</h3>
       <p>
-        Nearhost creates a local CA on first run and adds it to your keychain with one prompt. Each
-        alias gets its own certificate, and the binary ships no shared wildcard key.
+        Secure cookies, OAuth callbacks and service workers need HTTPS, so every alias gets a real
+        certificate. Nearhost creates its own local CA on first run and you trust it once. No shared
+        key ships in the binary, so nobody else can mint certificates for your <code>.test</code>{' '}
+        names.
       </p>
     </div>
     <div class="cell">
@@ -41,10 +43,11 @@
       >
         <path d="M13 2 4 14h7l-1 8 9-12h-7z" />
       </svg>
-      <h3>HMR and WebSockets pass through</h3>
+      <h3>Hot reload and WebSockets pass through</h3>
       <p>
-        Nearhost forwards Vite's port to the same number on your laptop, so <code>public/hot</code>{' '}
-        resolves and hot reload works with the remote config untouched.
+        Nearhost can forward a dev server's port to the same number on your laptop. Asset URLs that
+        point at <code>localhost</code> still resolve, so hot reload connects with the remote config
+        untouched.
       </p>
     </div>
     <div class="cell">
@@ -64,9 +67,9 @@
       </svg>
       <h3>Port discovery</h3>
       <p>
-        Nearhost reads <code>.env</code>, Compose files and <code>vite.config</code>, and knows the
-        Laravel Sail port variables. It flags port clashes and a missing <code>allowedHosts</code>{' '}
-        before you start the project.
+        Nearhost reads <code>.env</code>, Compose files and <code>vite.config</code> to propose the
+        ports, with presets for Laravel Sail. It flags port clashes and a missing{' '}
+        <code>allowedHosts</code> before you start. For anything else, you enter the ports yourself.
       </p>
     </div>
     <div class="cell">

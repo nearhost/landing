@@ -12,8 +12,8 @@ const commands = [
   <div class="intro">
     <h2 class="heading">Install Nearhost.</h2>
     <p class="lede">
-      One static binary for macOS and Linux, Apple silicon and Intel. The first run installs the
-      local CA and lands you on Home.
+      One static binary for macOS and Linux, on Apple silicon, Intel and ARM. The first run installs
+      the local CA and lands you on Home.
     </p>
   </div>
   <div class="cards">
@@ -33,9 +33,9 @@ const commands = [
     ))}
   </div>
   <p class="note">
-    Linux needs permission to bind ports 80 and 443. The installer offers to set{' '}
-    <code>cap_net_bind_service</code>, and <code>nearhost doctor</code> will tell you if it's
-    missing.
+    Linux needs one extra step to bind ports 80 and 443 and to trust the certificate in your
+    browser. The <a href="/docs/getting-started/install/">install guide</a> has the commands, and{' '}
+    <code>nearhost doctor</code> tells you what is missing.
   </p>
 </section>
 
@@ -101,6 +101,10 @@ const commands = [
     margin: 0;
     font-size: 14px;
     color: var(--nh-faint);
+  }
+  .note a {
+    color: var(--nh-muted);
+    text-decoration: underline;
   }
   @media (max-width: 719px) {
     .cards {

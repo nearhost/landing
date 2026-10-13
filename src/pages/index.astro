@@ -3,9 +3,11 @@ import Landing from '../layouts/Landing.astro';
 import Nav from '../components/landing/Nav.astro';
 import Hero from '../components/landing/Hero.astro';
 import TuiMock from '../components/landing/TuiMock.astro';
+import Problem from '../components/landing/Problem.astro';
 import Steps from '../components/landing/Steps.astro';
 import RequestPath from '../components/landing/RequestPath.astro';
 import Features from '../components/landing/Features.astro';
+import Compare from '../components/landing/Compare.astro';
 import Trust from '../components/landing/Trust.astro';
 import Install from '../components/landing/Install.astro';
 import Footer from '../components/landing/Footer.astro';
@@ -13,14 +15,16 @@ import Footer from '../components/landing/Footer.astro';
 
 <Landing
   title="Nearhost · Run it anywhere. Open it here."
-  description="Nearhost opens projects running on your other machines at a local https address, over the SSH you already have."
+  description="Nearhost opens the dev server running on your other machine at a trusted https://name.test address on your laptop, over the SSH you already have. Any stack, nothing installed on the server."
 >
   <Nav slot="header" />
   <Hero />
   <TuiMock />
+  <Problem />
   <Steps />
   <RequestPath />
   <Features />
+  <Compare />
   <Trust />
   <Install />
   <Footer slot="footer" />

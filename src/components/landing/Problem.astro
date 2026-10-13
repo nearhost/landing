@@ -1,0 +1,40 @@
+---
+---
+
+<section class="container problem">
+  <h2>The code runs on another machine. Your browser is on this one.</h2>
+  <p>
+    Today that means an <code>ssh -L</code> flag for every port, a certificate warning on every
+    load, and hot reload that never connects. Nearhost sets that up once per project and gives each
+    one a name you can open.
+  </p>
+</section>
+
+<style>
+  .problem {
+    padding-block: 0 var(--nh-section);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  h2 {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: clamp(28px, 3.4vw, 40px);
+    line-height: 1.08;
+    letter-spacing: var(--nh-track-display);
+    max-width: 820px;
+  }
+  p {
+    margin: 0;
+    color: var(--nh-body);
+    font-size: 19px;
+    line-height: 1.5;
+    max-width: 820px;
+  }
+  code {
+    font-family: var(--nh-font-mono);
+    font-size: 0.92em;
+  }
+</style>

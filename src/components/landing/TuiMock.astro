@@ -71,7 +71,7 @@
             <span class="faint">server</span> mini
           </span>
           <span>
-            <span class="faint">path</span> ~/Code/myapp
+            <span class="faint">path</span> ~/code/myapp
           </span>
           <span>
             <span class="faint">state</span> <span class="running">running</span>
@@ -86,19 +86,19 @@
             <div class="th">local</div>
             <div class="th">status</div>
 
-            <div>80</div>
+            <div>8080</div>
             <div class="accent">web</div>
-            <div>Laravel (APP_PORT)</div>
+            <div>app</div>
             <div>52114</div>
             <div class="running">●</div>
-            <div>5174</div>
+            <div>5173</div>
             <div class="muted">loopback</div>
-            <div>Vite (VITE_PORT)</div>
-            <div>5174</div>
+            <div>Vite (vite.config)</div>
+            <div>5173</div>
             <div class="running">●</div>
-            <div class="faint">3306</div>
+            <div class="faint">5432</div>
             <div class="faint">ignore</div>
-            <div class="faint">MySQL (FORWARD_DB_PORT)</div>
+            <div class="faint">db</div>
             <div class="faint">–</div>
             <div class="faint">–</div>
           </div>
@@ -107,16 +107,16 @@
         <div class="advisory">
           <span>▲</span>
           <span>
-            APP_URL mismatch: set <span class="text">APP_URL=https://myapp.test</span> in .env{' '}
-            <span class="faint">· y copy</span>
+            Vite rejects requests for <span class="text">myapp.test</span> unless it is in
+            server.allowedHosts <span class="faint">· y copy</span>
           </span>
         </div>
 
         {/* prettier-ignore */}
         <div class="log">
           <div class="log-head">log</div>
-          <div><span class="time">12:04:01</span>  forward  127.0.0.1:52114 → mini:80</div>
-          <div><span class="time">12:04:01</span>  forward  127.0.0.1:5174 → mini:5174</div>
+          <div><span class="time">12:04:01</span>  forward  127.0.0.1:52114 → mini:8080</div>
+          <div><span class="time">12:04:01</span>  forward  127.0.0.1:5173 → mini:5173</div>
           <div><span class="time">12:04:02</span>  proxy    <span class="running">https://myapp.test ready</span></div>
           <div><span class="time">12:04:09</span>  GET /                 200  41ms</div>
           <div><span class="time">12:04:09</span>  GET /@vite/client     200  3ms</div>
