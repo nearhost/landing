@@ -1,0 +1,54 @@
+src/content/docs/docs/concepts/discovery.md
+  s_47b881fc8d9b0b::t_6eb30f186a21a4 1-49
+src/content/docs/docs/getting-started/add-a-project.md
+  s_47b881fc8d9b0b::t_cce7c3260b421d 39-43
+  s_47b881fc8d9b0b::t_6eb30f186a21a4 1-38,44-64
+src/content/docs/docs/getting-started/add-a-server.md
+  s_47b881fc8d9b0b::t_6eb30f186a21a4 1-48
+src/content/docs/docs/getting-started/install.md
+  s_47b881fc8d9b0b::t_6eb30f186a21a4 8-44
+src/content/docs/docs/concepts/routes-and-roles.md
+  s_47b881fc8d9b0b::t_6eb30f186a21a4 1-43
+src/content/docs/docs/concepts/the-hosts-file.md
+  s_47b881fc8d9b0b::t_be1f9c21acb166 36
+  s_47b881fc8d9b0b::t_6eb30f186a21a4 1-35,37
+src/content/docs/docs/getting-started/first-run.md
+  s_47b881fc8d9b0b::t_6eb30f186a21a4 1-50
+src/content/docs/docs/concepts/laravel-sail-and-vite.md
+  s_47b881fc8d9b0b::t_6eb30f186a21a4 1-36
+src/content/docs/docs/concepts/tls-and-the-proxy.md
+  s_47b881fc8d9b0b::t_6eb30f186a21a4 1-31
+src/content/docs/docs/reference/config.md
+  s_47b881fc8d9b0b::t_cce7c3260b421d 1-59
+src/content/docs/docs/reference/advisories.md
+  s_47b881fc8d9b0b::t_cce7c3260b421d 1-46
+src/content/docs/docs/concepts/ssh-transport.md
+  s_47b881fc8d9b0b::t_6eb30f186a21a4 1-41
+src/content/docs/docs/troubleshooting/troubleshooting.md
+  s_47b881fc8d9b0b::t_cce7c3260b421d 1-54
+src/content/docs/docs/reference/keyboard-shortcuts.md
+  s_47b881fc8d9b0b::t_cce7c3260b421d 1-42
+src/content/docs/docs/reference/cli.md
+  s_47b881fc8d9b0b::t_cce7c3260b421d 1-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cd7ce17824ba0f0c6422a3fee44b68b139eb8ad8",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_47b881fc8d9b0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48de3381-e9cc-491d-8617-bd9a148f5b97",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
