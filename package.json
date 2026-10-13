@@ -1,0 +1,22 @@
+{
+  "name": "landing",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.42.6",
+    "@astrojs/svelte": "^9.0.1",
+    "astro": "^7.2.10",
+    "sharp": "^0.35.3",
+    "svelte": "^5.57.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
