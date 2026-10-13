@@ -1,0 +1,60 @@
+/* Maps Nearhost tokens onto Starlight's variables. Dark first, then light. */
+:root {
+  --sl-color-white: var(--nh-text);
+  --sl-color-gray-1: var(--nh-body);
+  --sl-color-gray-2: var(--nh-muted);
+  --sl-color-gray-3: var(--nh-faint);
+  --sl-color-gray-4: color-mix(in srgb, var(--nh-faint) 60%, var(--nh-ground));
+  --sl-color-gray-5: var(--nh-line);
+  --sl-color-gray-6: var(--nh-surface);
+  --sl-color-black: var(--nh-ground);
+  --sl-color-accent-low: color-mix(in srgb, var(--nh-accent) 22%, var(--nh-ground));
+  --sl-color-accent: var(--nh-accent);
+  --sl-color-accent-high: color-mix(in srgb, var(--nh-accent) 70%, white);
+  --sl-color-text-accent: var(--nh-accent);
+  --sl-color-bg: var(--nh-ground);
+  --sl-color-bg-nav: var(--nh-ground);
+  --sl-color-bg-sidebar: var(--nh-ground);
+  --sl-color-bg-inline-code: var(--nh-raised);
+  --sl-color-hairline: var(--nh-line);
+  --sl-color-hairline-light: var(--nh-line);
+  --sl-font: var(--nh-font-body);
+  --sl-font-mono: var(--nh-font-mono);
+}
+
+:root[data-theme='light'] {
+  --sl-color-white: var(--nh-text);
+  --sl-color-gray-1: var(--nh-body);
+  --sl-color-gray-2: var(--nh-muted);
+  --sl-color-gray-3: var(--nh-faint);
+  --sl-color-gray-4: color-mix(in srgb, var(--nh-faint) 50%, var(--nh-ground));
+  --sl-color-gray-5: var(--nh-line);
+  --sl-color-gray-6: var(--nh-raised);
+  --sl-color-gray-7: var(--nh-ground);
+  --sl-color-black: var(--nh-ground);
+  --sl-color-accent-low: color-mix(in srgb, var(--nh-accent) 14%, var(--nh-ground));
+  --sl-color-accent: var(--nh-accent);
+  --sl-color-accent-high: color-mix(in srgb, var(--nh-accent) 70%, black);
+  --sl-color-text-accent: var(--nh-accent);
+  --sl-color-bg: var(--nh-ground);
+  --sl-color-bg-nav: var(--nh-ground);
+  --sl-color-bg-sidebar: var(--nh-ground);
+  --sl-color-bg-inline-code: var(--nh-raised);
+  --sl-color-hairline: var(--nh-line);
+  --sl-color-hairline-light: var(--nh-line);
+}
+
+.sl-markdown-content :is(h1, h2, h3, h4),
+.content-panel h1 {
+  font-family: var(--nh-font-display);
+  letter-spacing: var(--nh-track-display);
+}
+
+.sl-markdown-content h1,
+.content-panel h1 {
+  font-weight: 700;
+}
+
+.sl-markdown-content :is(h2, h3) {
+  font-weight: 600;
+}
