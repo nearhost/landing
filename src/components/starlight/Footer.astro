@@ -1,5 +1,9 @@
 ---
-import Footer from '../landing/Footer.astro';
+import Default from '@astrojs/starlight/components/Footer.astro';
+import SiteFooter from '../landing/Footer.astro';
 ---
 
-<Footer />
+<Default>
+  <slot />
+</Default>
+<SiteFooter />
