@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "check": "astro check && svelte-check --tsconfig ./tsconfig.json",
     "verify": "npm run format:check && npm run lint && npm run check && npm run build",
-    "prepare": "simple-git-hooks"
+    "prepare": "simple-git-hooks",
+    "og": "node scripts/og.mjs"
   },
   "dependencies": {
     "@astrojs/starlight": "^0.42.6",

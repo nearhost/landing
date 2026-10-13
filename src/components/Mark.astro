@@ -1,0 +1,33 @@
+---
+interface Props {
+  size?: number;
+  title?: string;
+}
+const { size = 28, title } = Astro.props;
+---
+
+<svg
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  role={title ? 'img' : undefined}
+  aria-label={title}
+  aria-hidden={title ? undefined : 'true'}
+  class="mark"
+>
+  <path
+    d="M14 56V32a18 18 0 0 1 36 0v24"
+    fill="none"
+    stroke="var(--nh-mark-arch)"
+    stroke-width="11"
+    stroke-linecap="round"
+  ></path>
+  <circle cx="32" cy="48" r="6" fill="var(--nh-mark-dot)"></circle>
+</svg>
+
+<style>
+  .mark {
+    display: block;
+    flex: none;
+  }
+</style>
