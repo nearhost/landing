@@ -1,0 +1,21 @@
+.gitignore
+  s_47b881fc8d9b0b::t_aee75935650a90 20-25
+src/content/docs/docs/getting-started/install.md
+  s_47b881fc8d9b0b::t_231cc9c85840f2 1-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0ecb833dd54b9da0547cc1c529e397274837ea35",
+  "prompts": {},
+  "sessions": {
+    "s_47b881fc8d9b0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48de3381-e9cc-491d-8617-bd9a148f5b97",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
