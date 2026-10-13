@@ -1,0 +1,124 @@
+---
+import CopyButton from '../CopyButton.svelte';
+const install = 'curl -fsSL https://nearhost.dev/install.sh | sh';
+---
+
+<section class="container hero" id="top">
+  <h1 class="headline">
+    Run it anywhere.
+    <br />
+    Open it <span class="accent">here</span>.
+  </h1>
+  <p class="sub">
+    Nearhost is a terminal app that opens a project running on one of your other machines at a local{' '}
+    <code class="alias">https://myapp.test</code>, over the SSH config you already have.
+    <span class="strong">
+      You install nothing on the server, and your usual dev tooling works as it does locally, hot
+      reload included.
+    </span>
+  </p>
+  <div class="actions">
+    <div class="command">
+      <span class="prompt" aria-hidden="true">
+        $
+      </span>
+      <code id="hero-install">{install}</code>
+      <CopyButton
+        client:visible
+        text={install}
+        label="Copy install command"
+        targetId="hero-install"
+      />
+    </div>
+    <a href="/docs/getting-started/install/" class="secondary">
+      Read the docs
+    </a>
+  </div>
+  <p class="note">
+    Open source under MIT, for macOS and Linux. Also <code>brew install nearhost/tap/nearhost</code>
+    or <code>npx nearhost</code>.
+  </p>
+</section>
+
+<style>
+  .hero {
+    padding-block: var(--nh-section) 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    align-items: flex-start;
+  }
+  .headline {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-weight: 700;
+    font-size: clamp(52px, 8vw, 112px);
+    line-height: 0.95;
+    letter-spacing: var(--nh-track-hero);
+  }
+  .accent {
+    color: var(--nh-accent);
+  }
+  .sub {
+    margin: 0;
+    font-size: 21px;
+    line-height: 1.5;
+    color: var(--nh-body);
+    max-width: 62ch;
+  }
+  .alias {
+    color: var(--nh-accent);
+  }
+  .strong {
+    color: var(--nh-text);
+  }
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 720px;
+  }
+  .command {
+    flex: 1 1 420px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--nh-surface);
+    border: 1px solid var(--nh-line);
+    border-radius: var(--nh-radius-m);
+    padding: 0 8px 0 18px;
+    min-height: 56px;
+    font-family: var(--nh-font-mono);
+    font-size: 15px;
+    overflow-x: auto;
+  }
+  .command code {
+    white-space: nowrap;
+    font-size: 1em;
+  }
+  .prompt {
+    color: var(--nh-faint);
+  }
+  .secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 0 22px;
+    border: 1px solid var(--nh-line);
+    border-radius: var(--nh-radius-m);
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .note {
+    margin: 0;
+    font-size: 14px;
+    color: var(--nh-faint);
+  }
+  @media (max-width: 719px) {
+    .sub {
+      font-size: 18px;
+    }
+  }
+</style>
