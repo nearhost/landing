@@ -1,0 +1,55 @@
+---
+import Mark from '../Mark.astro';
+import { latestVersion } from '../../lib/version';
+const version = await latestVersion();
+---
+
+<footer class="footer">
+  <div class="inner">
+    <div class="brand">
+      <Mark size={22} />
+      <span>
+        nearhost · <span data-version>{version}</span> · MIT licence
+      </span>
+    </div>
+    <div class="links">
+      <a href="/docs/getting-started/install/">Docs</a>
+      <a href="https://github.com/nearhost/nearhost">GitHub</a>
+      <a href="https://github.com/nearhost/nearhost/releases">Releases</a>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--nh-line);
+  }
+  .inner {
+    max-width: var(--nh-container);
+    margin-inline: auto;
+    padding-inline: var(--nh-gutter);
+    padding-block: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    font-size: 14px;
+    color: var(--nh-faint);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    --nh-mark-arch: var(--nh-faint);
+    --nh-mark-dot: var(--nh-faint);
+  }
+  .links {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .links a {
+    color: var(--nh-muted);
+  }
+</style>

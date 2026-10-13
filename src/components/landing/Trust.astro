@@ -1,0 +1,131 @@
+---
+---
+
+<section class="trust">
+  <div class="container inner">
+    <div class="copy">
+      <h2>Your traffic stays between your machines.</h2>
+      <p class="lede">
+        Nearhost has no relay, no account and no public hostname. Your <code>.test</code> names
+        resolve from a marked block in <code>/etc/hosts</code> that Nearhost owns, and requests
+        travel over your own SSH connection to the server.
+      </p>
+      <ul>
+        <li>
+          <span class="arrow">→</span>
+          <span>Runs in the foreground. Quit it and the tunnels close.</span>
+        </li>
+        <li>
+          <span class="arrow">→</span>
+          <span>One sudo prompt per hosts change, and it tells you why first.</span>
+        </li>
+        <li>
+          <span class="arrow">→</span>
+          <span>
+            <code>nearhost untrust</code> and <code>hosts clean</code> undo the keychain and hosts
+            changes.
+          </span>
+        </li>
+      </ul>
+    </div>
+    <pre class="hosts"><span class="faint"># /etc/hosts</span>
+
+<span class="dim">127.0.0.1   localhost
+::1         localhost
+…</span>
+
+<span class="marker"># nearhost:start</span>
+<span class="entry">127.0.0.1   myapp.test
+127.0.0.1   website.test
+127.0.0.1   otherapp.test</span>
+<span class="marker"># nearhost:end</span></pre>
+  </div>
+</section>
+
+<style>
+  .trust {
+    border-block: 1px solid var(--nh-line);
+    background: color-mix(in srgb, var(--nh-ground) 92%, var(--nh-surface));
+  }
+  .inner {
+    padding-block: 96px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 48px;
+    align-items: center;
+  }
+  .copy {
+    flex: 1 1 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+  }
+  h2 {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1.05;
+    letter-spacing: var(--nh-track-display);
+  }
+  .lede {
+    margin: 0;
+    color: var(--nh-body);
+    font-size: 18px;
+  }
+  code {
+    font-family: var(--nh-font-mono);
+    font-size: 0.92em;
+  }
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--nh-body);
+    font-size: 16px;
+  }
+  li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .arrow {
+    color: var(--nh-accent);
+    font-family: var(--nh-font-mono);
+  }
+  .hosts {
+    flex: 1 1 380px;
+    min-width: 0;
+    margin: 0;
+    background: color-mix(in srgb, var(--nh-ground) 85%, black);
+    border: 1px solid var(--nh-line);
+    border-radius: 12px;
+    padding: 22px 24px;
+    font-family: var(--nh-font-mono);
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--nh-muted);
+    overflow-x: auto;
+  }
+  .hosts .faint {
+    color: var(--nh-faint);
+  }
+  .hosts .dim {
+    color: color-mix(in srgb, var(--nh-faint) 60%, var(--nh-ground));
+  }
+  .hosts .marker {
+    color: var(--nh-accent);
+  }
+  .hosts .entry {
+    color: var(--nh-text);
+  }
+  @media (max-width: 719px) {
+    .inner {
+      padding-block: 64px;
+    }
+  }
+</style>
