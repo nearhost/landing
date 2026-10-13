@@ -28,10 +28,10 @@ brew install nearhost/tap/nearhost
 ## npm
 
 ```sh
-npx nearhost
+npx @nearhost/cli
 ```
 
-The npm package downloads the matching binary on install, so `npx` runs the real thing.
+The `@nearhost/cli` package downloads the matching binary on install, so `npx` runs the real thing.
 
 ## Linux and ports 80 and 443
 
