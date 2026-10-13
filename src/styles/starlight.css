@@ -1,6 +1,7 @@
 /* Maps Nearhost tokens onto Starlight's variables. Dark first, then light. */
 :root {
   --sl-color-white: var(--nh-text);
+  --sl-color-text: var(--nh-body);
   --sl-color-gray-1: var(--nh-body);
   --sl-color-gray-2: var(--nh-muted);
   --sl-color-gray-3: var(--nh-faint);
@@ -24,6 +25,7 @@
 
 :root[data-theme='light'] {
   --sl-color-white: var(--nh-text);
+  --sl-color-text: var(--nh-body);
   --sl-color-gray-1: var(--nh-body);
   --sl-color-gray-2: var(--nh-muted);
   --sl-color-gray-3: var(--nh-faint);
