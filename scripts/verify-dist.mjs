@@ -1,23 +1,32 @@
 // Checks the built site for things a green build can still get wrong.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const dist = new URL('../dist/', import.meta.url).pathname;
+const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const failures = [];
 
 function check(condition, message) {
   if (!condition) failures.push(message);
 }
 
-function htmlFiles(dir) {
+function filesMatching(dir, extensions) {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
-    if (statSync(path).isDirectory()) return htmlFiles(path);
-    return name.endsWith('.html') ? [path] : [];
+    if (statSync(path).isDirectory()) return filesMatching(path, extensions);
+    return extensions.some((ext) => name.endsWith(ext)) ? [path] : [];
   });
 }
 
-check(existsSync(dist), 'dist/ does not exist; run the build first');
+function htmlFiles(dir) {
+  return filesMatching(dir, ['.html']);
+}
+
+function textFiles(dir) {
+  return filesMatching(dir, ['.html', '.css', '.js', '.mjs', '.json', '.txt', '.xml', '.svg']);
+}
+
+check(existsSync(dist), 'verify-dist: dist/ does not exist; run the build first');
 if (failures.length) {
   console.error(failures.join('\n'));
   process.exit(1);
@@ -47,20 +56,24 @@ if (existsSync(join(dist, 'og.png'))) {
     .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
   check(isPng, 'og.png is not a PNG');
   if (isPng) {
-    const width = png.readUInt32BE(16);
-    const height = png.readUInt32BE(20);
-    check(width === 1200 && height === 630, `og.png is ${width}x${height}, expected 1200x630`);
+    if (png.length < 24) {
+      failures.push('og.png is truncated');
+    } else {
+      const width = png.readUInt32BE(16);
+      const height = png.readUInt32BE(20);
+      check(width === 1200 && height === 630, `og.png is ${width}x${height}, expected 1200x630`);
+    }
   }
 } else {
   failures.push('dist/og.png is missing');
 }
 
-// 3. No third-party font requests anywhere.
+// 3. No third-party font requests anywhere in dist/.
 const pages = htmlFiles(dist);
 check(pages.length > 0, 'no HTML files in dist/');
-for (const page of pages) {
-  const html = readFileSync(page, 'utf8');
-  check(!/fonts\.(googleapis|gstatic)\.com/.test(html), `${page} references Google Fonts`);
+for (const file of textFiles(dist)) {
+  const text = readFileSync(file, 'utf8');
+  check(!/fonts\.(googleapis|gstatic)\.com/.test(text), `${file} references Google Fonts`);
 }
 
 // 4. Landing page essentials.
@@ -68,7 +81,10 @@ const index = join(dist, 'index.html');
 check(existsSync(index), 'dist/index.html is missing');
 if (existsSync(index)) {
   const html = readFileSync(index, 'utf8');
-  check(html.includes('Run it anywhere.'), 'landing headline is missing');
+  check(
+    /Run it anywhere\.\s*<br[^>]*>\s*Open it\s*<span[^>]*>here<\/span>\./.test(html),
+    'landing headline is missing or changed',
+  );
   check(
     /data-version[^>]*>(v\d+\.\d+\.\d+[^<]*|latest)</.test(html),
     'footer version is neither a tag nor "latest"',
