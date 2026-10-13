@@ -8,6 +8,8 @@ src/content/docs/docs/reference/config.md
   s_47b881fc8d9b0b::t_37d079470c13e1 8
 src/content/docs/docs/getting-started/install.md
   s_47b881fc8d9b0b::t_37d079470c13e1 8-11
+scripts/verify-dist.mjs
+  s_47b881fc8d9b0b::t_f4116e00c4dca3 4,6,13,16-17,21-29,59-65,71,74-76,84-87
 ---
 {
   "schema_version": "authorship/3.0.0",
