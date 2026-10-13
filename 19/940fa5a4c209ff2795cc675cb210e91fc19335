@@ -1,0 +1,34 @@
+src/pages/index.astro
+  s_47b881fc8d9b0b::t_0af3dba44d5847 3-4,18-19
+src/components/landing/Hero.astro
+  s_47b881fc8d9b0b::t_0af3dba44d5847 1-124
+src/components/CopyButton.svelte
+  s_47b881fc8d9b0b::t_0af3dba44d5847 1-80
+src/components/landing/Nav.astro
+  s_47b881fc8d9b0b::t_0af3dba44d5847 1-97
+src/components/NavMenu.svelte
+  s_47b881fc8d9b0b::t_0af3dba44d5847 1-90
+src/layouts/Landing.astro
+  s_47b881fc8d9b0b::t_0af3dba44d5847 43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "19940fa5a4c209ff2795cc675cb210e91fc19335",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_47b881fc8d9b0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48de3381-e9cc-491d-8617-bd9a148f5b97",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
