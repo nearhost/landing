@@ -1,0 +1,55 @@
+src/content/docs/docs/concepts/dev-servers-and-hot-reload.md
+  s_47b881fc8d9b0b::t_ff00b2dd80c9ad 2-3,8,10,12,14,16,18-19,26,28
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 1,4-7,9,11,13,15,17,20-25,27,29-30
+src/components/landing/TuiMock.astro
+  s_47b881fc8d9b0b::t_c0578f52a6fd81 74,89,91,94,96-97,99,101,110-111,118-119
+src/pages/index.astro
+  s_47b881fc8d9b0b::t_c0578f52a6fd81 6,10,18,23,27
+src/components/starlight/SiteTitle.astro
+  s_47b881fc8d9b0b::t_ff00b2dd80c9ad 13
+src/components/landing/Footer.astro
+  s_47b881fc8d9b0b::t_ff00b2dd80c9ad 16
+src/components/landing/Features.astro
+  s_47b881fc8d9b0b::t_c0578f52a6fd81 26-29,46,48
+  s_47b881fc8d9b0b::t_9f73a2361a38d3 49-50,70-72
+src/components/landing/Problem.astro
+  s_47b881fc8d9b0b::t_c0578f52a6fd81 1-40
+src/components/landing/Nav.astro
+  s_47b881fc8d9b0b::t_ff00b2dd80c9ad 6
+src/components/landing/Hero.astro
+  s_47b881fc8d9b0b::t_ff00b2dd80c9ad 33
+  s_47b881fc8d9b0b::t_c0578f52a6fd81 16-17
+src/components/landing/RequestPath.astro
+  s_47b881fc8d9b0b::t_c0578f52a6fd81 46,64
+src/components/landing/Steps.astro
+  s_47b881fc8d9b0b::t_9f73a2361a38d3 38-39
+src/components/landing/Compare.astro
+  s_47b881fc8d9b0b::t_c0578f52a6fd81 1-7,10-13,17-43,45-130
+  s_47b881fc8d9b0b::t_9f73a2361a38d3 8-9,14-16
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 44
+src/components/landing/Install.astro
+  s_47b881fc8d9b0b::t_e10b753e02f3e0 15-16,36-38,105-108
+src/components/landing/Trust.astro
+  s_47b881fc8d9b0b::t_6a469ba4dfd6bf 25-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "caac82e24c4d498b990c6ef248fc18ca9717a693",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_47b881fc8d9b0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48de3381-e9cc-491d-8617-bd9a148f5b97",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
