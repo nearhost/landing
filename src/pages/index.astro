@@ -2,6 +2,9 @@
 import Landing from '../layouts/Landing.astro';
 import Nav from '../components/landing/Nav.astro';
 import Hero from '../components/landing/Hero.astro';
+import TuiMock from '../components/landing/TuiMock.astro';
+import Steps from '../components/landing/Steps.astro';
+import RequestPath from '../components/landing/RequestPath.astro';
 ---
 
 <Landing
@@ -10,4 +13,7 @@ import Hero from '../components/landing/Hero.astro';
 >
   <Nav slot="header" />
   <Hero />
+  <TuiMock />
+  <Steps />
+  <RequestPath />
 </Landing>

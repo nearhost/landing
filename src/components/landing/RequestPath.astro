@@ -1,0 +1,133 @@
+---
+---
+
+<section class="path">
+  <div class="container inner">
+    <div class="caption">The path of one request</div>
+    <div class="flow">
+      <div class="node">
+        <span class="where">laptop · browser</span>
+        <span class="what accent">https://myapp.test</span>
+      </div>
+      <div class="arrow" aria-hidden="true">
+        <svg
+          width="28"
+          height="16"
+          viewBox="0 0 28 16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M2 8h22M18 2l6 6-6 6" />
+        </svg>
+      </div>
+      <div class="node">
+        <span class="where">laptop · nearhost</span>
+        <span class="what">Caddy :443, TLS</span>
+      </div>
+      <div class="arrow" aria-hidden="true">
+        <svg
+          width="28"
+          height="16"
+          viewBox="0 0 28 16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M2 8h22M18 2l6 6-6 6" />
+        </svg>
+      </div>
+      <div class="node">
+        <span class="where">laptop · openssh</span>
+        <span class="what">-L 52114 → localhost:80</span>
+      </div>
+      <div class="arrow" aria-hidden="true">
+        <svg
+          width="28"
+          height="16"
+          viewBox="0 0 28 16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M2 8h22M18 2l6 6-6 6" />
+        </svg>
+      </div>
+      <div class="node remote">
+        <span class="where">mini · untouched</span>
+        <span class="what">localhost:80 · Sail</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .path {
+    background: color-mix(in srgb, var(--nh-ground) 92%, var(--nh-surface));
+  }
+  .inner {
+    padding-block: 0 96px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .caption {
+    font-family: var(--nh-font-mono);
+    font-size: 13px;
+    color: var(--nh-faint);
+  }
+  .flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    flex-wrap: wrap;
+    row-gap: 16px;
+  }
+  .node {
+    flex: 1 1 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px;
+    background: var(--nh-ground);
+    border: 1px solid var(--nh-line);
+    border-radius: var(--nh-radius-m);
+    min-width: 0;
+  }
+  .remote {
+    background: var(--nh-surface);
+    border-color: var(--nh-accent);
+  }
+  .where {
+    font-size: 12px;
+    color: var(--nh-faint);
+    font-family: var(--nh-font-mono);
+  }
+  .what {
+    font-family: var(--nh-font-mono);
+    font-size: 15px;
+  }
+  .accent {
+    color: var(--nh-accent);
+  }
+  .arrow {
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    color: color-mix(in srgb, var(--nh-faint) 60%, var(--nh-ground));
+  }
+  @media (max-width: 719px) {
+    .arrow {
+      display: none;
+    }
+    .node {
+      flex-basis: 100%;
+    }
+  }
+</style>
