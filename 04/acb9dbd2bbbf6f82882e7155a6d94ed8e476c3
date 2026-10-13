@@ -1,0 +1,27 @@
+package.json
+  s_47b881fc8d9b0b::t_42341a8e4de133 16
+scripts/verify-dist.mjs
+  s_47b881fc8d9b0b::t_9f5e53bd352cbe 1-76
+  s_47b881fc8d9b0b::t_ce3f5c7a391250 77-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "04acb9dbd2bbbf6f82882e7155a6d94ed8e476c3",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_47b881fc8d9b0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48de3381-e9cc-491d-8617-bd9a148f5b97",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
