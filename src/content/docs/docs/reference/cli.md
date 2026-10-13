@@ -27,7 +27,7 @@ Starts the TUI. On first run it shows the setup screen. See [First run](/docs/ge
 
 ## nearhost up
 
-Headless. Starts the named projects, or all enabled projects when none are named, and runs until Ctrl-C.
+Headless. Starts the named projects headless and runs until Ctrl-C.
 
 ```sh
 nearhost up myapp

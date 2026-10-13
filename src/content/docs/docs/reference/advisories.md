@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-Advisories are shown, never applied. Nearhost does not edit files on the remote machine. In the project view they render in yellow beneath the routes, with their snippet.
+Advisories are shown, never applied. Nearhost does not edit files on the remote machine. In the TUI, once it ships, they render in yellow beneath the routes, with their snippet.
 
 ## Loopback port clash
 
@@ -30,9 +30,8 @@ VITE_PORT=5175
 Appears when Vite is present, the project is not under Sail, and `server.allowedHosts` does not include the alias. Add it to `vite.config.js`:
 
 ```js
-server: {
-  allowedHosts: ['myapp.test'],
-},
+// vite.config.js
+server: { allowedHosts: ['myapp.test'] },
 ```
 
 ## APP_URL mismatch

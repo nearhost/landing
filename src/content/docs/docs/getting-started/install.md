@@ -5,6 +5,10 @@ sidebar:
   order: 1
 ---
 
+:::note[Planned]
+This describes behaviour from the Nearhost design that is not in a release yet.
+:::
+
 Nearhost is one static binary. Pick whichever of these fits how you install tools.
 
 ## Shell installer

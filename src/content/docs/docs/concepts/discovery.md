@@ -44,6 +44,6 @@ The file is scanned with regular expressions for `server.port`, `server.hmr`, `s
 
 ## When nothing is found
 
-Anything unrecognised is still listed, with the role `ignore`. If discovery finds nothing at all, the add-project wizard lets you enter ports by hand.
+Anything unrecognised is still listed, with the role `ignore`. If discovery finds nothing at all, the add-project wizard in the TUI, once it ships, lets you enter ports by hand.
 
 Discovery also produces advisories, which are shown and never applied. See [Advisories](/docs/reference/advisories/).

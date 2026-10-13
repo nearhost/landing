@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-The file is `~/.config/nearhost/config.yaml`. Hand edits and TUI edits can mix. The TUI writes the file back on every change.
+The file is `~/.config/nearhost/config.yaml`. Hand edits and TUI edits can mix. Once it ships, the TUI writes the file back on every change.
 
 ```yaml
 servers:
