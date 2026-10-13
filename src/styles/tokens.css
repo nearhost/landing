@@ -1,0 +1,48 @@
+/* Nearhost brand tokens. Dark is the default; light applies under Starlight's data-theme. */
+:root {
+  --nh-ground: #0f1210;
+  --nh-surface: #161a17;
+  --nh-raised: #1d221e;
+  --nh-line: #2a312b;
+  --nh-text: #ecefe8;
+  --nh-body: #c5ccc6;
+  --nh-muted: #a4ada5;
+  --nh-faint: #6e776f;
+  --nh-accent: #d6f26b;
+  --nh-accent-ink: #0f1210;
+  --nh-mark-arch: var(--nh-accent);
+  --nh-mark-dot: var(--nh-text);
+
+  --nh-running: #7fdb8a;
+  --nh-starting: #f2c14e;
+  --nh-failed: #f27d72;
+
+  --nh-font-display: 'Space Grotesk Variable', system-ui, sans-serif;
+  --nh-font-body: 'DM Sans Variable', system-ui, sans-serif;
+  --nh-font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --nh-track-hero: -0.045em;
+  --nh-track-display: -0.03em;
+
+  --nh-radius-s: 6px;
+  --nh-radius-m: 10px;
+  --nh-radius-l: 14px;
+
+  --nh-container: 1200px;
+  --nh-gutter: 24px;
+  --nh-section: clamp(64px, 8vw, 112px);
+}
+
+:root[data-theme='light'] {
+  --nh-ground: #f4f5f1;
+  --nh-surface: #ffffff;
+  --nh-raised: #e6e9e0;
+  --nh-line: #dde0d9;
+  --nh-text: #1b1f1c;
+  --nh-body: #3e463f;
+  --nh-muted: #5c645d;
+  --nh-faint: #7d867e;
+  --nh-accent: #4a6200;
+  --nh-accent-ink: #ffffff;
+  --nh-mark-arch: var(--nh-text);
+  --nh-mark-dot: #d6f26b;
+}
