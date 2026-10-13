@@ -1,0 +1,55 @@
+src/content/docs/docs/concepts/discovery.md
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 8,19,21,35,47
+src/content/docs/docs/getting-started/install.md
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 3,8,16,32-36,38,44-53,60-79,83
+  s_47b881fc8d9b0b::t_9f73a2361a38d3 54-59
+src/content/docs/docs/concepts/tls-and-the-proxy.md
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 14,18
+src/content/docs/docs/getting-started/add-a-project.md
+  s_47b881fc8d9b0b::t_9f73a2361a38d3 37-39,41
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 8,25-29,33,40,53,57-59
+  s_47b881fc8d9b0b::t_48cf13022930c8 34
+src/content/docs/docs/concepts/routes-and-roles.md
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 12,14-15,17-18,20,27-29,33,35
+src/content/docs/docs/getting-started/first-run.md
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 12,23-25,27
+src/content/docs/docs/reference/config.md
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 8,17,21,23-24,26-27,29
+src/content/docs/docs/concepts/dev-servers-and-hot-reload.md
+  s_47b881fc8d9b0b::t_ff00b2dd80c9ad 20-24,32-34,36,38,40
+  s_47b881fc8d9b0b::t_6cd4cc210119d5 2-3,8,10,12,14,16,18-19
+astro.config.mjs
+  s_47b881fc8d9b0b::t_ff00b2dd80c9ad 8-11
+src/content/docs/docs/concepts/the-hosts-file.md
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 23,33
+src/content/docs/docs/reference/advisories.md
+  s_47b881fc8d9b0b::t_9f73a2361a38d3 32,51
+  s_47b881fc8d9b0b::t_ff00b2dd80c9ad 8,12,20,22-31,33-35,43,45-50,56
+src/content/docs/docs/reference/cli.md
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 14,26,42,50
+src/content/docs/docs/troubleshooting/troubleshooting.md
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 14,20
+src/content/docs/docs/getting-started/introduction.md
+  s_47b881fc8d9b0b::t_dc58a03f4bc9bb 1-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c4a8266a1d50ecfa00815233e8a1a6c1034c3642",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_47b881fc8d9b0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48de3381-e9cc-491d-8617-bd9a148f5b97",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
