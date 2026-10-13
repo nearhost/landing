@@ -12,10 +12,16 @@ export default defineConfig({
       editLink: { baseUrl: 'https://github.com/nearhost/landing/edit/main/' },
       lastUpdated: true,
       sidebar: [
-        { label: 'Getting started', items: [{ autogenerate: { directory: 'docs/getting-started' } }] },
+        {
+          label: 'Getting started',
+          items: [{ autogenerate: { directory: 'docs/getting-started' } }],
+        },
         { label: 'Concepts', items: [{ autogenerate: { directory: 'docs/concepts' } }] },
         { label: 'Reference', items: [{ autogenerate: { directory: 'docs/reference' } }] },
-        { label: 'Troubleshooting', items: [{ autogenerate: { directory: 'docs/troubleshooting' } }] },
+        {
+          label: 'Troubleshooting',
+          items: [{ autogenerate: { directory: 'docs/troubleshooting' } }],
+        },
       ],
     }),
     svelte(),
