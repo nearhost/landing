@@ -1,0 +1,31 @@
+package.json
+  s_47b881fc8d9b0b::t_3b0b997a247d60 3,32
+scripts/verify-dist.mjs
+  s_47b881fc8d9b0b::t_3b0b997a247d60 92-96
+src/components/landing/Nav.astro
+  s_47b881fc8d9b0b::t_3b0b997a247d60 20-33
+src/lib/version.ts
+  s_47b881fc8d9b0b::t_3b0b997a247d60 3-5,24-26
+  s_47b881fc8d9b0b::t_52059aec056d42 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a24861db53e4f06f6c3a03829becf5fd06714a59",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_47b881fc8d9b0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48de3381-e9cc-491d-8617-bd9a148f5b97",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
