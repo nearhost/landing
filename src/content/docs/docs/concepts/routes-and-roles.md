@@ -9,28 +9,30 @@ A project has a list of routes. Each route is a port on the server, a role and a
 
 ```yaml
 routes:
-  - port: 80
+  - port: 8080
     role: web
-    label: 'Laravel (APP_PORT)'
-  - port: 5174
+    label: 'app'
+  - port: 5173
     role: loopback
-    label: 'Vite (VITE_PORT)'
-  - port: 3306
+    label: 'Vite (vite.config)'
+  - port: 5432
     role: ignore
-    label: 'MySQL (FORWARD_DB_PORT)'
+    label: 'db'
 ```
 
 ## web
 
 Served at `https://<alias>`. Exactly one per project.
 
-The default candidate is APP_PORT, else port 80, else the first discovered HTTP-looking port. Nearhost picks an ephemeral local port for the forward and the proxy sends requests for the alias to it.
+Discovery proposes one in this order: a Compose port mapped to container port 80, then port 80 itself, then the Vite port, then a project's only port. Under Laravel Sail, `APP_PORT` wins. You can move the role to any route.
+
+Nearhost picks an ephemeral local port for the forward and the proxy sends requests for the alias to it.
 
 ## loopback
 
-A raw TCP forward to `127.0.0.1:<port>` on the laptop, using the same port number as the remote. The default for VITE_PORT.
+A raw TCP forward to `127.0.0.1:<port>` on the laptop, using the same port number as the remote. Use it for a dev server whose URLs point at `localhost`, such as Vite behind a backend framework.
 
-A loopback route is skipped for local projects, because the port is already local. See [Laravel Sail and Vite](/docs/concepts/laravel-sail-and-vite/) for why Vite needs this.
+A loopback route is skipped for local projects, because the port is already local. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) for when you need one.
 
 ## ignore
 

@@ -11,11 +11,11 @@ Caddy runs inside the Nearhost process, with its storage under `~/.config/nearho
 
 The internal certificate authority, "Nearhost Local CA", is created on first run. Nearhost never ships a shared key or a wildcard certificate.
 
-`nearhost trust` installs its root into the macOS System keychain, with one sudo prompt. Where a Firefox profile exists, it also enables `enterprise_roots` so Firefox trusts the keychain. `nearhost untrust` reverses both.
+`nearhost trust` installs its root into the system trust store, with one password prompt: the System keychain on macOS, your distribution's certificate store on Linux. It also updates the separate stores that Firefox and Linux Chromium-based browsers use, when `certutil` is installed. `nearhost untrust` reverses all of it. See [Install](/docs/getting-started/install/) for the Linux and Firefox setup.
 
 ## Per-alias certificates
 
-Leaf certificates are issued automatically, one per alias.
+Leaf certificates are issued automatically, one per alias. Because the CA is created on your machine, nobody else holds a key that can sign for your `.test` names.
 
 ## What the proxy sets
 

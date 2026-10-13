@@ -5,10 +5,6 @@ sidebar:
   order: 3
 ---
 
-:::note[Planned]
-This describes behaviour from the Nearhost design that is not in a release yet.
-:::
-
 Mouse and keyboard both work. With the mouse, click selects, the wheel scrolls and clicking a footer action activates it.
 
 ## Sidebar

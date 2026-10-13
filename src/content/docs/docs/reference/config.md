@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-The file is `~/.config/nearhost/config.yaml`. Hand edits and TUI edits can mix. Once it ships, the TUI writes the file back on every change.
+The file is `~/.config/nearhost/config.yaml`. Hand edits and TUI edits can mix. The TUI writes the file back on every change.
 
 ```yaml
 servers:
@@ -14,19 +14,19 @@ servers:
 projects:
   - name: myapp
     server: mini
-    path: /Users/ecs/Code/myapp
+    path: /home/dev/code/myapp
     alias: myapp.test # generated from name, editable
     enabled: true # start automatically when Nearhost launches
     routes:
-      - port: 80 # port on the server
+      - port: 8080 # port on the server
         role: web # web | loopback | ignore
-        label: 'Laravel (APP_PORT)'
-      - port: 5174
+        label: 'app'
+      - port: 5173
         role: loopback
-        label: 'Vite (VITE_PORT)'
-      - port: 3306
+        label: 'Vite (vite.config)'
+      - port: 5432
         role: ignore
-        label: 'MySQL (FORWARD_DB_PORT)'
+        label: 'db'
 ```
 
 ## Keys

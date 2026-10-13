@@ -5,17 +5,13 @@ sidebar:
   order: 1
 ---
 
-:::note[Planned]
-Nothing is released yet. The `version`, `trust`, `untrust` and `hosts` commands exist in the source tree. The rest of this page describes the design.
-:::
-
 ```text
 nearhost                    TUI
 nearhost up [project...]    headless: start projects, run until Ctrl-C
 nearhost add [path]         non-interactive add using discovery defaults
 nearhost ls                 print projects and states
 nearhost trust | untrust    local CA in the keychain
-nearhost hosts apply|clean  hosts block (apply reads the block from stdin)
+nearhost hosts apply|clean  hosts block (apply reads aliases from stdin)
 nearhost doctor             checks: ports 80/443 free, CA trusted, hosts
                             block present, each server reachable, Linux
                             port binding capability
@@ -27,7 +23,7 @@ Starts the TUI. On first run it shows the setup screen. See [First run](/docs/ge
 
 ## nearhost up
 
-Headless. Starts the named projects headless and runs until Ctrl-C.
+Starts the named projects without the TUI and runs until Ctrl-C.
 
 ```sh
 nearhost up myapp
@@ -43,7 +39,7 @@ Prints projects and their states.
 
 ## nearhost trust
 
-Installs the local CA root into the macOS System keychain, with one sudo prompt, and enables `enterprise_roots` for Firefox where a profile exists.
+Installs the local CA root into the system trust store, with one password prompt. It then reports on the browser stores that Firefox and Linux Chromium-based browsers use, and updates them when `certutil` is installed. Run it again at any time; it only does what is missing.
 
 ## nearhost untrust
 
@@ -51,7 +47,7 @@ Reverses `trust`.
 
 ## nearhost hosts
 
-`apply` reads the desired block from stdin and rewrites the Nearhost block in `/etc/hosts`. `clean` removes the block. See [The hosts file](/docs/concepts/the-hosts-file/).
+`apply` reads the aliases from stdin, one per line, and rewrites the Nearhost block in `/etc/hosts`. `clean` removes the block. Both prompt for sudo. See [The hosts file](/docs/concepts/the-hosts-file/).
 
 ## nearhost doctor
 

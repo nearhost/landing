@@ -20,7 +20,7 @@ Nearhost owns one block and touches nothing else in the file:
 
 ## How changes are applied
 
-On any alias change, Nearhost computes the desired block in full and applies it with one sudo call. The command reads the block from stdin:
+On any alias change, Nearhost computes the desired block in full and applies it with one sudo call. The command reads the aliases from stdin, one per line:
 
 ```sh
 sudo nearhost hosts apply
@@ -30,7 +30,7 @@ The helper rewrites only the content between the markers. If the block is absent
 
 ## Removing it
 
-Nothing is removed when Nearhost quits. To remove the block:
+Nothing is removed when Nearhost quits. To remove the block, which prompts for sudo:
 
 ```sh
 nearhost hosts clean

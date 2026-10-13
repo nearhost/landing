@@ -5,15 +5,11 @@ sidebar:
   order: 2
 ---
 
-:::note[Planned]
-This describes behaviour from the Nearhost design that is not in a release yet.
-:::
-
 The first time you start `nearhost`, the main panel shows a one-screen setup instead of the usual views. It explains the two prompts you are about to see, runs `nearhost trust`, then lands on Home.
 
 ## What the setup screen does
 
-1. Explains the keychain prompt and the sudo prompt before either appears.
+1. Explains the trust prompt and the sudo prompt before either appears.
 2. Creates the internal certificate authority, named "Nearhost Local CA", under `~/.config/nearhost/caddy`.
 3. Runs `nearhost trust` to install the authority's root certificate.
 4. Opens Home.
@@ -24,9 +20,11 @@ You can run the trust step yourself at any time:
 nearhost trust
 ```
 
-## The keychain prompt
+## The trust prompt
 
-`nearhost trust` installs the root certificate into the macOS System keychain. This is what lets your browser accept `https://<alias>` without a warning. Where a Firefox profile exists, Nearhost also enables `enterprise_roots` so Firefox trusts the keychain.
+`nearhost trust` installs the root certificate into your system trust store. This is what lets your browser accept `https://<alias>` without a warning. On macOS that is the System keychain, and on Linux it is your distribution's certificate store. Both ask for your password once.
+
+Firefox, and Chromium-based browsers on Linux, keep their own stores. Nearhost updates those too when `certutil` is installed, and tells you when it could not. See [Install](/docs/getting-started/install/) for the one-line setup.
 
 If you decline, the proxy still runs. Home shows the certificate authority as untrusted, with the `nearhost trust` hint. `nearhost untrust` reverses the change.
 

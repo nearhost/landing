@@ -1,23 +1,27 @@
 ---
-title: Laravel Sail and Vite
-description: Why Sail projects need a loopback forward for Vite and how Nearhost sets it up.
+title: Dev servers and hot reload
+description: How assets and live reload reach your browser, and when a project needs a loopback forward.
 sidebar:
   order: 6
 ---
 
-:::note[Planned]
-This describes behaviour from the Nearhost design that is not in a release yet.
-:::
+A page served from `https://<alias>` usually needs a second thing to work: the dev server that builds its scripts and pushes live updates. There are two ways that server shows up, and Nearhost handles both.
 
-Laravel Sail with Vite and hot module replacement is the reference workload. Any HTTP service routes the same way.
+## The dev server is the web app
 
-## Why Vite needs a loopback forward
+A Vite, Next.js or similar project serves pages and assets from one port. Give that port the `web` role and you are done. Hot reload uses a WebSocket on the same origin, and the proxy passes WebSocket upgrades through.
 
-Under Sail, `laravel-vite-plugin` writes `public/hot` as `http://localhost:<VITE_PORT>`. The page served from `https://<alias>` then asks the browser for scripts at that address, so the browser must find Vite on the laptop's own localhost.
+Vite checks the `Host` header, so it needs the alias in `server.allowedHosts`. Nearhost shows the exact lines to add. See [Advisories](/docs/reference/advisories/).
 
-## What Nearhost does
+## The dev server sits beside a backend
 
-When a project starts:
+A backend framework renders the HTML, and the page loads its scripts from a separate dev server at an address like `http://localhost:5173`. Rails, Django and Laravel projects that use Vite all work this way.
+
+That address is resolved by your browser, on your laptop. Nothing listens there, so scripts fail to load and hot reload never connects.
+
+A `loopback` route fixes it. Nearhost forwards the same port number on your laptop to the dev server on the remote machine, so `localhost:5173` in the browser reaches port 5173 over there. The remote project needs no changes.
+
+## What happens when a project starts
 
 1. The project's server transport is ensured: the SSH master is up, or the project is local.
 2. The hosts block contains `127.0.0.1 <alias>`. Nearhost prompts for sudo if the block changes.
@@ -25,12 +29,12 @@ When a project starts:
 4. The proxy rebuilds its Caddy config with the new site and applies it in-process.
 5. The project's state becomes `running`.
 
-A request to `https://myapp.test` reaches Caddy on 443, then the ephemeral local port, then `localhost:80` on the remote. The page's `<script src="http://localhost:5174/...">` reaches the loopback forward on 5174, then `localhost:5174` on the remote. Vite's HMR client connects to the same origin its script came from, so HMR works with no remote configuration.
+A request to `https://myapp.test` reaches Caddy on 443, then the ephemeral local port, then the web port on the remote. A script tag pointing at `http://localhost:5173/...` reaches the loopback forward on 5173, then port 5173 on the remote. The hot reload client connects to the origin its script came from, so it works with no remote configuration.
 
-## Advisories you may see
+## Example: Laravel Sail
 
-- **Vite on the default port.** Vite is present but neither VITE_PORT nor `server.port` is set, so it uses 5173 and is likely to clash.
-- **allowedHosts missing.** Vite is present outside Sail and `server.allowedHosts` does not include the alias.
-- **APP_URL mismatch.** The Laravel `.env` has an APP_URL other than `https://<alias>`.
+Under Sail, `laravel-vite-plugin` writes `public/hot` as `http://localhost:<VITE_PORT>`. Discovery recognises Sail and proposes `APP_PORT` as the `web` route and `VITE_PORT` as a `loopback` route, so a Sail project needs no manual setup.
 
-Each comes with its fix. See [Advisories](/docs/reference/advisories/).
+## Running several projects at once
+
+A loopback route uses the same port number on both machines, so two running projects cannot share one. Give each project's dev server its own port. Nearhost warns you before the clash happens and suggests a free port. See [Advisories](/docs/reference/advisories/).
