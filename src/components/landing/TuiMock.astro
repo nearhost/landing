@@ -1,8 +1,8 @@
 ---
 ---
 
-<section class="container wrap" aria-label="Nearhost terminal interface">
-  <div class="window">
+<section class="container wrap">
+  <div class="window" role="img" aria-label="Nearhost terminal interface">
     <div class="titlebar">
       <span>nearhost</span>
       <span>proxy :443 ● · CA trusted · hosts ok</span>
@@ -107,12 +107,12 @@
         <div class="advisory">
           <span>▲</span>
           <span>
-            APP_URL mismatch: set <span class="text">APP_URL=https://myapp.test</span>
-            in .env <span class="faint">· y copy</span>
+            APP_URL mismatch: set <span class="text">APP_URL=https://myapp.test</span> in .env{' '}
+            <span class="faint">· y copy</span>
           </span>
         </div>
 
-        <!-- prettier-ignore -->
+        {/* prettier-ignore */}
         <div class="log">
           <div class="log-head">log</div>
           <div><span class="time">12:04:01</span>  forward  127.0.0.1:52114 → mini:80</div>

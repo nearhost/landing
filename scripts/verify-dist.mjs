@@ -89,8 +89,16 @@ if (existsSync(index)) {
     /data-version[^>]*>(v\d+\.\d+\.\d+[^<]*|latest)</.test(html),
     'footer version is neither a tag nor "latest"',
   );
-  const islands = (html.match(/astro-island/g) ?? []).length;
-  check(islands > 0, 'no islands rendered on the landing page');
+  const components = new Set([...html.matchAll(/component-url="([^"]*)"/g)].map((m) => m[1]));
+  check(
+    components.size === 2,
+    `landing page must hydrate exactly two island components, found ${components.size}`,
+  );
+  const main = html.match(/<main[\s\S]*<\/main>/)?.[0] ?? '';
+  check(
+    !/[A-Za-z.]<(code|span)[^>]*>\w/.test(main) && !/<\/(code|span)>[A-Za-z]/.test(main),
+    'landing copy has words glued to an inline element',
+  );
 }
 
 // 5. The docs entry point exists.

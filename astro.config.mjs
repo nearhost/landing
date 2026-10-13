@@ -5,6 +5,7 @@ import svelte from '@astrojs/svelte';
 
 export default defineConfig({
   site: 'https://nearhost.dev',
+  redirects: { '/docs': '/docs/getting-started/install/' },
   integrations: [
     starlight({
       title: 'Nearhost',

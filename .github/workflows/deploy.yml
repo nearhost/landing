@@ -28,7 +28,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
       - name: Check internal links
-        uses: lycheeverse/lychee-action@v2
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2
         with:
           args: --offline --root-dir ${{ github.workspace }}/dist --no-progress 'dist/**/*.html'
           fail: true
@@ -47,7 +47,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - uses: treosh/lighthouse-ci-action@v12
+      - uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12
         with:
           configPath: ./lighthouserc.json
           uploadArtifacts: true

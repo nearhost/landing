@@ -6,7 +6,7 @@ sidebar:
 ---
 
 :::note[Planned]
-Only `version`, `trust`, `untrust` and `hosts` are in a release. The other subcommands describe behaviour from the Nearhost design that is not released yet.
+Nothing is released yet. The `version`, `trust`, `untrust` and `hosts` commands exist in the source tree. The rest of this page describes the design.
 :::
 
 ```text

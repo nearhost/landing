@@ -1,6 +1,8 @@
 const RELEASES = 'https://api.github.com/repos/nearhost/nearhost/releases/latest';
 
-export async function latestVersion(): Promise<string> {
+let cached: Promise<string> | undefined;
+
+async function fetchVersion(): Promise<string> {
   const token = process.env.GITHUB_TOKEN;
   if (!token) return 'latest';
   try {
@@ -18,4 +20,8 @@ export async function latestVersion(): Promise<string> {
   } catch {
     return 'latest';
   }
+}
+
+export function latestVersion(): Promise<string> {
+  return (cached ??= fetchVersion());
 }

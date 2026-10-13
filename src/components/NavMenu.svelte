@@ -5,15 +5,20 @@
   }
   let { links }: { links: Link[] } = $props();
   let open = $state(false);
+  let toggle: HTMLButtonElement | undefined = $state();
 
   function onKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape') open = false;
+    if (event.key !== 'Escape' || !open) return;
+    open = false;
+    toggle?.focus();
   }
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class="menu" onkeydown={onKeydown}>
+<svelte:window onkeydown={onKeydown} />
+
+<div class="menu">
   <button
+    bind:this={toggle}
     type="button"
     class="toggle"
     aria-expanded={open}

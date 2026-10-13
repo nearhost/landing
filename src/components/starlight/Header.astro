@@ -12,7 +12,7 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
   <div class="middle">
     <Search />
   </div>
-  <div class="right">
+  <div class="right sl-hidden md:sl-flex">
     <a href="/" class="home">
       Home
     </a>
@@ -39,7 +39,6 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
     justify-content: center;
   }
   .right {
-    display: flex;
     align-items: center;
     gap: 1rem;
   }
@@ -48,10 +47,5 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
     font-weight: 500;
     color: var(--sl-color-gray-2);
     text-decoration: none;
-  }
-  @media (max-width: 50rem) {
-    .home {
-      display: none;
-    }
   }
 </style>
