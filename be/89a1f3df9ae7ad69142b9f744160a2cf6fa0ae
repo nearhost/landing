@@ -1,0 +1,14 @@
+src/hook-probe.ts
+  h_13c4e797d6e9d2 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "be89a1f3df9ae7ad69142b9f744160a2cf6fa0ae",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
