@@ -1,5 +1,6 @@
 {
   "name": "landing",
+  "private": true,
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -28,7 +29,7 @@
     "svelte": "^5.57.2"
   },
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13"
   },
   "overrides": {
     "eslint-plugin-jsx-a11y": {
