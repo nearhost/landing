@@ -60,5 +60,12 @@ expect "install ok" 0 "installed nearhost v0.1.0" \
   env PATH="$work/bin:$PATH" NEARHOST_VERSION=v0.1.0 NEARHOST_BASE_URL="file://$work/release" NEARHOST_INSTALL_DIR="$work/dest" NEARHOST_SKIP_SETCAP=1 sh "$script"
 [ -x "$work/dest/nearhost" ] || { echo "FAIL binary not installed"; fails=$((fails + 1)); }
 
+# 6. An unresolvable latest release fails clearly instead of building a bogus asset name.
+fake_uname Darwin arm64
+printf '#!/bin/sh\necho "https://github.com/nearhost/nearhost/releases"\n' > "$work/bin/curl"
+chmod +x "$work/bin/curl"
+expect "no release" 1 "could not determine the latest release" \
+  env -u NEARHOST_VERSION -u NEARHOST_BASE_URL PATH="$work/bin:$PATH" sh "$script"
+
 [ "$fails" -eq 0 ] || exit 1
 echo "all install.sh checks passed"

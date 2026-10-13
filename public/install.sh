@@ -32,8 +32,11 @@ esac
 
 version="${NEARHOST_VERSION:-}"
 if [ -z "$version" ]; then
-  version="$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$REPO/releases/latest" | sed 's#.*/tag/##')"
-  [ -n "$version" ] || fail "could not determine the latest release"
+  version="$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$REPO/releases/latest" | sed -n 's#.*/tag/##p')"
+  case "$version" in
+    v[0-9]*) ;;
+    *) fail "could not determine the latest release. Nearhost has no published release yet, or GitHub could not be reached." ;;
+  esac
 fi
 
 base="${NEARHOST_BASE_URL:-https://github.com/$REPO/releases/download/$version}"
@@ -83,9 +86,9 @@ esac
 if [ "$os" = "linux" ] && [ "${NEARHOST_SKIP_SETCAP:-}" != "1" ] && command -v setcap >/dev/null 2>&1; then
   if [ -t 0 ]; then
     printf 'Allow nearhost to bind ports 80 and 443 without sudo? [y/N] '
-    read -r answer
+    read -r answer || answer=n
     case "$answer" in
-      y | Y) sudo setcap cap_net_bind_service=+ep "$dest/nearhost" && echo "capability set" ;;
+      y | Y) sudo setcap cap_net_bind_service=+ep "$dest/nearhost" && echo "capability set" || echo "setcap failed; run it later: sudo setcap cap_net_bind_service=+ep $dest/nearhost" ;;
       *) echo "Skipped. Run later: sudo setcap cap_net_bind_service=+ep $dest/nearhost" ;;
     esac
   else
