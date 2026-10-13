@@ -1,0 +1,26 @@
+lighthouserc.json
+  s_47b881fc8d9b0b::t_93c668981db2df 1-16
+.github/workflows/deploy.yml
+  s_47b881fc8d9b0b::t_93c668981db2df 1-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ef78898acb8b61c2c02662c2dea74d08c6075cdf",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_47b881fc8d9b0b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48de3381-e9cc-491d-8617-bd9a148f5b97",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
