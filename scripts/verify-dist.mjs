@@ -91,6 +91,11 @@ if (existsSync(index)) {
   );
   const islands = (html.match(/astro-island/g) ?? []).length;
   check(islands > 0, 'no islands rendered on the landing page');
+  const main = html.match(/<main[\s\S]*<\/main>/)?.[0] ?? '';
+  check(
+    !/[A-Za-z.]<(code|span)[^>]*>\w/.test(main) && !/<\/(code|span)>[A-Za-z]/.test(main),
+    'landing copy has words glued to an inline element',
+  );
 }
 
 // 5. The docs entry point exists.
