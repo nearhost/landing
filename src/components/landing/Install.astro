@@ -1,0 +1,110 @@
+---
+import CopyButton from '../CopyButton.svelte';
+
+const commands = [
+  { id: 'install-sh', label: 'Shell', text: 'curl -fsSL https://nearhost.dev/install.sh | sh' },
+  { id: 'install-brew', label: 'Homebrew', text: 'brew install nearhost/tap/nearhost' },
+  { id: 'install-npm', label: 'npm', text: 'npx nearhost' },
+];
+---
+
+<section id="install" class="container install">
+  <div class="intro">
+    <h2 class="heading">Install Nearhost.</h2>
+    <p class="lede">
+      One static binary for macOS and Linux, Apple silicon and Intel. The first run installs the
+      local CA and lands you on Home.
+    </p>
+  </div>
+  <div class="cards">
+    {commands.map((c) => (
+      <div class="card">
+        <span class="label">{c.label}</span>
+        <div class="line">
+          <code id={c.id}>{c.text}</code>
+          <CopyButton
+            client:visible
+            text={c.text}
+            label={`Copy ${c.label} command`}
+            targetId={c.id}
+          />
+        </div>
+      </div>
+    ))}
+  </div>
+  <p class="note">
+    Linux needs permission to bind ports 80 and 443. The installer offers to set
+    <code>cap_net_bind_service</code>, and <code>nearhost doctor</code> will tell you if it's
+    missing.
+  </p>
+</section>
+
+<style>
+  .install {
+    padding-block: var(--nh-section);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: flex-start;
+  }
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 720px;
+  }
+  .heading {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-weight: 700;
+    font-size: clamp(36px, 5vw, 64px);
+    line-height: 1;
+    letter-spacing: var(--nh-track-display);
+  }
+  .lede {
+    margin: 0;
+    color: var(--nh-body);
+    font-size: 18px;
+  }
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 12px 16px 22px;
+    background: var(--nh-surface);
+    border: 1px solid var(--nh-line);
+    border-radius: 12px;
+    min-width: 0;
+  }
+  .label {
+    font-size: 13px;
+    color: var(--nh-faint);
+  }
+  .line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .line code {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow-x: auto;
+    flex: 1;
+  }
+  .note {
+    margin: 0;
+    font-size: 14px;
+    color: var(--nh-faint);
+  }
+  @media (max-width: 719px) {
+    .cards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
