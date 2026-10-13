@@ -34,3 +34,7 @@ Pushes to `main` build and deploy through `.github/workflows/deploy.yml`. Pull r
 ## Conventions
 
 Commits are conventional-commit titles with no body. Prettier and ESLint run on staged files before each commit. Copy stays in the components as plain text, labels are sentence case, and the landing page is dark only. Dependent pull requests are managed as a stack with the gh stack extension.
+
+## Licence
+
+MIT. See [LICENSE](LICENSE). Logo files for avatars and app icons are in [brand/](brand/).
