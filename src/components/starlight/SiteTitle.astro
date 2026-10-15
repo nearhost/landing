@@ -1,16 +1,17 @@
 ---
+import { url } from '../../lib/url';
 import Mark from '../Mark.astro';
 ---
 
 <div class="title">
-  <a href="/" class="brand" aria-label="Nearhost home">
+  <a href={url('/')} class="brand" aria-label="Nearhost home">
     <Mark size={26} />
     <span class="word">nearhost</span>
   </a>
   <span class="sep" aria-hidden="true">
     /
   </span>
-  <a href="/docs/getting-started/introduction/" class="docs">
+  <a href={url('/docs/getting-started/introduction/')} class="docs">
     Docs
   </a>
 </div>

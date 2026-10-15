@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 import SiteTitle from './SiteTitle.astro';
 import Search from '@astrojs/starlight/components/Search.astro';
 import SocialIcons from '@astrojs/starlight/components/SocialIcons.astro';
@@ -13,7 +14,7 @@ import ThemeSelect from '@astrojs/starlight/components/ThemeSelect.astro';
     <Search />
   </div>
   <div class="right sl-hidden md:sl-flex">
-    <a href="/" class="home">
+    <a href={url('/')} class="home">
       Home
     </a>
     <SocialIcons />

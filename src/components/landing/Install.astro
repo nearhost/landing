@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 import CopyButton from '../CopyButton.svelte';
 
 const commands = [
@@ -34,8 +35,8 @@ const commands = [
   </div>
   <p class="note">
     Linux needs one extra step to bind ports 80 and 443 and to trust the certificate in your
-    browser. The <a href="/docs/getting-started/install/">install guide</a> has the commands, and{' '}
-    <code>nearhost doctor</code> tells you what is missing.
+    browser. The <a href={url('/docs/getting-started/install/')}>install guide</a> has the commands,
+    and <code>nearhost doctor</code> tells you what is missing.
   </p>
 </section>
 

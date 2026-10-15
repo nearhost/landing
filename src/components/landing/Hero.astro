@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 import CopyButton from '../CopyButton.svelte';
 const install = 'curl -fsSL https://nearhost.dev/install.sh | sh';
 ---
@@ -30,7 +31,7 @@ const install = 'curl -fsSL https://nearhost.dev/install.sh | sh';
         targetId="hero-install"
       />
     </div>
-    <a href="/docs/getting-started/introduction/" class="secondary">
+    <a href={url('/docs/getting-started/introduction/')} class="secondary">
       Read the docs
     </a>
   </div>
