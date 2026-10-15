@@ -5,8 +5,7 @@ import TuiDemo from './TuiDemo.svelte';
 <section class="container wrap">
   <TuiDemo client:visible />
   <p class="caption">
-    This is the real layout with made-up projects. Click in and use the keys in its footer, or click
-    rows and keys.
+    Every key works. No servers were harmed. Click in and press <kbd>?</kbd>
   </p>
 </section>
 
@@ -19,5 +18,9 @@ import TuiDemo from './TuiDemo.svelte';
     text-align: center;
     color: var(--nh-faint);
     font-size: 14px;
+  }
+  kbd {
+    font-family: var(--nh-font-mono);
+    color: var(--nh-accent);
   }
 </style>
