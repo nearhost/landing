@@ -17,13 +17,16 @@
         </li>
         <li>
           <span class="arrow">→</span>
-          <span>One sudo prompt per hosts change, and it tells you why first.</span>
+          <span>
+            Asks for your password only when <code>/etc/hosts</code> needs a change, and says why in
+            the same box.
+          </span>
         </li>
         <li>
           <span class="arrow">→</span>
           <span>
-            <code>nearhost untrust</code> and <code>hosts clean</code> undo the trust store and
-            hosts changes.
+            <code>nearhost untrust</code> and <code>nearhost hosts clean</code> undo the trust store
+            and hosts changes.
           </span>
         </li>
       </ul>
@@ -35,9 +38,9 @@
 …</span>
 
 <span class="marker"># nearhost:start</span>
-<span class="entry">127.0.0.1   myapp.test
-127.0.0.1   website.test
-127.0.0.1   otherapp.test</span>
+<span class="entry">127.0.0.1 myapp.test
+127.0.0.1 otherapp.test
+127.0.0.1 website.test</span>
 <span class="marker"># nearhost:end</span></pre>
   </div>
 </section>
