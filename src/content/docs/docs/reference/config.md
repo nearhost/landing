@@ -55,6 +55,7 @@ presets:
 | `registries[].alias`        | string  | The name a registry's presets are known by, as in `nearhost/vite`.                         |
 | `registries[].repo`         | string  | The registry's GitHub repository, as `owner/name`.                                         |
 | `registry_prompt`           | boolean | `false` stops Nearhost offering to trust the official registry. Absent means ask.          |
+| `notifications`             | boolean | `false` stops the terminal notification when an agent proposes a project. Absent means on. |
 | `presets[].name`            | string  | An enabled preset: `<registry>/<name>`, or a plain name for a local file.                  |
 | `presets[].ref`             | string  | For a registry preset, the commit it was installed from.                                   |
 | `presets[].sha256`          | string  | For a registry preset, the hash of its file.                                               |

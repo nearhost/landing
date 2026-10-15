@@ -57,6 +57,10 @@ ssh <host>
 
 Run it in a terminal and handle the host key, passphrase or `ssh-add` prompt. Then press `r`. On Home, `y` copies the command.
 
+## Agents unavailable on a server
+
+The server's sshd refuses the socket coding agents reach Nearhost on, usually because `sshd_config` sets `AllowStreamLocalForwarding no`. Set it to `yes`, reload sshd and press `r` on the server. `nearhost doctor` shows the same check. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+
 ## A server shows dropped
 
 You pressed `c` on it, which holds its connection closed. Its projects wait. Press `c` again to connect it.

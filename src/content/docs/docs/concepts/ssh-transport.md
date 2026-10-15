@@ -34,6 +34,10 @@ ssh -S <sock> -O cancel -L 127.0.0.1:<local>:localhost:<remote> <host>
 
 Nearhost keeps the list of forwards each server should have. After a reconnect it puts them all back before the server shows as connected. A forward that fails, because something on your laptop holds the port, puts its project in `error` with the name of the program.
 
+## The agent socket
+
+Each master also forwards a Unix socket back to the laptop, at `~/.nearhost/<id>.sock` on the server, so that a coding agent there reaches Nearhost. It is added after the master connects and again after each reconnect, and a server that refuses it only loses that: its projects serve as usual. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+
 ## Reconnection and backoff
 
 If the master exits, Nearhost starts it again, waiting 1 second, then twice as long each time, up to 30 seconds. A master that does not connect within 20 seconds is stopped and tried again. While it waits, the server shows `reconnecting · attempt 3 · next in 8s`, and its projects show `degraded`.
