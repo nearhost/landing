@@ -1,0 +1,53 @@
+docs/concepts/dev-servers-and-hot-reload/index.html
+  s_7f8158a72a02c6::t_d311bf31637dd5 1-94
+docs/concepts/discovery/index.html
+  s_7f8158a72a02c6::t_22b7f4d70f8c63 1-105
+docs/concepts/laravel-sail-and-vite/index.html
+  s_7f8158a72a02c6::t_b056ca6946125d 1
+docs/concepts/routes-and-roles/index.html
+  s_7f8158a72a02c6::t_cd51fc05c4ed67 1-90
+docs/concepts/ssh-transport/index.html
+  s_7f8158a72a02c6::t_1c91f0941cbe4a 1-87
+docs/concepts/the-hosts-file/index.html
+  s_7f8158a72a02c6::t_92a0b9649af479 1-84
+docs/concepts/tls-and-the-proxy/index.html
+  s_7f8158a72a02c6::t_405256fca27472 1-89
+docs/getting-started/add-a-project/index.html
+  s_7f8158a72a02c6::t_b8bb719ec4200b 1-119
+docs/getting-started/add-a-server/index.html
+  s_7f8158a72a02c6::t_0791048ac8a758 1-92
+docs/getting-started/first-run/index.html
+  s_7f8158a72a02c6::t_d67bf66af1ca28 1-101
+docs/getting-started/install/index.html
+  s_7f8158a72a02c6::t_badf5f0f9b4459 1-126
+docs/getting-started/introduction/index.html
+  s_7f8158a72a02c6::t_8381ae3b1922fa 1-100
+docs/index.html
+  s_7f8158a72a02c6::t_7818cf231512d2 1
+docs/reference/advisories/index.html
+  s_7f8158a72a02c6::t_d8352f4bd2aaaa 1-91
+docs/reference/cli/index.html
+  s_7f8158a72a02c6::t_691eada8e354b4 1-98
+docs/reference/config/index.html
+  s_7f8158a72a02c6::t_e9dc99a39ffeb8 1-147
+docs/reference/keyboard-shortcuts/index.html
+  s_7f8158a72a02c6::t_368f95ecfa2fc0 1-167
+docs/troubleshooting/troubleshooting/index.html
+  s_7f8158a72a02c6::t_ec69430b6ce4b6 1-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "47dde592de4bc745904772c530f8db6ce67f425c",
+  "prompts": {},
+  "sessions": {
+    "s_7f8158a72a02c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "376aaa0e-d7a1-4ba9-a7b7-604688493e9e",
+        "model": "unknown"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
