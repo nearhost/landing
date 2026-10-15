@@ -24,22 +24,31 @@ routes:
 
 Served at `https://<alias>`. Exactly one per project.
 
-Discovery proposes one in this order: a Compose port mapped to container port 80, then port 80 itself, then the Vite port, then a project's only port. Under Laravel Sail, `APP_PORT` wins. You can move the role to any route.
+Discovery proposes one: a route a preset prefers, then a Compose port mapped to container port 80, then a route a preset offers as a fallback, such as Vite's configured port, then a project's only port. See [Discovery](/docs/concepts/discovery/#roles). You can move the role to any route.
 
-Nearhost picks an ephemeral local port for the forward and the proxy sends requests for the alias to it.
+For a project on a server, Nearhost picks an ephemeral local port for the forward and the proxy sends requests for the alias to it. For a local project the proxy sends them straight to the port.
 
 ## loopback
 
 A raw TCP forward to `127.0.0.1:<port>` on the laptop, using the same port number as the remote. Use it for a dev server whose URLs point at `localhost`, such as Vite behind a backend framework.
 
-A loopback route is skipped for local projects, because the port is already local. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) for when you need one.
+A loopback route means nothing for local projects, because the port is already local, so a local route is either `web` or `ignore`. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) for when you need one.
 
 ## ignore
 
-Discovered and listed, not forwarded. Anything discovery does not recognise is listed with this role.
+Discovered and listed, not forwarded. Discovery proposes every route as `ignore` unless it is the web route or a preset proposes `loopback`.
+
+## Changing roles
+
+In the interface, select the project and press `tab` to move into its routes. Choose a route with `↑` and `↓`, then:
+
+- `space` switches it between `loopback` and `ignore`
+- `w` makes it the web route, and the old web route becomes `ignore`
+
+Press `tab` or `esc` when you are done. The change is saved and applied at once. `e` on the project reads its files again and walks through the routes step of the form. From the command line, `nearhost add --web <port>` chooses the web route.
 
 ## Uniqueness rules
 
-- Aliases must be unique across projects.
-- Loopback ports must be unique across enabled projects. A clash is an advisory at edit time and an error at start time.
+- Aliases must be unique across projects, ignoring case.
+- Loopback ports must be unique across enabled projects. Adding a project whose loopback port another enabled project uses is refused, and a config file with such a clash does not load.
 - Each project has exactly one `web` route.
