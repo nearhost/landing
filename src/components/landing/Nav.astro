@@ -1,9 +1,10 @@
 ---
+import { url } from '../../lib/url';
 import Mark from '../Mark.astro';
 import NavMenu from '../NavMenu.svelte';
 
 const links = [
-  { href: '/docs/getting-started/introduction/', label: 'Docs' },
+  { href: url('/docs/getting-started/introduction/'), label: 'Docs' },
   { href: '#how', label: 'How it works' },
   { href: 'https://github.com/nearhost/nearhost', label: 'GitHub' },
   { href: '#install', label: 'Install' },
@@ -12,7 +13,7 @@ const links = [
 
 <header class="header">
   <nav class="container nav" aria-label="Main">
-    <a href="/" class="brand" aria-label="Nearhost home">
+    <a href={url('/')} class="brand" aria-label="Nearhost home">
       <Mark size={28} />
       <span class="word">nearhost</span>
     </a>

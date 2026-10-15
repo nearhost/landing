@@ -29,7 +29,9 @@ Pages live in `src/content/docs/docs/<group>/`. Add a Markdown file with `title`
 
 ## Deploy
 
-Pushes to `main` build and deploy through `.github/workflows/deploy.yml`. Pull requests build, verify, check links and run Lighthouse, but do not deploy. The custom domain is set by `public/CNAME`. GitHub Pages must be enabled with GitHub Actions as its source before the first deploy.
+Pushes to `main` build, verify and publish the site to the `gh-pages` branch through `.github/workflows/deploy.yml`, and GitHub Pages serves that branch. Each pull request from this repository also gets a preview at `nearhost.dev/pr-preview/pr-<number>/`, linked in a comment on the pull request and removed when it closes. The custom domain is set by `public/CNAME`.
+
+A preview is built with `SITE_BASE` set to its path. Root-relative links in components go through `url()` from `src/lib/url.ts`; links in Markdown are prefixed by `src/lib/base-links.mjs`. Try a preview build locally with `SITE_BASE=/pr-preview/pr-1/ npm run build`.
 
 ## Conventions
 

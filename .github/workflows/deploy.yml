@@ -1,9 +1,13 @@
 name: Deploy
 
+# Pages serves the gh-pages branch. Pushes to main publish the site at its root; each pull
+# request gets a preview under pr-preview/pr-<number>/, removed again when the pull request
+# closes.
 on:
   push:
     branches: [main]
   pull_request:
+    types: [opened, reopened, synchronize, closed]
   workflow_dispatch:
 
 permissions:
@@ -15,6 +19,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,12 +37,27 @@ jobs:
         with:
           args: --offline --root-dir ${{ github.workspace }}/dist --no-progress 'dist/**/*.html'
           fail: true
-      - uses: actions/upload-pages-artifact@v3
+
+      # A preview is built again under its own base path. The deploy actions never delete CNAME
+      # or .nojekyll, so in a preview they would outlive its removal; only the root gets them.
+      - if: github.event_name == 'pull_request'
+        run: |
+          npm run build
+          rm dist/CNAME
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SITE_BASE: /pr-preview/pr-${{ github.event.number }}/
+      - if: github.event_name != 'pull_request'
+        run: touch dist/.nojekyll
+      - uses: actions/upload-artifact@v4
         with:
+          name: site
           path: dist
+          include-hidden-files: true
+          retention-days: 1
 
   lighthouse:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,15 +73,42 @@ jobs:
           uploadArtifacts: true
 
   deploy:
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: build
+    # Runs after a green build, or alone when a pull request closes to remove its preview. A
+    # fork's token cannot push to gh-pages, so fork pull requests get no preview.
+    if: >-
+      always() &&
+      (needs.build.result == 'success' || github.event.action == 'closed') &&
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
+      (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
     permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      contents: write
+      pull-requests: write
+    # Every deploy pushes to gh-pages, so deploys queue rather than race.
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
     steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - uses: actions/checkout@v4
+      - if: github.event.action != 'closed'
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: site
+
+      - if: github.event_name != 'pull_request'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: site
+          branch: gh-pages
+          clean-exclude: pr-preview/
+
+      - if: github.event_name == 'pull_request'
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: site
+          preview-branch: gh-pages
+          umbrella-dir: pr-preview
+          pages-base-url: nearhost.dev
+          qr-code: false

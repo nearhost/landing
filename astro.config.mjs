@@ -2,12 +2,23 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import svelte from '@astrojs/svelte';
+import { satteri } from '@astrojs/markdown-satteri';
+import baseLinks from './src/lib/base-links.mjs';
+
+// Pull request previews are built under /pr-preview/pr-<number>/; the live site sits at /.
+const base = process.env.SITE_BASE ?? '/';
+/** @param {string} path */
+const atBase = (path) => base.replace(/\/$/, '') + path;
 
 export default defineConfig({
   site: 'https://nearhost.dev',
+  base,
+  markdown: {
+    processor: satteri({ hastPlugins: base === '/' ? [] : [baseLinks(base)] }),
+  },
   redirects: {
-    '/docs': '/docs/getting-started/introduction/',
-    '/docs/concepts/laravel-sail-and-vite': '/docs/concepts/dev-servers-and-hot-reload/',
+    '/docs': atBase('/docs/getting-started/introduction/'),
+    '/docs/concepts/laravel-sail-and-vite': atBase('/docs/concepts/dev-servers-and-hot-reload/'),
   },
   integrations: [
     starlight({
