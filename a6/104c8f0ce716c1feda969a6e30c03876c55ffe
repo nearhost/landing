@@ -1,0 +1,19 @@
+src/components/landing/TuiMock.astro
+  s_d85e728b268a59::t_cc393819797e86 8,22-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a6104c8f0ce716c1feda969a6e30c03876c55ffe",
+  "prompts": {},
+  "sessions": {
+    "s_d85e728b268a59": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4e0e5832-3961-4227-870a-efcd25b7048d",
+        "model": "unknown"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
