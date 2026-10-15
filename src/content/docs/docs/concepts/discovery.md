@@ -5,45 +5,55 @@ sidebar:
   order: 2
 ---
 
-Discovery takes a server and a path, reads the project's files and returns proposed routes with labels and roles, plus advisories. It saves typing. It is not a requirement, and a project it knows nothing about works once you enter its ports. On a remote server the files are read over SFTP through the server's SSH master. No shell commands run on the remote machine. For `local` they are read from disk.
+Discovery takes a server and a path, reads the project's files and proposes routes with labels and roles, plus advisories. It saves typing. It is not a requirement: a project it knows nothing about works once you give its web port.
 
-## What is read, in order
+Discovery only reads. No command runs on the remote machine. On a server the files are read over SFTP, through an SSH connection of discovery's own. On `local` they are read from disk.
 
-Later sources override the labels of earlier ones.
+## The .env rule
 
-1. `.env`, then `.env.local`.
-2. `docker-compose.yml`, `docker-compose.yaml`, `compose.yml`, `compose.yaml`.
-3. `vite.config.js`, `vite.config.ts`, `vite.config.mjs`, `vite.config.mts`.
-4. `package.json`. Only the presence of a `vite` dependency is used.
+Without presets, Nearhost reads `.env`, then `.env.local`, and the later file wins. A port variable is any variable with `PORT` or `PORTS` as one of its parts, split on `_` or `-`, whose value is a whole number from 1 to 65535. `APP_PORT`, `FORWARD_DB_PORT` and `vite-port` all count.
 
-## Framework presets
+Each one becomes a route labelled with the rest of its name and the variable itself:
 
-Compose files and Vite configs cover most projects without any preset. Laravel Sail is the first framework with one. Its variables map to labels and roles:
+```text
+  8080  app (APP_PORT)
+  3307  forward-db (FORWARD_DB_PORT)
+```
 
-- `APP_PORT`
-- `VITE_PORT`
-- `FORWARD_DB_PORT`
-- `FORWARD_REDIS_PORT`
-- `FORWARD_MAILPIT_PORT`
-- `FORWARD_MAILPIT_DASHBOARD_PORT`
-- `FORWARD_MEILISEARCH_PORT`
-- `FORWARD_TYPESENSE_PORT`
-- `FORWARD_MINIO_PORT`
-- `FORWARD_MINIO_CONSOLE_PORT`
-- `FORWARD_MONGODB_PORT`
+When several variables hold the same port, the first in alphabetical order names it and the others are added in brackets.
 
-When a variable is absent but its service is present in Compose, the default from the Sail stubs applies. Outside Sail, a Compose port that reads a variable is labelled with the service and the variable name.
+With no registry trusted, this is all discovery does, and it makes no network request.
 
-## Compose ports
+## What presets add
 
-Each `ports:` entry is parsed for its host port. The `${VAR:-default}` syntax is resolved against the values in `.env`. A literal port is labelled with its service name.
+Each enabled preset that applies to the project adds to what is found. See [Presets and registries](/docs/concepts/presets-and-registries/).
 
-## Vite config
+- **Compose files.** A preset that asks for Compose ports, such as `nearhost/compose` or `nearhost/sail`, makes discovery read the first of `docker-compose.yml`, `docker-compose.yaml`, `compose.yml` and `compose.yaml`. Each published TCP port becomes a route, labelled with its service, or `service (VAR)` when a variable sets it. `${VAR}`, `${VAR:-default}`, `${VAR-default}` and `$VAR` are filled in from the `.env` files, never from your shell. Ranges, UDP ports and ports that are not published are skipped. Without such a preset the Compose file is not read, and Nearhost says so.
+- **Other files.** A preset can scan files such as `vite.config.ts` for values with a regular expression, and check `package.json` for a dependency. Nothing is executed, and JavaScript is not parsed.
+- **Labels and roles.** A preset can relabel a port variable, propose a route as `loopback`, and hint which port should be the web route.
+- **Advice.** Most advisories come from presets. See [Advisories](/docs/reference/advisories/).
 
-The file is scanned with regular expressions for `server.port`, `server.hmr`, `server.allowedHosts` and `server.https`. No JavaScript is executed or parsed.
+## Who claims a port
 
-## When nothing is found
+Each port is claimed once, by the first source that finds it:
 
-Anything unrecognised is still listed, with the role `ignore`. If discovery finds nothing at all, the add-project wizard lets you enter ports by hand.
+1. Compose's published ports, when a preset asked for them.
+2. Each preset that applies, in the order they declare.
+3. The `.env` rule, for ports nothing else claimed.
 
-Discovery also produces advisories, which are shown and never applied. See [Advisories](/docs/reference/advisories/).
+A later preset can replace an earlier one's route or advice by using the same id, or remove it.
+
+## Roles
+
+Every proposed route starts as `ignore`, unless a preset proposes `loopback`. Then one route is made `web`, in this order:
+
+1. A route a preset prefers as the web route.
+2. A Compose port whose container port is 80.
+3. A route a preset offers as a fallback, such as Vite's configured port.
+4. The only route, when no preset recognised the project.
+
+If none of these applies, the interface asks you for the web port, and `nearhost add` asks at a terminal or needs `--web <port>`. See [Routes and roles](/docs/concepts/routes-and-roles/).
+
+## When something cannot be read
+
+A file that does not exist is skipped. A file that exists but cannot be read stops discovery with its error, rather than being treated as absent. If nothing at all is found, the interface asks for the web port.

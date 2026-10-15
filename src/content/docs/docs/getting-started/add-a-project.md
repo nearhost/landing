@@ -1,50 +1,94 @@
 ---
 title: Add a project
-description: Register a directory on a server and serve it at a .test alias.
+description: Register a directory on this machine or a server and serve it at a .test alias.
 sidebar:
   order: 4
 ---
 
-A project is a directory on a server that runs an HTTP service. Nearhost reads the project's own files to work out its ports, then serves it at a `.test` alias. The service can be anything that listens on a port.
+A project is a directory, on this machine or on a server, that runs an HTTP service. Nearhost reads the project's files to work out its ports, then serves it at a `.test` alias. The service can be anything that listens on a port.
 
-## From the TUI
+## From the interface
 
-Press `n` and choose **project**. The wizard replaces the main panel and keeps the sidebar visible.
+Press `n`. A box titled "Add project" opens over the screen. Its steps are counted at the top, and steps that have nothing to ask are skipped. `esc` goes back a step.
 
-1. **Server.** Pick `local` or any server you have added.
-2. **Path.** The project directory on that server. For `local` it defaults to the current directory.
-3. **Ports.** Discovery runs and shows a table of ports with a proposed role for each. Press `space` on a row to cycle its role.
-4. **Alias.** Prefilled as `<name>.test`. Aliases must be unique across projects.
-5. **Confirm.** If the hosts block changes, you are asked for sudo once.
+1. **Server.** Pick `local` for this machine, or a server you have added. The selected server, or the selected project's, is chosen already. **New server…** adds one on the way. See [Add a server](/docs/getting-started/add-a-server/).
+2. **Path.** The project's directory. On `local` it starts as the folder you ran `nearhost` in, and on a server as `~/`. See [Typing a path](#typing-a-path).
+3. **Presets.** Nearhost reads ports from `.env` by itself. While no preset registry is trusted, it asks once whether to trust the official presets, which add Compose files, Vite and Laravel Sail. Choose Yes, No, or Don't ask again. With a registry trusted, it lists the presets that suit this project, ticked. `space` unticks one, and `enter` enables the rest. See [Presets and registries](/docs/concepts/presets-and-registries/).
+4. **Routes.** The ports found, with a role and a label for each. Ticked ports are served. `space` ticks or unticks a port, and `←` or `→` changes its role. One port must be `web`. If no ports were found, give the web port yourself.
+5. **Name.** The project's name and its alias, which follows the name until you change it. `tab` moves between them. Names and aliases must be unique.
+6. **Confirm.** The server, path, address and routes, with any advice. `enter` adds the project.
+
+The project is selected and starts at once. If its alias is not in `/etc/hosts` yet, Nearhost asks for your password to add it. See [First run](/docs/getting-started/first-run/#the-password-box).
+
+## Typing a path
+
+Nearhost suggests directories as you type, on this machine and on servers alike. It reads each folder in the background, so typing never waits.
+
+```text
+path      ~/code/bl▏og/
+          blog  blob
+```
+
+The rest of the suggested name appears faint after the cursor. When several directories match, they are listed under the field.
+
+| Key        | Action                                                  |
+| ---------- | ------------------------------------------------------- |
+| `tab`, `→` | Accept the suggestion.                                  |
+| `↑`, `↓`   | Choose between the matches.                             |
+| `enter`    | Use the path exactly as typed, without the suggestion.  |
+| `ctrl+r`   | Reconnect to the server, if the connection has dropped. |
+
+`tab` with nothing suggested lists the folder again, which picks up a directory made since. Hidden directories are suggested once you type the `.`.
 
 ## From the command line
 
-The non-interactive form accepts discovery's defaults and prints the resulting routes.
+`nearhost add` takes a path and discovers its routes the same way. Run without a terminal, as in a script, it prints:
 
 ```text
-$ nearhost add --server mini ~/code/myapp
-discovering ports on mini:~/code/myapp …
-  5173   ignore    Vite (vite.config)
-  5432   ignore    db
-  8080   web       app
-added myapp → https://myapp.test
+$ nearhost add --server mini '~/code/myapp' --web 8080
+No preset registries are trusted. To use the official presets: nearhost preset registry add nearhost/presets
+
+Routes found for myapp (mini:/home/dev/code/myapp):
+  PORT  ROLE    LABEL
+  3307  ignore  forward-db (FORWARD_DB_PORT)
+  5174  ignore  vite (VITE_PORT)
+  8080  web     app (APP_PORT)
+
+Added myapp on mini at https://myapp.test
+Start it with `nearhost up`.
 ```
 
-Here a Compose service named `app` publishes `8080:80`, so it becomes the web route. The Vite port is listed but not forwarded. If your pages load scripts from `localhost:5173`, change that route to `loopback`. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/).
+With no registry trusted, only the `.env` port variables are found, and every port but the web one is `ignore`. Here the Vite port should reach the browser as `localhost:5174`, so change it to `loopback` afterwards: select the project, press `tab`, choose the route and press `space`. The [Vite and Sail presets](/docs/concepts/presets-and-registries/) do that for you.
+
+At a terminal it asks what the interface asks: whether to trust the official presets, which suggested presets to enable, and which port is the web app when that is not clear. It also offers to add a server it does not know. Without a terminal it takes the defaults, and stops if it cannot tell which port is web.
+
+| Flag              | Effect                                                    |
+| ----------------- | --------------------------------------------------------- |
+| `--server <name>` | The server the path is on. The default is `local`.        |
+| `--name <name>`   | The project name. The default is the directory's name.    |
+| `--alias <alias>` | The alias. The default is `<name>.test`.                  |
+| `--web <port>`    | The port to serve at the alias.                           |
+| `--preset <name>` | Enable this preset without asking. Repeat for more.       |
+| `--no-presets`    | Use no presets and suggest none.                          |
+| `--disabled`      | Add it disabled: `nearhost up` starts it only when named. |
+
+A `~` in the path means the server's home directory, even when your shell has already turned it into this machine's.
 
 ## Route roles
 
-| Role       | What happens                                                                           | Default for                                                   |
-| ---------- | -------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| `web`      | Served at `https://<alias>` through the proxy. Exactly one per project.                | A port mapped to container port 80, else the Vite port        |
-| `loopback` | Raw forward to the same port on your laptop's `127.0.0.1`. Skipped for local projects. | A dev server port you choose, or VITE_PORT under Laravel Sail |
-| `ignore`   | Listed, not forwarded.                                                                 | Databases, caches, everything else                            |
+| Role       | What happens                                                                           |
+| ---------- | -------------------------------------------------------------------------------------- |
+| `web`      | Served at `https://<alias>` through the proxy. Exactly one per project.                |
+| `loopback` | Raw forward to the same port on your laptop's `127.0.0.1`. Skipped for local projects. |
+| `ignore`   | Listed, not forwarded.                                                                 |
+
+Discovery proposes the roles, and you can change them at any time. See [Routes and roles](/docs/concepts/routes-and-roles/).
 
 Advisories are shown, never applied. See [Advisories](/docs/reference/advisories/). Nothing on the remote machine is edited.
 
 ## What gets written
 
-Every project lives in `~/.config/nearhost/config.yaml`. Hand edits and TUI edits mix freely.
+Every project lives in `~/.config/nearhost/config.yaml`. You can edit it by hand too.
 
 ```yaml
 projects:
@@ -54,9 +98,9 @@ projects:
     alias: myapp.test
     enabled: true
     routes:
-      - { port: 8080, role: web, label: 'app' }
-      - { port: 5173, role: loopback, label: 'Vite (vite.config)' }
-      - { port: 5432, role: ignore, label: 'db' }
+      - { port: 3307, role: ignore, label: 'forward-db (FORWARD_DB_PORT)' }
+      - { port: 5174, role: loopback, label: 'vite (VITE_PORT)' }
+      - { port: 8080, role: web, label: 'app (APP_PORT)' }
 ```
 
 See [config.yaml](/docs/reference/config/) for every key.

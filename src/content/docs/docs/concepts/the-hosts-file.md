@@ -2,7 +2,7 @@
 title: The hosts file
 description: How Nearhost keeps one delimited block in /etc/hosts to resolve .test aliases.
 sidebar:
-  order: 5
+  order: 6
 ---
 
 `.test` is a reserved top-level domain that is never public, so Nearhost resolves aliases through `/etc/hosts` and not through DNS.
@@ -18,19 +18,31 @@ Nearhost owns one block and touches nothing else in the file:
 # nearhost:end
 ```
 
+The block lists the alias of every project, running or not, sorted. With no projects, the block is removed rather than left empty.
+
 ## How changes are applied
 
-On any alias change, Nearhost computes the desired block in full and applies it with one sudo call. The command reads the aliases from stdin, one per line:
+Each time a project starts, Nearhost works out the block the file should have. If the file already has it, nothing happens. If not, Nearhost runs itself as root to rewrite the block:
 
 ```sh
-sudo nearhost hosts apply
+sudo nearhost hosts apply --file /etc/hosts
 ```
 
-The helper rewrites only the content between the markers. If the block is absent, it creates it at the end of the file.
+with the aliases on its standard input, one per line. Only one project's start asks at a time.
+
+In the interface, the password is asked for in a box, and `sudo` remembers it for a few minutes. Where `sudo` asks every time, Nearhost hands over to the terminal for it. See [First run](/docs/getting-started/first-run/#the-password-box). `nearhost up` asks in the terminal.
+
+The rewrite changes only the content between the markers, and adds the block at the end of the file if it is absent. It writes a new file and renames it into place, keeping the file's permissions, and on Linux its SELinux label and access lists.
+
+If you cancel the password, the project stays stopped, and Home's `hosts` row shows which aliases are missing. Start the project again to retry.
+
+## Managing it yourself
+
+Run Nearhost with `--no-hosts` to leave `/etc/hosts` alone, for example when you add the aliases yourself. `nearhost doctor` reports whether the block has every alias.
 
 ## Removing it
 
-Nothing is removed when Nearhost quits. To remove the block, which prompts for sudo:
+Nothing is removed when Nearhost quits. To remove the block, which asks for your password through `sudo`:
 
 ```sh
 nearhost hosts clean

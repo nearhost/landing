@@ -1,38 +1,109 @@
 ---
 title: Keyboard shortcuts
-description: Keys for the sidebar, the project view and the server view in the TUI.
+description: Every key in the Nearhost interface, by screen.
 sidebar:
   order: 3
 ---
 
-Mouse and keyboard both work. With the mouse, click selects, the wheel scrolls and clicking a footer action activates it.
+The footer always shows the keys that work where you are. When the window is narrow it leaves some out and shows `? more`, and `?` lists them all.
 
-## Sidebar
+Mouse and keyboard both work. Click a sidebar row to select it, click a footer action to run it, and scroll the log with the wheel.
 
-| Key                  | Action                         |
-| -------------------- | ------------------------------ |
-| `up`, `down`         | Move the selection.            |
-| `enter` on a project | Start or stop it.              |
-| `enter` on a server  | Collapse or expand it.         |
-| `h`, `esc`           | Go to Home.                    |
-| `n`                  | New server or project.         |
-| `m`                  | Menu.                          |
-| `q`                  | Quit. This stops every tunnel. |
+## Anywhere
 
-## Project view
+`ctrl+c` quits, even from a form or the password box. While Nearhost is stopping, `q` or `ctrl+c` again stops it at once.
 
-| Key     | Action                                    |
-| ------- | ----------------------------------------- |
-| `o`     | Open the alias in the browser.            |
-| `e`     | Edit routes and re-run discovery.         |
-| `space` | Cycle the selected route's role in place. |
-| `y`     | Copy the snippet of the shown advisory.   |
-| `d`     | Remove the project.                       |
+## Main screen
 
-## Server view
+| Key      | Action                                                                  |
+| -------- | ----------------------------------------------------------------------- |
+| `↑`, `↓` | Move the selection. `k` and `j` too.                                    |
+| `h`      | Go to Home.                                                             |
+| `/`      | Filter the sidebar by name. `enter` keeps the filter.                   |
+| `esc`    | Clear the filter, or go to Home.                                        |
+| `l`      | Full-screen log of the selected row, or of everything from Home.        |
+| `n`      | Add a project, on the selected server or the selected project's server. |
+| `s`      | Add a server.                                                           |
+| `?`      | Show or hide every key.                                                 |
+| `q`      | Quit. This stops every project.                                         |
 
-| Key | Action     |
-| --- | ---------- |
-| `r` | Reconnect. |
-| `e` | Edit.      |
-| `d` | Remove.    |
+On Home, when a server cannot connect, `r` retries every such server now and `y` copies the `ssh` command that fixes access.
+
+## Project
+
+| Key     | Action                                                    |
+| ------- | --------------------------------------------------------- |
+| `enter` | Start or stop it.                                         |
+| `o`     | Open `https://<alias>` in the browser.                    |
+| `tab`   | Move into its routes, to change them.                     |
+| `e`     | Edit: read its files again and change its routes or name. |
+| `d`     | Remove it, after you confirm.                             |
+| `y`     | Copy the snippets of its advice.                          |
+
+## Routes
+
+After `tab` on a project.
+
+| Key          | Action                                                     |
+| ------------ | ---------------------------------------------------------- |
+| `↑`, `↓`     | Choose a route.                                            |
+| `space`      | Switch it between `loopback` and `ignore`.                 |
+| `w`          | Make it the web route. The old web route becomes `ignore`. |
+| `y`          | Copy the snippets of the project's advice.                 |
+| `tab`, `esc` | Done.                                                      |
+
+On a project on this machine, a route is only `web` or `ignore`.
+
+## Server
+
+| Key     | Action                                                       |
+| ------- | ------------------------------------------------------------ |
+| `enter` | Collapse or expand its projects.                             |
+| `r`     | Reconnect now.                                               |
+| `c`     | Drop the connection and hold it closed, or connect it again. |
+| `e`     | Edit its host and name.                                      |
+| `d`     | Remove it and its projects, after you confirm.               |
+
+Only `enter` works on `local`.
+
+## Full-screen log
+
+| Key               | Action                                            |
+| ----------------- | ------------------------------------------------- |
+| `j`, `k`          | Move. The arrow keys too.                         |
+| `space`, `pgdown` | Page down.                                        |
+| `pgup`            | Page up.                                          |
+| `g`               | Go to the oldest line.                            |
+| `G`               | Go to the end and follow new lines.               |
+| `tab`             | Show all entries, requests, events or errors.     |
+| `/`               | Search. `enter` keeps it, `esc` clears it.        |
+| `w`               | Wrap long lines.                                  |
+| `enter`           | Open or close a request.                          |
+| `v`               | Show or hide cookies and authorisation headers.   |
+| `c`               | Copy the request as a `curl` command.             |
+| `r`               | Send the request again. Unsafe methods ask first. |
+| `esc`, `q`        | Close the log. `esc` clears a search first.       |
+
+See [The request log](/docs/concepts/the-request-log/).
+
+## Forms
+
+`esc` goes back a step, and from the first step closes the form. The footer of each step lists its keys.
+
+| Where        | Keys                                                                                                               |
+| ------------ | ------------------------------------------------------------------------------------------------------------------ |
+| Lists        | `↑`, `↓` to choose, `enter` to pick.                                                                               |
+| Path         | `tab` or `→` accepts the suggestion, `↑`, `↓` choose a match, `enter` uses the path as typed, `ctrl+r` reconnects. |
+| Presets      | `space` ticks or unticks, `enter` goes on.                                                                         |
+| Routes       | `space` serves or ignores a port, `←`, `→` change its role.                                                        |
+| Name         | `tab` moves between name and alias.                                                                                |
+| Server check | `r` checks again after a failure.                                                                                  |
+| Confirm      | `enter` adds or saves.                                                                                             |
+| Remove       | `y` removes, `n` or `esc` keeps.                                                                                   |
+
+## Welcome and password boxes
+
+| Box      | Keys                                                 |
+| -------- | ---------------------------------------------------- |
+| Welcome  | `enter` trusts the certificate authority, `s` skips. |
+| Password | `enter` continues, `esc` cancels.                    |

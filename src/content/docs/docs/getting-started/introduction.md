@@ -5,11 +5,11 @@ sidebar:
   order: 0
 ---
 
-Nearhost opens a dev server that runs on another machine at a trusted `https://name.test` address on your laptop. It uses the SSH access you already have and installs nothing on the server.
+Nearhost opens your dev servers at trusted `https://name.test` addresses, whether they run on this machine or on another one you reach over SSH. For a remote server it uses the SSH access you already have and installs nothing there.
 
 ## Who it is for
 
-You write code on a laptop and run it somewhere else: a desktop under the desk, a home server, a VPS. The app listens on `localhost` over there, and your browser is over here.
+You run dev servers on your laptop, or somewhere else: a desktop under the desk, a home server, a VPS. Over there the app listens on `localhost`, and your browser is over here.
 
 Without Nearhost that means an `ssh -L` flag per port, a certificate warning, and hot reload that fails to connect. With it, each project has a name, a certificate your browser trusts, and forwards that reconnect on their own.
 
@@ -18,8 +18,8 @@ Without Nearhost that means an `ssh -L` flag per port, a certificate warning, an
 - **One address per project.** `https://myapp.test` today, tomorrow and after a reboot.
 - **Real HTTPS.** Secure cookies, OAuth callbacks and service workers behave as they do in production.
 - **Hot reload and WebSockets.** They travel through the same SSH connection.
-- **Nothing on the server.** No agent, no config changes, no open ports. If `ssh <host>` works, Nearhost works.
-- **Any stack.** Nearhost routes ports. It reads Compose files and Vite configs to propose them, and you can enter them by hand for anything else.
+- **Nothing on the server.** No agent, no config changes, no open ports. If `ssh <host>` works without a prompt, Nearhost works.
+- **Any stack.** Nearhost routes ports. It finds them in `.env`, and [presets](/docs/concepts/presets-and-registries/) teach it Compose files, Vite and Laravel Sail. You can set routes by hand for anything else.
 
 ## Quick start
 
@@ -29,23 +29,28 @@ Install the binary:
 curl -fsSL https://nearhost.dev/install.sh | sh
 ```
 
-Start it. The first run sets up the local certificate authority:
+Start it. The first time, it offers to trust its local certificate authority so your browser accepts its certificates:
 
 ```sh
 nearhost
 ```
 
-Then press `n` to add a server, `n` again to add a project, and `o` to open it. The same steps from the command line:
+Then press `s` to add a server, `n` to add a project on it or on this machine, and `o` to open it. Nearhost starts each project as soon as it is added, and every enabled project each time it opens. `q` quits and stops them all.
+
+The same steps from the command line, which offers to add `mini` when it is not a server yet:
 
 ```sh
 nearhost add --server mini ~/code/myapp
 nearhost up myapp
 ```
 
+`nearhost doctor` checks your setup at any time.
+
 ## Where to go next
 
-- [Install](/docs/getting-started/install/) covers Homebrew, npm and Linux setup.
+- [Install](/docs/getting-started/install/) covers the installer, Homebrew and Linux setup.
 - [Add a server](/docs/getting-started/add-a-server/) and [Add a project](/docs/getting-started/add-a-project/) walk through each screen.
+- [Presets and registries](/docs/concepts/presets-and-registries/) explains how Nearhost learns a framework's ports.
 - [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) explains how assets and live reload reach your browser.
 
 ## When to use something else

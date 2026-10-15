@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-Nearhost is one static binary for macOS and Linux, on Apple silicon, Intel and ARM. Pick whichever of these fits how you install tools.
+Nearhost is one static binary for macOS and Linux, built for amd64 and arm64. Pick whichever of these fits how you install tools.
 
 ## Shell installer
 
@@ -13,12 +13,34 @@ Nearhost is one static binary for macOS and Linux, on Apple silicon, Intel and A
 curl -fsSL https://nearhost.dev/install.sh | sh
 ```
 
-The script detects your OS and CPU, downloads the matching release from GitHub, verifies its checksum and installs to `/usr/local/bin` when that is writable, otherwise to `~/.local/bin`. It never runs `sudo` on its own.
+The script detects your OS and CPU, downloads the matching release from GitHub, verifies its checksum and installs to `/usr/local/bin` when that is writable, otherwise to `~/.local/bin`. It tells you when that folder is not on your `PATH`.
+
+Three environment variables change what it does:
+
+| Variable               | Effect                                                   |
+| ---------------------- | -------------------------------------------------------- |
+| `NEARHOST_VERSION`     | Install this release instead of the latest, as `v0.4.0`. |
+| `NEARHOST_INSTALL_DIR` | Install into this folder.                                |
+| `NEARHOST_SKIP_SETCAP` | Set to `1` to skip the Linux port step below.            |
+
+Check the install with:
+
+```sh
+nearhost version
+```
 
 ## Homebrew
 
 ```sh
 brew install nearhost/tap/nearhost
+```
+
+## From source
+
+With Go 1.26 or later:
+
+```sh
+go install github.com/nearhost/nearhost/cmd/nearhost@latest
 ```
 
 ## npm
@@ -41,7 +63,7 @@ Nearhost serves HTTPS on 443 and redirects 80. A normal user cannot bind those p
 sudo setcap cap_net_bind_service=+ep "$(command -v nearhost)"
 ```
 
-Run it again after each upgrade, because replacing the binary clears the capability. The shell installer prints this command for you.
+Run it again after each upgrade, because replacing the binary clears the capability. The shell installer prints this command for you. Run from a downloaded copy at a terminal, rather than through `curl | sh`, it asks whether to run it, and only uses `sudo` if you say yes.
 
 ### Trust the certificate authority
 
@@ -51,12 +73,12 @@ nearhost trust
 
 This adds the Nearhost Local CA to the system trust store and asks for your password through `sudo`. It uses your distribution's own tool:
 
-| Distribution   | Command it runs          |
-| -------------- | ------------------------ |
-| Debian, Ubuntu | `update-ca-certificates` |
-| Fedora, RHEL   | `update-ca-trust`        |
-| openSUSE       | `update-ca-certificates` |
-| Arch           | `trust extract-compat`   |
+| Distribution   | Command it runs           |
+| -------------- | ------------------------- |
+| Debian, Ubuntu | `update-ca-certificates`  |
+| Fedora, RHEL   | `update-ca-trust extract` |
+| openSUSE       | `update-ca-certificates`  |
+| Arch           | `trust extract-compat`    |
 
 ### Trust it in your browser
 
@@ -80,4 +102,4 @@ nearhost trust
 
 ## Next
 
-Run `nearhost` to start the one-screen first-run setup. See [First run](/docs/getting-started/first-run/).
+Run `nearhost`. The first time, it offers to trust the certificate authority for you. See [First run](/docs/getting-started/first-run/).
