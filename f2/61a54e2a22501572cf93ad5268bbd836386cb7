@@ -1,0 +1,14 @@
+src/content/docs/docs/getting-started/introduction.md
+  h_13c4e797d6e9d2 51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f261a54e2a22501572cf93ad5268bbd836386cb7",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
