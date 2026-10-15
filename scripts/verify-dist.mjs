@@ -89,10 +89,11 @@ if (existsSync(index)) {
     /data-version[^>]*>(v\d+\.\d+\.\d+[^<]*|latest)</.test(html),
     'footer version is neither a tag nor "latest"',
   );
+  // The nav menu, the copy button and the interface demo.
   const components = new Set([...html.matchAll(/component-url="([^"]*)"/g)].map((m) => m[1]));
   check(
-    components.size === 2,
-    `landing page must hydrate exactly two island components, found ${components.size}`,
+    components.size === 3,
+    `landing page must hydrate exactly three island components, found ${components.size}`,
   );
   const main = html.match(/<main[\s\S]*<\/main>/)?.[0] ?? '';
   check(
