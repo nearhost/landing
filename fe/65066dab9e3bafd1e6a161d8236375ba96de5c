@@ -1,0 +1,82 @@
+404.html
+  h_13c4e797d6e9d2 1-41
+CNAME
+  h_13c4e797d6e9d2 1
+_astro/CopyButton.Cjjc7fPo.js
+  h_13c4e797d6e9d2 1
+_astro/Footer.D2buenN_.css
+  h_13c4e797d6e9d2 1
+_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.C3fM4Kra.js
+  h_13c4e797d6e9d2 1
+_astro/NavMenu.B2De-_Qr.js
+  h_13c4e797d6e9d2 1
+_astro/Search.astro_astro_type_script_index_0_lang.g9hoxVJg.js
+  h_13c4e797d6e9d2 1
+_astro/TableOfContents.astro_astro_type_script_index_0_lang.BpJaGz7G.js
+  h_13c4e797d6e9d2 1
+_astro/client.GsUm35hl.js
+  h_13c4e797d6e9d2 1-2
+_astro/client.svelte.DoLsfRtf.js
+  h_13c4e797d6e9d2 1
+_astro/common.CFuWej-m.css
+  h_13c4e797d6e9d2 1-3
+_astro/disclose-version.xihTtKlq.js
+  h_13c4e797d6e9d2 1
+_astro/ec.0vx5m.js
+  h_13c4e797d6e9d2 1-3
+_astro/ec.w36nc.css
+  h_13c4e797d6e9d2 1
+_astro/index.jRWx89EB.css
+  h_13c4e797d6e9d2 1
+_astro/page.cNngjUgL.js
+  h_13c4e797d6e9d2 1
+_astro/print.ehPL0gv-.css
+  h_13c4e797d6e9d2 1
+_astro/starlight-toc.D4UDIxQL.js
+  h_13c4e797d6e9d2 1
+_astro/ui-core.Clh5jUUO.js
+  h_13c4e797d6e9d2 1-2
+favicon.svg
+  h_13c4e797d6e9d2 1-5
+index.html
+  h_13c4e797d6e9d2 1-11
+install.sh
+  h_13c4e797d6e9d2 1-111
+pagefind/pagefind-component-ui.css
+  h_13c4e797d6e9d2 1-1509
+pagefind/pagefind-component-ui.js
+  h_13c4e797d6e9d2 1-56
+pagefind/pagefind-entry.json
+  h_13c4e797d6e9d2 1
+pagefind/pagefind-highlight.js
+  h_13c4e797d6e9d2 1-1070
+pagefind/pagefind-modular-ui.css
+  h_13c4e797d6e9d2 1-214
+pagefind/pagefind-modular-ui.js
+  h_13c4e797d6e9d2 1-8
+pagefind/pagefind-ui.css
+  h_13c4e797d6e9d2 1
+pagefind/pagefind-ui.js
+  h_13c4e797d6e9d2 1-2
+pagefind/pagefind-worker.js
+  h_13c4e797d6e9d2 1-6
+pagefind/pagefind.js
+  h_13c4e797d6e9d2 1-6
+robots.txt
+  h_13c4e797d6e9d2 1-3
+sitemap-0.xml
+  h_13c4e797d6e9d2 1
+sitemap-index.xml
+  h_13c4e797d6e9d2 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "fe65066dab9e3bafd1e6a161d8236375ba96de5c",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
