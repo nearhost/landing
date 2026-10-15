@@ -67,9 +67,9 @@
       </svg>
       <h3>Port discovery</h3>
       <p>
-        Nearhost reads <code>.env</code>, Compose files and <code>vite.config</code> to propose the
-        ports, with presets for Laravel Sail. It flags port clashes and a missing{' '}
-        <code>allowedHosts</code> before you start. For anything else, you enter the ports yourself.
+        Nearhost reads port variables from <code>.env</code>. Presets from a registry you choose to
+        trust add Compose, Vite and Laravel Sail, and warn about port clashes and a missing{' '}
+        <code>allowedHosts</code> before you start. For anything else, give it the web port.
       </p>
     </div>
     <div class="cell">
