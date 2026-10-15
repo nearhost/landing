@@ -1,0 +1,47 @@
+.github/workflows/deploy.yml
+  s_f390899c03d13b::t_fac3d9231fd5ea 3-5,10,22,40-52,54,56-57,60,77-83,86-91,93-114
+README.md
+  s_f390899c03d13b::t_eab806f644452b 32-34
+astro.config.mjs
+  s_f390899c03d13b::t_c498e8402f4ed9 5-11,15-18,20-21
+package-lock.json
+  s_f390899c03d13b::t_a1c397c765c8eb 10,12,41
+package.json
+  s_f390899c03d13b::t_97ddc0b4e2b101 25
+public/robots.txt
+  s_f390899c03d13b::t_cd738f0bb5d37c 3
+src/components/landing/Footer.astro
+  s_f390899c03d13b::t_9327af1bc7740a 2,17
+src/components/landing/Hero.astro
+  s_f390899c03d13b::t_95f6bf4173e3dc 2,34
+src/components/landing/Install.astro
+  s_f390899c03d13b::t_1d40ff7461f26a 2,38-39
+src/components/landing/Nav.astro
+  s_f390899c03d13b::t_8b761f60108f35 2,7,16
+src/components/starlight/Header.astro
+  s_f390899c03d13b::t_010d55e13f25e7 2,17
+src/components/starlight/SiteTitle.astro
+  s_f390899c03d13b::t_da49972832a410 2,7,14
+src/layouts/Landing.astro
+  s_f390899c03d13b::t_d82fdb30e3021d 2,27
+src/lib/base-links.mjs
+  s_f390899c03d13b::t_49950baafb2565 1-17
+src/lib/url.ts
+  s_f390899c03d13b::t_836088ca8ca58f 1-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "81837746ded0a888c52491886e06a4cc637e8765",
+  "prompts": {},
+  "sessions": {
+    "s_f390899c03d13b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa9de9c2-e0cf-4ec4-9a38-c49c714cb363",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
