@@ -15,6 +15,7 @@ nearhost hosts apply | clean   the nearhost block in /etc/hosts
 nearhost doctor                check ports, the CA, the hosts block and servers
 nearhost preset ...            presets, which say what a framework's ports mean
 nearhost preset registry ...   the preset registries you trust
+nearhost update                update to the latest release
 nearhost version               print the version
 ```
 
@@ -113,6 +114,26 @@ Checks the setup and changes nothing, apart from creating `~/.nearhost` on each 
 | `nearhost preset registry remove <alias>`   | Stop trusting a registry, once none of its presets are enabled. Their files are kept. |
 
 See [Presets and registries](/docs/concepts/presets-and-registries/).
+
+## nearhost update
+
+Checks GitHub for the latest release and updates Nearhost the way it was installed. It shows the command it will run and asks first.
+
+| Installed with      | Command it runs                                                             |
+| ------------------- | --------------------------------------------------------------------------- |
+| Homebrew            | `brew upgrade --cask nearhost/tap/nearhost`                                 |
+| npm, pnpm, bun      | `npm install -g @nearhost/cli@latest`, or the pnpm or bun equivalent        |
+| `go install`        | `go install github.com/nearhost/nearhost/cmd/nearhost@latest`               |
+| The shell installer | The installer again, with `NEARHOST_INSTALL_DIR` set to the binary's folder |
+
+Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. When the binary's folder is not writable, it prints the installer command with `sudo` rather than running anything. On Linux, after a Homebrew or `go install` update, it prints the `setcap` command to run again.
+
+| Flag      | Effect                                                         |
+| --------- | -------------------------------------------------------------- |
+| `--yes`   | Update without asking.                                         |
+| `--check` | Only report. Exits 1 when a newer release is out, 0 otherwise. |
+
+Nearhost also checks for a new release at most once a day, in the background, and prints a line after the command when one is out. The interface shows it in its log. Set `NEARHOST_NO_UPDATE_CHECK=1` to turn the check off.
 
 ## nearhost version
 
