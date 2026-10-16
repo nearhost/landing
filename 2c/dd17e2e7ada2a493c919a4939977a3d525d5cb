@@ -1,0 +1,30 @@
+scripts/collect-stats.mjs
+  s_45a646981f59bb::t_a1e9d2e50c9647 1-103
+.github/workflows/stats.yml
+  s_45a646981f59bb::t_dff9176e618f26 1-48
+scripts/collect-stats.test.mjs
+  s_45a646981f59bb::t_9c9852fa7d7b13 1-74
+  s_45a646981f59bb::t_44fa8616a1aeb2 75-77
+.github/workflows/deploy.yml
+  s_45a646981f59bb::t_65ac09a428002f 105-108
+README.md
+  s_45a646981f59bb::t_fcbbc910917e10 36-37
+package.json
+  s_45a646981f59bb::t_2ed9495f0a56db 19-20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2cdd17e2e7ada2a493c919a4939977a3d525d5cb",
+  "prompts": {},
+  "sessions": {
+    "s_45a646981f59bb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8a2df9ca-aa86-4cd3-9bfe-f8120798a9ac",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
