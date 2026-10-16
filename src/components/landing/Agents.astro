@@ -2,9 +2,25 @@
 import CopyButton from '../CopyButton.svelte';
 
 const install = 'npx skills add nearhost/nearhost -g';
-// What the skill's script prints, as the agent's tool results show it.
-const proposed = '{"expires_at":"2026-10-16T09:12:40Z","id":"7c1f04a2e9b3d851"}';
-const accepted = '{"project":{"name":"myapp","url":"https://myapp.test",…},"state":"accepted"}';
+
+// Claude Code's logo as it prints it: block characters in three rows, each
+// cell split into quadrants (top left, top right, bottom left, bottom right).
+// Drawn as an SVG, so the rows meet whatever the line height.
+const quadrants: Record<string, number[]> = {
+  ' ': [],
+  '▐': [1, 3],
+  '▛': [0, 1, 2],
+  '█': [0, 1, 2, 3],
+  '▝': [1],
+  '▜': [0, 1, 3],
+  '▀': [0, 1],
+};
+const logoRows = [' ▐▛███▛█ ', '▝▜██████▀', ' ▝▝   ▝▝ '];
+const logo = logoRows.flatMap((row, y) =>
+  [...row].flatMap((ch, x) =>
+    quadrants[ch].map((q) => ({ x: x * 2 + (q % 2), y: y * 2 + Math.floor(q / 2) })),
+  ),
+);
 ---
 
 <section id="agents" class="agents">
@@ -41,19 +57,38 @@ const accepted = '{"project":{"name":"myapp","url":"https://myapp.test",…},"st
 
       <!-- prettier-ignore -->
       <div class="pane claude" role="tabpanel" data-pane="claude" aria-label="claude on mini">
-        <div class="l s0"><span class="dim">dev@mini:~/code/myapp$</span> claude</div>
-        <div class="l s0 dim">Claude Code, in /home/dev/code/myapp</div>
-        <div class="l s0"></div>
-        <div class="l s0 prompt"><span class="dim">&gt;</span> <span class="typed" data-text="/nearhost add">/nearhost add</span><span class="caret"></span></div>
-        <div class="l s0"></div>
-        <div class="l s2"><span class="dot">⏺</span> <b>Bash</b>(sh …/nearhost/scripts/nearhost.sh propose .)</div>
-        <div class="l s2 dim raw">  ⎿ {proposed}</div>
-        <div class="l s3"><span class="dot">⏺</span> I've proposed myapp to Nearhost. Review it in Nearhost on ecs@macbook.</div>
-        <div class="l s3"><span class="dot">⏺</span> <b>Bash</b>(sh …/nearhost/scripts/nearhost.sh wait 7c1f04a2e9b3d851)</div>
-        <div class="l s3 dim waiting">  ⎿ Waiting for your answer…</div>
-        <div class="l s8 dim raw">  ⎿ {accepted}</div>
-        <div class="l s8"></div>
-        <div class="l s8"><span class="dot ok">⏺</span> Added. myapp is running at <span class="url">https://myapp.test</span>, served from port 5173 on mini.</div>
+        <div class="cc-head">
+          <svg class="logo" viewBox="0 0 18 6" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true">{logo.map((p) => <rect x={p.x} y={p.y} width="1" height="1" />)}</svg>
+          <div>
+            <div class="l"><b>Claude Code</b> <span class="grey">v2.1.301</span></div>
+            <div class="l grey">Opus 5.5 · Claude Max</div>
+            <div class="l grey">~/code/myapp</div>
+          </div>
+        </div>
+        <div class="transcript">
+          <div class="g g-user"><div class="l you"><span class="grey">❯</span> <span class="white">/nearhost:nearhost add</span></div></div>
+          <div class="g g-run1">
+            <div class="l">  Proposing this project to Nearhost</div>
+            <div class="l grey">  ⎿  $ sh ~/.claude/skills/nearhost/scripts/nearhost.sh propose .</div>
+          </div>
+          <div class="g g-ran1"><div class="l grey">  Ran <b>1</b> shell command</div></div>
+          <div class="g g-msg1"><div class="l"><span class="white">⏺</span> I've proposed myapp to Nearhost. Review it in Nearhost on ecs@macbook.</div></div>
+          <div class="g g-run2">
+            <div class="l">  Waiting for your answer in Nearhost</div>
+            <div class="l grey">  ⎿  $ sh ~/.claude/skills/nearhost/scripts/nearhost.sh wait 7c1f04a2e9b3d851</div>
+          </div>
+          <div class="g g-ran2"><div class="l grey">  Ran <b>1</b> shell command</div></div>
+          <div class="g g-final"><div class="l wrap"><span class="white">⏺</span> Added. myapp is running at <span class="lav">https://myapp.test</span>, served from port 5173 on mini.</div></div>
+          <div class="g spin spin1"><div class="l"><span class="spinc">✢ Combobulating…</span> <span class="grey">(2s · esc to interrupt)</span></div></div>
+          <div class="g spin spin2"><div class="l"><span class="spinc">✻ Percolating…</span> <span class="grey">(14s · esc to interrupt)</span></div></div>
+          <div class="g g-done"><div class="l grey">✻ Brewed for 21s</div></div>
+        </div>
+        <div class="promptbox">
+          <div class="hr"></div>
+          <div class="l"><span class="grey">❯</span> <span class="typed lav" data-text="/nearhost add"></span><span class="caret"></span></div>
+          <div class="hr"></div>
+          <div class="l grey">  ? for shortcuts</div>
+        </div>
       </div>
 
       <!-- prettier-ignore -->
@@ -153,22 +188,26 @@ const accepted = '{"project":{"name":"myapp","url":"https://myapp.test",…},"st
       win.dataset.step = '0';
       show('claude');
       typed.textContent = '';
-      [...text].forEach((c, i) => at(500 + i * 70, () => (typed.textContent += c)));
-      const done = 500 + text.length * 70;
-      at(done + 500, () => (win.dataset.step = '2'));
-      at(done + 1300, () => (win.dataset.step = '3'));
-      at(done + 2300, () => win.classList.add('notified'));
-      at(done + 3300, () => show('nearhost'));
-      at(done + 5100, () => win.classList.add('pressed'));
-      at(done + 5500, () => {
+      [...text].forEach((c, i) => at(600 + i * 70, () => (typed.textContent += c)));
+      const done = 600 + text.length * 70;
+      // Enter: the prompt joins the transcript and the skill starts.
+      at(done + 400, () => {
+        typed.textContent = '';
+        win.dataset.step = '1';
+      });
+      at(done + 1800, () => (win.dataset.step = '3'));
+      at(done + 2800, () => win.classList.add('notified'));
+      at(done + 3800, () => show('nearhost'));
+      at(done + 5600, () => win.classList.add('pressed'));
+      at(done + 6000, () => {
         win.classList.remove('pressed');
         win.dataset.step = '7';
       });
-      at(done + 6900, () => {
+      at(done + 7400, () => {
         win.dataset.step = '8';
         show('claude');
       });
-      at(done + 7400, () => {
+      at(done + 7900, () => {
         win.dataset.step = '9';
         replay.hidden = false;
       });
@@ -324,7 +363,7 @@ const accepted = '{"project":{"name":"myapp","url":"https://myapp.test",…},"st
   }
 
   .pane {
-    height: calc(15 * var(--cell));
+    height: calc(21 * var(--cell));
     padding: 12px 2ch;
     overflow: hidden;
   }
@@ -347,12 +386,6 @@ const accepted = '{"project":{"name":"myapp","url":"https://myapp.test",…},"st
   .amber {
     color: var(--amber);
   }
-  .dot {
-    color: var(--text);
-  }
-  .dot.ok {
-    color: var(--ok);
-  }
   b {
     font-weight: 600;
   }
@@ -372,31 +405,106 @@ const accepted = '{"project":{"name":"myapp","url":"https://myapp.test",…},"st
   .live .pane {
     display: none;
   }
-  .live[data-tab='claude'] .claude,
+  .live[data-tab='claude'] .claude {
+    display: flex;
+  }
   .live[data-tab='nearhost'] .nearhost {
     display: block;
   }
 
-  /* Lines belong to a step of the exchange and wait for it. */
-  .live[data-step='0'] :is(.s2, .s3, .s7, .s8),
-  .live[data-step='2'] :is(.s3, .s7, .s8),
-  .live[data-step='3'] :is(.s7, .s8),
-  .live[data-step='7'] .s8 {
+  /* Each part of the exchange waits for its step. Without the script the
+     finished session shows: no spinner, nothing still running. */
+  .g-run1,
+  .g-run2,
+  .spin {
+    display: none;
+  }
+  .live[data-step='0'] :is(.g-user, .g-ran1, .g-msg1, .g-ran2, .g-final, .g-done),
+  .live[data-step='1'] :is(.g-ran1, .g-msg1, .g-ran2, .g-final, .g-done),
+  .live:is([data-step='3'], [data-step='7']) :is(.g-ran2, .g-final, .g-done) {
+    display: none;
+  }
+  .live[data-step='1'] :is(.g-run1, .spin1),
+  .live:is([data-step='3'], [data-step='7']) :is(.g-run2, .spin2) {
+    display: block;
+  }
+  /* On the Nearhost tab, the proposal arrives at 3 and is saved at 7. */
+  .live:is([data-step='0'], [data-step='1']) :is(.s3, .s7),
+  .live[data-step='3'] .s7 {
     visibility: hidden;
   }
-  .live[data-step='0'] .caret,
-  .live[data-step='2'] .caret {
+  .caret {
     opacity: 1;
     animation: blink 1.06s steps(1) infinite;
   }
-  .live:is([data-step='8'], [data-step='9']) .waiting,
-  .window:not(.live) .waiting {
-    display: none;
+  .live:is([data-step='1'], [data-step='3'], [data-step='7']) .caret {
+    opacity: 0;
+    animation: none;
   }
   @keyframes blink {
     50% {
       opacity: 0;
     }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .caret {
+      animation: none;
+    }
+  }
+
+  /* Claude Code's own colours, as its terminal session draws them. */
+  .claude {
+    display: flex;
+    flex-direction: column;
+    color: #d6d6d6;
+  }
+  .cc-head {
+    display: flex;
+    gap: 3ch;
+    align-items: center;
+  }
+  .cc-head .l {
+    min-height: 1.3em;
+    line-height: 1.3em;
+  }
+  .logo {
+    width: 9ch;
+    height: 3.9em;
+    fill: #d77757;
+  }
+  .grey {
+    color: #999;
+  }
+  .white {
+    color: #fff;
+  }
+  .lav {
+    color: #b1b9f9;
+  }
+  .spinc {
+    color: #c75b4e;
+  }
+  .transcript {
+    padding-top: var(--cell);
+  }
+  .g + .g {
+    margin-top: var(--cell);
+  }
+  .you {
+    background: #373737;
+    margin-inline: -2ch;
+    padding-inline: 2ch;
+  }
+  .promptbox {
+    margin-top: var(--cell);
+  }
+  .l.wrap {
+    white-space: pre-wrap;
+  }
+  .hr {
+    margin-inline: -2ch;
+    height: var(--cell);
+    background: linear-gradient(#888, #888) 0 50% / 100% 1px no-repeat;
   }
 
   /* The Nearhost tab: the interface with the proposal open over it. */
@@ -543,12 +651,11 @@ const accepted = '{"project":{"name":"myapp","url":"https://myapp.test",…},"st
        script's raw output, which says least, is left out. */
     .pane {
       height: auto;
-      min-height: calc(15 * var(--cell));
+      min-height: calc(21 * var(--cell));
     }
     .claude .l {
       white-space: pre-wrap;
     }
-    .raw,
     .lights {
       display: none;
     }
