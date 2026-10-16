@@ -78,7 +78,7 @@ Both take `--file <path>` to work on another file than `/etc/hosts`. See [The ho
 
 ## nearhost doctor
 
-Checks the setup and changes nothing. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. It takes `--https-port`, `--http-port` and `--no-hosts`.
+Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. It takes `--https-port`, `--http-port` and `--no-hosts`.
 
 | Check                 | What it looks at                                                                       |
 | --------------------- | -------------------------------------------------------------------------------------- |
@@ -90,6 +90,7 @@ Checks the setup and changes nothing. Each line is `ok`, `warn` or `FAIL`, with 
 | `aliases`             | Only shown when an alias is not a lowercase `.test` name.                              |
 | `hosts block`         | Whether `/etc/hosts` has every project's alias.                                        |
 | `server <name>`       | Whether `ssh <host>` connects without a prompt, for each server.                       |
+| `agents on <name>`    | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.  |
 
 ## nearhost preset
 
