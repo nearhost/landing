@@ -1,6 +1,10 @@
+<a href="https://nearhost.dev"><img src="https://raw.githubusercontent.com/nearhost/.github/main/assets/header.png" alt="Nearhost. Run it anywhere. Open it here."></a>
+
 # nearhost.dev
 
-Source for the Nearhost website and documentation. Built with Astro and Starlight, deployed to GitHub Pages.
+The source for [nearhost.dev](https://nearhost.dev), the website and documentation for [Nearhost](https://github.com/nearhost/nearhost). Nearhost is a terminal app that opens a dev server running on one of your other machines at a local `https://myapp.test`, over the SSH config you already have. This site is built with Astro and Starlight and deployed to GitHub Pages.
+
+[Website](https://nearhost.dev) · [Docs](https://nearhost.dev/docs/getting-started/introduction/) · [Nearhost](https://github.com/nearhost/nearhost) · [Releases](https://github.com/nearhost/nearhost/releases)
 
 ## Develop
 
