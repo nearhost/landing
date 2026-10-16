@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-10-16T09:15:50.920Z",
+  "repo": "nearhost/nearhost",
+  "downloads": {
+    "total": 1,
+    "byRelease": {
+      "v0.4.0": 0,
+      "v0.3.0": 0,
+      "v0.2.0": 0,
+      "v0.1.0": 1
+    },
+    "daily": [
+      {
+        "d": "2026-10-16",
+        "v": 1
+      }
+    ]
+  },
+  "stars": {
+    "total": 0,
+    "daily": [
+      {
+        "d": "2026-10-16",
+        "v": 0
+      }
+    ]
+  }
+}
