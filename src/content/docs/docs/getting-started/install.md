@@ -49,7 +49,7 @@ go install github.com/nearhost/nearhost/cmd/nearhost@latest
 npx @nearhost/cli
 ```
 
-The `@nearhost/cli` package downloads the matching binary on install, so `npx` runs the real thing.
+or `npm install -g @nearhost/cli` to keep the `nearhost` command. npm installs the binary for your machine as a platform package, such as `@nearhost/cli-linux-x64`, with no install script, so pnpm, bun and `--ignore-scripts` work too.
 
 ## Linux setup
 
@@ -64,6 +64,8 @@ sudo setcap cap_net_bind_service=+ep "$(command -v nearhost)"
 ```
 
 Run it again after each upgrade, because replacing the binary clears the capability. The shell installer prints this command for you. Run from a downloaded copy at a terminal, rather than through `curl | sh`, it asks whether to run it, and only uses `sudo` if you say yes.
+
+Installed from npm, `command -v nearhost` finds the Node launcher rather than the binary, so run the command `nearhost doctor` prints instead: it names the binary itself.
 
 ### Trust the certificate authority
 
