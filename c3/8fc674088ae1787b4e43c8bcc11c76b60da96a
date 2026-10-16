@@ -1,0 +1,24 @@
+src/layouts/Landing.astro
+  s_eac23485f35f15::t_31182aa2402b27 43-48
+  s_eac23485f35f15::t_69b576a5fe6f76 3,18
+astro.config.mjs
+  s_eac23485f35f15::t_69b576a5fe6f76 7,13-18,36
+src/lib/plausible.mjs
+  s_eac23485f35f15::t_69ef6a3cd28413 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c38fc674088ae1787b4e43c8bcc11c76b60da96a",
+  "prompts": {},
+  "sessions": {
+    "s_eac23485f35f15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "42f96f90-8ac4-4a4f-8a13-41b93f23af99",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
