@@ -61,24 +61,21 @@ To use one socket explicitly, set `NEARHOST_SOCKET` to its path where the agent 
 
 **The server refuses the forward.** Its sshd has `AllowStreamLocalForwarding no`. The server's panel shows `agents unavailable` with sshd's message, and so does `nearhost doctor`. Set `AllowStreamLocalForwarding yes` in the server's `sshd_config` and press `r` on the server to reconnect. Projects serve either way, and `r` on Home leaves such a server connected.
 
-**The agent's sandbox blocks the socket.** An agent that runs commands in a sandbox needs `~/.nearhost/*.sock` allowed, and most block Unix sockets by default. Here is how for two of them.
+**The agent's sandbox blocks the socket.** Agents that run commands in a sandbox block Unix sockets by default, so the skill's script cannot reach `~/.nearhost`. Allow only what Nearhost needs.
 
-With Claude Code's sandbox on, allow the socket in `~/.claude/settings.json` where the agent runs. On macOS, name it by its full path, which `ls ~/.nearhost` shows:
+- **Approve the one command.** Claude Code and Codex ask before they run a command the sandbox blocks outside it. Approving that for the skill's script opens nothing else, so it is the narrowest choice.
+- **Claude Code on macOS** can allow the one socket by its full path, which `ls ~/.nearhost` shows, in `~/.claude/settings.json` where the agent runs:
 
-```json
-{ "sandbox": { "network": { "allowUnixSockets": ["/home/dev/.nearhost/k3f9q2.sock"] } } }
-```
+  ```json
+  { "sandbox": { "network": { "allowUnixSockets": ["/home/dev/.nearhost/k3f9q2.sock"] } } }
+  ```
 
-On Linux, Claude Code cannot allow one socket, only all of them, with `"allowAllUnixSockets": true` in the same place.
+Two settings also work, but open far more than Nearhost:
 
-Codex runs commands in a sandbox too. Allow network access for its workspace sandbox in `~/.codex/config.toml`:
+- **Claude Code on Linux** cannot allow one socket, only every one, with `"allowAllUnixSockets": true`.
+- **Codex's** `network_access = true` under `[sandbox_workspace_write]` gives its sandbox the network and every socket.
 
-```toml
-[sandbox_workspace_write]
-network_access = true
-```
-
-Or approve the command when Codex asks to run it outside the sandbox.
+Every socket includes ones like Docker's `/var/run/docker.sock`, and a command that reaches Docker's socket can take over the machine. Use these settings only if that is acceptable where the agent runs; otherwise approve the command when the agent asks.
 
 ## Turn notifications off
 
