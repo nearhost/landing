@@ -1,0 +1,29 @@
+src/components/landing/Agents.astro
+  s_b33b52432eafa1::t_5623e11ead12da 42,44,47,49-54,56,59,61,65,68,71-72,75,77,83-84,87-88,90-92,94
+  s_b33b52432eafa1::t_9785717a9f4f65 5-7
+  s_b33b52432eafa1::t_6f517951f188b7 1-4,8-22,28-36,40-41,43,45-46,48,55,57-58,60,62-64,66-67,69-70,73-74,76,78,80-82,85-86,89,93,95-178,180-207,209-212,219-286,288-434,442-541,544,547-549,561-563
+  s_b33b52432eafa1::t_9a12bf7173247f 437,440
+  s_b33b52432eafa1::t_76d55638ba3765 213-218,435-436,438-439,441
+  s_b33b52432eafa1::t_d2740204c65826 23-27,37-39,551-552,554-557
+  s_b33b52432eafa1::t_daaff4010fc65f 79,179
+  s_b33b52432eafa1::t_6a6026e82d4e2f 287,542-543,545-546,550,553,558-560
+  s_b33b52432eafa1::t_2d6c77ac70a2b3 208
+src/pages/index.astro
+  s_b33b52432eafa1::t_daaff4010fc65f 9,27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b07f5ff2336536169623a3848e877bf6de230d48",
+  "prompts": {},
+  "sessions": {
+    "s_b33b52432eafa1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "134e9450-f2ff-4de4-b4ab-05e5f61b0288",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
