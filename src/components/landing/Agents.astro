@@ -1,0 +1,563 @@
+---
+import CopyButton from '../CopyButton.svelte';
+
+const install = 'npx skills add nearhost/nearhost -g';
+// What the skill's script prints, as the agent's tool results show it.
+const proposed = '{"expires_at":"2026-10-16T09:12:40Z","id":"7c1f04a2e9b3d851"}';
+const accepted = '{"project":{"name":"myapp","url":"https://myapp.test",…},"state":"accepted"}';
+---
+
+<section id="agents" class="agents">
+  <div class="container inner">
+    <div class="intro">
+      <h2>Your agent asks. You say yes.</h2>
+      <p>
+        Ask the coding agent in your project to add it to Nearhost. Nearhost opens the add form on
+        your laptop, already filled in, and the agent gets the address once you save it. It works
+        the same when the agent runs on a server you reach over SSH.
+      </p>
+    </div>
+
+    <div class="window" data-agents data-tab="claude" data-step="9">
+      <div class="titlebar">
+        <span class="lights" aria-hidden="true">
+          <i></i>
+          <i></i>
+          <i></i>
+        </span>
+        <div class="tabs" role="tablist" aria-label="Terminal tabs">
+          <button type="button" role="tab" class="tab" data-for="claude" aria-selected="true">
+            claude on mini
+          </button>
+          <button type="button" role="tab" class="tab" data-for="nearhost" aria-selected="false">
+            nearhost
+            <span class="badge" aria-label="notification"></span>
+          </button>
+        </div>
+        <button type="button" class="replay" hidden>
+          Replay
+        </button>
+      </div>
+
+      <!-- prettier-ignore -->
+      <div class="pane claude" role="tabpanel" data-pane="claude" aria-label="claude on mini">
+        <div class="l s0"><span class="dim">dev@mini:~/code/myapp$</span> claude</div>
+        <div class="l s0 dim">Claude Code, in /home/dev/code/myapp</div>
+        <div class="l s0"></div>
+        <div class="l s0 prompt"><span class="dim">&gt;</span> <span class="typed" data-text="/nearhost add">/nearhost add</span><span class="caret"></span></div>
+        <div class="l s0"></div>
+        <div class="l s2"><span class="dot">⏺</span> <b>Bash</b>(sh …/nearhost/scripts/nearhost.sh propose .)</div>
+        <div class="l s2 dim raw">  ⎿ {proposed}</div>
+        <div class="l s3"><span class="dot">⏺</span> I've proposed myapp to Nearhost. Review it in Nearhost on ecs@macbook.</div>
+        <div class="l s3"><span class="dot">⏺</span> <b>Bash</b>(sh …/nearhost/scripts/nearhost.sh wait 7c1f04a2e9b3d851)</div>
+        <div class="l s3 dim waiting">  ⎿ Waiting for your answer…</div>
+        <div class="l s8 dim raw">  ⎿ {accepted}</div>
+        <div class="l s8"></div>
+        <div class="l s8"><span class="dot ok">⏺</span> Added. myapp is running at <span class="url">https://myapp.test</span>, served from port 5173 on mini.</div>
+      </div>
+
+      <!-- prettier-ignore -->
+      <div class="pane nearhost" role="tabpanel" data-pane="nearhost" aria-label="nearhost">
+        <div class="l status"><span><span class="beacon">∩</span> nearhost</span><span class="dim">proxy <span class="ok">●</span> · CA trusted · hosts ok</span></div>
+        <div class="rule"></div>
+        <div class="body">
+          <div class="side">
+            <div class="l"><span class="beacon">▌</span>home</div>
+            <div class="l"></div>
+            <div class="l">▾ local</div>
+            <div class="l">  <span class="ok">●</span> website</div>
+            <div class="l"></div>
+            <div class="l">▾ mini</div>
+            <div class="l">  <span class="dim">○</span> blog</div>
+            <div class="l s7">  <span class="ok">●</span> myapp</div>
+          </div>
+          <div class="main">
+            <div class="l"><b>Nearhost</b></div>
+            <div class="l"></div>
+            <div class="l"><span class="dim">running  </span>1 of 2 projects</div>
+            <div class="l"></div>
+            <div class="l s3 dim">Agent on mini wants to add /home/dev/code/myapp.</div>
+            <div class="l s7">Added myapp, as an agent on mini proposed.</div>
+          </div>
+          <div class="box" aria-label="Add project">
+            <div class="l head"><span><b>Add project</b><span class="dim"> · routes</span></span><span class="dim">5 of 7</span></div>
+            <div class="l progress"><span></span></div>
+            <div class="l amber">Proposed by an agent on mini</div>
+            <div class="l"></div>
+            <div class="l"><span class="dim">server    </span>mini</div>
+            <div class="l"><span class="dim">path      </span>/home/dev/code/myapp</div>
+            <div class="l"></div>
+            <div class="l dim">      port    role        label</div>
+            <div class="l sel"><span class="beacon">▌</span> [x] 5173    <span class="beacon">‹ web ›</span>     vite (VITE_PORT)</div>
+            <div class="l">  [ ] 5432    ignore      db (DB_PORT)</div>
+            <div class="l"></div>
+            <div class="l keys"><span class="key">enter</span><span class="dim"> next · esc back</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="after">
+      <ul class="facts">
+        <li>Nothing is added until you save it in Nearhost.</li>
+        <li>
+          On a server, the agent reaches Nearhost through the SSH connection Nearhost already has.
+          No port is opened.
+        </li>
+        <li>Works in Claude Code, Codex, Cursor, Gemini CLI and any agent that reads skills.</li>
+      </ul>
+      <div class="get">
+        <span class="label">Give your agent the skill</span>
+        <div class="line">
+          <code id="install-skill">{install}</code>
+          <CopyButton
+            client:visible
+            text={install}
+            label="Copy the skill install command"
+            targetId="install-skill"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Plays the exchange once, when the window comes into view: the agent
+  // proposes, the Nearhost tab gets a notification, the view flips to it, the
+  // form is saved, and the view flips back for the answer. Without this
+  // script, or with reduced motion, every line is shown and the tabs flip
+  // only when clicked.
+  for (const win of document.querySelectorAll<HTMLElement>('[data-agents]')) {
+    const tabs = [...win.querySelectorAll<HTMLButtonElement>('.tab')];
+    const replay = win.querySelector<HTMLButtonElement>('.replay')!;
+    const typed = win.querySelector<HTMLElement>('.typed')!;
+    const text = typed.dataset.text ?? '';
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let timers: number[] = [];
+
+    const show = (tab: string) => {
+      win.dataset.tab = tab;
+      for (const t of tabs) t.setAttribute('aria-selected', String(t.dataset.for === tab));
+      if (tab === 'nearhost') win.classList.remove('notified');
+    };
+    win.classList.add('live');
+    for (const t of tabs) t.addEventListener('click', () => show(t.dataset.for!));
+
+    const at = (ms: number, fn: () => void) => timers.push(window.setTimeout(fn, ms));
+    const play = () => {
+      timers.forEach(clearTimeout);
+      timers = [];
+      replay.hidden = true;
+      win.classList.remove('notified');
+      win.dataset.step = '0';
+      show('claude');
+      typed.textContent = '';
+      [...text].forEach((c, i) => at(500 + i * 70, () => (typed.textContent += c)));
+      const done = 500 + text.length * 70;
+      at(done + 500, () => (win.dataset.step = '2'));
+      at(done + 1300, () => (win.dataset.step = '3'));
+      at(done + 2300, () => win.classList.add('notified'));
+      at(done + 3300, () => show('nearhost'));
+      at(done + 5100, () => win.classList.add('pressed'));
+      at(done + 5500, () => {
+        win.classList.remove('pressed');
+        win.dataset.step = '7';
+      });
+      at(done + 6900, () => {
+        win.dataset.step = '8';
+        show('claude');
+      });
+      at(done + 7400, () => {
+        win.dataset.step = '9';
+        replay.hidden = false;
+      });
+    };
+    replay.addEventListener('click', play);
+
+    if (still.matches) {
+      replay.hidden = false; // it plays only when asked
+      continue;
+    }
+    const seen = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          seen.disconnect();
+          play();
+        }
+      },
+      { threshold: 0.5 },
+    );
+    seen.observe(win);
+  }
+</script>
+
+<style>
+  .agents {
+    border-top: 1px solid var(--nh-line);
+  }
+  .inner {
+    padding-block: 112px;
+    display: flex;
+    flex-direction: column;
+    gap: 48px;
+  }
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    max-width: 720px;
+  }
+  .intro h2 {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-weight: 700;
+    font-size: clamp(40px, 6vw, 80px);
+    line-height: 1;
+    letter-spacing: var(--nh-track-display);
+    text-wrap: balance;
+  }
+  .intro p {
+    margin: 0;
+    color: var(--nh-body);
+    font-size: 18px;
+  }
+
+  /* The terminal keeps its own colours, as the interface mock-up does. */
+  .window {
+    --ground: #0f1210;
+    --beacon: #d6f26b;
+    --text: #ecefe8;
+    --dim: #7c8479;
+    --amber: #f2b84b;
+    --ok: #7fdb8a;
+    --edge: #4a5449;
+    --cell: 1.6em;
+    container-type: inline-size;
+    background: var(--ground);
+    color: var(--text);
+    border: 1px solid var(--nh-line);
+    border-radius: var(--nh-radius-l);
+    overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.5);
+    font-family: var(--nh-font-mono);
+    font-size: clamp(10.5px, 1.45vw, 13.5px);
+    line-height: var(--cell);
+    font-variant-ligatures: none;
+  }
+  .titlebar {
+    display: flex;
+    align-items: stretch;
+    gap: 14px;
+    height: 34px;
+    padding: 0 12px;
+    background: #121513;
+    border-bottom: 1px solid #1e231f;
+    font-size: 12px;
+  }
+  .lights {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+  }
+  .lights i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2a312b;
+  }
+  .tabs {
+    display: flex;
+    gap: 2px;
+    align-items: flex-end;
+  }
+  .tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 27px;
+    padding: 0 16px;
+    border: 1px solid transparent;
+    border-bottom: 0;
+    border-radius: 7px 7px 0 0;
+    background: none;
+    color: var(--dim);
+    font: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .tab[aria-selected='true'] {
+    background: var(--ground);
+    border-color: #1e231f;
+    color: var(--text);
+  }
+  .tab:focus-visible {
+    outline: 2px solid var(--beacon);
+    outline-offset: -2px;
+  }
+  .badge {
+    display: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--beacon);
+  }
+  .live.notified .badge {
+    display: inline-block;
+  }
+  .replay {
+    margin-left: auto;
+    align-self: center;
+    background: none;
+    border: 1px solid var(--nh-line);
+    border-radius: var(--nh-radius-s);
+    color: var(--dim);
+    font: inherit;
+    padding: 3px 10px;
+    cursor: pointer;
+  }
+  .replay:hover,
+  .replay:focus-visible {
+    color: var(--text);
+    border-color: var(--edge);
+  }
+
+  .pane {
+    height: calc(15 * var(--cell));
+    padding: 12px 2ch;
+    overflow: hidden;
+  }
+  .l {
+    min-height: var(--cell);
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .dim {
+    color: var(--dim);
+  }
+  .beacon,
+  .url {
+    color: var(--beacon);
+  }
+  .ok {
+    color: var(--ok);
+  }
+  .amber {
+    color: var(--amber);
+  }
+  .dot {
+    color: var(--text);
+  }
+  .dot.ok {
+    color: var(--ok);
+  }
+  b {
+    font-weight: 600;
+  }
+  .caret {
+    display: inline-block;
+    width: 1ch;
+    height: 1.15em;
+    vertical-align: text-bottom;
+    background: var(--text);
+    opacity: 0;
+  }
+
+  /* Without the script both tabs show, one under the other. */
+  .window:not(.live) .nearhost {
+    border-top: 1px solid #1e231f;
+  }
+  .live .pane {
+    display: none;
+  }
+  .live[data-tab='claude'] .claude,
+  .live[data-tab='nearhost'] .nearhost {
+    display: block;
+  }
+
+  /* Lines belong to a step of the exchange and wait for it. */
+  .live[data-step='0'] :is(.s2, .s3, .s7, .s8),
+  .live[data-step='2'] :is(.s3, .s7, .s8),
+  .live[data-step='3'] :is(.s7, .s8),
+  .live[data-step='7'] .s8 {
+    visibility: hidden;
+  }
+  .live[data-step='0'] .caret,
+  .live[data-step='2'] .caret {
+    opacity: 1;
+    animation: blink 1.06s steps(1) infinite;
+  }
+  .live:is([data-step='8'], [data-step='9']) .waiting,
+  .window:not(.live) .waiting {
+    display: none;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* The Nearhost tab: the interface with the proposal open over it. */
+  .nearhost {
+    position: relative;
+    padding: 8px 1ch 0;
+  }
+  .status {
+    display: flex;
+    justify-content: space-between;
+  }
+  .rule {
+    height: 1px;
+    margin: 2px 0 6px;
+    background: #1e231f;
+  }
+  .body {
+    position: relative;
+    display: grid;
+    grid-template-columns: 18ch 1fr;
+    gap: 2ch;
+  }
+  .side {
+    border-right: 1px solid #1e231f;
+  }
+  .box {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: min(56ch, calc(100% - 2ch));
+    padding: 4px 2.5ch 6px;
+    background: #121613;
+    border: 1px solid var(--edge);
+    border-radius: 6px;
+  }
+  /* What the form is open over waits behind it, faint. */
+  .body > :not(.box) {
+    opacity: 0.4;
+  }
+  .live:is([data-step='7'], [data-step='8'], [data-step='9']) .body > * {
+    opacity: 1;
+  }
+  .live:is([data-step='7'], [data-step='8'], [data-step='9']) .box {
+    display: none;
+  }
+  .head {
+    display: flex;
+    justify-content: space-between;
+  }
+  .progress {
+    background: linear-gradient(#3a413b, #3a413b) 0 50% / 100% 3px no-repeat;
+  }
+  .progress span {
+    display: block;
+    height: var(--cell);
+    width: 71%;
+    background: linear-gradient(var(--beacon), var(--beacon)) 0 50% / 100% 3px no-repeat;
+  }
+  .sel {
+    background: #1f261f;
+  }
+  .key {
+    color: var(--beacon);
+    border-radius: 3px;
+    transition: background 0.12s;
+  }
+  .pressed .key {
+    background: var(--beacon);
+    color: var(--ground);
+  }
+
+  .after {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 32px 56px;
+    align-items: end;
+  }
+  .facts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    color: var(--nh-body);
+  }
+  .facts li {
+    padding-left: 18px;
+    position: relative;
+  }
+  .facts li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.62em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--nh-accent);
+  }
+  .get {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 12px 16px 22px;
+    background: var(--nh-surface);
+    border: 1px solid var(--nh-line);
+    border-radius: 12px;
+    min-width: 0;
+  }
+  .label {
+    font-size: 13px;
+    color: var(--nh-faint);
+  }
+  .line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .line code {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow-x: auto;
+    flex: 1;
+  }
+
+  @container (max-width: 640px) {
+    .body {
+      grid-template-columns: 1fr;
+    }
+    .side {
+      display: none;
+    }
+  }
+  @media (max-width: 719px) {
+    .inner {
+      padding-block: 80px;
+    }
+    .after {
+      grid-template-columns: 1fr;
+    }
+    /* Lines wrap here, so the panes grow to what they hold, and the
+       script's raw output, which says least, is left out. */
+    .pane {
+      height: auto;
+      min-height: calc(15 * var(--cell));
+    }
+    .claude .l {
+      white-space: pre-wrap;
+    }
+    .raw,
+    .lights {
+      display: none;
+    }
+    .titlebar {
+      gap: 8px;
+      padding: 0 8px;
+    }
+    .tab {
+      padding: 0 10px;
+    }
+  }
+</style>
