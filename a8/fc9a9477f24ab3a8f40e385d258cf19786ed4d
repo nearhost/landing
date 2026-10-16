@@ -1,0 +1,23 @@
+src/components/landing/Agents.astro
+  s_b33b52432eafa1::t_bde8c5627d70dc 5-23,60,62-67,461-468,470-473,499,505
+  s_b33b52432eafa1::t_074456c80cc55d 366,654
+  s_b33b52432eafa1::t_9511a4a85699b1 61
+  s_b33b52432eafa1::t_9fd04686a4d9da 501-503,508
+  s_b33b52432eafa1::t_82bc537df1f2a6 68-91,191-202,206,210,408-410,415-433,436,440-442,449-460,469,474-498,500,504,506-507
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a8fc9a9477f24ab3a8f40e385d258cf19786ed4d",
+  "prompts": {},
+  "sessions": {
+    "s_b33b52432eafa1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "134e9450-f2ff-4de4-b4ab-05e5f61b0288",
+        "model": "unknown"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
