@@ -7,20 +7,20 @@ sidebar:
 
 A coding agent can ask Nearhost to add the project it is working in, and can read whether a project is served and where. It works the same when the agent runs on your laptop or on a server Nearhost is connected to, for example in an SSH session. The agent proposes and you decide: every add opens the add form in Nearhost, filled in, for you to save or dismiss.
 
-## Install the plugin
+## Install the skill
 
-In Claude Code:
+The `nearhost` skill installs with the [skills](https://skills.sh) CLI, which puts it where your agents look for skills: Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot and many more.
+
+```sh
+npx skills add nearhost/nearhost -g
+```
+
+`-g` installs it for your user rather than into the current project. Add `-a codex`, `-a cursor` and so on to choose the agents; without it, the CLI asks. Install it where the agent runs: on the laptop, on the server, or both.
+
+In Claude Code you can install it as a plugin instead:
 
 ```text
 /plugin install nearhost --marketplace nearhost/nearhost
-```
-
-Install it where the agent runs: on the laptop, on the server, or both.
-
-For Codex, the skill is in the [nearhost/nearhost](https://github.com/nearhost/nearhost) repository. From a checkout of it, on the machine Codex runs on:
-
-```sh
-ln -s "$PWD/agents/nearhost/skills/nearhost" ~/.agents/skills/nearhost
 ```
 
 The skill needs `sh` and `curl`, and nothing else. Nothing is installed with it.
@@ -42,7 +42,7 @@ Proposals need the full-screen interface. Under `nearhost up`, an agent can read
 
 ## How the agent reaches Nearhost
 
-Nearhost listens on `~/.nearhost/<id>.sock` on your laptop, where `<id>` is six letters and digits made when Nearhost first runs and kept in `~/.config/nearhost/id`. On each server it is connected to, it forwards a socket of the same name over its own SSH connection:
+Nearhost listens on `~/.nearhost/<id>.sock` on your laptop, where `<id>` is six letters and digits made when Nearhost first runs and kept in `~/.config/nearhost/id`. A config directory copied to another machine gets a new id there, so two laptops never share a socket. On each server it is connected to, it forwards a socket of the same name over its own SSH connection:
 
 ```sh
 ssh -S <sock> -O forward -R <home on the server>/.nearhost/<id>.sock:<socket on the laptop> <host>
@@ -61,7 +61,7 @@ To use one socket explicitly, set `NEARHOST_SOCKET` to its path where the agent 
 
 **The server refuses the forward.** Its sshd has `AllowStreamLocalForwarding no`. The server's panel shows `agents unavailable` with sshd's message, and so does `nearhost doctor`. Set `AllowStreamLocalForwarding yes` in the server's `sshd_config` and press `r` on the server to reconnect. Projects serve either way, and `r` on Home leaves such a server connected.
 
-**The agent's sandbox blocks the socket.** Sandboxes block Unix sockets by default.
+**The agent's sandbox blocks the socket.** An agent that runs commands in a sandbox needs `~/.nearhost/*.sock` allowed, and most block Unix sockets by default. Here is how for two of them.
 
 With Claude Code's sandbox on, allow the socket in `~/.claude/settings.json` where the agent runs. On macOS, name it by its full path, which `ls ~/.nearhost` shows:
 
