@@ -33,6 +33,8 @@ Pushes to `main` build, verify and publish the site to the `gh-pages` branch thr
 
 A preview is built with `SITE_BASE` set to its path. Root-relative links in components go through `url()` from `src/lib/url.ts`; links in Markdown are prefixed by `src/lib/base-links.mjs`. Try a preview build locally with `SITE_BASE=/pr-preview/pr-1/ npm run build`.
 
+Once a day `.github/workflows/stats.yml` runs `scripts/collect-stats.mjs`, which records Nearhost's release download and star counts at `nearhost.dev/stats/stats.json` with a daily history carried over from the previous snapshot. It pushes to `gh-pages` directly, and the site deploy leaves `stats/` in place. Downloads count the release archives only, not `checksums.txt`.
+
 ## Conventions
 
 Commits are conventional-commit titles with no body. Prettier and ESLint run on staged files before each commit. Copy stays in the components as plain text, labels are sentence case, and the landing page is dark only. Dependent pull requests are managed as a stack with the gh stack extension.

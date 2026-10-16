@@ -1,0 +1,48 @@
+name: Stats
+
+# Once a day, records nearhost's release download and star counts at nearhost.dev/stats/stats.json.
+# GitHub only reports running totals, so each run carries the history over from the last
+# snapshot. The file is pushed straight to gh-pages rather than through a pull request: it is
+# generated data with nothing to review, and deploy.yml leaves stats/ alone when it cleans.
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    # Shares the deploy job's group, so a snapshot and a deploy never push to gh-pages at once.
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # A missing snapshot starts a fresh history, but a failed fetch must stop the run, or the
+      # history would be lost.
+      - name: Read the previous snapshot
+        run: |
+          git fetch --depth=1 origin gh-pages
+          if git cat-file -e origin/gh-pages:stats/stats.json; then
+            git show origin/gh-pages:stats/stats.json > previous.json
+          fi
+
+      - run: node scripts/collect-stats.mjs previous.json out/stats.json
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: out
+          branch: gh-pages
+          target-folder: stats
+          commit-message: 'chore: update download stats'
