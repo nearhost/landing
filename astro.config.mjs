@@ -4,11 +4,18 @@ import starlight from '@astrojs/starlight';
 import svelte from '@astrojs/svelte';
 import { satteri } from '@astrojs/markdown-satteri';
 import baseLinks from './src/lib/base-links.mjs';
+import { plausibleInit, plausibleSrc, tracked } from './src/lib/plausible.mjs';
 
 // Pull request previews are built under /pr-preview/pr-<number>/; the live site sits at /.
 const base = process.env.SITE_BASE ?? '/';
 /** @param {string} path */
 const atBase = (path) => base.replace(/\/$/, '') + path;
+const analytics = tracked(base, process.argv.includes('build'))
+  ? [
+      { tag: /** @type {const} */ ('script'), attrs: { async: true, src: plausibleSrc } },
+      { tag: /** @type {const} */ ('script'), content: plausibleInit },
+    ]
+  : [];
 
 export default defineConfig({
   site: 'https://nearhost.dev',
@@ -26,6 +33,7 @@ export default defineConfig({
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/nearhost/nearhost' }],
       editLink: { baseUrl: 'https://github.com/nearhost/landing/edit/main/' },
       lastUpdated: true,
+      head: analytics,
       customCss: [
         '@fontsource-variable/space-grotesk/index.css',
         '@fontsource-variable/dm-sans/index.css',
