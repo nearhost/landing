@@ -33,6 +33,7 @@ export default defineConfig({
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/nearhost/nearhost' }],
       editLink: { baseUrl: 'https://github.com/nearhost/landing/edit/main/' },
       lastUpdated: true,
+      routeMiddleware: './src/route-data.ts',
       head: analytics,
       customCss: [
         '@fontsource-variable/space-grotesk/index.css',

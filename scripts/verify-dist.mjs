@@ -48,24 +48,29 @@ if (existsSync(join(dist, 'install.sh'))) {
   );
 }
 
-// 2. Social image is present and the right size.
-if (existsSync(join(dist, 'og.png'))) {
-  const png = readFileSync(join(dist, 'og.png'));
-  const isPng = png
-    .subarray(0, 8)
-    .equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
-  check(isPng, 'og.png is not a PNG');
-  if (isPng) {
-    if (png.length < 24) {
-      failures.push('og.png is truncated');
-    } else {
-      const width = png.readUInt32BE(16);
-      const height = png.readUInt32BE(20);
-      check(width === 1200 && height === 630, `og.png is ${width}x${height}, expected 1200x630`);
-    }
+// 2. Every page has its own social card, present and the right size.
+const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+for (const file of htmlFiles(dist)) {
+  const html = readFileSync(file, 'utf8');
+  // Redirect pages and the 404 page carry no card.
+  if (/http-equiv="refresh"/.test(html) || file.endsWith('404.html')) continue;
+  const image = html.match(/<meta property="og:image" content="([^"]*)"/)?.[1];
+  if (!image) {
+    failures.push(`${file} has no og:image`);
+    continue;
   }
-} else {
-  failures.push('dist/og.png is missing');
+  const path = join(dist, new URL(image).pathname);
+  if (!existsSync(path)) {
+    failures.push(`${file} points og:image at ${image}, which is not in dist/`);
+    continue;
+  }
+  const png = readFileSync(path);
+  if (png.length < 24 || !png.subarray(0, 8).equals(pngSignature)) {
+    failures.push(`${image} is not a PNG`);
+    continue;
+  }
+  const size = `${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`;
+  check(size === '1200x630', `${image} is ${size}, expected 1200x630`);
 }
 
 // 3. No third-party font requests anywhere in dist/.
