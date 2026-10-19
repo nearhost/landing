@@ -19,7 +19,9 @@ A backend framework renders the HTML, and the page loads its scripts from a sepa
 
 That address is resolved by your browser, on your laptop. Nothing listens there, so scripts fail to load and hot reload never connects.
 
-A `loopback` route fixes it. Nearhost forwards the same port number on your laptop to the dev server on the remote machine, so `localhost:5173` in the browser reaches port 5173 over there. The remote project needs no changes.
+A `loopback` route fixes it. Nearhost forwards the same port number on your laptop to the dev server on the remote machine, so `localhost:5173` in the browser reaches port 5173 over there. The remote project needs no changes, as long as the page asks for `localhost`.
+
+The forward listens on `127.0.0.1` only. A Laravel project outside Sail whose Vite listens on `::1` writes `http://[::1]:5173` to `public/hot`, and the browser finds nothing there. Set `server.hmr.host` to `'localhost'` in `vite.config.js`. See [Vite on the IPv6 loopback address](/docs/guides/ngrok-assets-on-localhost/#vite-on-the-ipv6-loopback-address).
 
 Discovery proposes a loopback route only under Laravel Sail. For other backends, select the project, press `tab`, choose the dev server's route and press `space` to make it `loopback`. See [Routes and roles](/docs/concepts/routes-and-roles/#changing-roles).
 

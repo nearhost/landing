@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-You put your dev server behind ngrok and open the tunnel's address. The HTML arrives, and then something still points somewhere else: the scripts and styles try `localhost`, a redirect takes you to `http://localhost:8000`, or the page loads and never updates when you edit a file.
+You put your dev server behind ngrok and open the tunnel's address. The HTML arrives, and then something still points somewhere else: the scripts and styles try `localhost`, a redirect takes you to `http://localhost:8000`, or the page never updates when you edit a file. Sometimes the dev server refuses the request outright.
 
 The tunnel did its job. It forwarded the request. The problem is that the page and the dev server still describe themselves with the addresses in their own config, and those addresses mean nothing in the browser that opened the tunnel.
 
@@ -28,18 +28,18 @@ Most frameworks build absolute URLs from the request, or from a URL in their con
 - **From the request.** ngrok ends HTTPS at its edge and forwards to your dev server, adding `X-Forwarded-Proto: https`. A framework that does not trust the proxy ignores that header and builds `http://` links and redirects. If you started ngrok with `--host-header=rewrite`, the app sees the local address's hostname, usually `localhost`, and builds links to that.
 - **From config.** Anything built from `APP_URL` or a similar setting, such as emails, queued jobs, or an OAuth redirect URI, uses whatever that setting says, usually `http://localhost:8000`.
 
-### Hot reload in single-port dev servers
+### Host checks in single-port dev servers
 
-Next.js and plain Vite serve pages, assets and hot reload from one port, so their assets use relative paths and load fine through the tunnel. What breaks is the dev server's host check:
+Next.js and plain Vite serve pages, assets and hot reload from one port, so their assets use relative paths. What gets in the way is the dev server's host check:
 
-- **Next.js** blocks its dev resources, hot reload included, from hostnames it was not told about, and logs `Blocked cross-origin request to Next.js dev resource` on the server. The page loads, but edits never show.
-- **Vite** refuses requests whose `Host` it does not recognise, and answers with `Blocked request. This host ("…") is not allowed.`, naming the host.
+- **Next.js** serves the page, assets included. Recent versions block its dev resources, hot reload included, from hostnames it was not told about, and log `Blocked cross-origin request to Next.js dev resource` on the server. The page loads, but edits never show.
+- **Vite** refuses every request whose `Host` it does not recognise, the page included, and answers with `Blocked request. This host ("…") is not allowed.`, naming the host. Nothing loads until the host is in `server.allowedHosts`.
 
 ## Patching it with ngrok
 
 Each patch fixes one of the three.
 
-- **Assets.** Stop the dev server, which deletes `public/hot`, and run `npm run build`. Laravel then serves the built files from the app's own origin. You lose hot reload. Keeping hot reload means a second tunnel for port 5173, with Vite told to advertise that tunnel's address through `server.origin` and `server.hmr`.
+- **Assets.** Stop the dev server, which deletes `public/hot`, and run `npm run build`. Laravel then serves the built files from the app's own origin. You lose hot reload. Keeping hot reload means a second tunnel for port 5173, with Vite told to advertise that tunnel's address through `server.origin` and `server.hmr`, and that tunnel's hostname added to `server.allowedHosts`.
 - **Links and redirects.** Set `APP_URL` to the tunnel's address and make the framework trust the proxy. The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) shows the one-line `trustProxies` change for Laravel. If the tunnel name changes each time you start it, so does `APP_URL`.
 - **Host checks.** Add the tunnel's hostname to `allowedDevOrigins` in `next.config.ts`, or to `server.allowedHosts` in Vite's config.
 
@@ -51,7 +51,20 @@ When the dev server runs on another machine, Nearhost serves it on your laptop a
 - **Links and redirects.** The proxy passes the `Host` header through unchanged and sets `X-Forwarded-Proto: https`. Set `APP_URL` to the Nearhost name once, and trust the proxy as above.
 - **Host checks.** Add the Nearhost name to `allowedDevOrigins` or `server.allowedHosts` once. It does not change between runs.
 
-A loopback forward listens on `127.0.0.1`. If `public/hot` says `http://[::1]:5173`, set `server.hmr.host` to `'localhost'` in `vite.config.js`, so the page asks for `localhost` instead.
+### Vite on the IPv6 loopback address
+
+A loopback forward listens on `127.0.0.1` only. Outside Sail, a Vite dev server that listens on `::1` makes `laravel-vite-plugin` write `http://[::1]:5173` to `public/hot`, and the browser asks for `[::1]`, where nothing listens. Set `server.hmr.host` to `'localhost'` in `vite.config.js`, and restart `npm run dev`, so the page asks for `localhost` instead:
+
+```js
+export default defineConfig({
+  // The rest of the config stays as it is.
+  server: {
+    hmr: { host: 'localhost' },
+  },
+});
+```
+
+## The guides
 
 The sign-in guides walk through all of this for one app each, at a name under your own domain:
 

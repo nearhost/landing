@@ -34,7 +34,7 @@ You need a name the browser resolves to the dev server, and a certificate for it
 **A name under your own domain, such as `local.myapp.com`.** It is shaped like production, so cookie scoping, cross-subdomain requests and provider settings behave as they do on staging. It needs no DNS record. Two things to know:
 
 - Cookies your production site sets for the whole domain, with `Domain=myapp.com`, are sent to `local.myapp.com` too, if your browser has them.
-- Nearhost writes the name to `/etc/hosts` only while the project is enabled, so the name never hides a real site at that address for longer than you use it. See [Main name](/docs/reference/config/#main-name).
+- Nearhost writes the name to `/etc/hosts` only while the project is enabled. Disable the project, and the name reaches the real site again, if there is one. See [Main name](/docs/reference/config/#main-name).
 
 Avoid `.dev`, which is a real top-level domain whose every name browsers force to HTTPS, and `.local`, which macOS and many Linux systems resolve with multicast DNS, and which can be slow to look up.
 
