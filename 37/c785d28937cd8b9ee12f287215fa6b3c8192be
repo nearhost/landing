@@ -1,0 +1,31 @@
+src/components/landing/Hero.astro
+  s_16a4dddf86921d::t_6df02c46c77888 120-123
+src/layouts/Landing.astro
+  s_89a63a3c1fa7d2::t_06019e681d5dff 6-8,54-57
+src/styles/tokens.css
+  s_89a63a3c1fa7d2::t_d60122f2dc401b 2-33,52-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "37c785d28937cd8b9ee12f287215fa6b3c8192be",
+  "prompts": {},
+  "sessions": {
+    "s_16a4dddf86921d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7cc721d4-6e08-49ce-bd6f-182ab2820371",
+        "model": "unknown"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    },
+    "s_89a63a3c1fa7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ade858e5-1767-41c6-b0b0-fdd74aba68cf",
+        "model": "unknown"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
