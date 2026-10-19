@@ -15,7 +15,7 @@ This guide gets Clerk sign-in working at `https://local.myapp.com` while your Ne
 
 A Clerk development instance is relaxed about where your app runs. It is built for an app on `localhost`, and it does not ask you to register a domain or a callback URL. When the app runs on a server or a VM, though, `localhost` in your browser is not where the app is.
 
-A tunnel such as ngrok gets the page on screen, but often not much more. The page loads at the ngrok address, and then hot reload never connects. Next.js blocks requests for its dev resources, hot reload included, from any host it was not told about, and logs `Blocked cross-origin request to Next.js dev resource` on the server. Anything the app builds from a URL in its environment, such as an app URL set to `http://localhost:3000`, still points there. And the app is on the public internet while you work on it.
+A tunnel such as ngrok gets the page on screen, but often not much more. The page loads at the ngrok address, and then hot reload never connects. Recent versions of Next.js block requests for its dev resources, hot reload included, from any host it was not told about, and logs `Blocked cross-origin request to Next.js dev resource` on the server. Anything the app builds from a URL in its environment, such as an app URL set to `http://localhost:3000`, still points there. And the app is on the public internet while you work on it.
 
 Nearhost serves the remote app on your laptop at a name you choose, with a trusted certificate, over SSH. The browser sees one stable HTTPS origin, the page and its hot reload connection come from that origin, and nothing is public.
 
@@ -81,7 +81,7 @@ These are the names `@clerk/nextjs` reads. If you set the app up with Clerk's `i
 
 ## Set up the app
 
-Next.js lets its dev resources be requested from `localhost` and from the hostname `next dev` was started with. A page at `https://local.myapp.com` asks for them from `local.myapp.com`, so add that name to `allowedDevOrigins` in `next.config.ts`:
+Recent versions of Next.js only let their dev resources be requested from `localhost` and from the hostname `next dev` was started with. A page at `https://local.myapp.com` asks for them from `local.myapp.com`, so add that name to `allowedDevOrigins` in `next.config.ts`:
 
 ```ts
 import type { NextConfig } from 'next';
@@ -119,7 +119,7 @@ When it does not:
 
 ## Testing with production keys
 
-Clerk's production keys only work on your production domain. Clerk's troubleshooting guide describes a way round that for debugging: point a subdomain such as `local.myapp.com` at your machine in the hosts file and serve the app over HTTPS on port 443. Nearhost does both. Clerk calls this strongly discouraged and not officially supported, so treat it as a last resort, and switch back to development keys when you are done.
+Clerk's production keys only work on your production domain. Clerk describes a way round that for debugging, with a local subdomain over HTTPS on port 443, which Nearhost provides, but calls it strongly discouraged. See [using production keys in local development](https://clerk.com/docs/guides/development/troubleshooting/using-production-keys-in-development).
 
 ## When you still need ngrok
 
@@ -134,6 +134,7 @@ You can run both: Nearhost for your own browser, and a tunnel just for the webho
 These pages, on 2026-10-19:
 
 - [Clerk: Next.js quickstart](https://clerk.com/docs/nextjs/getting-started/quickstart)
+- [Clerk: Express quickstart](https://clerk.com/docs/expressjs/getting-started/quickstart) (the API keys page)
 - [Clerk: clerkMiddleware()](https://clerk.com/docs/reference/nextjs/clerk-middleware)
 - [Clerk: environment variables](https://clerk.com/docs/guides/development/clerk-environment-variables)
 - [Clerk: development and production instances](https://clerk.com/docs/guides/development/managing-environments)
