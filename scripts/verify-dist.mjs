@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const failures = [];
+// SITE_BASE is the PR-preview prefix; src/lib/base-links.mjs puts it on links.
+const base = (process.env.SITE_BASE || '/').replace(/\/?$/, '/');
 
 function check(condition, message) {
   if (!condition) failures.push(message);
@@ -59,7 +61,7 @@ for (const file of htmlFiles(dist)) {
     failures.push(`${file} has no og:image`);
     continue;
   }
-  const path = join(dist, new URL(image).pathname);
+  const path = join(dist, new URL(image).pathname.slice(base.length));
   if (!existsSync(path)) {
     failures.push(`${file} points og:image at ${image}, which is not in dist/`);
     continue;
@@ -123,6 +125,26 @@ check(
   existsSync(join(dist, 'docs', 'getting-started', 'install', 'index.html')),
   'docs install page is missing',
 );
+
+// 6. Every internal link in every page resolves to a file in dist/.
+for (const file of pages) {
+  const html = readFileSync(file, 'utf8');
+  const hrefs = new Set(
+    [...html.matchAll(/<a\s[^>]*?href=(?:"([^"]*)"|'([^']*)')/gi)].map((m) => m[1] ?? m[2]),
+  );
+  for (const href of hrefs) {
+    if (!href.startsWith(base) || href.startsWith('//')) continue;
+    const path = decodeURIComponent(href.split('#')[0].split('?')[0].slice(base.length));
+    const target =
+      path === '' || path.endsWith('/') ? join(dist, path, 'index.html') : join(dist, path);
+    if (
+      !existsSync(target) ||
+      (statSync(target).isDirectory() && !existsSync(join(target, 'index.html')))
+    ) {
+      failures.push(`${file} links to ${href}, which is not in dist/`);
+    }
+  }
+}
 
 if (failures.length) {
   console.error(
