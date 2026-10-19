@@ -17,7 +17,7 @@ projects:
   - name: myapp
     server: mini
     path: /home/dev/code/myapp
-    alias: myapp.test # generated from name, editable
+    alias: myapp.test # the main name: <name>.test, or any domain
     enabled: true # start automatically when Nearhost launches
     routes:
       - port: 8080 # port on the server
@@ -47,7 +47,7 @@ presets:
 | `projects[].name`           | string  | The project name.                                                                          |
 | `projects[].server`         | string  | The `name` of a server, or `local`.                                                        |
 | `projects[].path`           | string  | The project directory on that server.                                                      |
-| `projects[].alias`          | string  | The hostname served over HTTPS, ending in `.test`. Generated from `name`, editable.        |
+| `projects[].alias`          | string  | The project's main name, served over HTTPS. `<name>.test` unless you change it. See below. |
 | `projects[].enabled`        | boolean | Start the project automatically when Nearhost launches.                                    |
 | `projects[].routes[].port`  | integer | The port on the server.                                                                    |
 | `projects[].routes[].role`  | string  | One of `web`, `loopback` or `ignore`.                                                      |
@@ -62,11 +62,35 @@ presets:
 
 Use `nearhost preset` and `nearhost preset registry` rather than editing the last five by hand. See [Presets and registries](/docs/concepts/presets-and-registries/).
 
+## Main name
+
+`projects[].alias` is the project's main name: the address Nearhost shows, prints after `nearhost add` and gives to agents. It is `<name>.test` by default. It can be any one exact domain instead, such as `app.local.example.com`.
+
+A main name must be lowercase. It cannot be a wildcard pattern, `localhost` or an IP address.
+
+A main name that does not end in `.test` is a real domain, so it needs your approval before it goes live. Typing it with `nearhost add --alias` approves it. A name from a `.nearhostrc` or an agent waits for you in the interface, and the old name keeps serving until you approve.
+
+The hosts file treats the two kinds differently:
+
+- A `.test` name is written to `/etc/hosts` for every project, enabled or not.
+- Any other name is written only while its project is enabled, and only if DNS does not already point it at this machine. A disabled project does not hide the real site.
+
+A project has one main name. If you switch to a real domain, the `<name>.test` address stops working.
+
+A `.nearhostrc` file can set the main name with `alias:`. It accepts `${VAR}` and `${VAR:-default}`, filled from `.env.local` and then `.env`, so each worktree can have its own name:
+
+```yaml
+version: 1
+alias: ${APP_HOST:-app.local.example.com}
+```
+
+`nearhost add --alias` wins over the file, and the file wins over `<name>.test`. Removing `alias:` from the file leaves the current name as it is.
+
 ## Validation
 
 - Server names are unique, each server has a host, and `local` is not used as a name.
 - Project names are unique, and each project's server exists.
-- Aliases are unique across projects, ignoring case. An alias that is not a lowercase `.test` hostname does not start, and `nearhost doctor` reports it.
+- Aliases are unique across projects, ignoring case. An alias that is not a valid main name does not start, and `nearhost doctor` reports it.
 - Each project has exactly one `web` route. Ports are from 1 to 65535.
 - Loopback ports are unique across enabled projects.
 - Registry aliases are lowercase letters, digits and single hyphens. Each preset's registry is trusted. Registry presets have `ref` and `sha256`, and local ones do not.
