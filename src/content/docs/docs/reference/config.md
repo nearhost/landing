@@ -68,12 +68,12 @@ Use `nearhost preset` and `nearhost preset registry` rather than editing the las
 
 A main name must be lowercase. It cannot be a wildcard pattern, `localhost` or an IP address.
 
-A main name that does not end in `.test` is a real domain, so it needs your approval before it goes live. Typing it with `nearhost add --alias` approves it. A name from a `.nearhostrc` or an agent waits for you in the interface, and the old name keeps serving until you approve.
+A main name that does not end in `.test` is a real domain, so it needs your approval before it goes live. Typing it with `nearhost add --alias` approves it. A name from a `.nearhostrc` that you did not type is asked about in the terminal by `nearhost add`. When a `.nearhostrc` or an agent proposes one later, it waits for you in the interface, and the old name keeps serving until you approve.
 
 The hosts file treats the two kinds differently:
 
 - A `.test` name is written to `/etc/hosts` for every project, enabled or not.
-- Any other name is written only while its project is enabled, and only if DNS does not already point it at this machine. A disabled project does not hide the real site.
+- Any other name is written only while its project is enabled, and unless DNS already resolves it only to this machine's loopback address. A disabled project does not hide the real site.
 
 A project has one main name. If you switch to a real domain, the `<name>.test` address stops working.
 
