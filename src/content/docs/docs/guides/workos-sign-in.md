@@ -69,7 +69,7 @@ Do this in the WorkOS staging environment, which is meant for development. Its A
 3. Set the sign-in endpoint, which WorkOS's docs also call the initiate login URI, to `https://local.myapp.com/login`. AuthKit sends people there when sign-in starts outside your app, such as from a password reset or an invitation link.
 4. Set the sign-out URI, or the app homepage URL, to `https://local.myapp.com/`. Without either, WorkOS shows an error after sign-out.
 
-Then copy the staging environment's client ID and API key into the app's `.env`.:
+Then copy the staging environment's client ID and API key into the app's `.env`:
 
 ```ini
 WORKOS_CLIENT_ID=your-client-id
