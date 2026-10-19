@@ -94,6 +94,17 @@ if (existsSync(index)) {
     /data-version[^>]*>(v\d+\.\d+\.\d+[^<]*|latest)</.test(html),
     'footer version is neither a tag nor "latest"',
   );
+  const ld = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+  let software;
+  try {
+    software = ld && JSON.parse(ld);
+  } catch {
+    // Reported below.
+  }
+  check(
+    software?.['@type'] === 'SoftwareApplication' && software?.name === 'Nearhost',
+    'landing page must carry SoftwareApplication JSON-LD that parses',
+  );
   // The nav menu, the copy button and the interface demo.
   const components = new Set([...html.matchAll(/component-url="([^"]*)"/g)].map((m) => m[1]));
   check(
