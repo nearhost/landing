@@ -133,8 +133,20 @@ for (const file of pages) {
     [...html.matchAll(/<a\s[^>]*?href=(?:"([^"]*)"|'([^']*)')/gi)].map((m) => m[1] ?? m[2]),
   );
   for (const href of hrefs) {
-    if (!href.startsWith(base) || href.startsWith('//')) continue;
-    const path = decodeURIComponent(href.split('#')[0].split('?')[0].slice(base.length));
+    if (href.startsWith('//')) continue;
+    if (!href.startsWith(base)) {
+      if (base !== '/' && href.startsWith('/')) {
+        failures.push(`${file} links to ${href}, which skips the site base ${base}`);
+      }
+      continue;
+    }
+    let path;
+    try {
+      path = decodeURIComponent(href.split('#')[0].split('?')[0].slice(base.length));
+    } catch {
+      failures.push(`${file} links to ${href}, which is not a valid URL path`);
+      continue;
+    }
     const target =
       path === '' || path.endsWith('/') ? join(dist, path, 'index.html') : join(dist, path);
     if (
