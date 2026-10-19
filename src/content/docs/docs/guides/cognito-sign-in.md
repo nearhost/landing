@@ -2,7 +2,7 @@
 title: Cognito sign-in on a remote dev server
 description: Give an Amazon Cognito app client an HTTPS callback URL in local dev, such as https://local.myapp.com/auth/cognito/callback, when the dev server runs on another machine.
 sidebar:
-  order: 3
+  order: 6
 ---
 
 :::note
