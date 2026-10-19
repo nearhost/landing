@@ -76,9 +76,11 @@ Use a user pool for development, separate from production's. Its users, app clie
 5. Add `https://local.myapp.com/` to **Allowed sign-out URLs**. Cognito only sends people back after sign-out to a URL on this list.
 6. Under **Identity providers**, keep the user pool's own sign-in, or whichever providers your users sign in with. Under **OAuth grant types**, choose **Authorization code grant**. Under **OpenID Connect scopes**, choose `openid`, `email` and `profile`. Save the changes.
 
-Then copy the domain, and the app client's ID and secret, into the app's `.env`:
+Then set `APP_URL` in the app's `.env` to the new name, and copy the domain and the app client's ID and secret below it. The last two lines build on `APP_URL`, so they have to come after it:
 
 ```ini
+APP_URL=https://local.myapp.com
+
 COGNITO_HOST=https://myapp-dev.auth.eu-west-2.amazoncognito.com
 COGNITO_CLIENT_ID=your-client-id
 COGNITO_CLIENT_SECRET=your-client-secret
@@ -128,6 +130,7 @@ public function boot(): void
 Then add the routes to `routes/web.php`. The provider asks for `openid` and `profile` by default; `scopes()` adds `email` to them:
 
 ```php
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Laravel\Socialite\Socialite;
@@ -144,8 +147,11 @@ Route::get('/auth/cognito/callback', function () {
     return redirect('/dashboard');
 });
 
-Route::post('/auth/cognito/logout', function () {
+Route::post('/auth/cognito/logout', function (Request $request) {
     Auth::logout();
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
     return redirect(Socialite::driver('cognito')->logoutCognitoUser());
 });
@@ -153,13 +159,7 @@ Route::post('/auth/cognito/logout', function () {
 
 `logoutCognitoUser()` sends the browser to Cognito's sign-out page with `COGNITO_SIGN_OUT_URL`, and Cognito sends it back there.
 
-Set `APP_URL` to the new name, so the callback and sign-out URLs follow it:
-
-```ini
-APP_URL=https://local.myapp.com
-```
-
-If you have cached the config, run `php artisan config:clear`.
+With `APP_URL` set to `https://local.myapp.com`, the callback and sign-out URLs follow it. If you have cached the config, run `php artisan config:clear`.
 
 Nearhost's proxy ends HTTPS on your laptop and passes plain HTTP to the server, with `X-Forwarded-Proto: https`. Laravel ignores that header until it trusts the proxy, so it thinks the request was `http://`. The callback is unaffected while `COGNITO_CALLBACK_URL` is a full URL, because Socialite uses it as it is. A path such as `/auth/cognito/callback` would be built from the request instead, as `http://`, and Cognito would refuse it. What goes wrong either way is everything Laravel builds from the request: `route()` and `url()` links, the redirect to `/dashboard` after sign-in, and `asset()` URLs.
 
@@ -202,7 +202,7 @@ You can run both: Nearhost for your own browser, and a tunnel just for whatever 
 These pages, on 2026-10-19:
 
 - [socialiteproviders/cognito README](https://github.com/SocialiteProviders/Providers/blob/master/src/Cognito/README.md) and [provider source](https://github.com/SocialiteProviders/Providers/blob/master/src/Cognito/Provider.php)
-- [SocialiteProviders Manager: how provider config is read](https://github.com/SocialiteProviders/Manager/blob/master/src/Helpers/ConfigRetriever.php)
+- [SocialiteProviders Manager: how provider config is read](https://github.com/SocialiteProviders/Manager/blob/master/src/Helpers/ConfigRetriever.php) and [how the redirect URL is formatted](https://github.com/SocialiteProviders/Manager/blob/master/src/Config.php)
 - [Laravel Socialite](https://laravel.com/docs/13.x/socialite)
 - [Laravel HTTP requests: configuring trusted proxies](https://laravel.com/docs/13.x/requests#configuring-trusted-proxies)
 - [Amazon Cognito: application-specific settings with app clients](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html)
