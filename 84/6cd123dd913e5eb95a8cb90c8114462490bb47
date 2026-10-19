@@ -1,0 +1,21 @@
+src/content/docs/docs/reference/cli.md
+  s_16a4dddf86921d::t_620eec3440b0ec 84-94
+src/content/docs/docs/reference/config.md
+  s_16a4dddf86921d::t_c97f18f1681c9b 71,76
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "846cd123dd913e5eb95a8cb90c8114462490bb47",
+  "prompts": {},
+  "sessions": {
+    "s_16a4dddf86921d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7cc721d4-6e08-49ce-bd6f-182ab2820371",
+        "model": "unknown"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
