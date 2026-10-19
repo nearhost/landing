@@ -117,6 +117,10 @@ const install = 'curl -fsSL https://nearhost.dev/install.sh | sh';
     font-size: 14px;
     color: var(--nh-faint);
   }
+  /* Each command stays in one piece, so a font swap cannot move where it breaks. */
+  .note code {
+    display: inline-block;
+  }
   @media (max-width: 719px) {
     .sub {
       font-size: 18px;

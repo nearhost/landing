@@ -1,4 +1,36 @@
 /* Nearhost brand tokens. Dark is the default; light applies under Starlight's data-theme. */
+
+/*
+ * Arial and Courier New (or their metric twins, Liberation Sans and Mono) scaled to each web font's metrics, so text
+ * set in the fallback takes the same space and nothing moves when the web font swaps in.
+ * Values from @capsizecss/unpack on the latin wght files, except DM Sans's size-adjust, which
+ * is set from the hero paragraph's measured width so its line breaks hold through the swap.
+ */
+@font-face {
+  font-family: 'Space Grotesk Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans');
+  size-adjust: 109.47%;
+  ascent-override: 89.89%;
+  descent-override: 26.67%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'DM Sans Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans');
+  size-adjust: 103.45%;
+  ascent-override: 95.89%;
+  descent-override: 29.97%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'IBM Plex Mono Fallback';
+  src: local('Courier New'), local('CourierNewPSMT'), local('Liberation Mono');
+  size-adjust: 99.98%;
+  ascent-override: 102.52%;
+  descent-override: 27.5%;
+  line-gap-override: 0%;
+}
+
 :root {
   --nh-ground: #0f1210;
   --nh-surface: #161a17;
@@ -17,9 +49,10 @@
   --nh-starting: #f2c14e;
   --nh-failed: #f27d72;
 
-  --nh-font-display: 'Space Grotesk Variable', system-ui, sans-serif;
-  --nh-font-body: 'DM Sans Variable', system-ui, sans-serif;
-  --nh-font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --nh-font-display: 'Space Grotesk Variable', 'Space Grotesk Fallback', system-ui, sans-serif;
+  --nh-font-body: 'DM Sans Variable', 'DM Sans Fallback', system-ui, sans-serif;
+  --nh-font-mono:
+    'IBM Plex Mono', 'IBM Plex Mono Fallback', ui-monospace, SFMono-Regular, Menlo, monospace;
   --nh-track-hero: -0.045em;
   --nh-track-display: -0.03em;
 
