@@ -1328,13 +1328,13 @@
                   >
                 </div>
                 <div class="l"></div>
-                <div class="l">
-                  <span class="d">server</span>
-                  {p.server === 'local' ? 'this machine' : p.server}{'    '}{#if p.preset}<span
-                      class="d">preset</span
-                    >
-                    {p.preset}{'    '}{/if}<span class="d">path</span>
-                  {p.path}
+                <div class="l meta">
+                  <span
+                    ><span class="d">server</span>
+                    {p.server === 'local' ? 'this machine' : p.server}</span
+                  >{#if p.preset}<span><span class="d">preset</span> {p.preset}</span>{/if}<span
+                    ><span class="d">path</span> {p.path}</span
+                  >
                 </div>
                 {#if p.state === 'error'}
                   <div class="l">
@@ -1348,7 +1348,9 @@
                 <div class="l"></div>
                 <div class="l d routes">
                   <span class="bar"></span><span class="c8">port</span><span class="c12">role</span
-                  ><span class="grow">label</span><span class="c10">local</span><span>status</span>
+                  ><span class="grow">label</span><span class="c10">local</span><span class="stc"
+                    >status</span
+                  >
                 </div>
                 {#each p.routes as r, i (r.port)}
                   {@const [dot, tone] = routeDot(p, r)}
@@ -1361,7 +1363,7 @@
                       class="c8">{r.port}</span
                     ><span class="c12 {r.role === 'web' ? 'b' : ''}">{r.role}</span><span
                       class="grow">{r.label}</span
-                    ><span class="c10">{localPort(p, r)}</span><span class={tone}>{dot}</span>
+                    ><span class="c10">{localPort(p, r)}</span><span class="stc {tone}">{dot}</span>
                   </div>
                 {/each}
                 {#if p.advice}
@@ -1851,6 +1853,18 @@
     width: 12ch;
     flex: none;
   }
+  /* As wide as its header in every row, so the local column lines up with its values. */
+  .stc {
+    width: 6ch;
+    flex: none;
+    text-align: right;
+  }
+  /* Wraps between fields on a narrow screen rather than clipping the path. */
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 4ch;
+  }
   .sel {
     background: var(--selected);
   }
@@ -1895,8 +1909,17 @@
   }
   .foot .keys {
     display: flex;
+    align-items: center;
     padding-left: 1ch;
     flex-wrap: wrap;
+  }
+  /* WCAG 2.2's 24px minimum target, for touch only: one line of text is about 18px tall. */
+  @media (pointer: coarse) {
+    .rowbtn,
+    .foot .keys button {
+      min-height: 24px;
+      align-items: center;
+    }
   }
   .foot .keys button:hover .d {
     color: var(--text);
@@ -2028,6 +2051,19 @@
     .l,
     .lr {
       overflow-x: hidden;
+    }
+    /* Narrower route columns leave the label room to show, with a gap before local. */
+    .routes .c8 {
+      width: 6ch;
+    }
+    .routes .c12 {
+      width: 10ch;
+    }
+    .routes .c10 {
+      width: 7ch;
+    }
+    .routes .grow {
+      padding-right: 1ch;
     }
     .help {
       grid-template-columns: repeat(2, 1fr);
