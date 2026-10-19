@@ -53,6 +53,10 @@ nearhost up myapp
 - [Presets and registries](/docs/concepts/presets-and-registries/) explains how Nearhost learns a framework's ports.
 - [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) explains how assets and live reload reach your browser.
 
+## Guides
+
+If single sign-on fails on a remote dev server, start with [SSO callback fails on a remote dev server](/docs/guides/sso-callback-on-a-remote-dev-server/).
+
 ## When to use something else
 
 Nearhost serves your own browser on your own machine. To show a page to a client or a teammate, use a public tunnel service. To reach a database or another non-HTTP port, a plain `ssh -L` forward is still the right tool.
