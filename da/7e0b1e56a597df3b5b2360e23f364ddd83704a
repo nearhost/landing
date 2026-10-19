@@ -1,0 +1,42 @@
+src/layouts/Landing.astro
+  s_16a4dddf86921d::t_5f75df3963fd3c 3,18
+astro.config.mjs
+  s_16a4dddf86921d::t_5f75df3963fd3c 36
+scripts/verify-dist.mjs
+  s_16a4dddf86921d::t_5f75df3963fd3c 51-60,62-73
+src/pages/og/[...id].png.ts
+  s_16a4dddf86921d::t_bd9558a6bdeb44 18-22
+  s_16a4dddf86921d::t_2607b4e45e8d4e 1-17,23-24
+package.json
+  s_16a4dddf86921d::t_ad4330a1b6ca8b 31,33-34
+  s_16a4dddf86921d::t_5f75df3963fd3c 20-21
+  s_16a4dddf86921d::t_ab9fcd74b5377d 36
+src/lib/og.mjs
+  s_16a4dddf86921d::t_c6c30740afb8fc 13-14,164,182
+  s_16a4dddf86921d::t_bd9558a6bdeb44 131-135,202-205
+  s_16a4dddf86921d::t_786f4c86a7f6b5 216-218
+  s_16a4dddf86921d::t_3235417fd23dd3 1-12,15-130,136-163,165-181,183-201,206-215,219-220
+src/route-data.ts
+  s_16a4dddf86921d::t_5f75df3963fd3c 9,11
+  s_16a4dddf86921d::t_b5f49566e0a838 1-8,10,12-21
+src/lib/og.test.mjs
+  s_16a4dddf86921d::t_d456fe625df446 1-34
+package-lock.json
+  s_16a4dddf86921d::t_0077f64dd63637 17,19-20,22,1112-1120,1130-1138,1975-1983,2348-2363,3282-3290,3399-3407,3537-3542,3621-3650,3683-3693,4087-4095,4295-4300,4778-4783,5452-5463,6450-6459,7566-7581,7828-7833,8441-8462,8837-8842,9481-9490,10470-10475
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "da7e0b1e56a597df3b5b2360e23f364ddd83704a",
+  "prompts": {},
+  "sessions": {
+    "s_16a4dddf86921d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7cc721d4-6e08-49ce-bd6f-182ab2820371",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
