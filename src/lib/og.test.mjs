@@ -14,6 +14,7 @@ test('maps an entry id to its card path', () => {
 test('names the sidebar section of a docs page', () => {
   assert.equal(section('docs/getting-started/install'), 'Getting started');
   assert.equal(section('docs/reference/cli'), 'Reference');
+  assert.equal(section('docs/guides/workos-sign-in'), 'Guides');
 });
 
 test('draws the landing card and a docs card, one after the other, at 1200x630', async () => {
