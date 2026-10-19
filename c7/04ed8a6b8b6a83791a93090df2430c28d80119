@@ -1,0 +1,21 @@
+scripts/verify-dist.mjs
+  s_16a4dddf86921d::t_aec305153cc391 97-107
+src/layouts/Landing.astro
+  s_16a4dddf86921d::t_475711ff5972f6 5,21-39,64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c704ed8a6b8b6a83791a93090df2430c28d80119",
+  "prompts": {},
+  "sessions": {
+    "s_16a4dddf86921d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7cc721d4-6e08-49ce-bd6f-182ab2820371",
+        "model": "unknown"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
