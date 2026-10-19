@@ -38,4 +38,4 @@ Config changes apply through Caddy's in-process reload. Starting or stopping a p
 
 The proxy also keeps the requests it passes on, so you can look at them and send them again. See [The request log](/docs/concepts/the-request-log/).
 
-If the browser still warns about the certificate, see [HTTPS on a local dev domain](/docs/guides/https-on-a-local-dev-domain/).
+If the browser still warns about the certificate, see [The CA is not trusted](/docs/troubleshooting/troubleshooting/#the-ca-is-not-trusted). For why local dev wants a real HTTPS name, see [HTTPS on a local dev domain](/docs/guides/https-on-a-local-dev-domain/).

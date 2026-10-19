@@ -9,6 +9,8 @@ sidebar:
 Needs Nearhost 0.6.0 or later, which lets a project's main name be a domain that does not end in `.test`. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
 This guide gets Clerk sign-in working at `https://local.myapp.com` while your Next.js app runs on another machine. The worked example uses Clerk's Next.js SDK, `@clerk/nextjs`, with a Clerk development instance. The Clerk and Nearhost steps are the same for any stack.
 
 ## The symptom

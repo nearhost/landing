@@ -25,6 +25,8 @@ There is a fourth failure that looks the same. Most integrations store a state v
 
 ## The fix: one HTTPS address everywhere
 
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
 Pick one address and use it in all three places: the URL your browser opens, the callback the app sends, and the callback the provider has registered. It has to be HTTPS, and your browser has to reach the remote app at it.
 
 Nearhost gives you that address. It serves the remote dev server on your laptop at a name you choose, such as `https://local.myapp.com`, with a trusted certificate, over SSH. Add the project with that name:

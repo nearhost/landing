@@ -9,6 +9,8 @@ sidebar:
 Needs Nearhost 0.6.0 or later, which lets a project's main name be a domain that does not end in `.test`. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
 This guide gets WorkOS AuthKit sign-in working at `https://local.myapp.com` while your Laravel app runs on another machine. The worked example uses the `laravel/workos` package from the Laravel starter kits, but the WorkOS and Nearhost steps are the same for any stack.
 
 ## The symptom
@@ -67,7 +69,7 @@ Do this in the WorkOS staging environment, which is meant for development. Its A
 3. Set the sign-in endpoint, which WorkOS's docs also call the initiate login URI, to `https://local.myapp.com/login`. AuthKit sends people there when sign-in starts outside your app, such as from a password reset or an invitation link.
 4. Set the sign-out URI, or the app homepage URL, to `https://local.myapp.com/`. Without either, WorkOS shows an error after sign-out.
 
-Then copy the staging environment's client ID and API key into the app's `.env`:
+Then copy the staging environment's client ID and API key into the app's `.env`.:
 
 ```ini
 WORKOS_CLIENT_ID=your-client-id
@@ -79,7 +81,7 @@ These are the names the starter kits read in `config/services.php`.
 
 ## Set up the app
 
-Set `APP_URL` to the new name, so the redirect URL follows it:
+Set `APP_URL` to the new name, so the redirect URL follows it. The `WORKOS_REDIRECT_URL` line builds on `APP_URL`, so `APP_URL` has to come before it in the file:
 
 ```ini
 APP_URL=https://local.myapp.com
@@ -99,7 +101,7 @@ The starter kit's `bootstrap/app.php` already has a `withMiddleware` closure. Ad
 })
 ```
 
-`'*'` trusts the forwarded headers from any address. If this file also runs in production behind a known load balancer, list that load balancer's addresses there instead.
+`'*'` trusts the forwarded headers from any address. If this file also runs in production behind a known load balancer, list that load balancer's addresses plus `127.0.0.1` instead, or read the list from an environment variable. Nearhost's forward arrives from `127.0.0.1`, or from the Docker network's gateway under Sail, so leaving it out stops Laravel trusting it and brings back `http://` links.
 
 If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, set `server.hmr.host` to `'localhost'` in `vite.config.js`, because the forward listens on `127.0.0.1` only. See [Vite on the IPv6 loopback address](/docs/guides/ngrok-assets-on-localhost/#vite-on-the-ipv6-loopback-address).
 

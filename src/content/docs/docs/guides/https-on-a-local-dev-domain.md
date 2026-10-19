@@ -40,6 +40,8 @@ Avoid `.dev`, which is a real top-level domain whose every name browsers force t
 
 ## Setting it up
 
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
 If the dev server runs on your laptop, a tool such as mkcert and a line in `/etc/hosts` are enough. You make a local certificate authority, trust it, issue a certificate for the name, and point the dev server at it.
 
 If the dev server runs on another machine, Nearhost does all of this on your laptop. It creates a local certificate authority the first time it starts, which you trust once with your password, and it issues a certificate for each project's name. Its proxy serves the name over HTTPS and forwards to the dev server over SSH. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/).
