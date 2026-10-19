@@ -87,11 +87,15 @@ APP_URL=https://local.myapp.com
 
 If you have cached the config, run `php artisan config:clear`.
 
-Nearhost's proxy ends HTTPS on your laptop and passes plain HTTP to the server, with `X-Forwarded-Proto: https`. Laravel ignores that header until it trusts the proxy, so it thinks the request was `http://` and builds `http://` links. Trust it in `bootstrap/app.php` (Laravel 11 and later):
+Nearhost's proxy ends HTTPS on your laptop and passes plain HTTP to the server, with `X-Forwarded-Proto: https`. Laravel ignores that header until it trusts the proxy, so it thinks the request was `http://`. The WorkOS callback is unaffected, because `laravel/workos` reads it from `WORKOS_REDIRECT_URL`. What goes wrong is everything Laravel builds from the request: `route()` and `url()` links, the redirect to the dashboard after sign-in, and `asset()` URLs.
+
+The starter kit's `bootstrap/app.php` already has a `withMiddleware` closure. Add one line inside it (Laravel 11 and later):
 
 ```php
 ->withMiddleware(function (Middleware $middleware): void {
     $middleware->trustProxies(at: '*');
+
+    // The lines already there stay as they are.
 })
 ```
 
@@ -108,14 +112,14 @@ Start the project with `nearhost up`, or from the interface, and open `https://l
 When it does not:
 
 - **WorkOS shows an error instead of the sign-in page.** Usually the redirect URI your app sent is not on the Redirects tab of the environment whose keys you use. Compare them character by character: `https`, the host, `/authenticate`, no trailing slash. Check that `WORKOS_REDIRECT_URL` and `APP_URL` are what you expect, and that the keys are the staging ones.
-- **Links, redirects or the callback use `http://`.** Laravel does not trust the proxy yet. Add `trustProxies` as above. The browser may follow the `http://` redirect to HTTPS, so look for mixed-content warnings in the console too.
+- **Links, the redirect after sign-in, or asset URLs use `http://`.** Laravel does not trust the proxy yet. Add `trustProxies` as above. Nearhost redirects `http://` to HTTPS, so a link may still seem to work, but `http://` scripts and styles on an HTTPS page are blocked as mixed content. Look for those warnings in the console.
 - **`/authenticate` returns 403.** `laravel/workos` keeps a state value in the session when you start sign-in, and refuses the callback when the session does not come back with it. Start sign-in at `https://local.myapp.com`, not at another address for the same app, and leave `SESSION_DOMAIN` unset (`null`) or set it to `local.myapp.com`. A cookie set for another domain never reaches this one.
 
 ## When you still need ngrok
 
 Nearhost is local-only. The name works in your browser on your laptop, and nowhere else. Use a public tunnel when:
 
-- **WorkOS sends webhooks.** They come from WorkOS's servers, which cannot reach your laptop. Point the staging webhook endpoint at a tunnel, or test events another way.
+- **WorkOS sends webhooks.** They come from WorkOS's servers, which cannot reach your laptop. Point the staging webhook endpoint at a tunnel. Or use WorkOS's events API, where your app fetches events from WorkOS rather than receiving them.
 - **Someone outside needs the link.** A colleague or a client cannot open `local.myapp.com` from their machine.
 
 You can run both: Nearhost for your own browser, and a tunnel just for the webhook endpoint.
@@ -130,6 +134,7 @@ These pages, on 2026-10-19:
 - [WorkOS: Staging and production environments](https://workos.com/docs/authkit/environments)
 - [WorkOS AuthKit: configure your project](https://workos.com/docs/authkit/vanilla/nodejs/1-configure-your-project)
 - [WorkOS: Redirect URIs for local, staging and production](https://workos.com/blog/redirect-uris-for-local-staging-and-production)
+- [WorkOS: Data syncing with the events API or webhooks](https://workos.com/docs/events/data-syncing)
 
 They were read, not run end to end. If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
 :::
