@@ -3,8 +3,10 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLlmsTxt from 'starlight-llms-txt';
 import svelte from '@astrojs/svelte';
+import sitemap from '@astrojs/sitemap';
 import { satteri } from '@astrojs/markdown-satteri';
 import baseLinks from './src/lib/base-links.mjs';
+import { lastCommitDate, sourcesFor } from './src/lib/lastmod.mjs';
 import { plausibleInit, plausibleSrc, tracked } from './src/lib/plausible.mjs';
 
 // Pull request previews are built under /pr-preview/pr-<number>/; the live site sits at /.
@@ -98,5 +100,13 @@ export default defineConfig({
       ],
     }),
     svelte(),
+    // Starlight adds a plain sitemap unless one is configured here; this one adds lastmod.
+    sitemap({
+      serialize(item) {
+        const path = new URL(item.url).pathname.slice(base.length);
+        const lastmod = lastCommitDate(sourcesFor(path));
+        return lastmod ? { ...item, lastmod } : item;
+      },
+    }),
   ],
 });

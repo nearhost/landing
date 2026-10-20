@@ -158,7 +158,18 @@ for (const name of ['llms.txt', 'llms-full.txt', 'llms-small.txt']) {
   check(!text.includes('Section titled'), `dist/${name} contains heading anchor text`);
 }
 
-// 8. Every internal link in every page resolves to a file in dist/.
+// 8. Every sitemap entry carries the date its page last changed.
+const sitemapFile = join(dist, 'sitemap-0.xml');
+check(existsSync(sitemapFile), 'dist/sitemap-0.xml is missing');
+if (existsSync(sitemapFile)) {
+  const xml = readFileSync(sitemapFile, 'utf8');
+  const entries = xml.match(/<url>/g)?.length ?? 0;
+  const dated = xml.match(/<lastmod>\d{4}-\d{2}-\d{2}T[^<]*<\/lastmod>/g)?.length ?? 0;
+  check(entries > 0, 'dist/sitemap-0.xml has no entries');
+  check(dated === entries, `dist/sitemap-0.xml dates ${dated} of ${entries} entries`);
+}
+
+// 9. Every internal link in every page resolves to a file in dist/.
 // Links are resolved the way a browser would, against the page's own URL on the site's origin.
 // Absolute links to the site point at production, which has no base.
 const origin = 'https://nearhost.dev';

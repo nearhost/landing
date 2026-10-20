@@ -22,7 +22,11 @@ jobs:
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     steps:
+      # The whole history, so each docs page and sitemap entry is dated by its own last commit
+      # rather than by the one commit a shallow clone has.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
