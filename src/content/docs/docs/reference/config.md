@@ -53,7 +53,7 @@ presets:
 | `projects[].routes[].role`  | string  | One of `web`, `loopback` or `ignore`.                                                          |
 | `projects[].routes[].label` | string  | Optional. A description, usually from discovery.                                               |
 | `projects[].routes[].hosts` | list    | Optional, web routes only. More names to serve the route at: exact names or wildcard patterns. |
-| `projects[].nearhostrc`     | map     | Written by Nearhost: what you last approved from the project's `.nearhostrc`. Do not edit it.  |
+| `projects[].nearhostrc`     | map     | Written by Nearhost: the project's `.nearhostrc` as Nearhost last applied it. Do not edit it.  |
 | `registries[].alias`        | string  | The name a registry's presets are known by, as in `nearhost/vite`.                             |
 | `registries[].repo`         | string  | The registry's GitHub repository, as `owner/name`.                                             |
 | `registry_prompt`           | boolean | `false` stops Nearhost offering to trust the official registry. Absent means ask.              |

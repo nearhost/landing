@@ -44,13 +44,13 @@ On Home, when a server cannot connect, `r` retries every such server now and `y`
 
 After `tab` on a project.
 
-| Key          | Action                                                             |
-| ------------ | ------------------------------------------------------------------ |
-| `↑`, `↓`     | Choose a route.                                                    |
-| `space`      | Switch it between `loopback` and `ignore`.                         |
-| `w`          | Make it the web route. A web route without hosts becomes `ignore`. |
-| `y`          | Copy the snippets of the project's advice.                         |
-| `tab`, `esc` | Done.                                                              |
+| Key          | Action                                                                        |
+| ------------ | ----------------------------------------------------------------------------- |
+| `↑`, `↓`     | Choose a route.                                                               |
+| `space`      | Switch it between `loopback` and `ignore`.                                    |
+| `w`          | Make it the web route. The old web route becomes `ignore` if it has no hosts. |
+| `y`          | Copy the snippets of the project's advice.                                    |
+| `tab`, `esc` | Done.                                                                         |
 
 On a project on this machine, a route is only `web` or `ignore`.
 

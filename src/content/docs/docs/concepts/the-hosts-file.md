@@ -18,7 +18,7 @@ Nearhost owns one block and touches nothing else in the file:
 # nearhost:end
 ```
 
-The block always lists `.test` names, running or not, sorted. Any other [main name](/docs/reference/config/#main-name) is listed only while its project is enabled, and only if DNS does not already resolve it to loopback addresses alone. Each enabled project's exact web hosts are listed too, under the same DNS rule for names that do not end in `.test`. `localhost` and wildcard patterns are never listed, because a hosts file cannot resolve them: a pattern's names need DNS that sends them to 127.0.0.1, and `nearhost doctor` reports any that do not resolve. With no projects, the block is removed rather than left empty.
+The block always lists `.test` names, running or not, sorted. Any other [main name](/docs/reference/config/#main-name) is listed only while its project is enabled, and only if DNS does not already resolve it to loopback addresses alone. Each enabled project's exact web hosts are listed too, under the same DNS rule for names that do not end in `.test`. `localhost` is never listed, because your system already maps it to loopback and Nearhost leaves that mapping alone. Wildcard patterns are never listed either, because a hosts file cannot express them: a pattern's names need DNS that sends them to 127.0.0.1, and `nearhost doctor` reports any that do not resolve. With no projects, the block is removed rather than left empty.
 
 ## How changes are applied
 
