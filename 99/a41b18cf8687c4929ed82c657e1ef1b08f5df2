@@ -1,0 +1,21 @@
+src/lib/lastmod.mjs
+  s_f73a4dba9f7d00::t_61075f5ab65071 3-4,46,49-59
+src/lib/lastmod.test.mjs
+  s_f73a4dba9f7d00::t_cdf095e8e2cd15 3,35-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "99a41b18cf8687c4929ed82c657e1ef1b08f5df2",
+  "prompts": {},
+  "sessions": {
+    "s_f73a4dba9f7d00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4d7d22e-aeb2-4a9a-ae19-70c1b770f423",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
