@@ -1865,6 +1865,12 @@
     flex-wrap: wrap;
     column-gap: 4ch;
   }
+  /* A long path wraps inside itself once it has a line to itself. */
+  .meta > span {
+    min-width: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
   .sel {
     background: var(--selected);
   }
@@ -1919,6 +1925,13 @@
     .foot .keys button {
       min-height: 24px;
       align-items: center;
+    }
+    .again {
+      min-height: 24px;
+    }
+    .tabs button {
+      display: inline-block;
+      min-height: 24px;
     }
   }
   .foot .keys button:hover .d {
