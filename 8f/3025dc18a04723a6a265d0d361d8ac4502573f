@@ -1,0 +1,19 @@
+src/content/docs/docs/guides/workos-sign-in.md
+  s_16a4dddf86921d::t_4f6c652a8f5326 90-92,97-98,115,122,137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8f3025dc18a04723a6a265d0d361d8ac4502573f",
+  "prompts": {},
+  "sessions": {
+    "s_16a4dddf86921d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7cc721d4-6e08-49ce-bd6f-182ab2820371",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
