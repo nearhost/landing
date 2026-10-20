@@ -1,10 +1,12 @@
 // Checks the built site for things a green build can still get wrong.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const failures = [];
+// SITE_BASE is the PR-preview prefix; src/lib/base-links.mjs puts it on links.
+const base = (process.env.SITE_BASE || '/').replace(/\/?$/, '/');
 
 function check(condition, message) {
   if (!condition) failures.push(message);
@@ -59,7 +61,7 @@ for (const file of htmlFiles(dist)) {
     failures.push(`${file} has no og:image`);
     continue;
   }
-  const path = join(dist, new URL(image).pathname);
+  const path = join(dist, new URL(image).pathname.slice(base.length));
   if (!existsSync(path)) {
     failures.push(`${file} points og:image at ${image}, which is not in dist/`);
     continue;
@@ -123,6 +125,50 @@ check(
   existsSync(join(dist, 'docs', 'getting-started', 'install', 'index.html')),
   'docs install page is missing',
 );
+
+// 6. Every internal link in every page resolves to a file in dist/.
+// Links are resolved the way a browser would, against the page's own URL on the site's origin.
+// Absolute links to the site point at production, which has no base.
+const origin = 'https://nearhost.dev';
+for (const file of pages) {
+  const html = readFileSync(file, 'utf8');
+  const page = new URL(base + relative(dist, file).split(sep).join('/'), origin);
+  const hrefs = new Set(
+    [...html.matchAll(/<a\s[^>]*?href=(?:"([^"]*)"|'([^']*)')/gi)].map((m) => m[1] ?? m[2]),
+  );
+  for (const href of hrefs) {
+    if (href.startsWith('#')) continue;
+    const absolute = /^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith('//');
+    const prefix = absolute ? '/' : base;
+    if (!absolute && base !== '/' && href.startsWith('/') && !href.startsWith(base)) {
+      failures.push(`${file} links to ${href}, which skips the site base ${base}`);
+      continue;
+    }
+    let path;
+    try {
+      const url = new URL(href, page);
+      // Other schemes and other hosts.
+      if (url.origin !== origin) continue;
+      if (!url.pathname.startsWith(prefix)) {
+        failures.push(`${file} links to ${href}, which is outside the site base ${base}`);
+        continue;
+      }
+      path = decodeURIComponent(url.pathname.slice(prefix.length));
+    } catch {
+      failures.push(`${file} links to ${href}, which is not a valid URL path`);
+      continue;
+    }
+    const target =
+      path === '' || path.endsWith('/') ? join(dist, path, 'index.html') : join(dist, path);
+    if (!target.startsWith(dist)) {
+      failures.push(`${file} links to ${href}, which is outside dist/`);
+    } else if (!existsSync(target)) {
+      failures.push(`${file} links to ${href}, which is not in dist/`);
+    } else if (statSync(target).isDirectory()) {
+      failures.push(`${file} links to ${href}, a directory; end the link with a slash`);
+    }
+  }
+}
 
 if (failures.length) {
   console.error(
