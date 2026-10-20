@@ -66,7 +66,7 @@ A request is answered for the machine its socket belongs to, so an agent on `min
 - **The one change on a server.** Nearhost creates `~/.nearhost` there, private to your account, and removes its own socket from an earlier run before forwarding again. sshd leaves the socket behind when the connection ends; the skill skips sockets that do not answer.
 - **Two laptops on one account.** Each install has its own id and socket, so both work. When more than one answers, the agent asks which laptop you mean.
 - **A server with no tunnel.** The forward exists while Nearhost is connected to the server, which is from when one of its projects starts, or when you select the server and press `c`. Otherwise the agent says to start Nearhost and connect the server, or gives the `nearhost add --server` command to run on the laptop for a server Nearhost does not know yet.
-- **A server that is this machine.** A server whose home is the laptop's own, such as `ssh_host: localhost` on your account, gets no forward: agents there already reach Nearhost on the laptop's socket.
+- **A server that is this machine.** A server whose home is the laptop's own, such as `ssh_host: localhost` on your account, gets no forward: agents there already reach Nearhost on the laptop's socket. Nearhost tells this from another machine whose home has the same path, such as a second Mac with the same user name, by checking whether the server sees a file it has just made on the laptop. That machine gets its forward like any other.
 
 To use one socket explicitly, set `NEARHOST_SOCKET` to its path where the agent runs.
 
