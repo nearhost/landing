@@ -2075,7 +2075,7 @@ Caddy runs inside the Nearhost process, with its storage under `~/.config/nearho
 
 It answers only this machine, and, for a project whose `.nearhostrc` sets `docker_clients`, containers on this machine’s Docker networks. A request from another computer, or for a name Nearhost does not serve, has its connection closed with no answer.
 
-While any project runs, `https://localhost` shows Nearhost’s own page, unless a project serves `localhost` itself.
+While Nearhost runs, even with no projects, `https://localhost` shows Nearhost’s own page, unless a project serves `localhost` itself.
 
 ## The local CA
 
@@ -2134,7 +2134,7 @@ VITE_PORT=5174
 
 ## Vite on the default port
 
-`vite-default-port`, from `nearhost/vite`. Appears when the Vite config sets no `server.port`, unless it reads `VITE_PORT` and `.env` sets it. Any `server.port` counts, a number, an expression such as `Number(process.env.APP_VITE_PORT) || 5291` or the shorthand `server: { port }`, but not one that is commented out. A port read from `VITE_PORT` counts only while `.env` sets `VITE_PORT`. Vite will use 5173, which other Vite projects also use, so set a port in the Vite config. The snippet suggests a free one:
+`vite-default-port`, from `nearhost/vite`. Appears when the Vite config sets no `server.port`, unless it reads `VITE_PORT` and `.env` sets it. Any `server.port` counts, a number, an expression such as `Number(process.env.APP_VITE_PORT) || 5291` or the shorthand `server: { port }`, but not one that is commented out. A port whose value reads `VITE_PORT` counts only while `.env` sets `VITE_PORT`. Vite will use 5173, which other Vite projects also use, so set a port in the Vite config. The snippet suggests a free one:
 
 vite.config.ts
 
@@ -2146,7 +2146,7 @@ export default defineConfig({
 });
 ```
 
-Under Laravel Sail, `nearhost/sail` replaces it with the same advice for `.env`. It does not appear when the Compose file gives `VITE_PORT` a default other than 5173, such as `${VITE_PORT:-5176}` or `${VITE_PORT-5176}`:
+Under Laravel Sail, `nearhost/sail` replaces it with the same advice for `.env`, where `laravel-vite-plugin` reads `VITE_PORT`. A default in the Compose file, such as `${VITE_PORT:-5176}`, does not count: it only maps the port, and Vite in the container still listens on 5173. Its snippet:
 
 ```sh
 VITE_PORT=5174
