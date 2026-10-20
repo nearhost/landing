@@ -2,6 +2,7 @@
 import { url } from '../lib/url';
 import { ogPath } from '../lib/og.mjs';
 import { plausibleInit, plausibleSrc, tracked } from '../lib/plausible.mjs';
+import { latestVersion } from '../lib/version';
 import '@fontsource-variable/space-grotesk/index.css';
 import '@fontsource-variable/dm-sans/index.css';
 import '@fontsource/ibm-plex-mono/400.css';
@@ -17,6 +18,25 @@ const { title, description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const image = new URL(url(ogPath('index')), Astro.site);
 const analytics = tracked(import.meta.env.BASE_URL, import.meta.env.PROD);
+const version = await latestVersion();
+
+// Tells search engines what the page is about: a free, open source developer tool.
+const software = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Nearhost',
+  description,
+  url: canonical.href,
+  image: image.href,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'macOS, Linux',
+  ...(version === 'latest' ? {} : { softwareVersion: version.replace(/^v/, '') }),
+  downloadUrl: new URL(url('/docs/getting-started/install/'), Astro.site).href,
+  license: 'https://opensource.org/licenses/MIT',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  sameAs: ['https://github.com/nearhost/nearhost'],
+};
 ---
 
 <!doctype html>
@@ -41,6 +61,7 @@ const analytics = tracked(import.meta.env.BASE_URL, import.meta.env.PROD);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
     <meta name="twitter:image:alt" content="Nearhost: Run it anywhere. Open it here." />
+    <script type="application/ld+json" set:html={JSON.stringify(software)} />
     {analytics && (
       <>
         <script is:inline async src={plausibleSrc} />
