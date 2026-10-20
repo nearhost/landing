@@ -136,12 +136,16 @@ const guides = existsSync(guidesDir)
   : [];
 check(guides.length > 0, 'no sign-in guides in dist/docs/guides/');
 for (const file of guides) {
-  const text = readFileSync(file, 'utf8').replace(/<[^>]*>/g, ' ');
+  const html = readFileSync(file, 'utf8');
+  const note = html.match(/<aside aria-label="Checked against"[\s\S]*?<\/aside>/)?.[0] ?? '';
   check(
-    /Checked against[\s\S]*?\d{4}-\d{2}-\d{2}/.test(text),
-    `${file} must say "Checked against" with a YYYY-MM-DD date`,
+    /\d{4}-\d{2}-\d{2}/.test(note),
+    `${file} must have a "Checked against" note with a YYYY-MM-DD date`,
   );
-  check(text.includes('Nearhost 0.6.0'), `${file} must say it needs Nearhost 0.6.0`);
+  check(
+    /Needs Nearhost \d+\.\d+\.\d+ or later/.test(html.replace(/<[^>]*>/g, '')),
+    `${file} must say "Needs Nearhost X.Y.Z or later"`,
+  );
 }
 
 // 7. Every internal link in every page resolves to a file in dist/.
