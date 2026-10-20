@@ -174,7 +174,7 @@ For a project whose `.nearhostrc` has a mistyped key, with a route that also ser
       "id": "hosts.public",
       "severity": "warning",
       "project": "shop",
-      "message": "www.example.com is a real name that resolves to 172.66.147.243; while the project is enabled, the real site is out of reach on this machine",
+      "message": "www.example.com is a real name that resolves to 203.0.113.10; while the project is enabled, the real site is out of reach on this machine",
       "fix": {
         "kind": "manual",
         "text": "Nothing to do if that is what you want; otherwise use a name that resolves to 127.0.0.1, or a .test name."
@@ -194,7 +194,7 @@ For a project whose `.nearhostrc` has a mistyped key, with a route that also ser
 }
 ```
 
-`api.local.example.com` and `shop.test` do not resolve to this machine either, but the `hosts block` check already names them, so no `hosts.unresolved` finding repeats them. The exit status is 1. Coding agents get the same findings for one project from the [agent API](/docs/getting-started/use-a-coding-agent/#agent-api).
+`api.local.example.com` and `shop.test` do not resolve to this machine either, but the `hosts block` check already names them, so no `hosts.unresolved` finding repeats them. The exit status is 1. Coding agents run the same checks on one project through the [agent API](/docs/getting-started/use-a-coding-agent/#agent-api).
 
 ## nearhost preset
 

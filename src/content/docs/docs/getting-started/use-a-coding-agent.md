@@ -43,12 +43,13 @@ Proposals need the full-screen interface. Under `nearhost up`, an agent can read
 
 ## Fix a project
 
-When a project is not served as you expect, run `/nearhost doctor` in its directory, or `$nearhost doctor` in Codex. The agent fetches the same [project checks](/docs/reference/cli/#project-checks) that `nearhost doctor` runs, for this project, and works through the errors, then the warnings. Each finding's fix has a kind, and the agent handles each kind in its own way:
+When a project is not served as you expect, run `/nearhost doctor` in its directory, or `$nearhost doctor` in Codex. The agent asks Nearhost to run the same [project checks](/docs/reference/cli/#project-checks) as `nearhost doctor` on this project, and works through the errors, then the warnings. Unlike `nearhost doctor`, this first reads the project's `.nearhostrc` again, as described under [Agent API](#agent-api). Each finding's fix has a kind, and the agent handles each kind in its own way:
 
 - **`project`.** The agent shows you the change, the snippet and where it goes, and makes it in the project's files once you agree. When the setup is more than Nearhost can work out for itself, such as several hosts, a pattern, `localhost` or callbacks from Docker, it writes or edits the project's [`.nearhostrc`](/docs/reference/nearhostrc/).
-- **Reading `.nearhostrc` again.** After editing the file, and for `nearhostrc.pending` and `nearhostrc.not-applied`, the agent asks Nearhost to read it again. A change that needs no approval applies at once. One that needs it waits, and the agent tells you to approve it in Nearhost, then waits for your answer. See [Approval](/docs/reference/nearhostrc/#approval).
-- **Other `nearhost` fixes.** Something you do in Nearhost, such as adding a port in the edit form. The agent passes it on, or offers to write the port or host into `.nearhostrc` instead.
+- **`nearhost`.** Something you do in Nearhost, such as adding a port in the edit form. The agent passes it on, or offers to write the port or host into `.nearhostrc` instead.
 - **`manual`.** Something only you can do, such as a DNS record. The agent tells you what it says.
+
+After editing `.nearhostrc`, and for `nearhostrc.pending` and `nearhostrc.not-applied`, the agent asks Nearhost to read the file again. A change that needs no approval applies at once. One that needs it waits, and the agent tells you to approve it in Nearhost, then waits for your answer. See [Approval](/docs/reference/nearhostrc/#approval).
 
 Then it runs the doctor again, and stops when nothing is left that it can fix. It never edits Nearhost's `config.yaml`. Approving a change needs the full-screen interface: under `nearhost up`, the agent tells you to open `nearhost`.
 
@@ -74,8 +75,8 @@ To use one socket explicitly, set `NEARHOST_SOCKET` to its path where the agent 
 The skill's script talks to Nearhost over that socket, with `curl --unix-socket`. Nearhost answers JSON for the machine the socket belongs to. These calls are the ones the doctor uses:
 
 - `GET /v1` says which API this is. Its `capabilities` list names the calls added since the first release of API 1: `doctor` and `reload`. An older Nearhost leaves them out, and the skill tells you to update it.
-- `GET /v1/doctor?path=…` returns `project` and `findings` for the project holding the absolute path, in the shape that [`nearhost doctor --json`](/docs/reference/cli/#json-output) gives its findings. For a directory that is not in Nearhost yet, `project` is `null` and the findings are for the project as it would be added.
-- `POST /v1/projects/reload`, with `{"path": "/abs/dir"}`, asks Nearhost to read the project's `.nearhostrc` again. It answers `applied` when nothing needs approval, or `pending` with an `id` the agent waits on, as it does for a proposal, while you decide. A change you declined stays declined until the file changes.
+- `GET /v1/doctor?path=…` returns `project` and `findings` for the project holding the absolute path, in the shape that [`nearhost doctor --json`](/docs/reference/cli/#json-output) gives its findings. For a project already in Nearhost, it first reads the project's `.nearhostrc` again, as a reload does: a change that needs no approval is applied, restarting the project if it runs under `nearhost up`, and one that needs approval waits in Nearhost. For a directory that is not in Nearhost yet, `project` is `null`, each finding's `project` is empty, and the findings are for the project as it would be added.
+- `POST /v1/projects/reload`, with `{"path": "/abs/dir"}`, asks Nearhost to read the `.nearhostrc` of the project holding the path again. The project must be added first. It answers `applied` when nothing needs approval, or `pending` with an `id` the agent waits on, as it does for a proposal, while you decide. A change you declined stays declined until the file changes.
 
 ## When agents cannot reach Nearhost
 
