@@ -1,0 +1,65 @@
+scripts/verify-dist.mjs
+  s_16a4dddf86921d::t_8f674b405931e6 8-9,64,155-156,158-161,183-184
+  s_16a4dddf86921d::t_5eb7b0f152ff74 188,191-194
+  s_16a4dddf86921d::t_31eb0977d730c5 167-170,179-182
+  s_16a4dddf86921d::t_65f66bf61ed03f 129-138,145,148,149-151
+  s_16a4dddf86921d::t_dededcde0aaca7 139-144,146-147
+src/content/docs/docs/reference/config.md
+  s_16a4dddf86921d::t_da6c5df0c6ee62 20,50,65-70,72-75,77-88,93
+  s_16a4dddf86921d::t_c97f18f1681c9b 71,76
+src/content/docs/docs/reference/cli.md
+  s_16a4dddf86921d::t_da6c5df0c6ee62 49-57
+  s_16a4dddf86921d::t_620eec3440b0ec 84-94
+src/lib/og.test.mjs
+  s_16a4dddf86921d::t_65f66bf61ed03f 17
+src/content/docs/docs/guides/workos-sign-in.md
+  s_16a4dddf86921d::t_350f2e32d1cd67 50,53-55,73-74,114
+  s_16a4dddf86921d::t_0c93c187c5a030 1-4,6-49,51-52,56-72,75-89,93-96,99-113,116-121,123-136,138-140
+  s_16a4dddf86921d::t_4f6c652a8f5326 90-92,97-98,115,122,137
+  s_16a4dddf86921d::t_5f9b8ac6426182 5
+astro.config.mjs
+  s_16a4dddf86921d::t_d8a66f34b67e05 56
+src/content/docs/docs/guides/clerk-sign-in.md
+  s_16a4dddf86921d::t_44cec620d9bf61 16,67
+  s_16a4dddf86921d::t_8076b2b00121e1 1-4,6-15,17,19-66,68-83,85-121,123-136,138-149
+  s_16a4dddf86921d::t_0920b418ff2b27 18,84,122,137
+  s_16a4dddf86921d::t_5f9b8ac6426182 5
+src/content/docs/docs/guides/cognito-sign-in.md
+  s_16a4dddf86921d::t_7c3767f385b9b8 77
+  s_16a4dddf86921d::t_79ada62811368c 1-4,6-22,24-76,78,80-81,84-132,134-149,151-152,156-161,163-187,189-204,206-217
+  s_16a4dddf86921d::t_38f6d4f70a57a4 188
+  s_16a4dddf86921d::t_42d60d96fbb857 23
+  s_16a4dddf86921d::t_a900c2b61fff1e 205
+  s_16a4dddf86921d::t_0e9eb6446a29fd 162
+  s_16a4dddf86921d::t_59e8c4fe30e637 133
+  s_16a4dddf86921d::t_75a042f487c0fd 150,153-154
+  s_16a4dddf86921d::t_3e8fda3fded709 79,82-83
+  s_16a4dddf86921d::t_02cd047afb8471 155
+  s_16a4dddf86921d::t_5f9b8ac6426182 5
+src/content/docs/docs/guides/ngrok-assets-on-localhost.md
+  s_16a4dddf86921d::t_8ceb35ec665fc0 28
+  s_16a4dddf86921d::t_bf8e5bad1ac494 1-27,29-35,37-41,43-69
+  s_16a4dddf86921d::t_457b0e2e0be492 36,42
+src/content/docs/docs/guides/sso-callback-on-a-remote-dev-server.md
+  s_16a4dddf86921d::t_155b8cf93381e0 24
+  s_16a4dddf86921d::t_e892b9af284723 1-23,25-58
+src/content/docs/docs/guides/https-on-a-local-dev-domain.md
+  s_16a4dddf86921d::t_18da9dd9c394db 1-23,25-38,40-44,46-71
+  s_16a4dddf86921d::t_9a2f91abb282e4 24,39,45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0154f2c8c8702470bfba69b9a437fbdfb6825f84",
+  "prompts": {},
+  "sessions": {
+    "s_16a4dddf86921d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7cc721d4-6e08-49ce-bd6f-182ab2820371",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
