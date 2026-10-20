@@ -1132,7 +1132,8 @@
   </div>
 {/snippet}
 
-<div class="frame">
+<!-- Sample data, kept out of search snippets and AI answers. -->
+<div class="frame" data-nosnippet>
   <!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
   <div
     class="term"
