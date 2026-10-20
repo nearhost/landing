@@ -1,0 +1,58 @@
+src/pages/logo.png.ts
+  s_f73a4dba9f7d00::t_560c2899832b90 3,6
+  s_f73a4dba9f7d00::t_54a87a33e4492b 1-2,4-5,7
+  s_f73a4dba9f7d00::t_fdec658d963154 8-13
+src/lib/structured-data.mjs
+  s_f73a4dba9f7d00::t_1be12a4ac0920b 1-76
+src/route-data.ts
+  s_f73a4dba9f7d00::t_fdec658d963154 1-2,6,22-34
+src/layouts/Landing.astro
+  s_f73a4dba9f7d00::t_fdec658d963154 6,27-30,32-61,91
+scripts/verify-dist.mjs
+  s_f73a4dba9f7d00::t_b84d9e4124d62f 31-39,109,111-114,142-150
+  s_f73a4dba9f7d00::t_d4c70c1036212a 116-128
+src/components/landing/Faq.astro
+  s_f73a4dba9f7d00::t_d4c70c1036212a 45-50
+  s_f73a4dba9f7d00::t_1d8e4e8875ac94 1-44,51-110
+src/pages/index.astro
+  s_f73a4dba9f7d00::t_d4c70c1036212a 13,32
+src/content/docs/docs/concepts/dev-servers-and-hot-reload.md
+  s_f73a4dba9f7d00::t_e60e160a558053 28-29
+src/content/docs/docs/guides/vite-hot-reload-over-ssh.md
+  s_f73a4dba9f7d00::t_e60e160a558053 75
+  s_f73a4dba9f7d00::t_1cd12bb9f0773f 1-13,15-25,27-51,53-72
+  s_f73a4dba9f7d00::t_6feba2971b7e49 14,26,52,73-74
+src/content/docs/docs/guides/cognito-sign-in.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+src/content/docs/docs/guides/clerk-sign-in.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+src/content/docs/docs/guides/workos-sign-in.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+src/content/docs/docs/guides/forward-ports-over-ssh.md
+  s_f73a4dba9f7d00::t_75e9b0c5ce8b47 55,81
+  s_f73a4dba9f7d00::t_ce26a44bb20aba 82
+  s_f73a4dba9f7d00::t_3405ade6916b42 1-54,56-80
+src/content/docs/docs/concepts/ssh-transport.md
+  s_f73a4dba9f7d00::t_ce26a44bb20aba 35
+  s_f73a4dba9f7d00::t_05dd20180a461f 36
+src/content/docs/docs/guides/https-on-a-local-dev-domain.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+astro.config.mjs
+  s_f73a4dba9f7d00::t_a9868e6ce4e4cf 50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5c6bfee589f1c42b3d6f16c03280b2694ecdd051",
+  "prompts": {},
+  "sessions": {
+    "s_f73a4dba9f7d00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4d7d22e-aeb2-4a9a-ae19-70c1b770f423",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
