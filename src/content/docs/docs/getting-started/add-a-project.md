@@ -14,7 +14,7 @@ Press `n`. A box titled "Add project" opens over the screen. Its steps are count
 1. **Server.** Pick `local` for this machine, or a server you have added. The selected server, or the selected project's, is chosen already. **New server…** adds one on the way. See [Add a server](/docs/getting-started/add-a-server/).
 2. **Path.** The project's directory. On `local` it starts as the folder you ran `nearhost` in, and on a server as `~/`. See [Typing a path](#typing-a-path).
 3. **Presets.** Nearhost reads ports from `.env` by itself. While no preset registry is trusted, it asks once whether to trust the official presets, which add Compose files, Vite and Laravel Sail. Choose Yes, No, or Don't ask again. With a registry trusted, it lists the presets that suit this project, ticked. `space` unticks one, and `enter` enables the rest. See [Presets and registries](/docs/concepts/presets-and-registries/).
-4. **Routes.** The ports found, with a role and a label for each. Ticked ports are served. `space` ticks or unticks a port, and `←` or `→` changes its role. One port must be `web`. If no ports were found, give the web port yourself.
+4. **Routes.** The ports found, with a role and a label for each. Ticked ports are served. `space` ticks or unticks a port, and `←` or `→` changes its role. At least one port must be `web`. If no ports were found, give the web port yourself.
 5. **Name.** The project's name and its alias, which follows the name until you change it. `tab` moves between them. Names and aliases must be unique. The alias is the project's [main name](/docs/reference/config/#main-name) and can be any lowercase domain name, such as `local.myapp.com`, but not a wildcard, `localhost` or an IP address. A real domain asks for approval, which typing it here gives. One that comes from the project's `.nearhostrc` is asked about on the last step.
 6. **Confirm.** The server, path, address and routes, with any advice. `enter` adds the project.
 
@@ -76,11 +76,11 @@ A `~` in the path means the server's home directory, even when your shell has al
 
 ## Route roles
 
-| Role       | What happens                                                                           |
-| ---------- | -------------------------------------------------------------------------------------- |
-| `web`      | Served at `https://<alias>` through the proxy. Exactly one per project.                |
-| `loopback` | Raw forward to the same port on your laptop's `127.0.0.1`. Skipped for local projects. |
-| `ignore`   | Listed, not forwarded.                                                                 |
+| Role       | What happens                                                                                             |
+| ---------- | -------------------------------------------------------------------------------------------------------- |
+| `web`      | Served through the proxy. The first is served at `https://<alias>`, and each later one at its own hosts. |
+| `loopback` | Raw forward to the same port on your laptop's `127.0.0.1`. Skipped for local projects.                   |
+| `ignore`   | Listed, not forwarded.                                                                                   |
 
 Discovery proposes the roles, and you can change them at any time. See [Routes and roles](/docs/concepts/routes-and-roles/).
 

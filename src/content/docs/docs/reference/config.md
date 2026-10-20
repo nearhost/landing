@@ -91,7 +91,7 @@ alias: ${APP_HOST:-app.local.example.com}
 - Server names are unique, each server has a host, and `local` is not used as a name.
 - Project names are unique, and each project's server exists.
 - Aliases are unique across projects, ignoring case. An alias that is not a valid main name does not start, and `nearhost doctor` reports it.
-- Each project has exactly one `web` route. Ports are from 1 to 65535.
+- Each project has at least one `web` route. The first is served at the main name. Every other web route needs at least one host. Ports are from 1 to 65535.
 - Loopback ports are unique across enabled projects.
 - Registry aliases are lowercase letters, digits and single hyphens. Each preset's registry is trusted. Registry presets have `ref` and `sha256`, and local ones do not.
 

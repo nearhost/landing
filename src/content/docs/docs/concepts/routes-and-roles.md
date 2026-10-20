@@ -22,7 +22,7 @@ routes:
 
 ## web
 
-Served at `https://<alias>`. Exactly one per project.
+Served through the proxy. A project has at least one. The first is served at `https://<alias>`, and each later one needs hosts of its own to be served at.
 
 Discovery proposes one: a route a preset prefers, then a Compose port mapped to container port 80, then a route a preset offers as a fallback, such as Vite's configured port, then a project's only port. See [Discovery](/docs/concepts/discovery/#roles). You can move the role to any route.
 
@@ -43,7 +43,7 @@ Discovered and listed, not forwarded. Discovery proposes every route as `ignore`
 In the interface, select the project and press `tab` to move into its routes. Choose a route with `↑` and `↓`, then:
 
 - `space` switches it between `loopback` and `ignore`
-- `w` makes it the web route, and the old web route becomes `ignore`
+- `w` makes it the web route, and a web route without hosts of its own becomes `ignore`
 
 Press `tab` or `esc` when you are done. The change is saved and applied at once. `e` on the project reads its files again and walks through the routes step of the form. From the command line, `nearhost add --web <port>` chooses the web route.
 
@@ -51,4 +51,4 @@ Press `tab` or `esc` when you are done. The change is saved and applied at once.
 
 - Aliases must be unique across projects, ignoring case.
 - Loopback ports must be unique across enabled projects. Adding a project whose loopback port another enabled project uses is refused, and a config file with such a clash does not load.
-- Each project has exactly one `web` route.
+- Each project has at least one `web` route. Every web route after the first needs at least one host.
