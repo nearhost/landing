@@ -1,0 +1,25 @@
+src/content/docs/docs/concepts/multi-host-projects.md
+  s_89a63a3c1fa7d2::t_55b7bf7d5f8ea5 20,54,56-60,88
+src/content/docs/docs/concepts/presets-and-registries.md
+  s_89a63a3c1fa7d2::t_0049322f882cac 24-29,33
+src/content/docs/docs/concepts/routes-and-roles.md
+  s_89a63a3c1fa7d2::t_fd419491ee3f04 46
+src/content/docs/docs/reference/keyboard-shortcuts.md
+  s_89a63a3c1fa7d2::t_1b1b47d0b1b8f4 42,49-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "50d665a251eabd0a86c05cd662a37fb972930f51",
+  "prompts": {},
+  "sessions": {
+    "s_89a63a3c1fa7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ade858e5-1767-41c6-b0b0-fdd74aba68cf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
