@@ -341,8 +341,8 @@ Press `n`. A box titled “Add project” opens over the screen. Its steps are c
 2. **Path.** The project’s directory. On `local` it starts as the folder you ran `nearhost` in, and on a server as `~/`. See [Typing a path](#typing-a-path).
 3. **Presets.** Nearhost reads ports from `.env` by itself. While no preset registry is trusted, it asks once whether to trust the official presets, which add Compose files, Vite and Laravel Sail. Choose Yes, No, or Don’t ask again. With a registry trusted, it lists the presets that suit this project, ticked. `space` unticks one, and `enter` enables the rest. See [Presets and registries](/docs/concepts/presets-and-registries/).
 4. **Routes.** The ports found, with a role and a label for each. Ticked ports are served. `space` ticks or unticks a port, and `←` or `→` changes its role. At least one port must be `web`. If no ports were found, give the web port yourself.
-5. **Name.** The project’s name and its alias, which follows the name until you change it. `tab` moves between them. Names and aliases must be unique. The alias is the project’s [main name](/docs/reference/config/#main-name) and can be any lowercase domain name, such as `local.myapp.com`, but not a wildcard, `localhost` or an IP address. A real domain asks for approval, which typing it here gives. One that comes from the project’s `.nearhostrc` is asked about on the last step.
-6. **Confirm.** The server, path, address and routes, with any advice. `enter` adds the project.
+5. **Name.** The project’s name and its alias, which follows the name until you change it. `tab` moves between them. Names and aliases must be unique. The alias is the project’s [main name](/docs/reference/config/#main-name) and can be any lowercase domain name, such as `local.myapp.com`, but not a wildcard, `localhost` or an IP address. A real domain asks for approval, which typing it here gives. One that comes from the project’s [`.nearhostrc`](/docs/reference/nearhostrc/) is asked about on the last step.
+6. **Confirm.** The server, path, address and routes, with any advice. It also lists anything that needs approval, such as a host or option from the project’s `.nearhostrc`, and `enter` approves it as it adds the project.
 
 The project is selected and starts at once. If its alias is not in `/etc/hosts` yet, Nearhost asks for your password to add it. See [First run](/docs/getting-started/first-run/#the-password-box).
 
@@ -388,7 +388,7 @@ Start it with `nearhost up`.
 
 With no registry trusted, only the `.env` port variables are found, and every port but the web one is `ignore`. Here the Vite port should reach the browser as `localhost:5174`, so change it to `loopback` afterwards: select the project, press `tab`, choose the route and press `space`. The [Vite and Sail presets](/docs/concepts/presets-and-registries/) do that for you.
 
-At a terminal it asks what the interface asks: whether to trust the official presets, which suggested presets to enable, and which port is the web app when that is not clear. It also offers to add a server it does not know, and asks you to approve any real domain, wildcard, `localhost` or Docker access that the project’s `.nearhostrc` or presets ask for. Without a terminal it takes the defaults, and stops if it cannot tell which port is web or if something needs approval.
+At a terminal it asks what the interface asks: whether to trust the official presets, which suggested presets to enable, and which port is the web app when that is not clear. It also offers to add a server it does not know, and asks you to approve any real domain, wildcard, `localhost` or Docker access that the project’s `.nearhostrc` or presets ask for. Without a terminal it takes the defaults, and stops if it cannot tell which port is web or if something needs approval. See [Approval](/docs/reference/nearhostrc/#approval).
 
 | Flag              | Effect                                                                                                                                                 |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -396,7 +396,7 @@ At a terminal it asks what the interface asks: whether to trust the official pre
 | `--name <name>`   | The project name. The default is the directory’s name.                                                                                                 |
 | `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost` or an IP address. Typing it approves it. |
 | `--web <port>`    | The port to serve at the alias.                                                                                                                        |
-| `--host <host>`   | Add this host to the web route. Repeat for more. Typing it approves it.                                                                                |
+| `--host <host>`   | Add this host to the primary web route. Repeat for more. Typing it approves it.                                                                        |
 | `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                    |
 | `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
 | `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
@@ -412,6 +412,8 @@ A `~` in the path means the server’s home directory, even when your shell has 
 | `ignore`   | Listed, not forwarded.                                                                                   |
 
 Discovery proposes the roles, and you can change them at any time. See [Routes and roles](/docs/concepts/routes-and-roles/).
+
+A project can have several web routes, each served at hosts of its own. In the form, choose a web route on the routes step and press `h` to type its hosts. On the command line, `--host` adds a host to the primary web route. See [Multi-host projects](/docs/concepts/multi-host-projects/).
 
 Advisories are shown, never applied. See [Advisories](/docs/reference/advisories/). Nothing on the remote machine is edited.
 
@@ -438,7 +440,7 @@ See [config.yaml](/docs/reference/config/) for every key.
 
 > Let Claude Code or Codex add the project it is working in, on this machine or on a server, for you to review.
 
-A coding agent can ask Nearhost to add the project it is working in, and can read whether a project is served and where. It works the same when the agent runs on your laptop or on a server Nearhost is connected to, for example in an SSH session. The agent proposes and you decide: every add opens the add form in Nearhost, filled in, for you to save or dismiss.
+A coding agent can ask Nearhost to add the project it is working in, can read whether a project is served and where, and can find and fix what stops it being served. It works the same when the agent runs on your laptop or on a server Nearhost is connected to, for example in an SSH session. The agent proposes and you decide: every add opens the add form in Nearhost, filled in, for you to save or dismiss.
 
 ## Install the skill
 
@@ -466,12 +468,25 @@ In the project’s directory, run `/nearhost add` in Claude Code, or `$nearhost 
 2. Nearhost notifies the terminal it runs in: `Agent on mini wants to add /home/dev/code/myapp`. Most terminals show it only when Nearhost is not the window or tab in front.
 3. The add form opens over the view with the server and path filled in, and the line `Proposed by an agent on mini`. Nearhost reads the project as it does for any add, and you choose the routes and the name as usual.
 4. Save it, and the agent reports `https://myapp.test`. Press `esc` on the path, and the agent is told you declined.
+5. The agent waits up to 30 seconds for the project to start, then runs the doctor on it and offers to work through any errors or warnings it finds. See [Fix a project](#fix-a-project).
 
 If a form is already open, the proposal waits, and Home shows `1 proposal waiting · p to review`. It opens when the form closes, or when you press `p`. An agent waits 10 minutes for an answer.
 
-`/nearhost status` reports the project holding the current directory: its address, its state and any error.
+`/nearhost status` reports the project holding the current directory: its address, every address it serves in `urls`, its state and any error. A project with several web routes or hosts has one URL for each, so you can see where each service lives. `/nearhost status --all` reports every project on the machine the agent runs on.
 
 Proposals need the full-screen interface. Under `nearhost up`, an agent can read the status but is told to open `nearhost` to propose.
+
+## Fix a project
+
+When a project is not served as you expect, run `/nearhost doctor` in its directory, or `$nearhost doctor` in Codex. The agent asks Nearhost to run the same [project checks](/docs/reference/cli/#project-checks) as `nearhost doctor` on this project, and works through the errors, then the warnings. Unlike `nearhost doctor`, this first reads the project’s `.nearhostrc` again, as described under [Agent API](#agent-api). Each finding’s fix has a kind, and the agent handles each kind in its own way:
+
+* **`project`.** The agent shows you the change, the snippet and where it goes, and makes it in the project’s files once you agree. When the setup is more than Nearhost can work out for itself, such as several hosts, a pattern, `localhost` or callbacks from Docker, it writes or edits the project’s [`.nearhostrc`](/docs/reference/nearhostrc/).
+* **`nearhost`.** Something you do in Nearhost, such as adding a port in the edit form. The agent passes it on, or offers to write the port or host into `.nearhostrc` instead.
+* **`manual`.** Something only you can do, such as a DNS record. The agent tells you what it says.
+
+After editing `.nearhostrc`, and for `nearhostrc.pending` and `nearhostrc.not-applied`, the agent asks Nearhost to read the file again. A change that needs no approval applies at once. One that needs it waits, and the agent tells you to approve it in Nearhost, then waits for your answer. See [Approval](/docs/reference/nearhostrc/#approval).
+
+Then it runs the doctor again, and stops when nothing is left that it can fix. It never edits Nearhost’s `config.yaml` itself; Nearhost saves a change there when it applies one. Approving a change needs the full-screen interface: under `nearhost up`, the agent tells you to open `nearhost`.
 
 ## How the agent reaches Nearhost
 
@@ -489,6 +504,14 @@ A request is answered for the machine its socket belongs to, so an agent on `min
 * **A server that is this machine.** A server whose home is the laptop’s own, such as `ssh_host: localhost` on your account, gets no forward: agents there already reach Nearhost on the laptop’s socket.
 
 To use one socket explicitly, set `NEARHOST_SOCKET` to its path where the agent runs.
+
+## Agent API
+
+The skill’s script talks to Nearhost over that socket, with `curl --unix-socket`. Nearhost answers JSON for the machine the socket belongs to. These calls are the ones the doctor uses:
+
+* `GET /v1` says which API this is. Its `capabilities` list names the calls added since the first release of API 1: `doctor` and `reload`. An older Nearhost leaves them out, and the skill tells you to update it.
+* `GET /v1/doctor?path=…` returns `project` and `findings` for the project holding the absolute path, in the shape that [`nearhost doctor --json`](/docs/reference/cli/#json-output) gives its findings. For a project already in Nearhost, it first reads the project’s `.nearhostrc` again, as a reload does: a change that needs no approval is applied, restarting the project if it runs under `nearhost up`, and one that needs approval waits in Nearhost. For a directory that is not in Nearhost yet, `project` is `null`, each finding’s `project` is empty, and the findings are for the project as it would be added.
+* `POST /v1/projects/reload`, with `{"path": "/abs/dir"}`, asks Nearhost to read the `.nearhostrc` of the project holding the path again. The project must be added first. It answers `applied` when nothing needs approval, or `pending` with an `id` the agent waits on, as it does for a proposal, while you decide. A change you declined stays declined until the file changes or Nearhost restarts.
 
 ## When agents cannot reach Nearhost
 
@@ -564,7 +587,7 @@ Start it with `nearhost up`.
 
 A name that does not end in `.test` needs your approval, because it can hide the real site. Typing it with `--alias` counts as approval.
 
-To keep the name with the project, put it in a `.nearhostrc` in the project’s root:
+To keep the name with the project, put it in a [`.nearhostrc`](/docs/reference/nearhostrc/) in the project’s root:
 
 ```yaml
 version: 1
@@ -720,7 +743,7 @@ Start it with `nearhost up`.
 
 A name that does not end in `.test` needs your approval, because it can hide the real site. Typing it with `--alias` counts as approval.
 
-To keep the name with the project, put it in a `.nearhostrc` in the project’s root:
+To keep the name with the project, put it in a [`.nearhostrc`](/docs/reference/nearhostrc/) in the project’s root:
 
 ```yaml
 version: 1
@@ -897,6 +920,142 @@ These pages, on 2026-10-19:
 * [Amazon Cognito: Lambda triggers](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-working-with-lambda-triggers.html)
 
 If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
+
+# Callbacks from Docker containers to a local HTTPS domain
+
+> Let a Docker Compose service, such as a queue worker or a LocalStack job, call your app at its Nearhost HTTPS name on this machine.
+
+Note
+
+Needs Nearhost 0.6.0 or later, which can serve a project to Docker containers. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+
+A service in your Compose file often calls the app back: a queue worker reports a finished job, or a LocalStack job delivers an event to a webhook. Point it at the app’s Nearhost name, such as `https://api.local.example.com/webhooks/jobs`, and the call fails, even though the same URL works in your browser.
+
+Three things stand between the container and Nearhost. The container cannot find the host, it does not trust the local certificate authority, and on Linux Nearhost does not let it in. The fixes go in the project’s files, which you commit. Each developer then sets one variable, for the certificate’s path, and approves the opt-in on their own machine.
+
+This works only for a project on this machine. A container on an SSH server cannot reach the proxy on your laptop.
+
+## The example
+
+The project is named `shop`, and its worker is a Node service. Its app listens on port 8000 and is served at `api.local.example.com`. Its `.nearhostrc`:
+
+```yaml
+version: 1
+routes:
+  - port: ${APP_PORT:-8000}
+    label: app
+    hosts: [api.local.example.com]
+docker_clients: true
+```
+
+`hosts` serves the route at a name of your own, besides the project’s main name. See [Multi-host projects](/docs/concepts/multi-host-projects/). `docker_clients` is explained in [Being let in](#being-let-in). Its Compose file runs the app and a worker that calls it:
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - '${APP_PORT:-8000}:8000'
+  worker:
+    build: .
+    command: ['./worker']
+    environment:
+      WEBHOOK_URL: https://api.local.example.com/webhooks/jobs
+```
+
+Nothing here depends on the stack. Any service that reads a URL naming a host Nearhost serves, from its `environment`, its `env_file` files, or the project’s `.env` or `.env.local` when it mounts the project directory, has the same three problems.
+
+## Reaching the host
+
+Nearhost puts `api.local.example.com` in your machine’s [hosts file](/docs/concepts/the-hosts-file/), pointing at loopback. A container does not read that file, and inside it loopback is the container itself. So the name resolves to nothing, to the public internet, or, where DNS points it at 127.0.0.1, back to the container.
+
+Map the name to the host with `extra_hosts`. `host-gateway` is Docker’s name for the host’s address as seen from a container:
+
+```yaml
+services:
+  worker:
+    extra_hosts:
+      - 'api.local.example.com:host-gateway'
+```
+
+List every name the service calls. `nearhost doctor` reports a service that calls a name without this mapping, as `docker.host-gateway`, and its fix is this snippet for the names it found.
+
+## Trusting the local CA
+
+Nearhost’s certificates are signed by its own local certificate authority. Your system trusts it, but a container has its own trust store, so the call fails with a certificate error.
+
+Mount the root certificate into the container and point the service at it. The certificate is at `~/.config/nearhost/caddy/pki/authorities/local/root.crt`, or under `$XDG_CONFIG_HOME/nearhost` when that is set, and `nearhost doctor` prints the path on your machine. The doctor’s snippet, for a Node service:
+
+```yaml
+services:
+  worker:
+    environment:
+      NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/nearhost.crt
+    volumes:
+      - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
+```
+
+Each developer sets `NEARHOST_CA_CERT` to the certificate’s path in their shell profile, or in `.env` when the project does not commit `.env`, so the Compose file holds no one’s path. Compose reads only `.env` and the shell, not `.env.local`. Until the variable is set, every `docker compose` command that reads this Compose file stops with `set NEARHOST_CA_CERT to Nearhost's root certificate`, so nobody runs the service without the certificate by mistake.
+
+`NODE_EXTRA_CA_CERTS` adds the certificate to Node’s own. `SSL_CERT_FILE`, `AWS_CA_BUNDLE` and `REQUESTS_CA_BUNDLE` replace the default bundle instead, so point them at a bundle that includes the certificate, or have the image run `update-ca-certificates`.
+
+`nearhost doctor` reports a service that calls a name Nearhost serves and does not trust the certificate, as `docker.ca`. A service that sets `SSL_CERT_FILE`, `NODE_EXTRA_CA_CERTS`, `AWS_CA_BUNDLE`, `REQUESTS_CA_BUNDLE` or `CURL_CA_BUNDLE`, or mounts the certificate’s path, counts as set up. The doctor checks only that the setting is there, not that the runtime trusts the certificate, so a worker in another language needs the setting its runtime reads.
+
+## Being let in
+
+Nearhost serves its projects only to this machine. A request from anywhere else is dropped without an answer. On Linux, a container’s request comes from its address on a Docker network, not from loopback, so Nearhost drops it.
+
+`docker_clients: true` in the project’s [`.nearhostrc`](/docs/reference/nearhostrc/#docker-clients) serves the project to the networks the Docker daemon has on this machine as well. Nearhost asks Docker for them when the project starts, and again every 30 seconds while it runs, so a network Compose creates later is let in too. Until Docker first answers, it accepts requests from `172.16.0.0/12`, the private block most of Docker’s default networks come from, which can also take in other machines on that block your machine can reach. The project’s log says which networks it accepts requests from.
+
+* It works only for a project on this machine. On a project on a server, the file is an error.
+* It always needs your approval, as a real domain does. See [Approval](/docs/reference/nearhostrc/#approval).
+* Other projects stay loopback-only. Only the project that opts in is served to Docker’s networks.
+
+With no `.nearhostrc` yet, `nearhost export` writes one from the project’s current setup, and you add the line to it.
+
+Docker Desktop on macOS already delivers container requests from 127.0.0.1, so this matters on Linux. On a Mac, the project is reached without it. Keep it in a committed `.nearhostrc` if anyone on the team uses Linux.
+
+`nearhost doctor` reports a project whose containers call a name it serves without the opt-in, as `docker.clients`. It is a warning on Linux, and only a note on macOS.
+
+## The finished Compose file
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - '${APP_PORT:-8000}:8000'
+  worker:
+    build: .
+    command: ['./worker']
+    environment:
+      WEBHOOK_URL: https://api.local.example.com/webhooks/jobs
+      NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/nearhost.crt
+    extra_hosts:
+      - 'api.local.example.com:host-gateway'
+    volumes:
+      - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
+```
+
+Approve `api.local.example.com` and `docker_clients` when you add the project, or when Nearhost asks after the file changes. See [Approval](/docs/reference/nearhostrc/#approval). Then restart the worker with `docker compose up -d worker`.
+
+## Check it works
+
+Run `nearhost doctor`. After the machine checks, it lists what it finds in each enabled project. For the example before any of the fixes, with `docker_clients` not yet in its `.nearhostrc`, on a Mac, these are the first lines of its three findings, without their fixes:
+
+```text
+warn  shop             worker calls a name Nearhost serves, and does not trust Nearhost's root certificate
+warn  shop             worker uses api.local.example.com, which a container resolves to itself or to the public internet, not to Nearhost
+info  shop             a container calls a name Nearhost serves, and Nearhost does not accept requests from Docker's network
+```
+
+Under each, a `fix:` line says what to do, followed by the snippet to paste. These are `docker.ca`, `docker.host-gateway` and `docker.clients`, and `nearhost doctor --json` gives each finding’s `id`. On Linux the last one is a warning too. When the project is fixed, none of them is shown. See [nearhost doctor](/docs/reference/cli/#nearhost-doctor).
+
+The doctor only reads the files. To see the call work, run the worker and watch the request arrive in Nearhost.
+
+## When a public tunnel is still the right tool
+
+This is for services you run yourself, on this machine. A webhook from a real provider, such as a payment or source control service, comes from its servers, which cannot reach your laptop. Use a public tunnel, such as ngrok, for that. See [ngrok loads the page, but assets point at localhost](/docs/guides/ngrok-assets-on-localhost/).
 
 # Forward several ports over SSH without retyping -L
 
@@ -1308,7 +1467,7 @@ Start it with `nearhost up`.
 
 A name that does not end in `.test` needs your approval, because it can hide the real site. Typing it with `--alias` counts as approval.
 
-To keep the name with the project, put it in a `.nearhostrc` in the project’s root:
+To keep the name with the project, put it in a [`.nearhostrc`](/docs/reference/nearhostrc/) in the project’s root:
 
 ```yaml
 version: 1
@@ -1513,6 +1672,101 @@ If none of these applies, the interface asks you for the web port, and `nearhost
 
 A file that does not exist is skipped. A file that exists but cannot be read stops discovery with its error, rather than being treated as absent. If nothing at all is found, the interface asks for the web port.
 
+# Multi-host projects
+
+> How one project serves several web routes, each at hosts of its own, and where those hosts come from.
+
+A project can serve more than one name. An app, its WebSocket server and its file store can each answer at a host of their own, all from one project in Nearhost.
+
+## Several web routes
+
+A project can have several `web` routes. The first is the primary: it is served at the project’s [main name](/docs/reference/config/#main-name), and at any hosts you give it too. Every other web route is served only at its own hosts, so it needs at least one.
+
+You give a route hosts in three ways:
+
+* **In the interface.** On the routes step of the add or edit form, choose a web route and press `h`. Type its hosts separated by spaces, and press `enter`.
+* **On the command line.** `nearhost add --host <host>` adds a host to the primary web route. Repeat it for more.
+* **In the project’s files.** A [`.nearhostrc`](/docs/reference/nearhostrc/#keys) lists hosts for each route, and presets can find them in `.env`. See [Hosts from presets](#hosts-from-presets).
+
+In the routes view on the main screen, `w` makes a route web. If it has no hosts, it becomes the primary. Other web routes with no hosts become `ignore`, so a route with hosts of its own keeps serving them.
+
+## Host patterns
+
+A host is an exact name, such as `api.local.example.com`, or a pattern with `*` in place of one label, such as `*.status.local.example.com`.
+
+* `*` stands for exactly one label. `*.status.local.example.com` matches `eu.status.local.example.com`, but not `status.local.example.com` or `a.eu.status.local.example.com`.
+* `*` can be the leftmost label or one in the middle, as in `internal.*.local.example.com`.
+* The part to the right of the last `*` must be at least two labels, and more than a public suffix. A pattern that is only wildcards is refused, and so are `*.test`, `*.com` and `*.co.uk`. `*.myapp.test` is allowed.
+* `localhost` is allowed as an exact host. Any other name needs at least two labels, and an IP address is refused.
+* Hosts are lowercase.
+
+## Which route answers
+
+When several hosts match a name, the most specific one answers:
+
+1. An exact host beats any pattern.
+2. Among patterns, the one with more fixed labels wins, so `internal.*.local.example.com` beats `*.*.local.example.com`.
+3. Patterns with as many fixed labels are taken in lexical order.
+
+A host can be served by only one enabled project. Two exact hosts clash when they are the same name, and two patterns when they are written the same. An exact host under another project’s pattern does not clash, because the exact host wins. Saving an enabled project, or starting one, that would serve a host another enabled project serves is refused with `host <host> is already served by project "<other>"`. `nearhost doctor` warns, as `hosts.overlap`, when a pattern overlaps another project’s without being the same.
+
+## Certificates and DNS
+
+Each exact host gets its own certificate. A name under a pattern gets one the first time it is visited. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/#per-name-certificates).
+
+An exact host goes in the hosts file while its project is enabled. One that does not end in `.test` is left out when DNS already points it only at loopback addresses, and `localhost` is never added. Patterns never go in the hosts file, because the file cannot hold them, so a pattern’s names need DNS that points them at this machine. `nearhost doctor` reports a pattern that does not resolve here as `hosts.unresolved-pattern`. See [The hosts file](/docs/concepts/the-hosts-file/).
+
+## What needs approval
+
+A host that does not end in `.test`, any pattern and `localhost` wait for your approval before they are served. A host you type with `--host` or `h` is approved by typing it. See [Approval](/docs/reference/nearhostrc/#approval).
+
+## Hosts from presets
+
+A preset can name hosts as well as ports. The [`nearhost/sail`](/docs/concepts/presets-and-registries/#the-official-presets) preset reads them from `.env`:
+
+| Variable                          | Served on the port in          |
+| --------------------------------- | ------------------------------ |
+| `APP_URL`                         | `APP_PORT`, or 80              |
+| `REVERB_HOST`                     | `FORWARD_REVERB_PORT`, or 8080 |
+| `FILES_URL`, `MINIO_URL`, or both | `FORWARD_MINIO_PORT`, or 9000  |
+
+Only the host is taken from each value. A port in the URL is ignored, and the route’s port comes from the variable beside it. The Reverb and MinIO hosts are read only when their port variable is set in `.env` or named in the Compose file.
+
+* Inference never proposes `localhost`, an IP address or a name without a dot. A malformed name is left out with a warning.
+* A route that has inferred hosts becomes a web route. A `loopback` route cannot have hosts, so they are dropped with a warning.
+* A `.nearhostrc` that lists a route wins over the hosts presets found for it. See [Keys](/docs/reference/nearhostrc/#keys).
+* `nearhost add` leaves out an inferred host that another enabled project already serves, with a note: `Not serving <host>: project "<other>" already serves it.` A later web route left with no hosts becomes `ignore`. A project added with `--disabled` keeps them, since it serves nothing yet. The interface does not leave them out: it refuses to save, and you remove the host with `h`.
+
+Inferred hosts are fixed when the project is added or edited. Changing `APP_URL` later does not change what is served. Editing the project, with `e` in the interface, adds any newly inferred hosts to a saved web route and never removes a saved one. `nearhost doctor` reports a host the project’s settings name that no web route serves, as `routes.unserved-host`, and tells you to edit the project.
+
+## Where the URLs show
+
+The project view in the interface lists every URL under the project’s name. A pattern is shown dim, since a browser cannot open it. For a coding agent, `/nearhost status` reports the main URL as `url`, and every URL the project serves, the main one first, as `urls`. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+
+## An example
+
+A Sail project with an app, Reverb and MinIO, whose Compose file publishes `APP_PORT`, `FORWARD_REVERB_PORT` and `FORWARD_MINIO_PORT`, has this in its `.env`:
+
+```ini
+APP_URL=https://shop.local.example.com
+APP_PORT=8010
+REVERB_HOST=ws.shop.local.example.com
+FORWARD_REVERB_PORT=8090
+FILES_URL=https://files.shop.local.example.com:9010
+FORWARD_MINIO_PORT=9010
+```
+
+With `nearhost/sail` enabled, `nearhost add` asks you to approve the three hosts, since none ends in `.test`. Nearhost then serves:
+
+| URL                                    | Port |
+| -------------------------------------- | ---- |
+| `https://shop.test`                    | 8010 |
+| `https://shop.local.example.com`       | 8010 |
+| `https://ws.shop.local.example.com`    | 8090 |
+| `https://files.shop.local.example.com` | 9010 |
+
+`shop.test` is the main name, so it is served on the primary route with the app’s own host. Add the project with `--alias shop.local.example.com` to make the real name the main one.
+
 # Presets and registries
 
 > How Nearhost learns what a framework's ports mean, and where that knowledge comes from.
@@ -1533,14 +1787,16 @@ Presets combine. On a Sail project with a Vite frontend, `sail`, `laravel` and `
 
 The official registry is [nearhost/presets](https://github.com/nearhost/presets).
 
-| Preset             | Turns on when                                                               | What it adds                                                                                                                                                                                                                      |
-| ------------------ | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nearhost/compose` | The project has a Compose file                                              | A route for every TCP port the Compose file publishes, labelled with its service. A service on container port 80 becomes the web route.                                                                                           |
-| `nearhost/laravel` | The project has an `artisan` file                                           | Advice when `APP_URL` is not one of the project’s addresses, with `https` and no port, since generated links use it.                                                                                                              |
-| `nearhost/sail`    | The Compose file mentions `laravel/sail`, a `sail-` image or `LARAVEL_SAIL` | Compose’s published ports, with the Vite dev server forwarded to `localhost` through `VITE_PORT`. The hosts in `APP_URL`, `REVERB_HOST` and `FILES_URL` or `MINIO_URL`, served on their ports. Vite advice that fits a container. |
-| `nearhost/vite`    | A `vite.config.*` file exists, or `package.json` depends on `vite`          | The dev server port from `server.port` as a route. Advice when the port is the default 5173, or when `server.allowedHosts` would reject the alias.                                                                                |
+| Preset             | Turns on when                                                               | What it adds                                                                                                                                                                                                                             |
+| ------------------ | --------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nearhost/compose` | The project has a Compose file                                              | A route for every TCP port the Compose file publishes, labelled with its service. A service on container port 80 becomes the web route.                                                                                                  |
+| `nearhost/laravel` | The project has an `artisan` file                                           | Advice when `APP_URL` is not one of the project’s addresses, with `https` and no port, since generated links use it.                                                                                                                     |
+| `nearhost/sail`    | The Compose file mentions `laravel/sail`, a `sail-` image or `LARAVEL_SAIL` | Compose’s published ports, with the Vite dev server forwarded to `localhost` through `VITE_PORT`. The hosts in `APP_URL`, `REVERB_HOST` and `FILES_URL`, `MINIO_URL`, or both, served on their ports. Vite advice that fits a container. |
+| `nearhost/vite`    | A `vite.config.*` file exists, or `package.json` depends on `vite`          | The dev server port from `server.port` as a route. Advice when the port is the default 5173, or when `server.allowedHosts` would reject the alias.                                                                                       |
 
-`nearhost add` serves the hosts a preset finds. A project’s `.nearhostrc` wins over them, a real domain among them is asked about first, and one that another enabled project serves is left out with a note.
+## Hosts from presets
+
+A preset can name hosts as well as ports. `nearhost/sail` reads them from `APP_URL` and `REVERB_HOST`, and from `FILES_URL`, `MINIO_URL` or both, and serves each on its port. The hosts are fixed when you add or edit the project. A project’s `.nearhostrc` wins over them, a real domain among them is asked about first, and `nearhost add` leaves out one that another enabled project serves, with a note. See [Multi-host projects](/docs/concepts/multi-host-projects/#hosts-from-presets).
 
 ## Trusting a registry
 
@@ -1650,7 +1906,7 @@ Discovered and listed, not forwarded. Discovery proposes every route as `ignore`
 In the interface, select the project and press `tab` to move into its routes. Choose a route with `↑` and `↓`, then:
 
 * `space` switches it between `loopback` and `ignore`
-* `w` makes it the web route, and the old web route becomes `ignore` if it has no hosts of its own
+* `w` makes it a web route, the primary if it has no hosts, and other web routes with no hosts become `ignore`
 
 Press `tab` or `esc` when you are done. The change is saved and applied at once. `e` on the project reads its files again and walks through the routes step of the form. From the command line, `nearhost add --web <port>` chooses the web route.
 
@@ -1968,12 +2224,76 @@ Adds a project. It discovers the routes from the project’s files, prints them 
 | `--name <name>`   | The project name. The default is the directory’s name.                                                                                                 |
 | `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost` or an IP address. Typing it approves it. |
 | `--web <port>`    | The port to serve at the alias.                                                                                                                        |
-| `--host <host>`   | Add this host to the web route. Repeat for more. Typing it approves it.                                                                                |
+| `--host <host>`   | Add this host to the primary web route. Repeat for more. Typing it approves it.                                                                        |
 | `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                    |
 | `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
 | `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
 
 See [Add a project](/docs/getting-started/add-a-project/).
+
+## nearhost export
+
+Writes what Nearhost serves for a project, its routes, hosts and main name, to a `.nearhostrc` in the project’s directory. Commit the file, and whoever adds the project after cloning it gets the same setup. For a project on a server, it writes the file on the server, over SFTP.
+
+```sh
+nearhost export [project] [--dry-run] [--force]
+```
+
+Without a name, it exports the project on this machine whose directory holds the current one. Name the project to export one on a server.
+
+| Flag        | Effect                                                                     |
+| ----------- | -------------------------------------------------------------------------- |
+| `--dry-run` | Print the file instead of writing it. Warnings go to stderr, not the file. |
+| `--force`   | Replace an existing `.nearhostrc`.                                         |
+
+`--dry-run` prints the file even when one exists. Without `--force`, an existing file stops a write:
+
+```text
+nearhost: .nearhostrc already exists in /home/you/code/shop; run with --force to replace it, or --dry-run to see what would be written
+```
+
+The file follows the project’s `.env` on another machine. See [Variables](/docs/reference/nearhostrc/#variables).
+
+* A port is written as `${VAR:-port}` when discovery finds a variable that sets it, and `.env` sets that variable to the same port or leaves it unset. A variable that `.env` sets to another port gives a plain number.
+* The main name is written as `${VAR:-name}` only when a variable whose name ends in `_HOST` holds exactly that name. A variable such as `SESSION_DOMAIN` with the same value is not used, since on another machine it may hold a parent domain or a cookie’s scope. With more than one `_HOST` variable, the first alphabetically wins.
+* The main name is left out when it is the default, the directory’s name followed by `.test`.
+* `docker_clients: true` is written when the project has it.
+
+Before writing, it checks that the file reads back to the same project. After writing, it records the file as approved, since it holds only what Nearhost already serves, so the project does not ask about it again. If a change to the old file was waiting for approval, the new file replaces it and the command says so. See [Approval](/docs/reference/nearhostrc/#approval).
+
+For a project called `shop` on server `mini`, with two web routes and a Vite route on loopback, whose `.env` has these lines:
+
+```ini
+APP_PORT=8010
+ADMIN_PORT=8020
+VITE_PORT=5173
+APP_HOST=shop.example.com
+SESSION_DOMAIN=shop.example.com
+```
+
+`nearhost export shop --dry-run` prints:
+
+```yaml
+# Written by nearhost export. Safe to edit and commit; see https://nearhost.dev/docs for the format.
+version: 1
+alias: ${APP_HOST:-shop.example.com}
+routes:
+  - port: ${VITE_PORT:-5173}
+    label: vite (VITE_PORT)
+    role: loopback
+  - port: ${APP_PORT:-8010}
+    label: app (APP_PORT)
+    hosts: [api.example.com]
+  - port: ${ADMIN_PORT:-8020}
+    label: admin (ADMIN_PORT)
+    hosts: [admin.example.com]
+```
+
+Without `--dry-run`, it prints where it wrote the file:
+
+```text
+Wrote /home/you/code/shop/.nearhostrc on server mini. Commit it so others get this setup when they add the project.
+```
 
 ## nearhost ls
 
@@ -1996,7 +2316,7 @@ Both take `--file <path>` to work on another file than `/etc/hosts`. See [The ho
 
 ## nearhost doctor
 
-Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project’s files and setup and lists what it finds. An error there also makes it exit non-zero. It takes `--https-port`, `--http-port` and `--no-hosts`, and `--json` prints all of it as one JSON object.
+Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project’s files and setup and lists what it finds. See [Project checks](#project-checks). An error there also makes it exit non-zero. It takes `--https-port`, `--http-port` and `--no-hosts`, and `--json` prints all of it as one JSON object. See [JSON output](#json-output).
 
 | Check                 | What it looks at                                                                                                       |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -2009,6 +2329,107 @@ Checks the setup and changes nothing, apart from creating `~/.nearhost` on each 
 | `hosts block`         | Whether `/etc/hosts` has every name it needs: main names and web hosts, less any DNS already resolves to this machine. |
 | `server <name>`       | Whether `ssh <host>` connects without a prompt, for each server.                                                       |
 | `agents on <name>`    | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.                                  |
+
+### Project checks
+
+Each enabled project is checked where it runs: its `.nearhostrc`, its routes against what discovery finds in its files, the names it is served at, and its Compose file. Each finding has an id, a severity and a fix. In the text output an `error` shows as `FAIL`, a `warning` as `warn` and an `info` as `info`, with a `fix:` line under it and any snippet to paste under that. The fix’s kind says who makes it:
+
+* `project`: an edit to the project’s own files.
+* `nearhost`: Nearhost reads a file again, or you approve or change something in Nearhost.
+* `manual`: something only you can do, such as starting the dev server or adding a DNS record.
+
+| Finding                     | Severity               | Fix        | When it shows                                                                                                                                         |
+| --------------------------- | ---------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nearhostrc.invalid`        | error                  | `project`  | The file has a mistake, such as a key or value Nearhost does not understand. The message gives the line.                                              |
+| `nearhostrc.unset-variable` | error                  | `project`  | The file uses a variable that is not set and has no default. Set it in `.env.local` or `.env`, or give it one: `${NAME:-value}`.                      |
+| `nearhostrc.version`        | error                  | `manual`   | The file’s `version` is newer than this Nearhost reads. Run `nearhost update`.                                                                        |
+| `nearhostrc.pending`        | warning                | `nearhost` | The file asks for changes that wait for your approval, which the message lists. Nearhost reads it again, and you approve them.                        |
+| `nearhostrc.not-applied`    | warning                | `nearhost` | The file has changed since Nearhost last read it, and the change needs no approval. Nearhost reads it again.                                          |
+| `nearhostrc.gone`           | warning                | `project`  | The file was deleted after it was approved. Nearhost serves what was approved until you restore it.                                                   |
+| `routes.unserved-port`      | warning                | `nearhost` | A port looks like a web server, and the project has no route for it. Select the project, press `e` and add it as a web route.                         |
+| `routes.unserved-host`      | warning                | `nearhost` | The project’s settings name a host for one of its ports, and no web route serves it. Press `e` on the project, and the form adds it.                  |
+| `routes.stale-port`         | info                   | `nearhost` | A web route’s port matches nothing in the project’s files any more. If the port changed, press `e` on the project and update it.                      |
+| `routes.not-listening`      | info, or warning       | `manual`   | Nothing listens on a web route’s port. Start the dev server on that port, or correct the port.                                                        |
+| `hosts.unresolved`          | error                  | `nearhost` | A name does not resolve to this machine and is not in the hosts file. Starting the project adds it to `/etc/hosts`.                                   |
+| `hosts.unresolved-pattern`  | error                  | `manual`   | A name the pattern matches does not resolve to this machine. Add a DNS record for the pattern that points at 127.0.0.1, or list exact hosts.          |
+| `hosts.public`              | warning                | `manual`   | A name that does not end in `.test` resolves to a real address, so the real site is out of reach on this machine while the project is enabled.        |
+| `hosts.overlap`             | warning                | `project`  | One of the project’s patterns overlaps a different pattern of another enabled project. A name that both patterns match goes to the more specific one. |
+| `docker.host-gateway`       | warning                | `project`  | A Compose service uses a name Nearhost serves, and its `extra_hosts` does not map that name to the host.                                              |
+| `docker.ca`                 | warning                | `project`  | A Compose service calls a name Nearhost serves, and does not trust Nearhost’s root certificate.                                                       |
+| `docker.clients`            | warning, info on macOS | `project`  | A container calls a name Nearhost serves, and the project does not have `docker_clients: true`.                                                       |
+| `advice.<id>`               | warning                | `project`  | An [advisory](/docs/reference/advisories/) applies. The snippet is the change to make.                                                                |
+| `presets.note`              | info                   | `manual`   | Discovery or a preset gave a warning, so some checks may be incomplete.                                                                               |
+| `projects.unchecked`        | info                   | `manual`   | The project could not be checked: its server can’t be reached, its directory is missing, or the checks took over 30 seconds.                          |
+
+A few depend on the project:
+
+* The `nearhostrc.*` findings follow [Approval](/docs/reference/nearhostrc/#approval) and [When it is read](/docs/reference/nearhostrc/#when-it-is-read).
+* `routes.unserved-port`, `routes.unserved-host` and `routes.stale-port` are for a project without a `.nearhostrc`. A project with one takes its routes from the file.
+* `routes.not-listening` and the `docker.*` findings are for a project on this machine. `routes.not-listening` is a warning only when Nearhost is running the project, which `nearhost doctor` does not know, so there it is always info.
+* `nearhost doctor` leaves out `hosts.unresolved` for a name the `hosts block` check already names. With `--no-hosts` it is not checked at all.
+* The `docker.*` findings come with the snippet to paste. [Callbacks from Docker containers to a local HTTPS domain](/docs/guides/container-callbacks/) explains each one.
+
+### JSON output
+
+`--json` prints one object with two arrays, `checks` and `findings`, and exits as the text output does. Each check has `name`, `level` (`ok`, `warn` or `fail`), `detail` and `fix`. Each finding has:
+
+* `id`, `severity` and `project`;
+* `message`, what is wrong;
+* `file` and `line`, where it is, when the finding points at a file;
+* `fix`, with its `kind`, its `text` and any `snippet`.
+
+`file`, `line` and `snippet` are left out when they are empty. A project’s findings come worst first.
+
+For a project whose `.nearhostrc` has a mistyped key, with a route that also serves a real name, the output starts like this, with the machine checks cut:
+
+```json
+{
+  "checks": [
+    {
+      "name": "hosts block",
+      "level": "fail",
+      "detail": "missing api.local.example.com, shop.test, www.example.com",
+      "fix": "run `nearhost up`; it updates the block and asks for your password"
+    }
+  ],
+  "findings": [
+    {
+      "id": "nearhostrc.invalid",
+      "severity": "error",
+      "project": "shop",
+      "message": ".nearhostrc: line 5: key \"hostz\" is not understood by this version of Nearhost; update Nearhost, or remove it",
+      "file": ".nearhostrc",
+      "line": 5,
+      "fix": {
+        "kind": "project",
+        "text": "Correct .nearhostrc."
+      }
+    },
+    {
+      "id": "hosts.public",
+      "severity": "warning",
+      "project": "shop",
+      "message": "www.example.com is a real name that resolves to 203.0.113.10; while the project is enabled, the real site is out of reach on this machine",
+      "fix": {
+        "kind": "manual",
+        "text": "Nothing to do if that is what you want; otherwise use a name that resolves to 127.0.0.1, or a .test name."
+      }
+    },
+    {
+      "id": "routes.not-listening",
+      "severity": "info",
+      "project": "shop",
+      "message": "nothing listens on port 8010, which serves shop.test, api.local.example.com, www.example.com",
+      "fix": {
+        "kind": "manual",
+        "text": "Start the project's dev server on port 8010, or correct the port."
+      }
+    }
+  ]
+}
+```
+
+`api.local.example.com` and `shop.test` do not resolve to this machine either, but the `hosts block` check already names them, so no `hosts.unresolved` finding repeats them. The exit status is 1. Coding agents run the same checks on one project through the [agent API](/docs/getting-started/use-a-coding-agent/#agent-api).
 
 ## nearhost preset
 
@@ -2134,14 +2555,7 @@ The hosts file treats the two kinds differently:
 
 A project has one main name. If you switch to a real domain, the `<name>.test` address stops working.
 
-A `.nearhostrc` file can set the main name with `alias:`. It accepts `${VAR}` and `${VAR:-default}`, filled from `.env.local` and then `.env`, so each worktree can have its own name:
-
-```yaml
-version: 1
-alias: ${APP_HOST:-app.local.example.com}
-```
-
-`nearhost add --alias` wins over the file, and the file wins over `<name>.test`. Removing `alias:` from the file leaves the current name as it is.
+A project’s `.nearhostrc` can set the main name with `alias:`, filled from the project’s `.env` so each worktree can have its own. `nearhost add --alias` wins over the file, and the file wins over `<name>.test`. See [`.nearhostrc`](/docs/reference/nearhostrc/#keys).
 
 ## Validation
 
@@ -2201,26 +2615,28 @@ On Home, when a server cannot connect, `r` retries every such server now and `y`
 
 ## Project
 
-| Key     | Action                                                    |
-| ------- | --------------------------------------------------------- |
-| `enter` | Start or stop it.                                         |
-| `o`     | Open `https://<alias>` in the browser.                    |
-| `tab`   | Move into its routes, to change them.                     |
-| `e`     | Edit: read its files again and change its routes or name. |
-| `d`     | Remove it, after you confirm.                             |
-| `y`     | Copy the snippets of its advice.                          |
+| Key     | Action                                                                                                        |
+| ------- | ------------------------------------------------------------------------------------------------------------- |
+| `enter` | Start or stop it.                                                                                             |
+| `o`     | Open `https://<alias>` in the browser.                                                                        |
+| `tab`   | Move into its routes, to change them.                                                                         |
+| `e`     | Edit: read its files again and change its routes or name.                                                     |
+| `d`     | Remove it, after you confirm.                                                                                 |
+| `y`     | Copy the snippets of its advice.                                                                              |
+| `r`     | Read its `.nearhostrc` again. A change that needs no approval is applied, which restarts it if it is running. |
+| `a`     | Review a pending `.nearhostrc` change.                                                                        |
 
 ## Routes
 
 After `tab` on a project.
 
-| Key          | Action                                                                        |
-| ------------ | ----------------------------------------------------------------------------- |
-| `↑`, `↓`     | Choose a route.                                                               |
-| `space`      | Switch it between `loopback` and `ignore`.                                    |
-| `w`          | Make it the web route. The old web route becomes `ignore` if it has no hosts. |
-| `y`          | Copy the snippets of the project’s advice.                                    |
-| `tab`, `esc` | Done.                                                                         |
+| Key          | Action                                                                                               |
+| ------------ | ---------------------------------------------------------------------------------------------------- |
+| `↑`, `↓`     | Choose a route.                                                                                      |
+| `space`      | Switch it between `loopback` and `ignore`.                                                           |
+| `w`          | Make it a web route, the primary if it has no hosts. Other web routes with no hosts become `ignore`. |
+| `y`          | Copy the snippets of the project’s advice.                                                           |
+| `tab`, `esc` | Done.                                                                                                |
 
 On a project on this machine, a route is only `web` or `ignore`.
 
@@ -2265,10 +2681,11 @@ See [The request log](/docs/concepts/the-request-log/).
 | Lists        | `↑`, `↓` to choose, `enter` to pick.                                                                               |
 | Path         | `tab` or `→` accepts the suggestion, `↑`, `↓` choose a match, `enter` uses the path as typed, `ctrl+r` reconnects. |
 | Presets      | `space` ticks or unticks, `enter` goes on.                                                                         |
-| Routes       | `space` serves or ignores a port, `←`, `→` change its role.                                                        |
+| Routes       | `space` serves or ignores a port, `←`, `→` change its role, `h` edits a web route’s hosts.                         |
 | Name         | `tab` moves between name and alias.                                                                                |
 | Server check | `r` checks again after a failure.                                                                                  |
-| Confirm      | `enter` adds or saves.                                                                                             |
+| Confirm      | `enter` adds or saves. The last step lists anything that needs approval, which `enter` approves.                   |
+| Review       | `y` approves, `n` declines, `esc` leaves it for later.                                                             |
 | Remove       | `y` removes, `n` or `esc` keeps.                                                                                   |
 
 ## Welcome and password boxes
@@ -2277,6 +2694,160 @@ See [The request log](/docs/concepts/the-request-log/).
 | -------- | ---------------------------------------------------- |
 | Welcome  | `enter` trusts the certificate authority, `s` skips. |
 | Password | `enter` continues, `esc` cancels.                    |
+
+# .nearhostrc
+
+> Every key in a project's .nearhostrc, how its variables are filled, and what it asks you to approve.
+
+A `.nearhostrc` is a YAML file in a project’s root directory. You commit it with the project, so everyone who adds the project gets the same ports, hosts and main name, and each worktree can fill them from its own `.env`.
+
+The file only ever proposes. A host or main name that is not `.test`, a wildcard, `localhost` and Docker access all wait for your approval before they go live. See [Approval](#approval).
+
+```yaml
+version: 1
+alias: ${APP_HOST:-app.local.example.com}
+routes:
+  - port: ${APP_PORT:-8000}
+    label: app
+    hosts:
+      - api.local.example.com
+      - '*.status.local.example.com'
+  - port: ${FORWARD_REVERB_PORT:-8080}
+    label: reverb
+    hosts: [ws.local.example.com]
+  - port: ${FORWARD_MINIO_PORT:-9000}
+    label: minio
+    hosts: [files.local.example.com]
+  - port: ${VITE_PORT:-5173}
+    role: ignore
+    label: vite
+docker_clients: true
+```
+
+With this `.env` beside it, the app is served at `https://app.local.example.com` and `https://api.local.example.com` from port 8010. A name one label under `status.local.example.com`, such as `eu.status.local.example.com`, reaches the same port; the hosts file cannot hold a pattern, so its names need DNS that points them at this machine. Reverb is served at `ws.local.example.com` from port 8090, and MinIO at `files.local.example.com` from port 9010:
+
+```ini
+APP_PORT=8010
+FORWARD_REVERB_PORT=8090
+FORWARD_MINIO_PORT=9010
+```
+
+## Keys
+
+| Key              | Type    | Meaning                                                                                                              |
+| ---------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
+| `version`        | integer | Required. Must be `1`.                                                                                               |
+| `alias`          | string  | Optional. The project’s [main name](/docs/reference/config/#main-name): `<name>.test`, or any one domain.            |
+| `routes[].port`  | integer | Required. The port on the server. A number from 1 to 65535, or a variable that gives one.                            |
+| `routes[].role`  | string  | Optional. `web`, `loopback` or `ignore`. `web` when left out.                                                        |
+| `routes[].label` | string  | Optional. A description, shown with the route.                                                                       |
+| `routes[].hosts` | list    | Optional, web routes only. Names to serve the route at: exact names or wildcard patterns.                            |
+| `docker_clients` | boolean | Optional. `true` serves the project to Docker containers on this machine too. See [Docker clients](#docker-clients). |
+
+The roles mean what they mean in `config.yaml`. See [Routes and roles](/docs/concepts/routes-and-roles/).
+
+The file is the authority on the routes it lists. Their hosts replace any that presets found for those ports. A port the project has that the file does not list stays visible, but a web one becomes `ignore`, so only the file says what is served.
+
+`nearhost add --alias` wins over `alias:`, and `alias:` wins over `<name>.test`. Removing `alias:` from the file leaves the current main name as it is.
+
+## Rules
+
+* A file that lists routes needs at least one `web` route among them.
+* The first web route is served at the project’s main name. Every later web route needs at least one host.
+* A port, or a host, listed twice is an error.
+* Only web routes have hosts.
+* The main name may be listed as a host only on the first web route, where it is served anyway.
+* `docker_clients` works only for a project on this machine, not one on a server.
+* Hosts and the main name must be lowercase. The main name cannot be a wildcard pattern, `localhost` or an IP address.
+
+## Variables
+
+`${VAR}` and `${VAR:-default}` work in ports, hosts, labels, roles and the alias. They are filled from `.env.local`, then `.env`, in the project’s directory, so a value in `.env.local` wins. They are never filled from Nearhost’s own environment.
+
+A variable with no value and no default is an error that names it:
+
+```text
+.nearhostrc: ${APP_PORT} has no value in .env.local or .env, and no default
+```
+
+A variable can fill part of a value, as in `app.${APP_DOMAIN}`. Worktrees of one repository can then share the committed file and each serve its own hosts. Approval works on the filled values, so you approve the names that will actually be served, and a change in `.env` that gives a new real domain asks again.
+
+## Errors
+
+Every error in the file itself starts with `.nearhostrc`. `nearhost add` stops with it, and the interface and `nearhost doctor` show it with the project.
+
+A key this version of Nearhost does not know is an error, rather than being ignored:
+
+```text
+.nearhostrc: line 4: key "hostz" is not understood by this version of Nearhost; update Nearhost, or remove it
+```
+
+So is a `version` newer than this Nearhost understands:
+
+```text
+.nearhostrc is version 2; this Nearhost understands version 1, so update Nearhost
+```
+
+Run `nearhost update` for the second. For the first, check the key’s spelling against [Keys](#keys).
+
+## Approval
+
+These need your approval before they go live:
+
+* a host that does not end in `.test`;
+* a wildcard pattern, even one under `.test`;
+* `localhost`;
+* a main name that does not end in `.test`;
+* `docker_clients: true`.
+
+A `.test` host, a port, a label or a role needs none. Neither does a host the project already serves.
+
+Each front end asks in its own way:
+
+* **The interface.** When you add a project, the last step lists what needs approval, and `enter` approves it and saves. When a project’s file changes later, the project shows `.nearhostrc asks for 1 change that needs approval · a to review`. Press `a` to see what it asks for, then `y` to approve, `n` to decline or `esc` to leave it for later. A declined change is not asked about again until the file changes or Nearhost restarts.
+
+* **`nearhost add`.** At a terminal it lists each item and asks `Approve these? [y/N]`. A host typed with `--host`, or a main name typed with `--alias`, is approved by typing it. Without a terminal it adds nothing, and names the items. For the file at the top of this page:
+
+  ```text
+  nearhost: not added: this project asks for things that need your approval (*.status.local.example.com, api.local.example.com, ws.local.example.com, files.local.example.com, app.local.example.com, docker_clients); run nearhost add in a terminal, or open nearhost
+  ```
+
+* **`nearhost up`.** It cannot approve anything. A project whose file asks for something new keeps serving what was approved before, and its log says what is waiting. Open `nearhost` to approve it.
+
+Nothing approves itself.
+
+## When it is read
+
+Nearhost reads the file, and applies what it finds:
+
+* when a project starts;
+* when you press `r` on a project in the interface;
+* when an agent asks Nearhost to read it again, or runs the doctor on the project.
+
+A change that needs no approval, such as a port moved in `.env`, a new label or a new `.test` host, applies at once and is saved to `config.yaml`. A change that needs approval waits, and the routes approved before keep serving until you approve it. If the file has an error, or is deleted after it was approved, the project keeps serving what was approved and shows the problem.
+
+`nearhost doctor` on the command line reads the file too, but only reports. It applies and saves nothing. It reports a file with an error, a change that waits for approval, and a change that needs none but has not been applied yet.
+
+## Docker clients
+
+Nearhost answers only this machine. On Linux, a request from a container comes from a Docker network, not from this machine’s loopback address, so Nearhost drops it. `docker_clients: true` also serves the project to the networks Docker has on this machine, while other projects stay loopback-only. It works only for a project on this machine, and it always needs your approval. Docker Desktop on macOS already delivers container requests from 127.0.0.1, so this matters on Linux.
+
+A container also needs to find the host and trust the local certificate authority. See [Callbacks from Docker containers to a local HTTPS domain](/docs/guides/container-callbacks/).
+
+## A file without routes
+
+Note
+
+A file without routes needs Nearhost 0.7.0 or later. Nearhost 0.6.0 stops with `.nearhostrc needs at least one web route`.
+
+To set only the main name, and leave the routes to discovery and to you, give the file `version` and `alias`:
+
+```yaml
+version: 1
+alias: ${APP_HOST:-app.local.example.com}
+```
+
+The routes stay as discovery found them or as you set them. The file removes only the hosts that an earlier, approved version of it gave, and the main name from any route other than the first web route. A later web route left with no hosts once the main name is removed becomes `ignore`.
 
 # Troubleshooting
 
