@@ -1,6 +1,7 @@
 // Dates each sitemap entry by the last commit to the files that make the page.
 import { execFileSync } from 'node:child_process';
-import { existsSync, statSync } from 'node:fs';
+import { existsSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 
 // The landing page is drawn from these, so a change to any of them changes the page.
 const landingSources = [
@@ -42,6 +43,17 @@ export function lastModified(files) {
   } catch {
     // Not a git checkout; fall back to the files themselves.
   }
-  const times = files.filter((file) => existsSync(file)).map((file) => statSync(file).mtimeMs);
+  const times = files.flatMap(filesIn).map((file) => statSync(file).mtimeMs);
   return times.length ? new Date(Math.max(...times)).toISOString() : undefined;
+}
+
+/**
+ * The files at a path: the path itself for a file, every file below it for a directory.
+ * @param {string} path
+ * @returns {string[]}
+ */
+function filesIn(path) {
+  if (!existsSync(path)) return [];
+  if (!statSync(path).isDirectory()) return [path];
+  return readdirSync(path).flatMap((name) => filesIn(join(path, name)));
 }
