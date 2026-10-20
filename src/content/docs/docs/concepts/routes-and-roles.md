@@ -43,7 +43,7 @@ Discovered and listed, not forwarded. Discovery proposes every route as `ignore`
 In the interface, select the project and press `tab` to move into its routes. Choose a route with `↑` and `↓`, then:
 
 - `space` switches it between `loopback` and `ignore`
-- `w` makes it the web route, and the old web route becomes `ignore` if it has no hosts of its own
+- `w` makes it a web route, the primary if it has no hosts, and other web routes with no hosts become `ignore`
 
 Press `tab` or `esc` when you are done. The change is saved and applied at once. `e` on the project reads its files again and walks through the routes step of the form. From the command line, `nearhost add --web <port>` chooses the web route.
 

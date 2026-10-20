@@ -2,7 +2,7 @@
 title: Dev servers and hot reload
 description: How assets and live reload reach your browser, and when a project needs a loopback forward.
 sidebar:
-  order: 7
+  order: 8
 ---
 
 A page served from `https://<alias>` usually needs a second thing to work: the dev server that builds its scripts and pushes live updates. There are two ways that server shows up, and Nearhost handles both.

@@ -2,7 +2,7 @@
 title: TLS and the proxy
 description: How the embedded Caddy proxy and the local certificate authority serve each alias over HTTPS.
 sidebar:
-  order: 5
+  order: 6
 ---
 
 Caddy runs inside the Nearhost process, with its storage under `~/.config/nearhost/caddy`. It listens on 443 for HTTPS and on 80 only to redirect to HTTPS, with a 308. To use other ports, run Nearhost with `--https-port` and `--http-port`.

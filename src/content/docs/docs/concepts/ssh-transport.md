@@ -2,7 +2,7 @@
 title: SSH transport
 description: How Nearhost drives OpenSSH with one supervised control master per server.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 Nearhost shells out to OpenSSH, so your `ssh_config` applies. If `ssh <host>` works without a prompt, Nearhost works.

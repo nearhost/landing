@@ -39,18 +39,20 @@ On Home, when a server cannot connect, `r` retries every such server now and `y`
 | `e`     | Edit: read its files again and change its routes or name. |
 | `d`     | Remove it, after you confirm.                             |
 | `y`     | Copy the snippets of its advice.                          |
+| `r`     | Read its `.nearhostrc` again, without restarting it.      |
+| `a`     | Review a pending `.nearhostrc` change.                    |
 
 ## Routes
 
 After `tab` on a project.
 
-| Key          | Action                                                                        |
-| ------------ | ----------------------------------------------------------------------------- |
-| `↑`, `↓`     | Choose a route.                                                               |
-| `space`      | Switch it between `loopback` and `ignore`.                                    |
-| `w`          | Make it the web route. The old web route becomes `ignore` if it has no hosts. |
-| `y`          | Copy the snippets of the project's advice.                                    |
-| `tab`, `esc` | Done.                                                                         |
+| Key          | Action                                                                                               |
+| ------------ | ---------------------------------------------------------------------------------------------------- |
+| `↑`, `↓`     | Choose a route.                                                                                      |
+| `space`      | Switch it between `loopback` and `ignore`.                                                           |
+| `w`          | Make it a web route, the primary if it has no hosts. Other web routes with no hosts become `ignore`. |
+| `y`          | Copy the snippets of the project's advice.                                                           |
+| `tab`, `esc` | Done.                                                                                                |
 
 On a project on this machine, a route is only `web` or `ignore`.
 
@@ -95,7 +97,7 @@ See [The request log](/docs/concepts/the-request-log/).
 | Lists        | `↑`, `↓` to choose, `enter` to pick.                                                                               |
 | Path         | `tab` or `→` accepts the suggestion, `↑`, `↓` choose a match, `enter` uses the path as typed, `ctrl+r` reconnects. |
 | Presets      | `space` ticks or unticks, `enter` goes on.                                                                         |
-| Routes       | `space` serves or ignores a port, `←`, `→` change its role.                                                        |
+| Routes       | `space` serves or ignores a port, `←`, `→` change its role, `h` edits a web route's hosts.                         |
 | Name         | `tab` moves between name and alias.                                                                                |
 | Server check | `r` checks again after a failure.                                                                                  |
 | Confirm      | `enter` adds or saves.                                                                                             |
