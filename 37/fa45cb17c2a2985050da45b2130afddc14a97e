@@ -1,0 +1,34 @@
+src/content/docs/docs/guides/cognito-sign-in.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+src/content/docs/docs/guides/clerk-sign-in.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+src/content/docs/docs/guides/workos-sign-in.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+src/content/docs/docs/guides/forward-ports-over-ssh.md
+  s_f73a4dba9f7d00::t_75e9b0c5ce8b47 55,81
+  s_f73a4dba9f7d00::t_ce26a44bb20aba 82
+  s_f73a4dba9f7d00::t_3405ade6916b42 1-54,56-80
+src/content/docs/docs/concepts/ssh-transport.md
+  s_f73a4dba9f7d00::t_ce26a44bb20aba 35
+  s_f73a4dba9f7d00::t_05dd20180a461f 36
+src/content/docs/docs/guides/https-on-a-local-dev-domain.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+astro.config.mjs
+  s_f73a4dba9f7d00::t_a9868e6ce4e4cf 50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "37fa45cb17c2a2985050da45b2130afddc14a97e",
+  "prompts": {},
+  "sessions": {
+    "s_f73a4dba9f7d00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4d7d22e-aeb2-4a9a-ae19-70c1b770f423",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
