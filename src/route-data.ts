@@ -3,7 +3,7 @@
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
 import { url } from './lib/url';
 import { height, ogPath, width } from './lib/og.mjs';
-import { techArticle } from './lib/structured-data.mjs';
+import { jsonLd, techArticle } from './lib/structured-data.mjs';
 
 export const onRequest = defineRouteMiddleware((context) => {
   const route = context.locals.starlightRoute;
@@ -22,7 +22,7 @@ export const onRequest = defineRouteMiddleware((context) => {
     {
       tag: 'script',
       attrs: { type: 'application/ld+json' },
-      content: JSON.stringify(
+      content: jsonLd(
         techArticle(context.site, {
           url: new URL(context.url.pathname, context.site).href,
           title: route.entry.data.title,

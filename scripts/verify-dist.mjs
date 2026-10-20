@@ -28,10 +28,10 @@ function textFiles(dir) {
   return filesMatching(dir, ['.html', '.css', '.js', '.mjs', '.json', '.txt', '.xml', '.svg']);
 }
 
-/** The @type of each node in a JSON-LD @graph, or none when it does not parse. */
-function graphTypes(json) {
+/** The nodes of a JSON-LD @graph, or none when it does not parse. */
+function graphNodes(json) {
   try {
-    return JSON.parse(json)['@graph'].map((node) => node['@type']);
+    return JSON.parse(json)['@graph'] ?? [];
   } catch {
     return [];
   }
@@ -106,12 +106,17 @@ if (existsSync(index)) {
     'footer version is neither a tag nor "latest"',
   );
   const ld = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
-  const types = graphTypes(ld);
+  const nodes = graphNodes(ld);
+  const types = nodes.map((node) => node['@type']);
   check(
     ['SoftwareApplication', 'SoftwareSourceCode', 'Organization', 'Person', 'WebSite'].every(
       (type) => types.includes(type),
     ),
     `landing page JSON-LD must describe the app, its source, maker and site; found ${types}`,
+  );
+  check(
+    nodes.find((node) => node['@type'] === 'SoftwareApplication')?.name === 'Nearhost',
+    'landing page SoftwareApplication must be named Nearhost',
   );
   // The nav menu, the copy button and the interface demo.
   const components = new Set([...html.matchAll(/component-url="([^"]*)"/g)].map((m) => m[1]));
@@ -126,14 +131,21 @@ if (existsSync(index)) {
   );
 }
 
-// 5. The docs entry point exists, dated as a technical article.
-const installPage = join(dist, 'docs', 'getting-started', 'install', 'index.html');
-check(existsSync(installPage), 'docs install page is missing');
-if (existsSync(installPage)) {
-  const html = readFileSync(installPage, 'utf8');
+// 5. The docs entry point exists, and every docs page is a dated technical article.
+check(
+  existsSync(join(dist, 'docs', 'getting-started', 'install', 'index.html')),
+  'docs install page is missing',
+);
+for (const file of htmlFiles(join(dist, 'docs'))) {
+  const html = readFileSync(file, 'utf8');
+  if (/http-equiv="refresh"/.test(html)) continue;
   const ld = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
-  check(graphTypes(ld).includes('TechArticle'), 'docs pages must carry TechArticle JSON-LD');
-  check(/"dateModified":"\d{4}-/.test(ld ?? ''), 'docs JSON-LD must have a dateModified');
+  const article = graphNodes(ld).find((node) => node['@type'] === 'TechArticle');
+  check(article, `${file} must carry TechArticle JSON-LD`);
+  check(
+    /^\d{4}-\d{2}-\d{2}T/.test(article?.dateModified ?? ''),
+    `${file} TechArticle must have a dateModified`,
+  );
 }
 
 // 6. Every provider guide says which Nearhost it needs and when it was checked.

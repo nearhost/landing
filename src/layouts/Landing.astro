@@ -3,7 +3,7 @@ import { url } from '../lib/url';
 import { ogPath } from '../lib/og.mjs';
 import { plausibleInit, plausibleSrc, tracked } from '../lib/plausible.mjs';
 import { latestVersion } from '../lib/version';
-import { entities, ids } from '../lib/structured-data.mjs';
+import { entities, ids, jsonLd } from '../lib/structured-data.mjs';
 import groteskFont from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 import sansFont from '@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?url';
 import monoFont from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2?url';
@@ -88,7 +88,7 @@ const structuredData = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
     <meta name="twitter:image:alt" content="Nearhost: Run it anywhere. Open it here." />
-    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <script type="application/ld+json" set:html={jsonLd(structuredData)} />
     {analytics && (
       <>
         <script is:inline async src={plausibleSrc} />

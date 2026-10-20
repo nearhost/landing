@@ -74,3 +74,10 @@ export function techArticle(site, page) {
     ],
   };
 }
+
+/**
+ * JSON-LD ready for a script element: a "<" in any value, such as "</script>" in a title,
+ * cannot end the element early.
+ * @param {unknown} data
+ */
+export const jsonLd = (data) => JSON.stringify(data).replace(/</g, '\\u003c');
