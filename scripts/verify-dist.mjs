@@ -145,8 +145,8 @@ if (existsSync(index)) {
   }
   // Both demos hold sample data that must not be quoted as real.
   check(
-    /<div class="frame[^"]*"[^>]*data-nosnippet/.test(html) &&
-      /<div class="window[^"]*"[^>]*data-nosnippet/.test(html),
+    /<div class="(?:[^"]*\s)?frame(?:\s[^"]*)?"[^>]*\sdata-nosnippet[\s=>]/.test(html) &&
+      /<div class="(?:[^"]*\s)?window(?:\s[^"]*)?"[^>]*\sdata-nosnippet[\s=>]/.test(html),
     'the interface demo and the agent demo must carry data-nosnippet',
   );
   // The nav menu, the copy button and the interface demo.
