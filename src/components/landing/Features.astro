@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 ---
 
 <section class="container features">
@@ -28,6 +29,9 @@
         key ships in the binary, so nobody else can mint certificates for your <code>.test</code>{' '}
         names.
       </p>
+      <a class="more" href={url('/docs/concepts/tls-and-the-proxy/')}>
+        TLS and the proxy
+      </a>
     </div>
     <div class="cell">
       <svg
@@ -49,6 +53,9 @@
         point at <code>localhost</code> still resolve, so hot reload connects with the remote config
         untouched.
       </p>
+      <a class="more" href={url('/docs/concepts/dev-servers-and-hot-reload/')}>
+        Dev servers and hot reload
+      </a>
     </div>
     <div class="cell">
       <svg
@@ -71,6 +78,9 @@
         trust add Compose, Vite and Laravel Sail, and warn about port clashes and a missing{' '}
         <code>allowedHosts</code> before you start. For anything else, give it the web port.
       </p>
+      <a class="more" href={url('/docs/concepts/discovery/')}>
+        How discovery works
+      </a>
     </div>
     <div class="cell">
       <svg
@@ -91,6 +101,9 @@
         Nearhost shells out to OpenSSH, so <code>Include</code>, <code>Match</code>, ProxyJump,
         agent forwarding and keychain identities apply. It stores nothing but the host name.
       </p>
+      <a class="more" href={url('/docs/concepts/ssh-transport/')}>
+        SSH transport
+      </a>
     </div>
     <div class="cell">
       <svg
@@ -112,6 +125,9 @@
         The <code>local</code> server needs no setup. Projects on your laptop get the same alias and
         certificate, so one tool covers the laptop and the servers.
       </p>
+      <a class="more" href={url('/docs/getting-started/add-a-project/')}>
+        Add a project
+      </a>
     </div>
     <div class="cell">
       <svg
@@ -133,11 +149,25 @@
         <code>nearhost up</code> starts projects without the UI. <code>nearhost doctor</code> checks
         ports, trust, hosts and each server. Config is one YAML file you can edit by hand.
       </p>
+      <a class="more" href={url('/docs/reference/cli/')}>
+        CLI reference
+      </a>
     </div>
   </div>
 </section>
 
 <style>
+  .more {
+    margin-top: auto;
+    padding-top: 4px;
+    color: var(--nh-accent);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .more:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
   .features {
     padding-block: var(--nh-section);
     display: flex;

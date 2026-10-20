@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 ---
 
 <section id="how" class="how">
@@ -20,6 +21,9 @@
           Pick a host alias from <code>~/.ssh/config</code> or type <code>user@host</code>. Nearhost
           checks that it connects without a prompt and shows OpenSSH's own output if it doesn't.
         </p>
+        <a class="more" href={url('/docs/getting-started/add-a-server/')}>
+          Adding a server
+        </a>
       </div>
       <div class="card">
         <div class="num">02</div>
@@ -29,6 +33,9 @@
           presets its Compose and Vite config, and proposes the ports: which one is the web app,
           which need a loopback forward, which to ignore.
         </p>
+        <a class="more" href={url('/docs/getting-started/add-a-project/')}>
+          Adding a project
+        </a>
       </div>
       <div class="card">
         <div class="num">03</div>
@@ -38,12 +45,26 @@
           its local CA and routes <code>https://myapp.test</code> through the SSH tunnel. WebSockets
           and hot reload pass through the same tunnel. Press <code>o</code> to open it.
         </p>
+        <a class="more" href={url('/docs/getting-started/first-run/')}>
+          The first run
+        </a>
       </div>
     </div>
   </div>
 </section>
 
 <style>
+  .more {
+    margin-top: auto;
+    padding-top: 4px;
+    color: var(--nh-accent);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .more:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
   .how {
     border-top: 1px solid var(--nh-line);
     background: color-mix(in srgb, var(--nh-ground) 92%, var(--nh-surface));

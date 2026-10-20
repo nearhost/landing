@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 import CopyButton from '../CopyButton.svelte';
 
 const install = 'npx skills add nearhost/nearhost -g';
@@ -32,6 +33,9 @@ const logo = logoRows.flatMap((row, y) =>
         your laptop, already filled in, and the agent gets the address once you save it. It works
         the same when the agent runs on a server you reach over SSH.
       </p>
+      <a class="more" href={url('/docs/getting-started/use-a-coding-agent/')}>
+        Use a coding agent
+      </a>
     </div>
 
     <div class="window" data-agents data-tab="claude" data-step="9">
@@ -246,6 +250,16 @@ const logo = logoRows.flatMap((row, y) =>
 </script>
 
 <style>
+  .more {
+    align-self: flex-start;
+    color: var(--nh-accent);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .more:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
   .agents {
     border-top: 1px solid var(--nh-line);
   }
