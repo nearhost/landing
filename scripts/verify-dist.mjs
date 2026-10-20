@@ -119,6 +119,19 @@ if (existsSync(index)) {
     nodes.find((node) => node['@type'] === 'SoftwareApplication')?.name === 'Nearhost',
     'landing page SoftwareApplication must be named Nearhost',
   );
+  const faq = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map((m) => {
+      try {
+        return JSON.parse(m[1]);
+      } catch {
+        return undefined;
+      }
+    })
+    .find((data) => data?.['@type'] === 'FAQPage');
+  check(faq?.mainEntity?.length > 0, 'landing page must carry FAQPage JSON-LD with questions');
+  for (const question of faq?.mainEntity ?? []) {
+    check(html.includes(`>${question.name}</h3>`), `FAQ "${question.name}" is not on the page`);
+  }
   // The nav menu, the copy button and the interface demo.
   const components = new Set([...html.matchAll(/component-url="([^"]*)"/g)].map((m) => m[1]));
   check(
