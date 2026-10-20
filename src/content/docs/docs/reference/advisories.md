@@ -38,7 +38,7 @@ export default defineConfig({
 });
 ```
 
-Under Laravel Sail, `nearhost/sail` replaces it with the same advice for `.env`, where `laravel-vite-plugin` reads `VITE_PORT`. A default in the Compose file, such as `${VITE_PORT:-5176}`, does not count: it only maps the port, and Vite in the container still listens on 5173. Its snippet:
+Under Laravel Sail, `nearhost/sail` replaces it with the same advice for `.env`. `laravel-vite-plugin` reads `VITE_PORT` from `.env` or the environment, so the advice does not appear when the Compose file's `environment` sets `VITE_PORT` to a port other than 5173. A default under `ports`, such as `${VITE_PORT:-5176}`, does not count: it only maps the port, and Vite in the container still listens on 5173. Its snippet:
 
 ```sh
 VITE_PORT=5174
