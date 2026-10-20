@@ -1,0 +1,19 @@
+src/components/landing/Faq.astro
+  s_f73a4dba9f7d00::t_74f4144a4e0447 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0e203ee18aff8f2a47891b712b207dd795ec1551",
+  "prompts": {},
+  "sessions": {
+    "s_f73a4dba9f7d00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4d7d22e-aeb2-4a9a-ae19-70c1b770f423",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
