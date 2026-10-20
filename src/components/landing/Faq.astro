@@ -1,0 +1,112 @@
+---
+import { jsonLd } from '../../lib/structured-data.mjs';
+
+// The questions people ask before they install. The same list feeds the FAQPage structured
+// data, so the page and the markup cannot drift apart.
+const faqs = [
+  {
+    q: 'Does Nearhost install anything on the server?',
+    a: 'No. Nearhost runs on your laptop and shells out to OpenSSH, and leaves your project and its config untouched. It reads files such as <code>.env</code> over SFTP. The server needs SSH that connects without a prompt, with SFTP and TCP forwarding allowed, as most servers do.',
+  },
+  {
+    q: 'Which operating systems does it run on?',
+    a: 'Nearhost runs on macOS and Linux, on Apple silicon, Intel and ARM. The server can be any machine you reach with <code>ssh</code>: a desktop under the desk, a home server, a VPS or a VM. Linux needs one extra step to bind ports 80 and 443 and to trust the certificate in your browser.',
+  },
+  {
+    q: 'Does it work with my framework?',
+    a: 'Nearhost routes ports, so it works with any HTTP dev server, such as Laravel, Rails, Django, Next.js or Vite. It finds ports in <code>.env</code>, and presets add Docker Compose, Vite and Laravel Sail. For anything else, give it the web port.',
+  },
+  {
+    q: 'Can I share a Nearhost address with someone else?',
+    a: 'No. A <code>.test</code> name resolves from <code>/etc/hosts</code> on your laptop and its certificate is trusted only there, so the address works in your own browser and nowhere else. To show a page to a client, use a public tunnel service such as ngrok.',
+  },
+  {
+    q: 'What happens when the SSH connection drops?',
+    a: 'Nearhost keeps one supervised SSH connection per server and reconnects by itself. While it is down, the projects on that server show as degraded and requests get a 502. Once <code>ssh</code> works again, press <code>r</code> to reconnect straight away.',
+  },
+  {
+    q: 'Is Nearhost free?',
+    a: 'Yes. Nearhost is open source under the MIT licence, with no account and no sign-up. Install it with the shell script, Homebrew or npm.',
+  },
+];
+
+const faqPage = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map(({ q, a }) => ({
+    '@type': 'Question',
+    name: q,
+    acceptedAnswer: { '@type': 'Answer', text: a.replace(/<[^>]*>/g, '') },
+  })),
+};
+---
+
+<section class="container faq">
+  <h2>Questions before you install.</h2>
+  <div class="rows">
+    {faqs.map(({ q, a }) => (
+      <div class="row">
+        <h3>{q}</h3>
+        <p set:html={a} />
+      </div>
+    ))}
+  </div>
+  <script type="application/ld+json" set:html={jsonLd(faqPage)} />
+</section>
+
+<style>
+  .faq {
+    padding-block: var(--nh-section);
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  h2 {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1.05;
+    letter-spacing: var(--nh-track-display);
+  }
+  .rows {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--nh-line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 2.4fr);
+    gap: 28px;
+    padding: 24px 28px;
+    border-top: 1px solid var(--nh-line);
+    align-items: start;
+  }
+  .row:first-child {
+    border-top: 0;
+  }
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .row p {
+    margin: 0;
+    max-width: 72ch;
+    color: var(--nh-body);
+    font-size: 15.5px;
+  }
+  .row :global(code) {
+    font-family: var(--nh-font-mono);
+    font-size: 0.92em;
+  }
+  @media (max-width: 719px) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: 10px;
+      padding: 20px;
+    }
+  }
+</style>
