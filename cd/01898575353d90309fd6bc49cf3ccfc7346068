@@ -1,0 +1,21 @@
+src/content/docs/docs/guides/forward-ports-over-ssh.md
+  s_f73a4dba9f7d00::t_bc2844b15930ce 55,61,82-84
+astro.config.mjs
+  s_f73a4dba9f7d00::t_bc2844b15930ce 50-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cd01898575353d90309fd6bc49cf3ccfc7346068",
+  "prompts": {},
+  "sessions": {
+    "s_f73a4dba9f7d00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4d7d22e-aeb2-4a9a-ae19-70c1b770f423",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
