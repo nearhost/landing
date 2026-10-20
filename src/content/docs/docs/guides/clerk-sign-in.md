@@ -29,6 +29,8 @@ Use a name under a domain you own, such as `local.myapp.com`. It needs no DNS re
 
 A real-domain name is shaped like production, where Clerk's Frontend API lives on a subdomain of your domain. Clerk's documentation does not say which local names a development instance accepts beyond `localhost`, so this guide uses a domain you own.
 
+If your production app already uses Clerk on `myapp.com`, use a name under a different domain you own, such as `local.myapp-dev.com`. Clerk's docs say a separate setup will not work on the production domain, even on a separate subdomain. The examples below use `local.myapp.com`; swap in your name.
+
 ## Add the project
 
 On the command line, give the name with `--alias`:

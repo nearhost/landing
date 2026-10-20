@@ -44,7 +44,7 @@ Then, on the app and provider side:
 
 ## The guides
 
-Each provider has its own place to register the callback, and its own way of failing. The guides cover them step by step:
+Each provider has its own setup, and its own way of failing. The guides cover them step by step:
 
 - [WorkOS sign-in](/docs/guides/workos-sign-in/): the redirect URI on the **Redirects** tab, with Laravel and `laravel/workos`.
 - [Clerk sign-in](/docs/guides/clerk-sign-in/): a development instance needs no callback registered at all, and what breaks is the dev server's hot reload. With Next.js.

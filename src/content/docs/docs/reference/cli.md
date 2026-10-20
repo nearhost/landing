@@ -46,15 +46,15 @@ When the hosts block needs to change, it asks for your password in the terminal.
 
 Adds a project. It discovers the routes from the project's files, prints them and saves the project. At a terminal it asks when it needs to: whether to trust the official presets, which suggested presets to enable, which port is the web app, and whether to add a server it does not know. It starts nothing and changes no file in the project.
 
-| Flag              | Effect                                                                                    |
-| ----------------- | ----------------------------------------------------------------------------------------- |
-| `--server <name>` | The server the path is on. The default is `local`.                                        |
-| `--name <name>`   | The project name. The default is the directory's name.                                    |
-| `--alias <alias>` | The main name. The default is `<name>.test`. Any domain works, and typing it approves it. |
-| `--web <port>`    | The port to serve at the alias.                                                           |
-| `--preset <name>` | Enable this preset without asking. Repeat for more.                                       |
-| `--no-presets`    | Use no presets and suggest none.                                                          |
-| `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                 |
+| Flag              | Effect                                                                                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--server <name>` | The server the path is on. The default is `local`.                                                                                                     |
+| `--name <name>`   | The project name. The default is the directory's name.                                                                                                 |
+| `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost` or an IP address. Typing it approves it. |
+| `--web <port>`    | The port to serve at the alias.                                                                                                                        |
+| `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                    |
+| `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
+| `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
 
 See [Add a project](/docs/getting-started/add-a-project/).
 

@@ -39,7 +39,7 @@ Next.js and plain Vite serve pages, assets and hot reload from one port, so thei
 
 Each patch fixes one of the three.
 
-- **Assets.** Stop the dev server, which deletes `public/hot`, and run `npm run build`. Laravel then serves the built files from the app's own origin. You lose hot reload. On other backends, build the assets or tunnel the Vite port. Keeping hot reload means a second tunnel for port 5173, with Vite told to advertise that tunnel's address through `server.origin` and `server.hmr`, and that tunnel's hostname added to `server.allowedHosts`.
+- **Assets.** Stop the dev server, which deletes `public/hot`, and run `npm run build`. Laravel then serves the built files from the app's own origin. You lose hot reload. On other backends, build the assets or tunnel the Vite port. Keeping hot reload means a second tunnel for port 5173, with Vite told to advertise that tunnel's address through `server.origin` and `server.hmr`, and that tunnel's hostname added to `server.allowedHosts`. Once `server.origin` is set, Laravel's Vite plugin allows only that origin through CORS, so also set `server.cors.origin` to the app tunnel's address, or the browser blocks the scripts.
 - **Links and redirects.** Set `APP_URL` to the tunnel's address and make the framework trust the proxy. The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) shows the one-line `trustProxies` change for Laravel. If the tunnel name changes each time you start it, so does `APP_URL`.
 - **Host checks.** Add the tunnel's hostname to `allowedDevOrigins` in `next.config.ts`, or to `server.allowedHosts` in Vite's config.
 
