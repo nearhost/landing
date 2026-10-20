@@ -152,8 +152,6 @@ for (const file of guides) {
 // Links are resolved the way a browser would, against the page's own URL on the site's origin.
 // Absolute links to the site point at production, which has no base.
 const origin = 'https://nearhost.dev';
-// Links are resolved the way a browser would, against the page's own URL on a stand-in origin.
-const origin = 'https://site.invalid';
 for (const file of pages) {
   const html = readFileSync(file, 'utf8');
   const page = new URL(base + relative(dist, file).split(sep).join('/'), origin);
