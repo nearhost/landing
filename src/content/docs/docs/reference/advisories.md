@@ -27,7 +27,7 @@ VITE_PORT=5174
 
 ## Vite on the default port
 
-`vite-default-port`, from `nearhost/vite`. Appears when the Vite config sets no `server.port`, unless it reads `VITE_PORT` and `.env` sets it. Vite will use 5173, which other Vite projects also use, so set a port in the Vite config. The snippet suggests a free one:
+`vite-default-port`, from `nearhost/vite`. Appears when the Vite config sets no `server.port`, unless it reads `VITE_PORT` and `.env` sets it. Any `server.port` counts, a number, an expression such as `Number(process.env.APP_VITE_PORT) || 5291` or the shorthand `server: { port }`, but not one that is commented out. A port read from `VITE_PORT` counts only while `.env` sets `VITE_PORT`. Vite will use 5173, which other Vite projects also use, so set a port in the Vite config. The snippet suggests a free one:
 
 ```ts
 // vite.config.ts
@@ -38,7 +38,7 @@ export default defineConfig({
 });
 ```
 
-Under Laravel Sail, `nearhost/sail` replaces it with the same advice for `.env`:
+Under Laravel Sail, `nearhost/sail` replaces it with the same advice for `.env`. It does not appear when the Compose file gives `VITE_PORT` a default other than 5173, such as `${VITE_PORT:-5176}` or `${VITE_PORT-5176}`:
 
 ```sh
 VITE_PORT=5174
