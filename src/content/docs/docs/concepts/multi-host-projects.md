@@ -17,7 +17,7 @@ You give a route hosts in three ways:
 - **On the command line.** `nearhost add --host <host>` adds a host to the primary web route. Repeat it for more.
 - **In the project's files.** A [`.nearhostrc`](/docs/reference/nearhostrc/#keys) lists hosts for each route, and presets can find them in `.env`. See [Hosts from presets](#hosts-from-presets).
 
-In the routes view on the main screen, `w` makes a route web. If it has no hosts, it becomes the primary. The old web route becomes `ignore` only if it has no hosts, so a route with hosts of its own keeps serving them.
+In the routes view on the main screen, `w` makes a route web. If it has no hosts, it becomes the primary. Other web routes with no hosts become `ignore`, so a route with hosts of its own keeps serving them.
 
 ## Host patterns
 
@@ -51,13 +51,13 @@ A host that does not end in `.test`, any pattern and `localhost` wait for your a
 
 ## Hosts from presets
 
-A preset can name hosts as well as ports. The [`nearhost/sail`](/docs/concepts/presets-and-registries/#hosts-from-presets) preset reads them from `.env`:
+A preset can name hosts as well as ports. The [`nearhost/sail`](/docs/concepts/presets-and-registries/#the-official-presets) preset reads them from `.env`:
 
-| Variable                   | Served on the port in          |
-| -------------------------- | ------------------------------ |
-| `APP_URL`                  | `APP_PORT`, or 80              |
-| `REVERB_HOST`              | `FORWARD_REVERB_PORT`, or 8080 |
-| `FILES_URL` or `MINIO_URL` | `FORWARD_MINIO_PORT`, or 9000  |
+| Variable                          | Served on the port in          |
+| --------------------------------- | ------------------------------ |
+| `APP_URL`                         | `APP_PORT`, or 80              |
+| `REVERB_HOST`                     | `FORWARD_REVERB_PORT`, or 8080 |
+| `FILES_URL`, `MINIO_URL`, or both | `FORWARD_MINIO_PORT`, or 9000  |
 
 Only the host is taken from each value. A port in the URL is ignored, and the route's port comes from the variable beside it. The Reverb and MinIO hosts are read only when their port variable is set in `.env` or named in the Compose file.
 
@@ -85,7 +85,7 @@ FILES_URL=https://files.shop.local.example.com:9010
 FORWARD_MINIO_PORT=9010
 ```
 
-With the `sail` preset enabled, `nearhost add` asks you to approve the three hosts, since none ends in `.test`. Nearhost then serves:
+With `nearhost/sail` enabled, `nearhost add` asks you to approve the three hosts, since none ends in `.test`. Nearhost then serves:
 
 | URL                                    | Port |
 | -------------------------------------- | ---- |

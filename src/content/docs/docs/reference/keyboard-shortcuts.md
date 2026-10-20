@@ -39,19 +39,20 @@ On Home, when a server cannot connect, `r` retries every such server now and `y`
 | `e`     | Edit: read its files again and change its routes or name. |
 | `d`     | Remove it, after you confirm.                             |
 | `y`     | Copy the snippets of its advice.                          |
+| `r`     | Read its `.nearhostrc` again, without restarting it.      |
 | `a`     | Review a pending `.nearhostrc` change.                    |
 
 ## Routes
 
 After `tab` on a project.
 
-| Key          | Action                                                                        |
-| ------------ | ----------------------------------------------------------------------------- |
-| `↑`, `↓`     | Choose a route.                                                               |
-| `space`      | Switch it between `loopback` and `ignore`.                                    |
-| `w`          | Make it the web route. The old web route becomes `ignore` if it has no hosts. |
-| `y`          | Copy the snippets of the project's advice.                                    |
-| `tab`, `esc` | Done.                                                                         |
+| Key          | Action                                                                                               |
+| ------------ | ---------------------------------------------------------------------------------------------------- |
+| `↑`, `↓`     | Choose a route.                                                                                      |
+| `space`      | Switch it between `loopback` and `ignore`.                                                           |
+| `w`          | Make it a web route, the primary if it has no hosts. Other web routes with no hosts become `ignore`. |
+| `y`          | Copy the snippets of the project's advice.                                                           |
+| `tab`, `esc` | Done.                                                                                                |
 
 On a project on this machine, a route is only `web` or `ignore`.
 
