@@ -1,0 +1,26 @@
+astro.config.mjs
+  s_f73a4dba9f7d00::t_b15e9aae94b1af 4,38-46,49,63-71
+  s_f73a4dba9f7d00::t_ee2660864f3df2 47-48,50-62
+scripts/verify-dist.mjs
+  s_f73a4dba9f7d00::t_0339b7496223eb 151-161
+package-lock.json
+  s_f73a4dba9f7d00::t_21cea93b240838 24,2426-2431,2494-2502,3351-3362,4822-4833,5297-5334,5471-5496,5958-5966,6658-6667,6700-6727,6752-6852,7020-7140,7533-7557,8005-8028,8685-8730,8747-8795,9313-9336,9786-9797,9808-9817,10124-10138,10331-10344,10738-10747
+package.json
+  s_f73a4dba9f7d00::t_bf571e62e36775 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2d7ac248ab6871790cf83b610060b767b312bf10",
+  "prompts": {},
+  "sessions": {
+    "s_f73a4dba9f7d00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4d7d22e-aeb2-4a9a-ae19-70c1b770f423",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
