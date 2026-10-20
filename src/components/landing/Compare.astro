@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 ---
 
 <section class="container compare">
@@ -51,10 +52,15 @@
         Built for sharing. Your traffic goes through someone else's relay to a public URL, usually
         behind an account.
       </p>
-      <p class="diff">
-        Nearhost has no relay, no account and no public URL. Use a tunnel service when a client
-        needs to see the page.
-      </p>
+      <div class="end">
+        <p class="diff">
+          Nearhost has no relay, no account and no public URL. Use a tunnel service when a client
+          needs to see the page.
+        </p>
+        <a class="more" href={url('/docs/guides/ngrok-assets-on-localhost/')}>
+          Fix ngrok assets that point at localhost
+        </a>
+      </div>
     </div>
   </div>
 </section>
@@ -115,6 +121,20 @@
   }
   .row .diff {
     color: var(--nh-text);
+  }
+  .end {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .more {
+    color: var(--nh-accent);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .more:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
   code {
     font-family: var(--nh-font-mono);

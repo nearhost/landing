@@ -37,3 +37,5 @@ Each running project is a site, `https://<alias>`, proxied to the web route's lo
 Config changes apply through Caddy's in-process reload. Starting or stopping a project leaves the connections of other projects open, and open WebSockets, such as hot reload, stay connected.
 
 The proxy also keeps the requests it passes on, so you can look at them and send them again. See [The request log](/docs/concepts/the-request-log/).
+
+If the browser still warns about the certificate, see [HTTPS on a local dev domain](/docs/guides/https-on-a-local-dev-domain/).
