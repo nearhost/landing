@@ -6,7 +6,7 @@ sidebar:
 ---
 
 :::note
-This needs Nearhost 0.6.0 or later. Run `nearhost update` to get the latest. See [CLI](/docs/reference/cli/#nearhost-update).
+Needs Nearhost 0.6.0 or later, which can serve a project to Docker containers. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
 A service in your Compose file often calls the app back: a queue worker reports a finished job, or a LocalStack job delivers an event to a webhook. Point it at the app's Nearhost name, such as `https://api.local.example.com/webhooks/jobs`, and the call fails, even though the same URL works in your browser.
@@ -17,7 +17,7 @@ This works only for a project on this machine. A container on an SSH server cann
 
 ## The example
 
-The app listens on port 8000 and is served at `api.local.example.com`. Its `.nearhostrc`:
+The project is named `shop`. Its app listens on port 8000 and is served at `api.local.example.com`. Its `.nearhostrc`:
 
 ```yaml
 version: 1
@@ -117,7 +117,7 @@ services:
       - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
 ```
 
-Approve `api.local.example.com` and `docker_clients` when you add the project, or when Nearhost asks after the file changes. See [What needs approval](/docs/concepts/multi-host-projects/#what-needs-approval). Then restart the worker with `docker compose up -d worker`.
+Approve `api.local.example.com` and `docker_clients` when you add the project, or when Nearhost asks after the file changes. See [Approval](/docs/reference/nearhostrc/#approval). Then restart the worker with `docker compose up -d worker`.
 
 ## Check it works
 

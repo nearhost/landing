@@ -31,16 +31,16 @@ On Home, when a server cannot connect, `r` retries every such server now and `y`
 
 ## Project
 
-| Key     | Action                                                    |
-| ------- | --------------------------------------------------------- |
-| `enter` | Start or stop it.                                         |
-| `o`     | Open `https://<alias>` in the browser.                    |
-| `tab`   | Move into its routes, to change them.                     |
-| `e`     | Edit: read its files again and change its routes or name. |
-| `d`     | Remove it, after you confirm.                             |
-| `y`     | Copy the snippets of its advice.                          |
-| `r`     | Read its `.nearhostrc` again, without restarting it.      |
-| `a`     | Review a pending `.nearhostrc` change.                    |
+| Key     | Action                                                                                       |
+| ------- | -------------------------------------------------------------------------------------------- |
+| `enter` | Start or stop it.                                                                            |
+| `o`     | Open `https://<alias>` in the browser.                                                       |
+| `tab`   | Move into its routes, to change them.                                                        |
+| `e`     | Edit: read its files again and change its routes or name.                                    |
+| `d`     | Remove it, after you confirm.                                                                |
+| `y`     | Copy the snippets of its advice.                                                             |
+| `r`     | Read its `.nearhostrc` again. A change that needs no approval is applied, which restarts it. |
+| `a`     | Review a pending `.nearhostrc` change.                                                       |
 
 ## Routes
 
@@ -100,7 +100,8 @@ See [The request log](/docs/concepts/the-request-log/).
 | Routes       | `space` serves or ignores a port, `←`, `→` change its role, `h` edits a web route's hosts.                         |
 | Name         | `tab` moves between name and alias.                                                                                |
 | Server check | `r` checks again after a failure.                                                                                  |
-| Confirm      | `enter` adds or saves.                                                                                             |
+| Confirm      | `enter` adds or saves. The last step lists anything that needs approval, which `enter` approves.                   |
+| Review       | `y` approves, `n` declines, `esc` leaves it for later.                                                             |
 | Remove       | `y` removes, `n` or `esc` keeps.                                                                                   |
 
 ## Welcome and password boxes

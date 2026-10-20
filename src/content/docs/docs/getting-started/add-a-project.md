@@ -16,7 +16,7 @@ Press `n`. A box titled "Add project" opens over the screen. Its steps are count
 3. **Presets.** Nearhost reads ports from `.env` by itself. While no preset registry is trusted, it asks once whether to trust the official presets, which add Compose files, Vite and Laravel Sail. Choose Yes, No, or Don't ask again. With a registry trusted, it lists the presets that suit this project, ticked. `space` unticks one, and `enter` enables the rest. See [Presets and registries](/docs/concepts/presets-and-registries/).
 4. **Routes.** The ports found, with a role and a label for each. Ticked ports are served. `space` ticks or unticks a port, and `←` or `→` changes its role. At least one port must be `web`. If no ports were found, give the web port yourself.
 5. **Name.** The project's name and its alias, which follows the name until you change it. `tab` moves between them. Names and aliases must be unique. The alias is the project's [main name](/docs/reference/config/#main-name) and can be any lowercase domain name, such as `local.myapp.com`, but not a wildcard, `localhost` or an IP address. A real domain asks for approval, which typing it here gives. One that comes from the project's [`.nearhostrc`](/docs/reference/nearhostrc/) is asked about on the last step.
-6. **Confirm.** The server, path, address and routes, with any advice. `enter` adds the project.
+6. **Confirm.** The server, path, address and routes, with any advice. It also lists anything that needs approval, such as a host or option from the project's `.nearhostrc`, and `enter` approves it as it adds the project.
 
 The project is selected and starts at once. If its alias is not in `/etc/hosts` yet, Nearhost asks for your password to add it. See [First run](/docs/getting-started/first-run/#the-password-box).
 
@@ -68,7 +68,7 @@ At a terminal it asks what the interface asks: whether to trust the official pre
 | `--name <name>`   | The project name. The default is the directory's name.                                                                                                 |
 | `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost` or an IP address. Typing it approves it. |
 | `--web <port>`    | The port to serve at the alias.                                                                                                                        |
-| `--host <host>`   | Add this host to the web route. Repeat for more. Typing it approves it.                                                                                |
+| `--host <host>`   | Add this host to the primary web route. Repeat for more. Typing it approves it.                                                                        |
 | `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                    |
 | `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
 | `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |

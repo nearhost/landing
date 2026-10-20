@@ -127,11 +127,11 @@ Nearhost reads the file, and applies what it finds:
 
 - when a project starts;
 - when you press `r` on a project in the interface;
-- when an agent asks Nearhost to read it again.
+- when an agent asks Nearhost to read it again, or runs the doctor on the project.
 
 A change that needs no approval, such as a port moved in `.env`, a new label or a new `.test` host, applies at once and is saved to `config.yaml`. A change that needs approval waits, and the routes approved before keep serving until you approve it. If the file has an error, or is deleted after it was approved, the project keeps serving what was approved and shows the problem.
 
-`nearhost doctor` reads the file too, but only reports. It applies and saves nothing. It reports a file with an error, a change that waits for approval, and a change that needs none but has not been applied yet.
+`nearhost doctor` on the command line reads the file too, but only reports. It applies and saves nothing. It reports a file with an error, a change that waits for approval, and a change that needs none but has not been applied yet.
 
 ## Docker clients
 

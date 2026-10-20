@@ -37,7 +37,7 @@ In the project's directory, run `/nearhost add` in Claude Code, or `$nearhost ad
 
 If a form is already open, the proposal waits, and Home shows `1 proposal waiting · p to review`. It opens when the form closes, or when you press `p`. An agent waits 10 minutes for an answer.
 
-`/nearhost status` reports the project holding the current directory: its address, the other addresses in its `urls`, its state and any error. A project with several web routes or hosts has one URL for each, so you can see where each service lives. `/nearhost status --all` reports every project on the machine the agent runs on.
+`/nearhost status` reports the project holding the current directory: its address, every address it serves in `urls`, its state and any error. A project with several web routes or hosts has one URL for each, so you can see where each service lives. `/nearhost status --all` reports every project on the machine the agent runs on.
 
 Proposals need the full-screen interface. Under `nearhost up`, an agent can read the status but is told to open `nearhost` to propose.
 
