@@ -1,0 +1,23 @@
+# Nearhost
+
+> Nearhost is a terminal app for macOS and Linux that opens a dev server running on another machine at a trusted https://name.test address on your laptop, over the SSH config you already have. It installs nothing on the server.
+
+- Nearhost is free and open source under MIT. Install it with `curl -fsSL https://nearhost.dev/install.sh | sh`, `brew install nearhost/tap/nearhost` or `npx @nearhost/cli`.
+- It works with any HTTP dev server. It reads ports from `.env`, and presets add Docker Compose, Vite and Laravel Sail.
+- It is for your own machines and your own browser, not for sharing a page publicly; use a tunnel service such as ngrok for that.
+
+Start with [Introduction](https://nearhost.dev/docs/getting-started/introduction/) and [Install](https://nearhost.dev/docs/getting-started/install/). The [guides](https://nearhost.dev/docs/guides/sso-callback-on-a-remote-dev-server/) cover SSO callbacks, HTTPS on a local dev domain and ngrok assets that point at localhost.
+
+## Documentation Sets
+
+- [Abridged documentation](https://nearhost.dev/pr-preview/pr-46/llms-small.txt): a compact version of the documentation for Nearhost, with non-essential content removed
+- [Complete documentation](https://nearhost.dev/pr-preview/pr-46/llms-full.txt): the full documentation for Nearhost
+
+## Notes
+
+- The complete documentation includes all content from the official documentation
+- The content is automatically generated from the same source as the official documentation
+
+## Optional
+
+- [Source code](https://github.com/nearhost/nearhost): the Go source, issues and releases
