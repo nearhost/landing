@@ -1,0 +1,30 @@
+src/content/docs/docs/guides/ngrok-assets-on-localhost.md
+  s_f73a4dba9f7d00::t_eaa9a6ca1009fe 58
+src/content/docs/docs/guides/cognito-sign-in.md
+  s_f73a4dba9f7d00::t_eaa9a6ca1009fe 176
+src/content/docs/docs/guides/workos-sign-in.md
+  s_f73a4dba9f7d00::t_eaa9a6ca1009fe 103
+src/content/docs/docs/concepts/dev-servers-and-hot-reload.md
+  s_f73a4dba9f7d00::t_eaa9a6ca1009fe 24
+src/content/docs/docs/guides/vite-hot-reload-over-ssh.md
+  s_f73a4dba9f7d00::t_eaa9a6ca1009fe 65
+src/content/docs/docs/troubleshooting/troubleshooting.md
+  s_f73a4dba9f7d00::t_eaa9a6ca1009fe 22-27,29
+  s_f73a4dba9f7d00::t_eddaaeb4970c10 28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "98f568caed4032b02a12fe9e55a438ef280f1ad2",
+  "prompts": {},
+  "sessions": {
+    "s_f73a4dba9f7d00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4d7d22e-aeb2-4a9a-ae19-70c1b770f423",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
