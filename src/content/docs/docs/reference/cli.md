@@ -46,15 +46,15 @@ When the hosts block needs to change, it asks for your password in the terminal.
 
 Adds a project. It discovers the routes from the project's files, prints them and saves the project. At a terminal it asks when it needs to: whether to trust the official presets, which suggested presets to enable, which port is the web app, and whether to add a server it does not know. It starts nothing and changes no file in the project.
 
-| Flag              | Effect                                                    |
-| ----------------- | --------------------------------------------------------- |
-| `--server <name>` | The server the path is on. The default is `local`.        |
-| `--name <name>`   | The project name. The default is the directory's name.    |
-| `--alias <alias>` | The alias. The default is `<name>.test`.                  |
-| `--web <port>`    | The port to serve at the alias.                           |
-| `--preset <name>` | Enable this preset without asking. Repeat for more.       |
-| `--no-presets`    | Use no presets and suggest none.                          |
-| `--disabled`      | Add it disabled: `nearhost up` starts it only when named. |
+| Flag              | Effect                                                                                    |
+| ----------------- | ----------------------------------------------------------------------------------------- |
+| `--server <name>` | The server the path is on. The default is `local`.                                        |
+| `--name <name>`   | The project name. The default is the directory's name.                                    |
+| `--alias <alias>` | The main name. The default is `<name>.test`. Any domain works, and typing it approves it. |
+| `--web <port>`    | The port to serve at the alias.                                                           |
+| `--preset <name>` | Enable this preset without asking. Repeat for more.                                       |
+| `--no-presets`    | Use no presets and suggest none.                                                          |
+| `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                 |
 
 See [Add a project](/docs/getting-started/add-a-project/).
 
@@ -81,17 +81,17 @@ Both take `--file <path>` to work on another file than `/etc/hosts`. See [The ho
 
 Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. It takes `--https-port`, `--http-port` and `--no-hosts`.
 
-| Check                 | What it looks at                                                                       |
-| --------------------- | -------------------------------------------------------------------------------------- |
-| `config`              | Whether the config file reads and is valid.                                            |
-| `port 443`, `port 80` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too. |
-| `privileged ports`    | On Linux, whether the binary may bind ports below 1024.                                |
-| `local CA`            | Whether it exists, whether the system trusts it, and when it expires.                  |
-| `browser stores`      | Whether the Firefox and Chromium stores trust it.                                      |
-| `aliases`             | Only shown when an alias is not a lowercase `.test` name.                              |
-| `hosts block`         | Whether `/etc/hosts` has every project's alias.                                        |
-| `server <name>`       | Whether `ssh <host>` connects without a prompt, for each server.                       |
-| `agents on <name>`    | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.  |
+| Check                 | What it looks at                                                                                                       |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `config`              | Whether the config file reads and is valid.                                                                            |
+| `port 443`, `port 80` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too.                                 |
+| `privileged ports`    | On Linux, whether the binary may bind ports below 1024.                                                                |
+| `local CA`            | Whether it exists, whether the system trusts it, and when it expires.                                                  |
+| `browser stores`      | Whether the Firefox and Chromium stores trust it.                                                                      |
+| `aliases`             | Only shown when a main name is not a valid domain. It fails, and the project does not start.                           |
+| `hosts block`         | Whether `/etc/hosts` has every name it needs: main names and web hosts, less any DNS already resolves to this machine. |
+| `server <name>`       | Whether `ssh <host>` connects without a prompt, for each server.                                                       |
+| `agents on <name>`    | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.                                  |
 
 ## nearhost preset
 
