@@ -53,7 +53,7 @@ Run `nearhost add` without `--alias`, and it asks before using the name, since y
 
 ```text
 $ nearhost add --server mini '~/code/myapp'
-.nearhostrc asks for these, which need your approval:
+This project asks for these, which need your approval:
   local.myapp.com on port 8080 (a real domain)
 Approve these? [y/N]
 ```
