@@ -1,10 +1,12 @@
 ---
+import { jsonLd } from '../../lib/structured-data.mjs';
+
 // The questions people ask before they install. The same list feeds the FAQPage structured
 // data, so the page and the markup cannot drift apart.
 const faqs = [
   {
     q: 'Does Nearhost install anything on the server?',
-    a: 'No. Nearhost runs on your laptop and shells out to OpenSSH. It reads project files such as <code>.env</code> over SFTP and writes nothing to the server, so all the server needs is SSH that connects without a prompt, and SFTP, which most servers allow.',
+    a: 'No. Nearhost runs on your laptop and shells out to OpenSSH, and leaves your project and its config untouched. It reads files such as <code>.env</code> over SFTP. The server needs SSH that connects without a prompt, with SFTP and TCP forwarding allowed, as most servers do.',
   },
   {
     q: 'Which operating systems does it run on?',
@@ -49,7 +51,7 @@ const faqPage = {
       </div>
     ))}
   </div>
-  <script type="application/ld+json" set:html={JSON.stringify(faqPage)} />
+  <script type="application/ld+json" set:html={jsonLd(faqPage)} />
 </section>
 
 <style>

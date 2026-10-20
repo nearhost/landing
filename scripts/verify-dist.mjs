@@ -129,8 +129,19 @@ if (existsSync(index)) {
     })
     .find((data) => data?.['@type'] === 'FAQPage');
   check(faq?.mainEntity?.length > 0, 'landing page must carry FAQPage JSON-LD with questions');
+  // Compare text, not markup, so entities such as &#39; in a heading still match.
+  const decode = (text) =>
+    text
+      .replace(/<[^>]*>/g, '')
+      .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+      .replace(/&#x([\da-f]+);/gi, (_, code) => String.fromCharCode(parseInt(code, 16)))
+      .replace(/&quot;/g, '"')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&');
+  const headings = [...html.matchAll(/<h3[^>]*>([\s\S]*?)<\/h3>/g)].map((m) => decode(m[1]).trim());
   for (const question of faq?.mainEntity ?? []) {
-    check(html.includes(`>${question.name}</h3>`), `FAQ "${question.name}" is not on the page`);
+    check(headings.includes(question.name), `FAQ "${question.name}" is not on the page`);
   }
   // The nav menu, the copy button and the interface demo.
   const components = new Set([...html.matchAll(/component-url="([^"]*)"/g)].map((m) => m[1]));
