@@ -60,6 +60,70 @@ Adds a project. It discovers the routes from the project's files, prints them an
 
 See [Add a project](/docs/getting-started/add-a-project/).
 
+## nearhost export
+
+Writes what Nearhost serves for a project, its routes, hosts and main name, to a `.nearhostrc` in the project's directory. Commit the file, and whoever adds the project after cloning it gets the same setup. For a project on a server, it writes the file on the server, over SFTP.
+
+```sh
+nearhost export [project] [--dry-run] [--force]
+```
+
+Without a name, it exports the project on this machine whose directory holds the current one. Name the project to export one on a server.
+
+| Flag        | Effect                                                                     |
+| ----------- | -------------------------------------------------------------------------- |
+| `--dry-run` | Print the file instead of writing it. Warnings go to stderr, not the file. |
+| `--force`   | Replace an existing `.nearhostrc`.                                         |
+
+Without `--force`, an existing file stops it:
+
+```text
+nearhost: .nearhostrc already exists in /home/you/code/shop; run with --force to replace it, or --dry-run to see what would be written
+```
+
+The file follows the project's `.env` on another machine. See [Variables](/docs/reference/nearhostrc/#variables).
+
+- A port is written as `${VAR:-port}` when discovery finds a variable that sets it, and `.env` sets that variable to the same port or leaves it unset. A variable that `.env` sets to another port gives a plain number.
+- The main name is written as `${VAR:-name}` only when a variable whose name ends in `_HOST` holds exactly that name. A variable such as `SESSION_DOMAIN` with the same value is not used, since on another machine it may hold a parent domain or a cookie's scope. With more than one `_HOST` variable, the first alphabetically wins.
+- The main name is left out when it is the default, the directory's name followed by `.test`.
+- `docker_clients: true` is written when the project has it.
+
+Before writing, it checks that the file reads back to the same project. After writing, it records the file as approved, since it holds only what Nearhost already serves, so the project does not ask about it again. If a change to the old file was waiting for approval, the new file replaces it and the command says so. See [Approval](/docs/reference/nearhostrc/#approval).
+
+For a project with two web routes and a Vite route on loopback, whose `.env` has these lines:
+
+```ini
+APP_PORT=8010
+ADMIN_PORT=8020
+VITE_PORT=5173
+APP_HOST=shop.example.com
+SESSION_DOMAIN=shop.example.com
+```
+
+`nearhost export --dry-run` prints:
+
+```yaml
+# Written by nearhost export. Safe to edit and commit; see https://nearhost.dev/docs for the format.
+version: 1
+alias: ${APP_HOST:-shop.example.com}
+routes:
+  - port: ${VITE_PORT:-5173}
+    label: vite (VITE_PORT)
+    role: loopback
+  - port: ${APP_PORT:-8010}
+    label: app (APP_PORT)
+    hosts: [api.example.com]
+  - port: ${ADMIN_PORT:-8020}
+    label: admin (ADMIN_PORT)
+    hosts: [admin.example.com]
+```
+
+Without `--dry-run`, it prints where it wrote the file:
+
+```text
+Wrote /home/you/code/shop/.nearhostrc. Commit it so others get this setup when they add the project.
+```
+
 ## nearhost ls
 
 Lists the projects in the config, with their server, alias, whether they are enabled, and the routes that are not ignored.
