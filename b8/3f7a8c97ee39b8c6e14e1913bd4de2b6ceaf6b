@@ -1,0 +1,25 @@
+scripts/verify-dist.mjs
+  s_16a4dddf86921d::t_8f674b405931e6 8-9,64,129,132-133,135-138,157-158
+  s_16a4dddf86921d::t_5eb7b0f152ff74 162,165-168
+  s_16a4dddf86921d::t_31eb0977d730c5 143-146,153-156
+src/content/docs/docs/reference/config.md
+  s_16a4dddf86921d::t_da6c5df0c6ee62 20,50,65-88,93
+src/content/docs/docs/reference/cli.md
+  s_16a4dddf86921d::t_da6c5df0c6ee62 49-57,84-94
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b83f7a8c97ee39b8c6e14e1913bd4de2b6ceaf6b",
+  "prompts": {},
+  "sessions": {
+    "s_16a4dddf86921d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7cc721d4-6e08-49ce-bd6f-182ab2820371",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
