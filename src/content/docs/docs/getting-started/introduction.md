@@ -18,7 +18,7 @@ Without Nearhost that means an `ssh -L` flag per port, a certificate warning, an
 - **One address per project.** `https://myapp.test` today, tomorrow and after a reboot.
 - **Real HTTPS.** Secure cookies, OAuth callbacks and service workers behave as they do in production.
 - **Hot reload and WebSockets.** They travel through the same SSH connection.
-- **Nothing on the server.** No agent, no config changes, no open ports. If `ssh <host>` works without a prompt, Nearhost works.
+- **Nothing installed on the server.** No daemon, no open ports, and nothing written to your project unless you run `nearhost export`. Nearhost only keeps a socket in `~/.nearhost` there, so a coding agent on the server can reach it. If `ssh <host>` works without a prompt, Nearhost works.
 - **Any stack.** Nearhost routes ports. It finds them in `.env`, and [presets](/docs/concepts/presets-and-registries/) teach it Compose files, Vite and Laravel Sail. You can set routes by hand for anything else.
 
 ## Quick start
