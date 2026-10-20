@@ -1,0 +1,29 @@
+src/content/docs/docs/concepts/multi-host-projects.md
+  s_89a63a3c1fa7d2::t_65b7372d327626 46,73
+src/content/docs/docs/concepts/presets-and-registries.md
+  s_89a63a3c1fa7d2::t_4fa34bbdb32c36 33
+src/content/docs/docs/getting-started/use-a-coding-agent.md
+  s_89a63a3c1fa7d2::t_9b1958f5080ae2 54,79
+src/content/docs/docs/guides/container-callbacks.md
+  s_89a63a3c1fa7d2::t_6d1b0b9821ed1f 20,78,82,88
+src/content/docs/docs/reference/cli.md
+  s_89a63a3c1fa7d2::t_f5d8115ac9533f 93,103,124,170-191
+src/content/docs/docs/reference/keyboard-shortcuts.md
+  s_89a63a3c1fa7d2::t_c8b99eaf5b3a5a 34-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3fbf5c1f8eabc0d5a998c9d0ea0be2fbf0a44e7a",
+  "prompts": {},
+  "sessions": {
+    "s_89a63a3c1fa7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ade858e5-1767-41c6-b0b0-fdd74aba68cf",
+        "model": "unknown"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
