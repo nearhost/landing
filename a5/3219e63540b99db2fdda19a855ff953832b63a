@@ -1,0 +1,25 @@
+src/content/docs/docs/concepts/routes-and-roles.md
+  s_89a63a3c1fa7d2::t_6f89a1c098972e 46
+src/content/docs/docs/concepts/the-hosts-file.md
+  s_89a63a3c1fa7d2::t_b3e6dbff503ffb 21
+src/content/docs/docs/reference/config.md
+  s_89a63a3c1fa7d2::t_04520d138fea54 56
+src/content/docs/docs/reference/keyboard-shortcuts.md
+  s_89a63a3c1fa7d2::t_18043d16b9951a 47-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a53219e63540b99db2fdda19a855ff953832b63a",
+  "prompts": {},
+  "sessions": {
+    "s_89a63a3c1fa7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ade858e5-1767-41c6-b0b0-fdd74aba68cf",
+        "model": "unknown"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
