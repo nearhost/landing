@@ -1,6 +1,6 @@
 ---
 title: The hosts file
-description: How Nearhost keeps one delimited block in /etc/hosts to resolve .test aliases.
+description: How Nearhost keeps one delimited block in /etc/hosts to resolve project names.
 sidebar:
   order: 6
 ---
@@ -18,7 +18,7 @@ Nearhost owns one block and touches nothing else in the file:
 # nearhost:end
 ```
 
-The block lists the alias of every project, running or not, sorted. With no projects, the block is removed rather than left empty.
+The block always lists `.test` names, running or not, sorted. Any other [main name](/docs/reference/config/#main-name) is listed only while its project is enabled, and only if DNS does not already resolve it to loopback addresses alone. With no projects, the block is removed rather than left empty.
 
 ## How changes are applied
 

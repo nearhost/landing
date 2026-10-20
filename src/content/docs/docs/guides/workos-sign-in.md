@@ -9,6 +9,8 @@ sidebar:
 Needs Nearhost 0.6.0 or later, which lets a project's main name be a domain that does not end in `.test`. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
 This guide gets WorkOS AuthKit sign-in working at `https://local.myapp.com` while your Laravel app runs on another machine. The worked example uses the `laravel/workos` package from the Laravel starter kits, but the WorkOS and Nearhost steps are the same for any stack.
 
 ## The symptom
@@ -65,11 +67,12 @@ Do this in the WorkOS staging environment, which is meant for development. Its A
 1. In the dashboard, open **Applications**, then your application, then the **Redirects** tab.
 2. Add the redirect URI `https://local.myapp.com/authenticate`, and make it the default. With `laravel/workos` the callback route is `/authenticate`. No trailing slash.
 3. Set the sign-in endpoint, which WorkOS's docs also call the initiate login URI, to `https://local.myapp.com/login`. AuthKit sends people there when sign-in starts outside your app, such as from a password reset or an invitation link.
-4. Set the sign-out URI, or the app homepage URL, to `https://local.myapp.com/`. Without either, WorkOS shows an error after sign-out.
+4. On the same tab, add the sign-out URI `https://local.myapp.com/` and make it the default. Without a sign-out URI, WorkOS shows an error after sign-out, unless the app still has the older App homepage URL set. That setting is deprecated, and only kept as a fallback for existing apps.
 
-Then copy the staging environment's client ID and API key into the app's `.env`:
+Then copy the staging environment's client ID and API key into the app's `.env`, after `APP_URL`, which the redirect URL builds on:
 
 ```ini
+APP_URL=https://local.myapp.com
 WORKOS_CLIENT_ID=your-client-id
 WORKOS_API_KEY=your-api-key
 WORKOS_REDIRECT_URL="${APP_URL}/authenticate"
@@ -79,11 +82,7 @@ These are the names the starter kits read in `config/services.php`.
 
 ## Set up the app
 
-Set `APP_URL` to the new name, so the redirect URL follows it:
-
-```ini
-APP_URL=https://local.myapp.com
-```
+`APP_URL` is set to the new name above, so the redirect URL follows it. If `APP_URL` is already further down the file, move it above `WORKOS_REDIRECT_URL`, which reads it.
 
 If you have cached the config, run `php artisan config:clear`.
 
@@ -99,7 +98,7 @@ The starter kit's `bootstrap/app.php` already has a `withMiddleware` closure. Ad
 })
 ```
 
-`'*'` trusts the forwarded headers from any address. If this file also runs in production behind a known load balancer, list that load balancer's addresses there instead.
+`'*'` trusts the forwarded headers from any address. If this file also runs in production behind a known load balancer, list that load balancer's addresses plus `127.0.0.1`, or the Docker network's gateway under Sail, instead, or read the list from an environment variable. Nearhost's forward arrives from `127.0.0.1`, or from the Docker network's gateway under Sail, so leaving it out stops Laravel trusting it and brings back `http://` links.
 
 If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, set `server.hmr.host` to `'localhost'` in `vite.config.js`, because the forward listens on `127.0.0.1` only. See [Vite on the IPv6 loopback address](/docs/guides/ngrok-assets-on-localhost/#vite-on-the-ipv6-loopback-address).
 
@@ -131,10 +130,11 @@ These pages, on 2026-10-19:
 - [Laravel HTTP requests: configuring trusted proxies](https://laravel.com/docs/13.x/requests#configuring-trusted-proxies)
 - [laravel/workos](https://github.com/laravel/workos) and the [React starter kit's WorkOS branch](https://github.com/laravel/react-starter-kit/tree/workos)
 - [WorkOS: Redirect URIs](https://workos.com/docs/sso/redirect-uris)
+- [WorkOS AuthKit: sessions](https://workos.com/docs/authkit/sessions) (sign-out URIs)
 - [WorkOS: Staging and production environments](https://workos.com/docs/authkit/environments)
 - [WorkOS AuthKit: configure your project](https://workos.com/docs/authkit/vanilla/nodejs/1-configure-your-project)
 - [WorkOS: Redirect URIs for local, staging and production](https://workos.com/blog/redirect-uris-for-local-staging-and-production)
 - [WorkOS: Data syncing with the events API or webhooks](https://workos.com/docs/events/data-syncing)
 
-They were read, not run end to end. If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
+If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
 :::

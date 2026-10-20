@@ -9,6 +9,8 @@ sidebar:
 Needs Nearhost 0.6.0 or later, which lets a project's main name be a domain that does not end in `.test`. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
 This guide gets Amazon Cognito sign-in working at `https://local.myapp.com` while your Laravel app runs on another machine. The worked example uses Laravel Socialite with the community `socialiteproviders/cognito` provider and Cognito's managed login pages. The Cognito and Nearhost steps are the same for any stack.
 
 ## The symptom
@@ -213,5 +215,5 @@ These pages, on 2026-10-19:
 - [Amazon Cognito: OIDC identity providers](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-oidc-idp.html) (the **Login pages** tab)
 - [Amazon Cognito: Lambda triggers](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-working-with-lambda-triggers.html)
 
-They were read, not run end to end. If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
+If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
 :::

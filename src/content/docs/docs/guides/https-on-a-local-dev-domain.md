@@ -9,7 +9,7 @@ sidebar:
 Names under your own domain, such as `local.myapp.com`, need Nearhost 0.6.0 or later. `.test` names work on every version. Run `nearhost update` to get the latest. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
-Some things in local development only work over HTTPS. On your laptop you rarely notice, because browsers treat `http://localhost` as secure. Once the dev server runs on another machine, or you browse to it by a name, plain HTTP stops being enough.
+Some things in local development only work over HTTPS. On your laptop you rarely notice, because browsers treat `http://localhost` as secure. Once you browse to the dev server by its address or by a name instead of `localhost`, which is usual when it runs on another machine, plain HTTP stops being enough.
 
 ## What needs HTTPS
 
@@ -21,7 +21,7 @@ Browsers give some features only to a secure context: a page served over HTTPS, 
 - **The camera and microphone.** `navigator.mediaDevices` is undefined.
 - **Passkeys and geolocation.** WebAuthn and the Geolocation API refuse to run.
 
-Cookies have the same rule. Browsers do not set a cookie marked `Secure` over plain HTTP, except on `localhost`. That rules out `SameSite=None` cookies, which must be `Secure`, and the `__Host-` and `__Secure-` cookie prefixes. If your app sets these in production, it behaves differently in development without HTTPS.
+Cookies have the same rule. Browsers do not set a cookie marked `Secure` over plain HTTP. Chrome and Firefox make an exception for `localhost`, but Safari does not, so test secure cookies over HTTPS. That rules out `SameSite=None` cookies, which must be `Secure`, and the `__Host-` and `__Secure-` cookie prefixes. If your app sets these in production, it behaves differently in development without HTTPS.
 
 A self-signed certificate is not a fix. The browser warns on every visit, and some features, such as service workers, refuse to load over a certificate it does not trust.
 
@@ -43,6 +43,8 @@ Avoid `.dev`, which is a real top-level domain whose every name browsers force t
 If the dev server runs on your laptop, a tool such as mkcert and a line in `/etc/hosts` are enough. You make a local certificate authority, trust it, issue a certificate for the name, and point the dev server at it.
 
 If the dev server runs on another machine, Nearhost does all of this on your laptop. It creates a local certificate authority the first time it starts, which you trust once with your password, and it issues a certificate for each project's name. Its proxy serves the name over HTTPS and forwards to the dev server over SSH. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/).
+
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
 
 Add the project with the name you chose:
 

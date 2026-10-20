@@ -9,6 +9,8 @@ sidebar:
 Needs Nearhost 0.6.0 or later, which lets a project's main name be a domain that does not end in `.test`. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
 This guide gets Clerk sign-in working at `https://local.myapp.com` while your Next.js app runs on another machine. The worked example uses Clerk's Next.js SDK, `@clerk/nextjs`, with a Clerk development instance. The Clerk and Nearhost steps are the same for any stack.
 
 ## The symptom
@@ -26,6 +28,8 @@ If you only need one app and plain HTTP, forwarding port 3000 with `ssh -L` gets
 Use a name under a domain you own, such as `local.myapp.com`. It needs no DNS record: Nearhost points it at your laptop through `/etc/hosts` while the project is enabled. When the project is disabled, the name resolves as it normally would.
 
 A real-domain name is shaped like production, where Clerk's Frontend API lives on a subdomain of your domain. Clerk's documentation does not say which local names a development instance accepts beyond `localhost`, so this guide uses a domain you own.
+
+If your production app already uses Clerk on `myapp.com`, use a name under a different domain you own, such as `local.myapp-dev.com`. Clerk's docs say a separate setup will not work on the production domain, even on a separate subdomain. The examples below use `local.myapp.com`; swap in your name.
 
 ## Add the project
 
@@ -145,5 +149,5 @@ These pages, on 2026-10-19:
 - [Clerk changelog: CLI webhooks](https://clerk.com/changelog/2026-07-09-clerk-cli-webhooks-and-impersonate)
 - [Next.js: allowedDevOrigins](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins)
 
-They were read, not run end to end. If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
+If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
 :::

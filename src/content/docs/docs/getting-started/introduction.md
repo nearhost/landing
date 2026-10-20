@@ -52,10 +52,7 @@ nearhost up myapp
 - [Add a server](/docs/getting-started/add-a-server/) and [Add a project](/docs/getting-started/add-a-project/) walk through each screen.
 - [Presets and registries](/docs/concepts/presets-and-registries/) explains how Nearhost learns a framework's ports.
 - [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) explains how assets and live reload reach your browser.
-
-## Guides
-
-If single sign-on fails on a remote dev server, start with [SSO callback fails on a remote dev server](/docs/guides/sso-callback-on-a-remote-dev-server/).
+- [SSO callback fails on a remote dev server](/docs/guides/sso-callback-on-a-remote-dev-server/) fixes sign-in that breaks on a remote dev server. [HTTPS on a local dev domain](/docs/guides/https-on-a-local-dev-domain/) and [ngrok loads the page, but assets point at localhost](/docs/guides/ngrok-assets-on-localhost/) cover the HTTPS name and the asset URLs.
 
 ## When to use something else
 

@@ -28,7 +28,7 @@ Discovery proposes a loopback route only under Laravel Sail. For other backends,
 ## What happens when a project starts
 
 1. For a project on a server, Nearhost waits for its SSH connection. If the server cannot connect, the project does not start.
-2. The hosts block is checked. It holds `127.0.0.1 <alias>` for every project, and Nearhost asks for your password only if it needs to change.
+2. The hosts block is checked. It holds `127.0.0.1 <alias>` for every `.test` project, and for an enabled project with another [main name](/docs/reference/config/#main-name) unless DNS already sends that name only to loopback. Nearhost asks for your password only if it needs to change.
 3. For a project on a server, one `-L` forward is added for the `web` route, on an ephemeral local port, and one per `loopback` route, on the same port locally. A local project needs no forwards.
 4. The proxy rebuilds its Caddy config with the new site and applies it in-process.
 5. The project's state becomes `running`.

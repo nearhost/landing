@@ -1,11 +1,11 @@
 ---
 title: Add a project
-description: Register a directory on this machine or a server and serve it at a .test alias.
+description: Register a directory on this machine or a server and serve it at an alias.
 sidebar:
   order: 4
 ---
 
-A project is a directory, on this machine or on a server, that runs an HTTP service. Nearhost reads the project's files to work out its ports, then serves it at a `.test` alias. The service can be anything that listens on a port.
+A project is a directory, on this machine or on a server, that runs an HTTP service. Nearhost reads the project's files to work out its ports, then serves it at an alias, `<name>.test` unless you choose another. The service can be anything that listens on a port.
 
 ## From the interface
 
@@ -15,7 +15,7 @@ Press `n`. A box titled "Add project" opens over the screen. Its steps are count
 2. **Path.** The project's directory. On `local` it starts as the folder you ran `nearhost` in, and on a server as `~/`. See [Typing a path](#typing-a-path).
 3. **Presets.** Nearhost reads ports from `.env` by itself. While no preset registry is trusted, it asks once whether to trust the official presets, which add Compose files, Vite and Laravel Sail. Choose Yes, No, or Don't ask again. With a registry trusted, it lists the presets that suit this project, ticked. `space` unticks one, and `enter` enables the rest. See [Presets and registries](/docs/concepts/presets-and-registries/).
 4. **Routes.** The ports found, with a role and a label for each. Ticked ports are served. `space` ticks or unticks a port, and `←` or `→` changes its role. One port must be `web`. If no ports were found, give the web port yourself.
-5. **Name.** The project's name and its alias, which follows the name until you change it. `tab` moves between them. Names and aliases must be unique.
+5. **Name.** The project's name and its alias, which follows the name until you change it. `tab` moves between them. Names and aliases must be unique. The alias is the project's [main name](/docs/reference/config/#main-name) and can be any lowercase domain name, such as `local.myapp.com`, but not a wildcard, `localhost` or an IP address. A real domain asks for approval, which typing it here gives. One that comes from the project's `.nearhostrc` is asked about on the last step.
 6. **Confirm.** The server, path, address and routes, with any advice. `enter` adds the project.
 
 The project is selected and starts at once. If its alias is not in `/etc/hosts` yet, Nearhost asks for your password to add it. See [First run](/docs/getting-started/first-run/#the-password-box).
@@ -62,15 +62,15 @@ With no registry trusted, only the `.env` port variables are found, and every po
 
 At a terminal it asks what the interface asks: whether to trust the official presets, which suggested presets to enable, and which port is the web app when that is not clear. It also offers to add a server it does not know. Without a terminal it takes the defaults, and stops if it cannot tell which port is web.
 
-| Flag              | Effect                                                    |
-| ----------------- | --------------------------------------------------------- |
-| `--server <name>` | The server the path is on. The default is `local`.        |
-| `--name <name>`   | The project name. The default is the directory's name.    |
-| `--alias <alias>` | The alias. The default is `<name>.test`.                  |
-| `--web <port>`    | The port to serve at the alias.                           |
-| `--preset <name>` | Enable this preset without asking. Repeat for more.       |
-| `--no-presets`    | Use no presets and suggest none.                          |
-| `--disabled`      | Add it disabled: `nearhost up` starts it only when named. |
+| Flag              | Effect                                                                                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--server <name>` | The server the path is on. The default is `local`.                                                                                                     |
+| `--name <name>`   | The project name. The default is the directory's name.                                                                                                 |
+| `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost` or an IP address. Typing it approves it. |
+| `--web <port>`    | The port to serve at the alias.                                                                                                                        |
+| `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                    |
+| `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
+| `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
 
 A `~` in the path means the server's home directory, even when your shell has already turned it into this machine's.
 
