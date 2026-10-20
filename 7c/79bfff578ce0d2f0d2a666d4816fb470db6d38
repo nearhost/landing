@@ -1,0 +1,23 @@
+src/content/docs/docs/getting-started/add-a-project.md
+  s_89a63a3c1fa7d2::t_2932e639fa6700 63,71
+src/content/docs/docs/getting-started/install.md
+  s_89a63a3c1fa7d2::t_01f567f2067aaa 22
+src/content/docs/docs/reference/cli.md
+  s_89a63a3c1fa7d2::t_8213dd01c58974 12,16,48,56,84,142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7c79bfff578ce0d2f0d2a666d4816fb470db6d38",
+  "prompts": {},
+  "sessions": {
+    "s_89a63a3c1fa7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ade858e5-1767-41c6-b0b0-fdd74aba68cf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
