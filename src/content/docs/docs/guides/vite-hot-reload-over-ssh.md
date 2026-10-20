@@ -62,7 +62,7 @@ Nearhost serves the project at a name such as `https://myapp.test`, over one SSH
 - **Vite sits beside a backend.** Give the Vite port the `loopback` role. Nearhost forwards it to the same port number on your laptop, so the page's `http://localhost:5173` reaches the remote dev server. Under Laravel Sail, discovery proposes this route for you. The page at `https://myapp.test` now loads its scripts from another origin, and Vite's default CORS policy allows only `localhost` pages. `laravel-vite-plugin` also allows `*.test` names and your `APP_URL`; with another integration, add the name to `server.cors.origin`.
 - **Several projects.** Nearhost warns about two projects that want the same loopback port before they clash, and suggests a free one when the port comes from a variable.
 
-From Nearhost 0.7.0, a loopback forward answers on both `127.0.0.1` and `[::1]`, so it still works when Vite listens on `::1` and `public/hot` says `http://[::1]:5173`. On Nearhost older than 0.7.0, the forward listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'`.
+From Nearhost 0.7.0, a loopback forward answers on both `127.0.0.1` and `[::1]`, so it still works when Vite listens on `::1` and `public/hot` says `http://[::1]:5173`. On Nearhost older than 0.7.0, the forward listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'`, or run `nearhost update`.
 
 For the details, see [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) and [Routes and roles](/docs/concepts/routes-and-roles/).
 

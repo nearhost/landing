@@ -32,7 +32,7 @@ ssh -S <sock> -O forward -L 127.0.0.1:<local>:localhost:<remote> <host>
 ssh -S <sock> -O cancel -L 127.0.0.1:<local>:localhost:<remote> <host>
 ```
 
-The forward always listens on `127.0.0.1`. From Nearhost 0.7.0, a `loopback` route also gets a relay that Nearhost runs on `[::1]:<port>` and passes to that forward, so the port answers on both loopback addresses. A program already listening on `[::1]:<port>` counts as holding the port.
+The forward always listens on `127.0.0.1`. From Nearhost 0.7.0, a `loopback` route also gets a relay that Nearhost runs on `[::1]:<port>` and passes to that forward, so the port answers on both loopback addresses. On a machine without the IPv6 loopback, it answers on `127.0.0.1` only. A program already listening on `[::1]:<port>` counts as holding the port.
 
 [Forward several ports over SSH without retyping -L](/docs/guides/forward-ports-over-ssh/) compares this with the ways to do it by hand.
 

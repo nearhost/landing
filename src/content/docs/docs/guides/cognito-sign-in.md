@@ -6,7 +6,7 @@ sidebar:
 ---
 
 :::note
-Needs Nearhost 0.6.0 or later, which lets a project's main name be a domain that does not end in `.test`. Keeping that name in a `.nearhostrc` on its own, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+Needs Nearhost 0.6.0 or later, which lets a project's main name be a domain that does not end in `.test`. A `.nearhostrc` that sets only that name, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
 New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
@@ -173,7 +173,7 @@ $middleware->trustProxies(at: '*');
 
 The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) explains it, and what to list instead of `'*'` if the file also runs in production behind a known load balancer.
 
-If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. On older versions it listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'` in `vite.config.js`.
+If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. On older versions it listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'` in `vite.config.js`, or run `nearhost update`.
 
 On another stack the idea is the same. Use any OpenID Connect client with the pool's domain and the app client's ID and secret. Set the app's public URL and its callback URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to Cognito matches the one you listed.
 
