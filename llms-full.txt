@@ -75,7 +75,7 @@ Three environment variables change what it does:
 
 | Variable               | Effect                                                   |
 | ---------------------- | -------------------------------------------------------- |
-| `NEARHOST_VERSION`     | Install this release instead of the latest, as `v0.6.0`. |
+| `NEARHOST_VERSION`     | Install this release instead of the latest, as `v0.7.0`. |
 | `NEARHOST_INSTALL_DIR` | Install into this folder.                                |
 | `NEARHOST_SKIP_SETCAP` | Set to `1` to skip the Linux port step below.            |
 
@@ -408,7 +408,7 @@ A `~` in the path means the server’s home directory, even when your shell has 
 | Role       | What happens                                                                                             |
 | ---------- | -------------------------------------------------------------------------------------------------------- |
 | `web`      | Served through the proxy. The first is served at `https://<alias>`, and each later one at its own hosts. |
-| `loopback` | Raw forward to the same port on your laptop’s `127.0.0.1`. Skipped for local projects.                   |
+| `loopback` | Raw forward to the same port on your laptop’s `127.0.0.1` and `[::1]`. Skipped for local projects.       |
 | `ignore`   | Listed, not forwarded.                                                                                   |
 
 Discovery proposes the roles, and you can change them at any time. See [Routes and roles](/docs/concepts/routes-and-roles/).
@@ -548,7 +548,7 @@ notifications: false
 
 Note
 
-Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. A `.nearhostrc` that sets only that name, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 
 New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
 
@@ -701,7 +701,7 @@ If a step no longer matches, please [open an issue](https://github.com/nearhost/
 
 Note
 
-Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. A `.nearhostrc` that sets only that name, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 
 New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
 
@@ -876,7 +876,7 @@ $middleware->trustProxies(at: '*');
 
 The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) explains it, and what to list instead of `'*'` if the file also runs in production behind a known load balancer.
 
-If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, set `server.hmr.host` to `'localhost'` in `vite.config.js`, because the forward listens on `127.0.0.1` only. See [Vite on the IPv6 loopback address](/docs/guides/ngrok-assets-on-localhost/#vite-on-the-ipv6-loopback-address).
+If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. On older versions it listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'` in `vite.config.js`, or run `nearhost update`.
 
 On another stack the idea is the same. Use any OpenID Connect client with the pool’s domain and the app client’s ID and secret. Set the app’s public URL and its callback URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to Cognito matches the one you listed.
 
@@ -1264,16 +1264,7 @@ When the dev server runs on another machine, Nearhost serves it on your laptop a
 
 ### Vite on the IPv6 loopback address
 
-A loopback forward listens on `127.0.0.1` only. Outside Sail, a Vite dev server that listens on `::1` makes `laravel-vite-plugin` write `http://[::1]:5173` to `public/hot`, and the browser asks for `[::1]`, where nothing listens. Set `server.hmr.host` to `'localhost'` in `vite.config.js`, and restart `npm run dev`, so the page asks for `localhost` instead:
-
-```js
-export default defineConfig({
-  // The rest of the config stays as it is.
-  server: {
-    hmr: { host: 'localhost' },
-  },
-});
-```
+From Nearhost 0.7.0, a loopback forward answers on both `127.0.0.1` and `[::1]`, so a `public/hot` that says `http://[::1]:5173` works as it is. On Nearhost older than 0.7.0, set `server.hmr.host` to `'localhost'` in `vite.config.js` and restart `npm run dev`, or run `nearhost update`.
 
 ## The guides
 
@@ -1412,7 +1403,7 @@ Nearhost serves the project at a name such as `https://myapp.test`, over one SSH
 * **Vite sits beside a backend.** Give the Vite port the `loopback` role. Nearhost forwards it to the same port number on your laptop, so the page’s `http://localhost:5173` reaches the remote dev server. Under Laravel Sail, discovery proposes this route for you. The page at `https://myapp.test` now loads its scripts from another origin, and Vite’s default CORS policy allows only `localhost` pages. `laravel-vite-plugin` also allows `*.test` names and your `APP_URL`; with another integration, add the name to `server.cors.origin`.
 * **Several projects.** Nearhost warns about two projects that want the same loopback port before they clash, and suggests a free one when the port comes from a variable.
 
-A Nearhost loopback forward listens on `127.0.0.1` only. If Vite listens on `::1`, `public/hot` says `http://[::1]:5173` and the browser finds nothing there. Set `server.hmr.host` to `'localhost'`. See [Vite on the IPv6 loopback address](/docs/guides/ngrok-assets-on-localhost/#vite-on-the-ipv6-loopback-address).
+From Nearhost 0.7.0, a loopback forward answers on both `127.0.0.1` and `[::1]`, so it still works when Vite listens on `::1` and `public/hot` says `http://[::1]:5173`. On Nearhost older than 0.7.0, the forward listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'`, or run `nearhost update`.
 
 For the details, see [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) and [Routes and roles](/docs/concepts/routes-and-roles/).
 
@@ -1432,7 +1423,7 @@ If something here no longer matches, please [open an issue](https://github.com/n
 
 Note
 
-Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. A `.nearhostrc` that sets only that name, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 
 New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
 
@@ -1526,7 +1517,7 @@ The starter kit’s `bootstrap/app.php` already has a `withMiddleware` closure. 
 
 `'*'` trusts the forwarded headers from any address. If this file also runs in production behind a known load balancer, list that load balancer’s addresses plus `127.0.0.1`, or the Docker network’s gateway under Sail, instead, or read the list from an environment variable. Nearhost’s forward arrives from `127.0.0.1`, or from the Docker network’s gateway under Sail, so leaving it out stops Laravel trusting it and brings back `http://` links.
 
-If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, set `server.hmr.host` to `'localhost'` in `vite.config.js`, because the forward listens on `127.0.0.1` only. See [Vite on the IPv6 loopback address](/docs/guides/ngrok-assets-on-localhost/#vite-on-the-ipv6-loopback-address).
+If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. On older versions it listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'` in `vite.config.js`, or run `nearhost update`.
 
 On another stack the idea is the same. Set the app’s public URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to WorkOS matches the one you registered.
 
@@ -1585,7 +1576,7 @@ That address is resolved by your browser, on your laptop. Nothing listens there,
 
 A `loopback` route fixes it. Nearhost forwards the same port number on your laptop to the dev server on the remote machine, so `localhost:5173` in the browser reaches port 5173 over there. The remote project needs no changes, as long as the page asks for `localhost`.
 
-The forward listens on `127.0.0.1` only. A Laravel project outside Sail whose Vite listens on `::1` writes `http://[::1]:5173` to `public/hot`, and the browser finds nothing there. Set `server.hmr.host` to `'localhost'` in `vite.config.js`. See [Vite on the IPv6 loopback address](/docs/guides/ngrok-assets-on-localhost/#vite-on-the-ipv6-loopback-address).
+A Laravel project outside Sail whose Vite listens on `::1` writes `http://[::1]:5173` to `public/hot`. From Nearhost 0.7.0, the forward answers on both `127.0.0.1` and `[::1]`, so the page reaches it there too. On Nearhost older than 0.7.0, the forward listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'` in `vite.config.js`, or run `nearhost update`.
 
 Discovery proposes a loopback route only under Laravel Sail. For other backends, select the project, press `tab`, choose the dev server’s route and press `space` to make it `loopback`. See [Routes and roles](/docs/concepts/routes-and-roles/#changing-roles).
 
@@ -1893,7 +1884,7 @@ For a project on a server, Nearhost picks an ephemeral local port for the forwar
 
 ## loopback
 
-A raw TCP forward to `127.0.0.1:<port>` on the laptop, using the same port number as the remote. Use it for a dev server whose URLs point at `localhost`, such as Vite behind a backend framework.
+A raw TCP forward to `127.0.0.1:<port>` on the laptop, using the same port number as the remote. From Nearhost 0.7.0, it answers on `[::1]:<port>` too. Use it for a dev server whose URLs point at `localhost`, such as Vite behind a backend framework.
 
 A loopback route means nothing for local projects, because the port is already local, so a local route is either `web` or `ignore`. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) for when you need one.
 
@@ -1946,6 +1937,8 @@ Forwards are added and removed on the running master, with no reconnect:
 ssh -S <sock> -O forward -L 127.0.0.1:<local>:localhost:<remote> <host>
 ssh -S <sock> -O cancel -L 127.0.0.1:<local>:localhost:<remote> <host>
 ```
+
+The forward always listens on `127.0.0.1`. From Nearhost 0.7.0, a `loopback` route also gets a relay that Nearhost runs on `[::1]:<port>` and passes to that forward, so the port answers on both loopback addresses. On a machine without the IPv6 loopback, it answers on `127.0.0.1` only. A program already listening on `[::1]:<port>` counts as holding the port.
 
 [Forward several ports over SSH without retyping -L](/docs/guides/forward-ports-over-ssh/) compares this with the ways to do it by hand.
 
@@ -2475,7 +2468,7 @@ Nearhost also checks for a new release at most once a day, in the background, an
 
 ## nearhost version
 
-Prints the version, as `nearhost 0.6.0`.
+Prints the version, as `nearhost 0.7.0`.
 
 # config.yaml
 
