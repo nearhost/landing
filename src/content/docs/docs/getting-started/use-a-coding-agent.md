@@ -51,7 +51,7 @@ When a project is not served as you expect, run `/nearhost doctor` in its direct
 
 After editing `.nearhostrc`, and for `nearhostrc.pending` and `nearhostrc.not-applied`, the agent asks Nearhost to read the file again. A change that needs no approval applies at once. One that needs it waits, and the agent tells you to approve it in Nearhost, then waits for your answer. See [Approval](/docs/reference/nearhostrc/#approval).
 
-Then it runs the doctor again, and stops when nothing is left that it can fix. It never edits Nearhost's `config.yaml`. Approving a change needs the full-screen interface: under `nearhost up`, the agent tells you to open `nearhost`.
+Then it runs the doctor again, and stops when nothing is left that it can fix. It never edits Nearhost's `config.yaml` itself; Nearhost saves a change there when it applies one. Approving a change needs the full-screen interface: under `nearhost up`, the agent tells you to open `nearhost`.
 
 ## How the agent reaches Nearhost
 
@@ -76,7 +76,7 @@ The skill's script talks to Nearhost over that socket, with `curl --unix-socket`
 
 - `GET /v1` says which API this is. Its `capabilities` list names the calls added since the first release of API 1: `doctor` and `reload`. An older Nearhost leaves them out, and the skill tells you to update it.
 - `GET /v1/doctor?path=…` returns `project` and `findings` for the project holding the absolute path, in the shape that [`nearhost doctor --json`](/docs/reference/cli/#json-output) gives its findings. For a project already in Nearhost, it first reads the project's `.nearhostrc` again, as a reload does: a change that needs no approval is applied, restarting the project if it runs under `nearhost up`, and one that needs approval waits in Nearhost. For a directory that is not in Nearhost yet, `project` is `null`, each finding's `project` is empty, and the findings are for the project as it would be added.
-- `POST /v1/projects/reload`, with `{"path": "/abs/dir"}`, asks Nearhost to read the `.nearhostrc` of the project holding the path again. The project must be added first. It answers `applied` when nothing needs approval, or `pending` with an `id` the agent waits on, as it does for a proposal, while you decide. A change you declined stays declined until the file changes.
+- `POST /v1/projects/reload`, with `{"path": "/abs/dir"}`, asks Nearhost to read the `.nearhostrc` of the project holding the path again. The project must be added first. It answers `applied` when nothing needs approval, or `pending` with an `id` the agent waits on, as it does for a proposal, while you decide. A change you declined stays declined until the file changes or Nearhost restarts.
 
 ## When agents cannot reach Nearhost
 

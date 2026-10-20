@@ -31,16 +31,16 @@ On Home, when a server cannot connect, `r` retries every such server now and `y`
 
 ## Project
 
-| Key     | Action                                                                                       |
-| ------- | -------------------------------------------------------------------------------------------- |
-| `enter` | Start or stop it.                                                                            |
-| `o`     | Open `https://<alias>` in the browser.                                                       |
-| `tab`   | Move into its routes, to change them.                                                        |
-| `e`     | Edit: read its files again and change its routes or name.                                    |
-| `d`     | Remove it, after you confirm.                                                                |
-| `y`     | Copy the snippets of its advice.                                                             |
-| `r`     | Read its `.nearhostrc` again. A change that needs no approval is applied, which restarts it. |
-| `a`     | Review a pending `.nearhostrc` change.                                                       |
+| Key     | Action                                                                                                        |
+| ------- | ------------------------------------------------------------------------------------------------------------- |
+| `enter` | Start or stop it.                                                                                             |
+| `o`     | Open `https://<alias>` in the browser.                                                                        |
+| `tab`   | Move into its routes, to change them.                                                                         |
+| `e`     | Edit: read its files again and change its routes or name.                                                     |
+| `d`     | Remove it, after you confirm.                                                                                 |
+| `y`     | Copy the snippets of its advice.                                                                              |
+| `r`     | Read its `.nearhostrc` again. A change that needs no approval is applied, which restarts it if it is running. |
+| `a`     | Review a pending `.nearhostrc` change.                                                                        |
 
 ## Routes
 
