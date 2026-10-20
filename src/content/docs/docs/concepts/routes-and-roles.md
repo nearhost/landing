@@ -36,7 +36,7 @@ A loopback route means nothing for local projects, because the port is already l
 
 ## ignore
 
-Discovered and listed, not forwarded. Discovery proposes every route as `ignore` unless it is the web route or a preset proposes `loopback`.
+Discovered and listed, not forwarded. Discovery proposes every route as `ignore` unless it is the web route or a preset proposes `loopback`. In a project's panel, ignored routes fold into one line with their ports, such as `3 ignored: 3306 6379 1025`. Press `i` to list them, and `i` again to fold them.
 
 ## Changing roles
 
