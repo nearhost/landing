@@ -2,7 +2,7 @@
 title: Clerk sign-in on a remote dev server
 description: Run a Clerk and Next.js app at a local HTTPS domain, such as https://local.myapp.com, with hot reload working, when the dev server runs on another machine.
 sidebar:
-  order: 5
+  order: 6
 ---
 
 :::note

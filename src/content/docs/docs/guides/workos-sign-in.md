@@ -2,7 +2,7 @@
 title: WorkOS sign-in on a remote dev server
 description: Give a WorkOS AuthKit app an HTTPS redirect URI in local dev, such as https://local.myapp.com/authenticate, when the dev server runs on another machine.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 :::note

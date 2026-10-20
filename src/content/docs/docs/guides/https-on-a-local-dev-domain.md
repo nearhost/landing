@@ -2,7 +2,7 @@
 title: HTTPS on a local dev domain
 description: Serve local development at a trusted HTTPS name, such as myapp.test or local.myapp.com, so secure-context browser APIs and Secure cookies work, and choose which kind of name to use.
 sidebar:
-  order: 3
+  order: 4
 ---
 
 :::note
