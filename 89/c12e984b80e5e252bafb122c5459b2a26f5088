@@ -1,0 +1,23 @@
+src/content/docs/docs/concepts/dev-servers-and-hot-reload.md
+  s_89a63a3c1fa7d2::t_a2bf72a8a3adfe 31-32
+src/content/docs/docs/concepts/the-hosts-file.md
+  s_89a63a3c1fa7d2::t_727a11fafbdd39 21
+src/content/docs/docs/concepts/tls-and-the-proxy.md
+  s_89a63a3c1fa7d2::t_13c9e3d7d6b12d 8,10-12,24,26,30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "89c12e984b80e5e252bafb122c5459b2a26f5088",
+  "prompts": {},
+  "sessions": {
+    "s_89a63a3c1fa7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ade858e5-1767-41c6-b0b0-fdd74aba68cf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
