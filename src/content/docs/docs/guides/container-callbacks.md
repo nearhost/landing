@@ -9,26 +9,26 @@ sidebar:
 This needs Nearhost 0.6.0 or later. Run `nearhost update` to get the latest. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
-A service in your Compose file often calls the app back: a queue worker reports a finished job, or a LocalStack job delivers an event to a webhook. Point it at the app's Nearhost name, such as `https://api.local.example.io/webhooks/jobs`, and the call fails, even though the same URL works in your browser.
+A service in your Compose file often calls the app back: a queue worker reports a finished job, or a LocalStack job delivers an event to a webhook. Point it at the app's Nearhost name, such as `https://api.local.example.com/webhooks/jobs`, and the call fails, even though the same URL works in your browser.
 
-Three things stand between the container and Nearhost. The container cannot find the host, it does not trust the local certificate authority, and on Linux Nearhost does not let it in. Each is fixed once, in the project's files.
+Three things stand between the container and Nearhost. The container cannot find the host, it does not trust the local certificate authority, and on Linux Nearhost does not let it in. The fixes go in the project's files, which you commit. Each developer then sets one variable, for the certificate's path, and approves the opt-in on their own machine.
 
 This works only for a project on this machine. A container on an SSH server cannot reach the proxy on your laptop.
 
 ## The example
 
-The app listens on port 8000 and is served at `api.local.example.io`. Its `.nearhostrc`:
+The app listens on port 8000 and is served at `api.local.example.com`. Its `.nearhostrc`:
 
 ```yaml
 version: 1
 routes:
   - port: ${APP_PORT:-8000}
     label: app
-    hosts: [api.local.example.io]
+    hosts: [api.local.example.com]
 docker_clients: true
 ```
 
-`docker_clients` is explained in [Being let in](#being-let-in). Its Compose file runs the app and a worker that calls it:
+`hosts` serves the route at a name of your own, besides the project's main name. See [Multi-host projects](/docs/concepts/multi-host-projects/). `docker_clients` is explained in [Being let in](#being-let-in). Its Compose file runs the app and a worker that calls it:
 
 ```yaml
 services:
@@ -40,14 +40,14 @@ services:
     build: .
     command: ['./worker']
     environment:
-      WEBHOOK_URL: https://api.local.example.io/webhooks/jobs
+      WEBHOOK_URL: https://api.local.example.com/webhooks/jobs
 ```
 
-Nothing here depends on the stack. Any service that reads a URL naming a host Nearhost serves, from its `environment`, its `env_file` files, or the project's `.env` when it mounts the project directory, has the same three problems.
+Nothing here depends on the stack. Any service that reads a URL naming a host Nearhost serves, from its `environment`, its `env_file` files, or the project's `.env` or `.env.local` when it mounts the project directory, has the same three problems.
 
 ## Reaching the host
 
-Nearhost puts `api.local.example.io` in your machine's hosts file, pointing at loopback. A container does not read that file, and inside it loopback is the container itself. So the name resolves to nothing, to the public internet, or, where DNS points it at 127.0.0.1, back to the container.
+Nearhost puts `api.local.example.com` in your machine's [hosts file](/docs/concepts/the-hosts-file/), pointing at loopback. A container does not read that file, and inside it loopback is the container itself. So the name resolves to nothing, to the public internet, or, where DNS points it at 127.0.0.1, back to the container.
 
 Map the name to the host with `extra_hosts`. `host-gateway` is Docker's name for the host's address as seen from a container:
 
@@ -55,7 +55,7 @@ Map the name to the host with `extra_hosts`. `host-gateway` is Docker's name for
 services:
   worker:
     extra_hosts:
-      - 'api.local.example.io:host-gateway'
+      - 'api.local.example.com:host-gateway'
 ```
 
 List every name the service calls. `nearhost doctor` reports a service that calls a name without this mapping, as `docker.host-gateway`, and its fix is this snippet for the names it found.
@@ -75,7 +75,7 @@ services:
       - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
 ```
 
-Each developer sets `NEARHOST_CA_CERT` to the certificate's path in their shell profile, or in `.env` when the project does not commit `.env`, so the Compose file holds no one's path. Compose reads only `.env` and the shell, not `.env.local`.
+Each developer sets `NEARHOST_CA_CERT` to the certificate's path in their shell profile, or in `.env` when the project does not commit `.env`, so the Compose file holds no one's path. Compose reads only `.env` and the shell, not `.env.local`. Until the variable is set, every `docker compose` command in the project stops with `set NEARHOST_CA_CERT to Nearhost's root certificate`, so nobody runs the service without the certificate by mistake.
 
 `NODE_EXTRA_CA_CERTS` adds the certificate to Node's own. `SSL_CERT_FILE`, `AWS_CA_BUNDLE` and `REQUESTS_CA_BUNDLE` replace the default bundle instead, so point them at a bundle that includes the certificate, or have the image run `update-ca-certificates`.
 
@@ -85,7 +85,7 @@ Each developer sets `NEARHOST_CA_CERT` to the certificate's path in their shell 
 
 Nearhost serves its projects only to this machine. A request from anywhere else is dropped without an answer. On Linux, a container's request comes from its address on a Docker network, not from loopback, so Nearhost drops it.
 
-`docker_clients: true` in the project's [`.nearhostrc`](/docs/reference/nearhostrc/#docker-clients) serves the project to the networks the Docker daemon has on this machine as well. Nearhost asks Docker for them when the project starts, and again every 30 seconds while it runs, so a network Compose creates later is let in too. Until Docker first answers, it accepts requests from `172.16.0.0/12`, the block Docker's networks come from by default. The project's log says which networks it accepts requests from.
+`docker_clients: true` in the project's [`.nearhostrc`](/docs/reference/nearhostrc/#docker-clients) serves the project to the networks the Docker daemon has on this machine as well. Nearhost asks Docker for them when the project starts, and again every 30 seconds while it runs, so a network Compose creates later is let in too. Until Docker first answers, it accepts requests from `172.16.0.0/12`, the private block most of Docker's default networks come from. The project's log says which networks it accepts requests from.
 
 - It works only for a project on this machine. On a project on a server, the file is an error.
 - It always needs your approval, as a real domain does. See [Approval](/docs/reference/nearhostrc/#approval).
@@ -109,27 +109,27 @@ services:
     build: .
     command: ['./worker']
     environment:
-      WEBHOOK_URL: https://api.local.example.io/webhooks/jobs
+      WEBHOOK_URL: https://api.local.example.com/webhooks/jobs
       NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/nearhost.crt
     extra_hosts:
-      - 'api.local.example.io:host-gateway'
+      - 'api.local.example.com:host-gateway'
     volumes:
       - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
 ```
 
-Approve `api.local.example.io` and `docker_clients` when you add the project, or when Nearhost asks after the file changes. Then restart the worker with `docker compose up -d worker`.
+Approve `api.local.example.com` and `docker_clients` when you add the project, or when Nearhost asks after the file changes. See [What needs approval](/docs/concepts/multi-host-projects/#what-needs-approval). Then restart the worker with `docker compose up -d worker`.
 
 ## Check it works
 
-Run `nearhost doctor`. After the machine checks, it lists what it finds in each enabled project. For the example before any of the fixes, with `docker_clients` not yet in its `.nearhostrc`, on a Mac, it reports:
+Run `nearhost doctor`. After the machine checks, it lists what it finds in each enabled project. For the example before any of the fixes, with `docker_clients` not yet in its `.nearhostrc`, on a Mac, these are the first lines of its three findings, without their fixes:
 
 ```text
 warn  shop             worker calls a name Nearhost serves, and does not trust Nearhost's root certificate
-warn  shop             worker uses api.local.example.io, which a container resolves to itself or to the public internet, not to Nearhost
+warn  shop             worker uses api.local.example.com, which a container resolves to itself or to the public internet, not to Nearhost
 info  shop             a container calls a name Nearhost serves, and Nearhost does not accept requests from Docker's network
 ```
 
-Each comes with its fix and a snippet to paste. These are `docker.ca`, `docker.host-gateway` and `docker.clients`, and `nearhost doctor --json` gives each finding's `id`. On Linux the last one is a warning too. When the project is fixed, none of them is shown. See [nearhost doctor](/docs/reference/cli/#nearhost-doctor).
+Under each, a `fix:` line says what to do, followed by the snippet to paste. These are `docker.ca`, `docker.host-gateway` and `docker.clients`, and `nearhost doctor --json` gives each finding's `id`. On Linux the last one is a warning too. When the project is fixed, none of them is shown. See [nearhost doctor](/docs/reference/cli/#nearhost-doctor).
 
 The doctor only reads the files. To see the call work, run the worker and watch the request arrive in Nearhost.
 
