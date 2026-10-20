@@ -25,6 +25,8 @@ The forward listens on `127.0.0.1` only. A Laravel project outside Sail whose Vi
 
 Discovery proposes a loopback route only under Laravel Sail. For other backends, select the project, press `tab`, choose the dev server's route and press `space` to make it `loopback`. See [Routes and roles](/docs/concepts/routes-and-roles/#changing-roles).
 
+To see which forwards plain `ssh -L` would need for the same project, see [Vite hot reload fails over SSH port forwarding](/docs/guides/vite-hot-reload-over-ssh/).
+
 ## What happens when a project starts
 
 1. For a project on a server, Nearhost waits for its SSH connection. If the server cannot connect, the project does not start.
