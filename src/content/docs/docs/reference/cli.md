@@ -75,7 +75,7 @@ Without a name, it exports the project on this machine whose directory holds the
 | `--dry-run` | Print the file instead of writing it. Warnings go to stderr, not the file. |
 | `--force`   | Replace an existing `.nearhostrc`.                                         |
 
-Without `--force`, an existing file stops it:
+Without `--force`, an existing file stops a write, though `--dry-run` still prints:
 
 ```text
 nearhost: .nearhostrc already exists in /home/you/code/shop; run with --force to replace it, or --dry-run to see what would be written
