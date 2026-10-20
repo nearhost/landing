@@ -21,7 +21,20 @@ That address is resolved by your browser, on your laptop. Nothing listens there,
 
 A `loopback` route fixes it. Nearhost forwards the same port number on your laptop to the dev server on the remote machine, so `localhost:5173` in the browser reaches port 5173 over there. The remote project needs no changes, as long as the page asks for `localhost`.
 
-A Laravel project outside Sail whose Vite listens on `::1` writes `http://[::1]:5173` to `public/hot`. The forward answers on both `127.0.0.1` and `[::1]`, so the page reaches the dev server either way. This needs Nearhost 0.7.0 or later; run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+A Laravel project outside Sail whose Vite listens on `::1` writes `http://[::1]:5173` to `public/hot`. The forward answers on both `127.0.0.1` and `[::1]`, so the page reaches the dev server either way.
+
+### Vite on `[::1]`
+
+The forward answers on `[::1]` from Nearhost 0.7.0, on a laptop with the IPv6 loopback. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update). With an older Nearhost, or on a laptop with IPv6 turned off, the forward answers on `127.0.0.1` only, and nothing answers `http://[::1]:5173`. Set `server.hmr.host` to `'localhost'` in `vite.config.js` and restart `npm run dev`, so that `public/hot` says `localhost` instead:
+
+```js
+export default defineConfig({
+  // The rest of the config stays as it is.
+  server: {
+    hmr: { host: 'localhost' },
+  },
+});
+```
 
 Discovery proposes a loopback route only under Laravel Sail. For other backends, select the project, press `tab`, choose the dev server's route and press `space` to make it `loopback`. See [Routes and roles](/docs/concepts/routes-and-roles/#changing-roles).
 
