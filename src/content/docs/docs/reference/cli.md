@@ -81,7 +81,7 @@ Both take `--file <path>` to work on another file than `/etc/hosts`. See [The ho
 
 ## nearhost doctor
 
-Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project's files and setup and lists what it finds. An error there also makes it exit non-zero. It takes `--https-port`, `--http-port` and `--no-hosts`, and `--json` prints all of it as one JSON object.
+Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project's files and setup and lists what it finds. See [Project checks](#project-checks). An error there also makes it exit non-zero. It takes `--https-port`, `--http-port` and `--no-hosts`, and `--json` prints all of it as one JSON object. See [JSON output](#json-output).
 
 | Check                 | What it looks at                                                                                                       |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -94,6 +94,107 @@ Checks the setup and changes nothing, apart from creating `~/.nearhost` on each 
 | `hosts block`         | Whether `/etc/hosts` has every name it needs: main names and web hosts, less any DNS already resolves to this machine. |
 | `server <name>`       | Whether `ssh <host>` connects without a prompt, for each server.                                                       |
 | `agents on <name>`    | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.                                  |
+
+### Project checks
+
+Each enabled project is checked where it runs: its `.nearhostrc`, its routes against what discovery finds in its files, the names it is served at, and its Compose file. Each finding has an id, a severity and a fix. In the text output an `error` shows as `FAIL`, a `warning` as `warn` and an `info` as `info`, with a `fix:` line under it and any snippet to paste under that. The fix's kind says who makes it:
+
+- `project`: an edit to the project's own files.
+- `nearhost`: Nearhost reads a file again, or you approve or change something in Nearhost.
+- `manual`: something only you can do, such as starting the dev server or adding a DNS record.
+
+| Finding                     | Severity               | Fix        | When it shows                                                                                                                                        |
+| --------------------------- | ---------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nearhostrc.invalid`        | error                  | `project`  | The file has a mistake, such as a key or value Nearhost does not understand. The message gives the line.                                             |
+| `nearhostrc.unset-variable` | error                  | `project`  | The file uses a variable that is not set and has no default. Set it in `.env.local` or `.env`, or give it one: `${NAME:-value}`.                     |
+| `nearhostrc.version`        | error                  | `manual`   | The file's `version` is newer than this Nearhost reads. Run `nearhost update`.                                                                       |
+| `nearhostrc.pending`        | warning                | `nearhost` | The file asks for changes that wait for your approval, which the message lists. Nearhost reads it again, and you approve them.                       |
+| `nearhostrc.not-applied`    | warning                | `nearhost` | The file has changed since Nearhost last read it, and the change needs no approval. Nearhost reads it again.                                         |
+| `nearhostrc.gone`           | warning                | `project`  | The file was deleted after it was approved. Nearhost serves what was approved until you restore it.                                                  |
+| `routes.unserved-port`      | warning                | `nearhost` | A port looks like a web server, and the project has no route for it. Select the project, press `e` and add it as a web route.                        |
+| `routes.unserved-host`      | warning                | `nearhost` | The project's settings name a host for one of its ports, and no web route serves it. Press `e` on the project, and the form adds it.                 |
+| `routes.stale-port`         | info                   | `nearhost` | A web route's port matches nothing in the project's files any more. If the port changed, press `e` on the project and update it.                     |
+| `routes.not-listening`      | info, or warning       | `manual`   | Nothing listens on a web route's port. Start the dev server on that port, or correct the port.                                                       |
+| `hosts.unresolved`          | error                  | `nearhost` | A name does not resolve to this machine and is not in the hosts file. Starting the project adds it to `/etc/hosts`.                                  |
+| `hosts.unresolved-pattern`  | error                  | `manual`   | A name a wildcard pattern matches resolves, but not to this machine. Add a DNS record for the pattern that points at 127.0.0.1, or list exact hosts. |
+| `hosts.public`              | warning                | `manual`   | A name that does not end in `.test` resolves to a real address, so the real site is out of reach on this machine while the project is enabled.       |
+| `hosts.overlap`             | warning                | `project`  | One of the project's patterns overlaps a different pattern of another enabled project. A name both match goes to the more specific one.              |
+| `docker.host-gateway`       | warning                | `project`  | A Compose service uses a name Nearhost serves, and its `extra_hosts` does not map that name to the host.                                             |
+| `docker.ca`                 | warning                | `project`  | A Compose service calls a name Nearhost serves, and does not trust Nearhost's root certificate.                                                      |
+| `docker.clients`            | warning, info on macOS | `project`  | A container calls a name Nearhost serves, and the project does not have `docker_clients: true`.                                                      |
+| `advice.<id>`               | warning                | `project`  | An [advisory](/docs/reference/advisories/) applies. The snippet is the change to make.                                                               |
+| `presets.note`              | info                   | `manual`   | Discovery or a preset gave a warning, so some checks may be incomplete.                                                                              |
+| `projects.unchecked`        | info                   | `manual`   | The project could not be checked: its server can't be reached, its directory is missing, or the checks took over 30 seconds.                         |
+
+A few depend on the project:
+
+- The `nearhostrc.*` findings follow [Approval](/docs/reference/nearhostrc/#approval) and [When it is read](/docs/reference/nearhostrc/#when-it-is-read).
+- `routes.unserved-port`, `routes.unserved-host` and `routes.stale-port` are for a project without a `.nearhostrc`. A project with one takes its routes from the file.
+- `routes.not-listening` and the `docker.*` findings are for a project on this machine. `routes.not-listening` is a warning only when Nearhost is running the project, which `nearhost doctor` does not know, so there it is always info.
+- `nearhost doctor` leaves out `hosts.unresolved` for a name the `hosts block` check already names. With `--no-hosts` it is not checked at all.
+- The `docker.*` findings come with the snippet to paste. [Callbacks from Docker containers to a local HTTPS domain](/docs/guides/container-callbacks/) explains each one.
+
+### JSON output
+
+`--json` prints one object with two arrays, `checks` and `findings`, and exits as the text output does. Each check has `name`, `level` (`ok`, `warn` or `fail`), `detail` and `fix`. Each finding has:
+
+- `id`, `severity` and `project`;
+- `message`, what is wrong;
+- `file` and `line`, where it is, when the finding points at a file;
+- `fix`, with its `kind`, its `text` and any `snippet`.
+
+`file`, `line` and `snippet` are left out when they are empty. A project's findings come worst first.
+
+For a project whose `.nearhostrc` has a mistyped key, with a route that also serves a real name, the output starts like this, with the machine checks cut:
+
+```json
+{
+  "checks": [
+    {
+      "name": "hosts block",
+      "level": "fail",
+      "detail": "missing api.local.example.com, shop.test, www.example.com",
+      "fix": "run `nearhost up`; it updates the block and asks for your password"
+    }
+  ],
+  "findings": [
+    {
+      "id": "nearhostrc.invalid",
+      "severity": "error",
+      "project": "shop",
+      "message": ".nearhostrc: line 5: key \"hostz\" is not understood by this version of Nearhost; update Nearhost, or remove it",
+      "file": ".nearhostrc",
+      "line": 5,
+      "fix": {
+        "kind": "project",
+        "text": "Correct .nearhostrc."
+      }
+    },
+    {
+      "id": "hosts.public",
+      "severity": "warning",
+      "project": "shop",
+      "message": "www.example.com is a real name that resolves to 172.66.147.243; while the project is enabled, the real site is out of reach on this machine",
+      "fix": {
+        "kind": "manual",
+        "text": "Nothing to do if that is what you want; otherwise use a name that resolves to 127.0.0.1, or a .test name."
+      }
+    },
+    {
+      "id": "routes.not-listening",
+      "severity": "info",
+      "project": "shop",
+      "message": "nothing listens on port 8010, which serves shop.test, api.local.example.com, www.example.com",
+      "fix": {
+        "kind": "manual",
+        "text": "Start the project's dev server on port 8010, or correct the port."
+      }
+    }
+  ]
+}
+```
+
+`api.local.example.com` and `shop.test` do not resolve to this machine either, but the `hosts block` check already names them, so no `hosts.unresolved` finding repeats them. The exit status is 1. Coding agents get the same findings for one project from the [agent API](/docs/getting-started/use-a-coding-agent/#agent-api).
 
 ## nearhost preset
 
