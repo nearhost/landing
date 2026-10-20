@@ -44,7 +44,7 @@ FORWARD_MINIO_PORT=9010
 | ---------------- | ------- | -------------------------------------------------------------------------------------------------------------------- |
 | `version`        | integer | Required. Must be `1`.                                                                                               |
 | `alias`          | string  | Optional. The project's [main name](/docs/reference/config/#main-name): `<name>.test`, or any one domain.            |
-| `routes[].port`  | integer | The port on the server. A number from 1 to 65535, or a variable that gives one.                                      |
+| `routes[].port`  | integer | Required. The port on the server. A number from 1 to 65535, or a variable that gives one.                            |
 | `routes[].role`  | string  | Optional. `web`, `loopback` or `ignore`. `web` when left out.                                                        |
 | `routes[].label` | string  | Optional. A description, shown with the route.                                                                       |
 | `routes[].hosts` | list    | Optional, web routes only. Names to serve the route at: exact names or wildcard patterns.                            |
@@ -80,7 +80,7 @@ A variable can fill part of a value, as in `app.${APP_DOMAIN}`. Worktrees of one
 
 ## Errors
 
-Every error from the file starts with `.nearhostrc`. `nearhost add` stops with it, and the interface and `nearhost doctor` show it with the project.
+Every error in the file itself starts with `.nearhostrc`. `nearhost add` stops with it, and the interface and `nearhost doctor` show it with the project.
 
 A key this version of Nearhost does not know is an error, rather than being ignored:
 
@@ -110,7 +110,7 @@ A `.test` host, a port, a label or a role needs none. Neither does a host the pr
 
 Each front end asks in its own way:
 
-- **The interface.** When you add a project, the last step lists what needs approval, and `enter` approves it and saves. When a project's file changes later, the project shows `.nearhostrc asks for 1 change that needs approval · a to review`. Press `a` to see what it asks for, then `y` to approve, `n` to decline or `esc` to leave it for later. A declined change is not asked about again until the file changes.
+- **The interface.** When you add a project, the last step lists what needs approval, and `enter` approves it and saves. When a project's file changes later, the project shows `.nearhostrc asks for 1 change that needs approval · a to review`. Press `a` to see what it asks for, then `y` to approve, `n` to decline or `esc` to leave it for later. A declined change is not asked about again until the file changes or Nearhost restarts.
 - **`nearhost add`.** At a terminal it lists each item and asks `Approve these? [y/N]`. A host typed with `--host`, or a main name typed with `--alias`, is approved by typing it. Without a terminal it adds nothing, and names the items. For the file at the top of this page:
 
   ```text
@@ -123,16 +123,15 @@ Nothing approves itself.
 
 ## When it is read
 
-Nearhost reads the file:
+Nearhost reads the file, and applies what it finds:
 
 - when a project starts;
 - when you press `r` on a project in the interface;
-- when `nearhost doctor` checks the project;
 - when an agent asks Nearhost to read it again.
 
 A change that needs no approval, such as a port moved in `.env`, a new label or a new `.test` host, applies at once and is saved to `config.yaml`. A change that needs approval waits, and the routes approved before keep serving until you approve it. If the file has an error, or is deleted after it was approved, the project keeps serving what was approved and shows the problem.
 
-`nearhost doctor` reports a file that has changed since Nearhost last read it, and one whose change waits for approval.
+`nearhost doctor` reads the file too, but only reports. It applies and saves nothing. It reports a file with an error, a change that waits for approval, and a change that needs none but has not been applied yet.
 
 ## Docker clients
 
@@ -151,4 +150,4 @@ version: 1
 alias: ${APP_HOST:-app.local.example.com}
 ```
 
-The routes stay as discovery found them or as you set them. The file removes only the hosts that an earlier, approved version of it gave, and the main name from any route other than the first web route.
+The routes stay as discovery found them or as you set them. The file removes only the hosts that an earlier, approved version of it gave, and the main name from any route other than the first web route. A later web route left with no hosts once the main name is removed becomes `ignore`.
