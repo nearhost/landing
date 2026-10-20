@@ -47,7 +47,13 @@ export default defineConfig({
             '- It works with any HTTP dev server. It reads ports from `.env`, and presets add Docker Compose, Vite and Laravel Sail.',
             '- It is for your own machines and your own browser, not for sharing a page publicly; use a tunnel service such as ngrok for that.',
             '',
-            'Start with [Introduction](https://nearhost.dev/docs/getting-started/introduction/) and [Install](https://nearhost.dev/docs/getting-started/install/). The [guides](https://nearhost.dev/docs/guides/sso-callback-on-a-remote-dev-server/) cover SSO callbacks, HTTPS on a local dev domain, ngrok assets that point at localhost, Vite hot reload over SSH and forwarding several ports over SSH.',
+            'Start with [Introduction](https://nearhost.dev/docs/getting-started/introduction/) and [Install](https://nearhost.dev/docs/getting-started/install/). The guides cover:',
+            '',
+            '- [SSO callback fails on a remote dev server](https://nearhost.dev/docs/guides/sso-callback-on-a-remote-dev-server/)',
+            '- [HTTPS on a local dev domain](https://nearhost.dev/docs/guides/https-on-a-local-dev-domain/)',
+            '- [ngrok loads the page, but assets point at localhost](https://nearhost.dev/docs/guides/ngrok-assets-on-localhost/)',
+            '- [Vite hot reload fails over SSH port forwarding](https://nearhost.dev/docs/guides/vite-hot-reload-over-ssh/)',
+            '- [Forward several ports over SSH without retyping -L](https://nearhost.dev/docs/guides/forward-ports-over-ssh/)',
           ].join('\n'),
           // The docs in reading order, not alphabetical: getting started, then guides, then concepts.
           promote: [

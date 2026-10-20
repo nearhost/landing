@@ -52,13 +52,13 @@ No reconnect, and no restart of the forwards already open. Nothing re-adds them 
 
 ## Use one SOCKS proxy instead
 
-`ssh -D 1080 myserver` opens a SOCKS proxy, and a browser set to use it reaches every port on the server's network. But Chrome and Firefox send `localhost` straight to your own machine, never through the proxy, so a dev server that listens only on the server's loopback stays out of reach. It also proxies every site the browser opens, unless you set it per profile.
+`ssh -N -D 1080 myserver` opens a SOCKS proxy, and a browser set to use it reaches every port on the server's network. But Chrome and Firefox send `localhost` straight to your own machine, never through the proxy, so a dev server that listens only on the server's loopback stays out of reach. It also proxies every site the browser opens, unless you set it per profile.
 
 ## What every plain-SSH option leaves to you
 
 - **Reconnecting.** When the connection drops, the forwards go with it. `autossh` or a shell loop brings back a fixed set.
 - **Port clashes.** Two projects that both use 5173 cannot both forward it to 5173 on your laptop. Change one project's port, or forward it to another local port where the page does not hard-code it.
-- **The address.** Each app is `http://localhost:<port>`, so secure cookies, OAuth callbacks and service workers behave differently from production. See [HTTPS on a local dev domain](/docs/guides/https-on-a-local-dev-domain/).
+- **The address.** Each app is `http://localhost:<port>`. Cookies ignore the port, so every project shares one cookie jar and signing in to one can sign you out of another, and an OAuth callback or cookie domain set up for a real name does not match. See [HTTPS on a local dev domain](/docs/guides/https-on-a-local-dev-domain/).
 
 ## How Nearhost does it
 
@@ -79,4 +79,6 @@ These, on 2026-10-20:
 - [OpenSSH: ssh(1)](https://man.openbsd.org/ssh), for `-L`, `-N`, `-D` and `-O`
 - [OpenSSH: ssh_config(5)](https://man.openbsd.org/ssh_config), for `LocalForward`, `GatewayPorts`, `ExitOnForwardFailure`, `ServerAliveInterval` and the `Control*` options
 - [Chromium: proxy support](https://chromium.googlesource.com/chromium/src/+/HEAD/net/docs/proxy.md), for the implicit `localhost` bypass
-  :::
+
+If something here no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
+:::
