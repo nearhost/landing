@@ -5,7 +5,7 @@ sidebar:
   order: 5
 ---
 
-A coding agent can ask Nearhost to add the project it is working in, and can read whether a project is served and where. It works the same when the agent runs on your laptop or on a server Nearhost is connected to, for example in an SSH session. The agent proposes and you decide: every add opens the add form in Nearhost, filled in, for you to save or dismiss.
+A coding agent can ask Nearhost to add the project it is working in, can read whether a project is served and where, and can find and fix what stops it being served. It works the same when the agent runs on your laptop or on a server Nearhost is connected to, for example in an SSH session. The agent proposes and you decide: every add opens the add form in Nearhost, filled in, for you to save or dismiss.
 
 ## Install the skill
 
@@ -33,12 +33,25 @@ In the project's directory, run `/nearhost add` in Claude Code, or `$nearhost ad
 2. Nearhost notifies the terminal it runs in: `Agent on mini wants to add /home/dev/code/myapp`. Most terminals show it only when Nearhost is not the window or tab in front.
 3. The add form opens over the view with the server and path filled in, and the line `Proposed by an agent on mini`. Nearhost reads the project as it does for any add, and you choose the routes and the name as usual.
 4. Save it, and the agent reports `https://myapp.test`. Press `esc` on the path, and the agent is told you declined.
+5. The agent waits up to 30 seconds for the project to start, then runs the doctor on it and offers to work through any errors or warnings it finds. See [Fix a project](#fix-a-project).
 
 If a form is already open, the proposal waits, and Home shows `1 proposal waiting · p to review`. It opens when the form closes, or when you press `p`. An agent waits 10 minutes for an answer.
 
-`/nearhost status` reports the project holding the current directory: its address, its state and any error.
+`/nearhost status` reports the project holding the current directory: its address, the other addresses in its `urls`, its state and any error. A project with several web routes or hosts has one URL for each, so you can see where each service lives. `/nearhost status --all` reports every project on the machine the agent runs on.
 
 Proposals need the full-screen interface. Under `nearhost up`, an agent can read the status but is told to open `nearhost` to propose.
+
+## Fix a project
+
+When a project is not served as you expect, run `/nearhost doctor` in its directory, or `$nearhost doctor` in Codex. The agent asks Nearhost to run the same [project checks](/docs/reference/cli/#project-checks) as `nearhost doctor` on this project, and works through the errors, then the warnings. Unlike `nearhost doctor`, this first reads the project's `.nearhostrc` again, as described under [Agent API](#agent-api). Each finding's fix has a kind, and the agent handles each kind in its own way:
+
+- **`project`.** The agent shows you the change, the snippet and where it goes, and makes it in the project's files once you agree. When the setup is more than Nearhost can work out for itself, such as several hosts, a pattern, `localhost` or callbacks from Docker, it writes or edits the project's [`.nearhostrc`](/docs/reference/nearhostrc/).
+- **`nearhost`.** Something you do in Nearhost, such as adding a port in the edit form. The agent passes it on, or offers to write the port or host into `.nearhostrc` instead.
+- **`manual`.** Something only you can do, such as a DNS record. The agent tells you what it says.
+
+After editing `.nearhostrc`, and for `nearhostrc.pending` and `nearhostrc.not-applied`, the agent asks Nearhost to read the file again. A change that needs no approval applies at once. One that needs it waits, and the agent tells you to approve it in Nearhost, then waits for your answer. See [Approval](/docs/reference/nearhostrc/#approval).
+
+Then it runs the doctor again, and stops when nothing is left that it can fix. It never edits Nearhost's `config.yaml`. Approving a change needs the full-screen interface: under `nearhost up`, the agent tells you to open `nearhost`.
 
 ## How the agent reaches Nearhost
 
@@ -56,6 +69,14 @@ A request is answered for the machine its socket belongs to, so an agent on `min
 - **A server that is this machine.** A server whose home is the laptop's own, such as `ssh_host: localhost` on your account, gets no forward: agents there already reach Nearhost on the laptop's socket.
 
 To use one socket explicitly, set `NEARHOST_SOCKET` to its path where the agent runs.
+
+## Agent API
+
+The skill's script talks to Nearhost over that socket, with `curl --unix-socket`. Nearhost answers JSON for the machine the socket belongs to. These calls are the ones the doctor uses:
+
+- `GET /v1` says which API this is. Its `capabilities` list names the calls added since the first release of API 1: `doctor` and `reload`. An older Nearhost leaves them out, and the skill tells you to update it.
+- `GET /v1/doctor?path=…` returns `project` and `findings` for the project holding the absolute path, in the shape that [`nearhost doctor --json`](/docs/reference/cli/#json-output) gives its findings. For a project already in Nearhost, it first reads the project's `.nearhostrc` again, as a reload does: a change that needs no approval is applied, restarting the project if it runs under `nearhost up`, and one that needs approval waits in Nearhost. For a directory that is not in Nearhost yet, `project` is `null`, each finding's `project` is empty, and the findings are for the project as it would be added.
+- `POST /v1/projects/reload`, with `{"path": "/abs/dir"}`, asks Nearhost to read the `.nearhostrc` of the project holding the path again. The project must be added first. It answers `applied` when nothing needs approval, or `pending` with an `id` the agent waits on, as it does for a proposal, while you decide. A change you declined stays declined until the file changes.
 
 ## When agents cannot reach Nearhost
 
