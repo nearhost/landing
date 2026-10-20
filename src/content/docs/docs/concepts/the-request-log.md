@@ -2,7 +2,7 @@
 title: The request log
 description: How Nearhost keeps each request and response in memory, and how to look at them and send them again.
 sidebar:
-  order: 8
+  order: 9
 ---
 
 Every request the proxy passes on is logged against its project, with its method, path, status and time. Nearhost also keeps the request and its response, bodies included, in memory, so you can look inside them and send them again.

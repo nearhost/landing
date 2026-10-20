@@ -2,7 +2,7 @@
 title: Discovery
 description: How Nearhost reads a project's files to propose routes without running anything.
 sidebar:
-  order: 2
+  order: 3
 ---
 
 Discovery takes a server and a path, reads the project's files and proposes routes with labels and roles, plus advisories. It saves typing. It is not a requirement: a project it knows nothing about works once you give its web port.

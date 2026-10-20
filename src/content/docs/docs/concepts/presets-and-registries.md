@@ -2,7 +2,7 @@
 title: Presets and registries
 description: How Nearhost learns what a framework's ports mean, and where that knowledge comes from.
 sidebar:
-  order: 3
+  order: 4
 ---
 
 On its own, Nearhost knows one thing about a project: the port variables in its `.env` files. Everything it knows about a particular tool, such as Docker Compose, Vite or Laravel Sail, comes from a preset. Presets come from registries, and Nearhost trusts none until you say so.
@@ -28,7 +28,9 @@ The official registry is [nearhost/presets](https://github.com/nearhost/presets)
 | `nearhost/sail`    | The Compose file mentions `laravel/sail`, a `sail-` image or `LARAVEL_SAIL` | Compose's published ports, with the Vite dev server forwarded to `localhost` through `VITE_PORT`. The hosts in `APP_URL`, `REVERB_HOST` and `FILES_URL` or `MINIO_URL`, served on their ports. Vite advice that fits a container. |
 | `nearhost/vite`    | A `vite.config.*` file exists, or `package.json` depends on `vite`          | The dev server port from `server.port` as a route. Advice when the port is the default 5173, or when `server.allowedHosts` would reject the alias.                                                                                |
 
-`nearhost add` serves the hosts a preset finds. A project's `.nearhostrc` wins over them, a real domain among them is asked about first, and one that another enabled project serves is left out with a note.
+## Hosts from presets
+
+A preset can name hosts as well as ports. `nearhost/sail` reads them from `APP_URL`, `REVERB_HOST` and `FILES_URL` or `MINIO_URL`, and serves each on its port. The hosts are fixed when you add or edit the project. A project's `.nearhostrc` wins over them, a real domain among them is asked about first, and `nearhost add` leaves out one that another enabled project serves, with a note. See [Multi-host projects](/docs/concepts/multi-host-projects/#hosts-from-presets).
 
 ## Trusting a registry
 

@@ -39,6 +39,7 @@ On Home, when a server cannot connect, `r` retries every such server now and `y`
 | `e`     | Edit: read its files again and change its routes or name. |
 | `d`     | Remove it, after you confirm.                             |
 | `y`     | Copy the snippets of its advice.                          |
+| `a`     | Review a pending `.nearhostrc` change.                    |
 
 ## Routes
 
@@ -95,7 +96,7 @@ See [The request log](/docs/concepts/the-request-log/).
 | Lists        | `↑`, `↓` to choose, `enter` to pick.                                                                               |
 | Path         | `tab` or `→` accepts the suggestion, `↑`, `↓` choose a match, `enter` uses the path as typed, `ctrl+r` reconnects. |
 | Presets      | `space` ticks or unticks, `enter` goes on.                                                                         |
-| Routes       | `space` serves or ignores a port, `←`, `→` change its role.                                                        |
+| Routes       | `space` serves or ignores a port, `←`, `→` change its role, `h` edits a web route's hosts.                         |
 | Name         | `tab` moves between name and alias.                                                                                |
 | Server check | `r` checks again after a failure.                                                                                  |
 | Confirm      | `enter` adds or saves.                                                                                             |

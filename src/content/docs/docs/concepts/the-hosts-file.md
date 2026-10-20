@@ -2,7 +2,7 @@
 title: The hosts file
 description: How Nearhost keeps one delimited block in /etc/hosts to resolve project names.
 sidebar:
-  order: 6
+  order: 7
 ---
 
 `.test` is a reserved top-level domain that is never public, so Nearhost resolves aliases through `/etc/hosts` and not through DNS.

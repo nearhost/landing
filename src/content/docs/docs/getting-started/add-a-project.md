@@ -85,6 +85,8 @@ A `~` in the path means the server's home directory, even when your shell has al
 
 Discovery proposes the roles, and you can change them at any time. See [Routes and roles](/docs/concepts/routes-and-roles/).
 
+A project can have several web routes, each served at hosts of its own. In the form, choose a web route on the routes step and press `h` to type its hosts. On the command line, `--host` adds a host to the primary web route. See [Multi-host projects](/docs/concepts/multi-host-projects/).
+
 Advisories are shown, never applied. See [Advisories](/docs/reference/advisories/). Nothing on the remote machine is edited.
 
 ## What gets written
