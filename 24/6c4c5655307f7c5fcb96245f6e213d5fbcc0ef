@@ -1,0 +1,23 @@
+src/content/docs/docs/guides/container-callbacks.md
+  s_89a63a3c1fa7d2::t_039c32979e4580 124
+  s_89a63a3c1fa7d2::t_343598c7e9491f 1-123,125-128,130-131,133-138
+  s_89a63a3c1fa7d2::t_8a7a7c3e669b58 129,132
+src/content/docs/docs/reference/nearhostrc.md
+  s_89a63a3c1fa7d2::t_dfc4197eb78758 140-141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "246c4c5655307f7c5fcb96245f6e213d5fbcc0ef",
+  "prompts": {},
+  "sessions": {
+    "s_89a63a3c1fa7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ade858e5-1767-41c6-b0b0-fdd74aba68cf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
