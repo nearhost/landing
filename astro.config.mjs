@@ -47,7 +47,7 @@ export default defineConfig({
             '- It works with any HTTP dev server. It reads ports from `.env`, and presets add Docker Compose, Vite and Laravel Sail.',
             '- It is for your own machines and your own browser, not for sharing a page publicly; use a tunnel service such as ngrok for that.',
             '',
-            'Start with [Introduction](https://nearhost.dev/docs/getting-started/introduction/) and [Install](https://nearhost.dev/docs/getting-started/install/). The [guides](https://nearhost.dev/docs/guides/sso-callback-on-a-remote-dev-server/) cover SSO callbacks, HTTPS on a local dev domain and ngrok assets that point at localhost.',
+            'Start with [Introduction](https://nearhost.dev/docs/getting-started/introduction/) and [Install](https://nearhost.dev/docs/getting-started/install/). The [guides](https://nearhost.dev/docs/guides/sso-callback-on-a-remote-dev-server/) cover SSO callbacks, HTTPS on a local dev domain, ngrok assets that point at localhost, Vite hot reload over SSH and forwarding several ports over SSH.',
           ].join('\n'),
           // The docs in reading order, not alphabetical: getting started, then guides, then concepts.
           promote: [

@@ -32,6 +32,8 @@ ssh -S <sock> -O forward -L 127.0.0.1:<local>:localhost:<remote> <host>
 ssh -S <sock> -O cancel -L 127.0.0.1:<local>:localhost:<remote> <host>
 ```
 
+[Forward several ports over SSH without retyping -L](/docs/guides/forward-ports-over-ssh/) compares this with the ways to do it by hand.
+
 Nearhost keeps the list of forwards each server should have. After a reconnect it puts them all back before the server shows as connected. A forward that fails, because something on your laptop holds the port, puts its project in `error` with the name of the program.
 
 ## The agent socket
