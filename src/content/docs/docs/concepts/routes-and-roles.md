@@ -22,7 +22,7 @@ routes:
 
 ## web
 
-Served through the proxy. A project has at least one. The first is served at `https://<alias>`, and each later one needs hosts of its own to be served at.
+Served through the proxy. A project has at least one. The first is served at `https://<alias>`, and each later one only at hosts of its own, so it needs at least one.
 
 Discovery proposes one: a route a preset prefers, then a Compose port mapped to container port 80, then a route a preset offers as a fallback, such as Vite's configured port, then a project's only port. See [Discovery](/docs/concepts/discovery/#roles). You can move the role to any route.
 
