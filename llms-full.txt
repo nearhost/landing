@@ -876,7 +876,7 @@ $middleware->trustProxies(at: '*');
 
 The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) explains it, and what to list instead of `'*'` if the file also runs in production behind a known load balancer.
 
-If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. On older versions it listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'` in `vite.config.js`, or run `nearhost update`.
+If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. With an older Nearhost, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
 
 On another stack the idea is the same. Use any OpenID Connect client with the pool’s domain and the app client’s ID and secret. Set the app’s public URL and its callback URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to Cognito matches the one you listed.
 
@@ -1264,7 +1264,7 @@ When the dev server runs on another machine, Nearhost serves it on your laptop a
 
 ### Vite on the IPv6 loopback address
 
-From Nearhost 0.7.0, a loopback forward answers on both `127.0.0.1` and `[::1]`, so a `public/hot` that says `http://[::1]:5173` works as it is. On Nearhost older than 0.7.0, set `server.hmr.host` to `'localhost'` in `vite.config.js` and restart `npm run dev`, or run `nearhost update`.
+A Vite dev server that listens on `::1` makes `laravel-vite-plugin` write `http://[::1]:5173` to `public/hot`. A loopback forward answers on both `127.0.0.1` and `[::1]`, so that works as it is. This needs Nearhost 0.7.0 or later and a laptop with the IPv6 loopback, which every Mac and almost every Linux machine has. Otherwise, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
 
 ## The guides
 
@@ -1403,7 +1403,7 @@ Nearhost serves the project at a name such as `https://myapp.test`, over one SSH
 * **Vite sits beside a backend.** Give the Vite port the `loopback` role. Nearhost forwards it to the same port number on your laptop, so the page’s `http://localhost:5173` reaches the remote dev server. Under Laravel Sail, discovery proposes this route for you. The page at `https://myapp.test` now loads its scripts from another origin, and Vite’s default CORS policy allows only `localhost` pages. `laravel-vite-plugin` also allows `*.test` names and your `APP_URL`; with another integration, add the name to `server.cors.origin`.
 * **Several projects.** Nearhost warns about two projects that want the same loopback port before they clash, and suggests a free one when the port comes from a variable.
 
-From Nearhost 0.7.0, a loopback forward answers on both `127.0.0.1` and `[::1]`, so it still works when Vite listens on `::1` and `public/hot` says `http://[::1]:5173`. On Nearhost older than 0.7.0, the forward listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'`, or run `nearhost update`.
+A loopback forward answers on both `127.0.0.1` and `[::1]`, so it also works when Vite listens on `::1` and `public/hot` says `http://[::1]:5173`. This needs Nearhost 0.7.0 or later and a laptop with the IPv6 loopback, which every Mac and almost every Linux machine has. Otherwise, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
 
 For the details, see [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) and [Routes and roles](/docs/concepts/routes-and-roles/).
 
@@ -1517,7 +1517,7 @@ The starter kit’s `bootstrap/app.php` already has a `withMiddleware` closure. 
 
 `'*'` trusts the forwarded headers from any address. If this file also runs in production behind a known load balancer, list that load balancer’s addresses plus `127.0.0.1`, or the Docker network’s gateway under Sail, instead, or read the list from an environment variable. Nearhost’s forward arrives from `127.0.0.1`, or from the Docker network’s gateway under Sail, so leaving it out stops Laravel trusting it and brings back `http://` links.
 
-If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. On older versions it listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'` in `vite.config.js`, or run `nearhost update`.
+If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. With an older Nearhost, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
 
 On another stack the idea is the same. Set the app’s public URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to WorkOS matches the one you registered.
 
@@ -1576,7 +1576,20 @@ That address is resolved by your browser, on your laptop. Nothing listens there,
 
 A `loopback` route fixes it. Nearhost forwards the same port number on your laptop to the dev server on the remote machine, so `localhost:5173` in the browser reaches port 5173 over there. The remote project needs no changes, as long as the page asks for `localhost`.
 
-A Laravel project outside Sail whose Vite listens on `::1` writes `http://[::1]:5173` to `public/hot`. From Nearhost 0.7.0, the forward answers on both `127.0.0.1` and `[::1]`, so the page reaches it there too. On Nearhost older than 0.7.0, the forward listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'` in `vite.config.js`, or run `nearhost update`.
+A Laravel project outside Sail whose Vite listens on `::1` writes `http://[::1]:5173` to `public/hot`. The forward answers on both `127.0.0.1` and `[::1]`, so the page reaches the dev server either way.
+
+### Vite on `[::1]`
+
+The forward answers on `[::1]` from Nearhost 0.7.0, on a laptop with the IPv6 loopback. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update). With an older Nearhost, or on a laptop with IPv6 turned off, the forward answers on `127.0.0.1` only, and nothing answers `http://[::1]:5173`. Set `server.hmr.host` to `'localhost'` in `vite.config.js` and restart `npm run dev`, so that `public/hot` says `localhost` instead:
+
+```js
+export default defineConfig({
+  // The rest of the config stays as it is.
+  server: {
+    hmr: { host: 'localhost' },
+  },
+});
+```
 
 Discovery proposes a loopback route only under Laravel Sail. For other backends, select the project, press `tab`, choose the dev server’s route and press `space` to make it `loopback`. See [Routes and roles](/docs/concepts/routes-and-roles/#changing-roles).
 
@@ -2859,6 +2872,14 @@ Quit that program, or run Nearhost with `--https-port` and `--http-port`. Anothe
 The project goes into `error`, naming the port and the program holding it on this machine. Its other routes still start.
 
 Stop that program, or move the project’s dev server to another port and edit the route. For Vite that is `server.port` in the Vite config, or `VITE_PORT` under Laravel Sail. Then press `enter` on the project to start it again.
+
+From Nearhost 0.7.0, on a laptop with the IPv6 loopback, a loopback forward answers on `[::1]` as well as `127.0.0.1`, so a program listening on either address holds the port. The usual one is a Vite dev server running on your laptop, which often listens on `::1` alone. To see every program on the port the error names, on both addresses, run this with that port in place of `<port>`:
+
+```sh
+lsof -nP -iTCP:<port> -sTCP:LISTEN
+```
+
+On older versions, such a program could answer the browser in the forward’s place, so the page loaded your laptop’s scripts instead of the server’s. Run `nearhost update` to get the check.
 
 ## The password was cancelled
 
