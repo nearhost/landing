@@ -1,0 +1,24 @@
+src/content/docs/docs/guides/cognito-sign-in.md
+  s_16a4dddf86921d::t_a900c2b61fff1e 205
+  s_16a4dddf86921d::t_0e9eb6446a29fd 162
+  s_16a4dddf86921d::t_59e8c4fe30e637 133
+  s_16a4dddf86921d::t_75a042f487c0fd 150,153-154
+  s_16a4dddf86921d::t_3e8fda3fded709 79,82-83
+  s_16a4dddf86921d::t_02cd047afb8471 155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c2da9588e1d7eed840b5feacfde599bea137c1da",
+  "prompts": {},
+  "sessions": {
+    "s_16a4dddf86921d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7cc721d4-6e08-49ce-bd6f-182ab2820371",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
