@@ -1,0 +1,21 @@
+src/content/docs/docs/concepts/presets-and-registries.md
+  s_89a63a3c1fa7d2::t_8c278931155be0 24-31
+src/content/docs/docs/reference/advisories.md
+  s_89a63a3c1fa7d2::t_ae6750e421cab5 64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bc5e8f6f92e649a6590b0bd9dd3db0bc344c726f",
+  "prompts": {},
+  "sessions": {
+    "s_89a63a3c1fa7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ade858e5-1767-41c6-b0b0-fdd74aba68cf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
