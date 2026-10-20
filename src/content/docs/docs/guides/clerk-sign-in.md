@@ -147,5 +147,5 @@ These pages, on 2026-10-19:
 - [Clerk changelog: CLI webhooks](https://clerk.com/changelog/2026-07-09-clerk-cli-webhooks-and-impersonate)
 - [Next.js: allowedDevOrigins](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins)
 
-They were read, not run end to end. If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
+If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
 :::

@@ -138,5 +138,5 @@ These pages, on 2026-10-19:
 - [WorkOS: Redirect URIs for local, staging and production](https://workos.com/blog/redirect-uris-for-local-staging-and-production)
 - [WorkOS: Data syncing with the events API or webhooks](https://workos.com/docs/events/data-syncing)
 
-They were read, not run end to end. If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
+If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
 :::
