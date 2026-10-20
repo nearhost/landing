@@ -1,0 +1,25 @@
+src/content/docs/docs/concepts/dev-servers-and-hot-reload.md
+  s_89a63a3c1fa7d2::t_81eb9af5d55135 24
+src/content/docs/docs/concepts/routes-and-roles.md
+  s_89a63a3c1fa7d2::t_af803c20fcc62f 33
+src/content/docs/docs/getting-started/add-a-project.md
+  s_89a63a3c1fa7d2::t_2469d8386de70d 80-84
+src/content/docs/docs/guides/ngrok-assets-on-localhost.md
+  s_89a63a3c1fa7d2::t_b3d6f3bf32e3d5 58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "044e6e022518bfd5d0aab02be91f79bd94f0645f",
+  "prompts": {},
+  "sessions": {
+    "s_89a63a3c1fa7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ade858e5-1767-41c6-b0b0-fdd74aba68cf",
+        "model": "unknown"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
