@@ -143,6 +143,12 @@ if (existsSync(index)) {
   for (const question of faq?.mainEntity ?? []) {
     check(headings.includes(question.name), `FAQ "${question.name}" is not on the page`);
   }
+  // Both demos hold sample data that must not be quoted as real.
+  check(
+    /<div class="(?:[^"]*\s)?frame(?:\s[^"]*)?"[^>]*\sdata-nosnippet[\s=>]/.test(html) &&
+      /<div class="(?:[^"]*\s)?window(?:\s[^"]*)?"[^>]*\sdata-nosnippet[\s=>]/.test(html),
+    'the interface demo and the agent demo must carry data-nosnippet',
+  );
   // The nav menu, the copy button and the interface demo.
   const components = new Set([...html.matchAll(/component-url="([^"]*)"/g)].map((m) => m[1]));
   check(
