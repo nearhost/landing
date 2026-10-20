@@ -2,7 +2,7 @@
 title: Advisories
 description: The advice Nearhost gives about a project, when each appears and how to fix it.
 sidebar:
-  order: 4
+  order: 5
 ---
 
 Advisories are shown, never applied. Nearhost does not edit your project's files. In the interface they appear in amber boxes under a project's routes, and `y` copies their snippets. `nearhost add` prints each one as `Advisory (<id>): <message>`.
