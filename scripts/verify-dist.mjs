@@ -127,8 +127,9 @@ check(
 );
 
 // 6. Every internal link in every page resolves to a file in dist/.
-// Links are resolved the way a browser would, against the page's own URL on a stand-in origin.
-const origin = 'https://site.invalid';
+// Links are resolved the way a browser would, against the page's own URL on the site's origin.
+// Absolute links to the site point at production, which has no base.
+const origin = 'https://nearhost.dev';
 for (const file of pages) {
   const html = readFileSync(file, 'utf8');
   const page = new URL(base + relative(dist, file).split(sep).join('/'), origin);
@@ -136,20 +137,23 @@ for (const file of pages) {
     [...html.matchAll(/<a\s[^>]*?href=(?:"([^"]*)"|'([^']*)')/gi)].map((m) => m[1] ?? m[2]),
   );
   for (const href of hrefs) {
-    // Other schemes, other hosts and links within the page.
-    if (/^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith('//') || href.startsWith('#')) continue;
-    if (base !== '/' && href.startsWith('/') && !href.startsWith(base)) {
+    if (href.startsWith('#')) continue;
+    const absolute = /^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith('//');
+    const prefix = absolute ? '/' : base;
+    if (!absolute && base !== '/' && href.startsWith('/') && !href.startsWith(base)) {
       failures.push(`${file} links to ${href}, which skips the site base ${base}`);
       continue;
     }
     let path;
     try {
-      const { pathname } = new URL(href, page);
-      if (!pathname.startsWith(base)) {
+      const url = new URL(href, page);
+      // Other schemes and other hosts.
+      if (url.origin !== origin) continue;
+      if (!url.pathname.startsWith(prefix)) {
         failures.push(`${file} links to ${href}, which is outside the site base ${base}`);
         continue;
       }
-      path = decodeURIComponent(pathname.slice(base.length));
+      path = decodeURIComponent(url.pathname.slice(prefix.length));
     } catch {
       failures.push(`${file} links to ${href}, which is not a valid URL path`);
       continue;
