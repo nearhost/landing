@@ -304,4 +304,4 @@ Nearhost also checks for a new release at most once a day, in the background, an
 
 ## nearhost version
 
-Prints the version, as `nearhost 0.6.0`.
+Prints the version, as `nearhost 0.7.0`.

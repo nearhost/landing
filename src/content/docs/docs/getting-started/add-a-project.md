@@ -80,7 +80,7 @@ A `~` in the path means the server's home directory, even when your shell has al
 | Role       | What happens                                                                                             |
 | ---------- | -------------------------------------------------------------------------------------------------------- |
 | `web`      | Served through the proxy. The first is served at `https://<alias>`, and each later one at its own hosts. |
-| `loopback` | Raw forward to the same port on your laptop's `127.0.0.1`. Skipped for local projects.                   |
+| `loopback` | Raw forward to the same port on your laptop's `127.0.0.1` and `[::1]`. Skipped for local projects.       |
 | `ignore`   | Listed, not forwarded.                                                                                   |
 
 Discovery proposes the roles, and you can change them at any time. See [Routes and roles](/docs/concepts/routes-and-roles/).

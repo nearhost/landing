@@ -6,7 +6,7 @@ sidebar:
 ---
 
 :::note
-Needs Nearhost 0.6.0 or later, which lets a project's main name be a domain that does not end in `.test`. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+Needs Nearhost 0.6.0 or later, which lets a project's main name be a domain that does not end in `.test`. A `.nearhostrc` that sets only that name, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
 New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
