@@ -1,0 +1,65 @@
+src/pages/logo.png.ts
+  s_f73a4dba9f7d00::t_560c2899832b90 3,6
+  s_f73a4dba9f7d00::t_54a87a33e4492b 1-2,4-5,7
+  s_f73a4dba9f7d00::t_fdec658d963154 8-13
+src/lib/structured-data.mjs
+  s_f73a4dba9f7d00::t_1be12a4ac0920b 1-76
+src/route-data.ts
+  s_f73a4dba9f7d00::t_fdec658d963154 1-2,22-24,26-34
+src/layouts/Landing.astro
+  s_f73a4dba9f7d00::t_fdec658d963154 27-30,32-61
+scripts/verify-dist.mjs
+  s_f73a4dba9f7d00::t_b84d9e4124d62f 33,36-40,113-116,173,180
+  s_f73a4dba9f7d00::t_d4c70c1036212a 122-131,143,145
+  s_f73a4dba9f7d00::t_90826e45734414 132-142,144
+  s_f73a4dba9f7d00::t_9617d99ddee802 146-151
+src/components/landing/Faq.astro
+  s_f73a4dba9f7d00::t_d4c70c1036212a 47-52
+  s_f73a4dba9f7d00::t_1d8e4e8875ac94 1,4-8,10-46,53,55-112
+  s_f73a4dba9f7d00::t_90826e45734414 2-3,9,54
+src/pages/index.astro
+  s_f73a4dba9f7d00::t_d4c70c1036212a 13,32
+src/content/docs/docs/concepts/dev-servers-and-hot-reload.md
+  s_f73a4dba9f7d00::t_e60e160a558053 28-29
+src/content/docs/docs/guides/vite-hot-reload-over-ssh.md
+  s_f73a4dba9f7d00::t_1cd12bb9f0773f 1-9,11-13,15-25,27-51,54-61,63-72
+  s_f73a4dba9f7d00::t_6feba2971b7e49 26,52,74
+  s_f73a4dba9f7d00::t_31066b5e666caf 10,14,53,62,73,75-77
+src/content/docs/docs/guides/cognito-sign-in.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+src/content/docs/docs/guides/clerk-sign-in.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+src/content/docs/docs/guides/workos-sign-in.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+src/content/docs/docs/guides/forward-ports-over-ssh.md
+  s_f73a4dba9f7d00::t_75e9b0c5ce8b47 81
+  s_f73a4dba9f7d00::t_3405ade6916b42 1-54,56-60,62-80
+  s_f73a4dba9f7d00::t_bc2844b15930ce 55,61,82-84
+src/content/docs/docs/concepts/ssh-transport.md
+  s_f73a4dba9f7d00::t_ce26a44bb20aba 35
+  s_f73a4dba9f7d00::t_05dd20180a461f 36
+src/content/docs/docs/guides/https-on-a-local-dev-domain.md
+  s_f73a4dba9f7d00::t_4166fc084efa9a 5
+astro.config.mjs
+  s_f73a4dba9f7d00::t_bc2844b15930ce 50-56
+src/components/landing/TuiDemo.svelte
+  s_f73a4dba9f7d00::t_9617d99ddee802 1135-1136
+src/components/landing/Agents.astro
+  s_f73a4dba9f7d00::t_9617d99ddee802 41-42
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f52c39b51a8ea282314e980dea11b9a57fab3139",
+  "prompts": {},
+  "sessions": {
+    "s_f73a4dba9f7d00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4d7d22e-aeb2-4a9a-ae19-70c1b770f423",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
