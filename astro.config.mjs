@@ -6,7 +6,7 @@ import svelte from '@astrojs/svelte';
 import sitemap from '@astrojs/sitemap';
 import { satteri } from '@astrojs/markdown-satteri';
 import baseLinks from './src/lib/base-links.mjs';
-import { lastCommitDate, sourcesFor } from './src/lib/lastmod.mjs';
+import { lastModified, sourcesFor } from './src/lib/lastmod.mjs';
 import { plausibleInit, plausibleSrc, tracked } from './src/lib/plausible.mjs';
 
 // Pull request previews are built under /pr-preview/pr-<number>/; the live site sits at /.
@@ -104,7 +104,7 @@ export default defineConfig({
     sitemap({
       serialize(item) {
         const path = new URL(item.url).pathname.slice(base.length);
-        const lastmod = lastCommitDate(sourcesFor(path));
+        const lastmod = lastModified(sourcesFor(path));
         return lastmod ? { ...item, lastmod } : item;
       },
     }),

@@ -1,6 +1,6 @@
 // Dates each sitemap entry by the last commit to the files that make the page.
 import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, statSync } from 'node:fs';
 
 // The landing page is drawn from these, so a change to any of them changes the page.
 const landingSources = [
@@ -25,20 +25,23 @@ export function sourcesFor(path) {
 }
 
 /**
- * The commit date of the newest commit to these files, or undefined outside a git checkout
- * or for files git does not know. A shallow clone dates every file by its one commit.
+ * When these files last changed: the date of the newest commit to them, or, for files not
+ * committed yet, their newest modification time. Undefined for no files. A shallow clone
+ * dates every committed file by its one commit.
  * @param {string[]} files
  * @returns {string | undefined}
  */
-export function lastCommitDate(files) {
+export function lastModified(files) {
   if (files.length === 0) return undefined;
   try {
     const date = execFileSync('git', ['log', '-1', '--format=%cI', '--', ...files], {
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();
-    return date || undefined;
+    if (date) return date;
   } catch {
-    return undefined;
+    // Not a git checkout; fall back to the files themselves.
   }
+  const times = files.filter((file) => existsSync(file)).map((file) => statSync(file).mtimeMs);
+  return times.length ? new Date(Math.max(...times)).toISOString() : undefined;
 }
