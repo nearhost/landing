@@ -30,7 +30,7 @@ The official registry is [nearhost/presets](https://github.com/nearhost/presets)
 
 ## Hosts from presets
 
-A preset can name hosts as well as ports. `nearhost/sail` reads them from `APP_URL`, `REVERB_HOST` and `FILES_URL`, `MINIO_URL`, or both, and serves each on its port. The hosts are fixed when you add or edit the project. A project's `.nearhostrc` wins over them, a real domain among them is asked about first, and `nearhost add` leaves out one that another enabled project serves, with a note. See [Multi-host projects](/docs/concepts/multi-host-projects/#hosts-from-presets).
+A preset can name hosts as well as ports. `nearhost/sail` reads them from `APP_URL` and `REVERB_HOST`, and from `FILES_URL`, `MINIO_URL` or both, and serves each on its port. The hosts are fixed when you add or edit the project. A project's `.nearhostrc` wins over them, a real domain among them is asked about first, and `nearhost add` leaves out one that another enabled project serves, with a note. See [Multi-host projects](/docs/concepts/multi-host-projects/#hosts-from-presets).
 
 ## Trusting a registry
 

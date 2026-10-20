@@ -53,7 +53,7 @@ Adds a project. It discovers the routes from the project's files, prints them an
 | `--name <name>`   | The project name. The default is the directory's name.                                                                                                 |
 | `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost` or an IP address. Typing it approves it. |
 | `--web <port>`    | The port to serve at the alias.                                                                                                                        |
-| `--host <host>`   | Add this host to the web route. Repeat for more. Typing it approves it.                                                                                |
+| `--host <host>`   | Add this host to the primary web route. Repeat for more. Typing it approves it.                                                                        |
 | `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                    |
 | `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
 | `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
@@ -75,7 +75,7 @@ Without a name, it exports the project on this machine whose directory holds the
 | `--dry-run` | Print the file instead of writing it. Warnings go to stderr, not the file. |
 | `--force`   | Replace an existing `.nearhostrc`.                                         |
 
-Without `--force`, an existing file stops a write, though `--dry-run` still prints:
+`--dry-run` prints the file even when one exists. Without `--force`, an existing file stops a write:
 
 ```text
 nearhost: .nearhostrc already exists in /home/you/code/shop; run with --force to replace it, or --dry-run to see what would be written
@@ -90,7 +90,7 @@ The file follows the project's `.env` on another machine. See [Variables](/docs/
 
 Before writing, it checks that the file reads back to the same project. After writing, it records the file as approved, since it holds only what Nearhost already serves, so the project does not ask about it again. If a change to the old file was waiting for approval, the new file replaces it and the command says so. See [Approval](/docs/reference/nearhostrc/#approval).
 
-For a project with two web routes and a Vite route on loopback, whose `.env` has these lines:
+For a project called `shop` on server `mini`, with two web routes and a Vite route on loopback, whose `.env` has these lines:
 
 ```ini
 APP_PORT=8010
@@ -100,7 +100,7 @@ APP_HOST=shop.example.com
 SESSION_DOMAIN=shop.example.com
 ```
 
-`nearhost export --dry-run` prints:
+`nearhost export shop --dry-run` prints:
 
 ```yaml
 # Written by nearhost export. Safe to edit and commit; see https://nearhost.dev/docs for the format.
@@ -121,7 +121,7 @@ routes:
 Without `--dry-run`, it prints where it wrote the file:
 
 ```text
-Wrote /home/you/code/shop/.nearhostrc. Commit it so others get this setup when they add the project.
+Wrote /home/you/code/shop/.nearhostrc on server mini. Commit it so others get this setup when they add the project.
 ```
 
 ## nearhost ls
@@ -167,28 +167,28 @@ Each enabled project is checked where it runs: its `.nearhostrc`, its routes aga
 - `nearhost`: Nearhost reads a file again, or you approve or change something in Nearhost.
 - `manual`: something only you can do, such as starting the dev server or adding a DNS record.
 
-| Finding                     | Severity               | Fix        | When it shows                                                                                                                                        |
-| --------------------------- | ---------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nearhostrc.invalid`        | error                  | `project`  | The file has a mistake, such as a key or value Nearhost does not understand. The message gives the line.                                             |
-| `nearhostrc.unset-variable` | error                  | `project`  | The file uses a variable that is not set and has no default. Set it in `.env.local` or `.env`, or give it one: `${NAME:-value}`.                     |
-| `nearhostrc.version`        | error                  | `manual`   | The file's `version` is newer than this Nearhost reads. Run `nearhost update`.                                                                       |
-| `nearhostrc.pending`        | warning                | `nearhost` | The file asks for changes that wait for your approval, which the message lists. Nearhost reads it again, and you approve them.                       |
-| `nearhostrc.not-applied`    | warning                | `nearhost` | The file has changed since Nearhost last read it, and the change needs no approval. Nearhost reads it again.                                         |
-| `nearhostrc.gone`           | warning                | `project`  | The file was deleted after it was approved. Nearhost serves what was approved until you restore it.                                                  |
-| `routes.unserved-port`      | warning                | `nearhost` | A port looks like a web server, and the project has no route for it. Select the project, press `e` and add it as a web route.                        |
-| `routes.unserved-host`      | warning                | `nearhost` | The project's settings name a host for one of its ports, and no web route serves it. Press `e` on the project, and the form adds it.                 |
-| `routes.stale-port`         | info                   | `nearhost` | A web route's port matches nothing in the project's files any more. If the port changed, press `e` on the project and update it.                     |
-| `routes.not-listening`      | info, or warning       | `manual`   | Nothing listens on a web route's port. Start the dev server on that port, or correct the port.                                                       |
-| `hosts.unresolved`          | error                  | `nearhost` | A name does not resolve to this machine and is not in the hosts file. Starting the project adds it to `/etc/hosts`.                                  |
-| `hosts.unresolved-pattern`  | error                  | `manual`   | A name a wildcard pattern matches resolves, but not to this machine. Add a DNS record for the pattern that points at 127.0.0.1, or list exact hosts. |
-| `hosts.public`              | warning                | `manual`   | A name that does not end in `.test` resolves to a real address, so the real site is out of reach on this machine while the project is enabled.       |
-| `hosts.overlap`             | warning                | `project`  | One of the project's patterns overlaps a different pattern of another enabled project. A name both match goes to the more specific one.              |
-| `docker.host-gateway`       | warning                | `project`  | A Compose service uses a name Nearhost serves, and its `extra_hosts` does not map that name to the host.                                             |
-| `docker.ca`                 | warning                | `project`  | A Compose service calls a name Nearhost serves, and does not trust Nearhost's root certificate.                                                      |
-| `docker.clients`            | warning, info on macOS | `project`  | A container calls a name Nearhost serves, and the project does not have `docker_clients: true`.                                                      |
-| `advice.<id>`               | warning                | `project`  | An [advisory](/docs/reference/advisories/) applies. The snippet is the change to make.                                                               |
-| `presets.note`              | info                   | `manual`   | Discovery or a preset gave a warning, so some checks may be incomplete.                                                                              |
-| `projects.unchecked`        | info                   | `manual`   | The project could not be checked: its server can't be reached, its directory is missing, or the checks took over 30 seconds.                         |
+| Finding                     | Severity               | Fix        | When it shows                                                                                                                                         |
+| --------------------------- | ---------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nearhostrc.invalid`        | error                  | `project`  | The file has a mistake, such as a key or value Nearhost does not understand. The message gives the line.                                              |
+| `nearhostrc.unset-variable` | error                  | `project`  | The file uses a variable that is not set and has no default. Set it in `.env.local` or `.env`, or give it one: `${NAME:-value}`.                      |
+| `nearhostrc.version`        | error                  | `manual`   | The file's `version` is newer than this Nearhost reads. Run `nearhost update`.                                                                        |
+| `nearhostrc.pending`        | warning                | `nearhost` | The file asks for changes that wait for your approval, which the message lists. Nearhost reads it again, and you approve them.                        |
+| `nearhostrc.not-applied`    | warning                | `nearhost` | The file has changed since Nearhost last read it, and the change needs no approval. Nearhost reads it again.                                          |
+| `nearhostrc.gone`           | warning                | `project`  | The file was deleted after it was approved. Nearhost serves what was approved until you restore it.                                                   |
+| `routes.unserved-port`      | warning                | `nearhost` | A port looks like a web server, and the project has no route for it. Select the project, press `e` and add it as a web route.                         |
+| `routes.unserved-host`      | warning                | `nearhost` | The project's settings name a host for one of its ports, and no web route serves it. Press `e` on the project, and the form adds it.                  |
+| `routes.stale-port`         | info                   | `nearhost` | A web route's port matches nothing in the project's files any more. If the port changed, press `e` on the project and update it.                      |
+| `routes.not-listening`      | info, or warning       | `manual`   | Nothing listens on a web route's port. Start the dev server on that port, or correct the port.                                                        |
+| `hosts.unresolved`          | error                  | `nearhost` | A name does not resolve to this machine and is not in the hosts file. Starting the project adds it to `/etc/hosts`.                                   |
+| `hosts.unresolved-pattern`  | error                  | `manual`   | A name the pattern matches does not resolve to this machine. Add a DNS record for the pattern that points at 127.0.0.1, or list exact hosts.          |
+| `hosts.public`              | warning                | `manual`   | A name that does not end in `.test` resolves to a real address, so the real site is out of reach on this machine while the project is enabled.        |
+| `hosts.overlap`             | warning                | `project`  | One of the project's patterns overlaps a different pattern of another enabled project. A name that both patterns match goes to the more specific one. |
+| `docker.host-gateway`       | warning                | `project`  | A Compose service uses a name Nearhost serves, and its `extra_hosts` does not map that name to the host.                                              |
+| `docker.ca`                 | warning                | `project`  | A Compose service calls a name Nearhost serves, and does not trust Nearhost's root certificate.                                                       |
+| `docker.clients`            | warning, info on macOS | `project`  | A container calls a name Nearhost serves, and the project does not have `docker_clients: true`.                                                       |
+| `advice.<id>`               | warning                | `project`  | An [advisory](/docs/reference/advisories/) applies. The snippet is the change to make.                                                                |
+| `presets.note`              | info                   | `manual`   | Discovery or a preset gave a warning, so some checks may be incomplete.                                                                               |
+| `projects.unchecked`        | info                   | `manual`   | The project could not be checked: its server can't be reached, its directory is missing, or the checks took over 30 seconds.                          |
 
 A few depend on the project:
 

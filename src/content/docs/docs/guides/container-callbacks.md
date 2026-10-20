@@ -6,7 +6,7 @@ sidebar:
 ---
 
 :::note
-This needs Nearhost 0.6.0 or later. Run `nearhost update` to get the latest. See [CLI](/docs/reference/cli/#nearhost-update).
+Needs Nearhost 0.6.0 or later, which can serve a project to Docker containers. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
 A service in your Compose file often calls the app back: a queue worker reports a finished job, or a LocalStack job delivers an event to a webhook. Point it at the app's Nearhost name, such as `https://api.local.example.com/webhooks/jobs`, and the call fails, even though the same URL works in your browser.
@@ -17,7 +17,7 @@ This works only for a project on this machine. A container on an SSH server cann
 
 ## The example
 
-The app listens on port 8000 and is served at `api.local.example.com`. Its `.nearhostrc`:
+The project is named `shop`, and its worker is a Node service. Its app listens on port 8000 and is served at `api.local.example.com`. Its `.nearhostrc`:
 
 ```yaml
 version: 1
@@ -75,17 +75,17 @@ services:
       - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
 ```
 
-Each developer sets `NEARHOST_CA_CERT` to the certificate's path in their shell profile, or in `.env` when the project does not commit `.env`, so the Compose file holds no one's path. Compose reads only `.env` and the shell, not `.env.local`. Until the variable is set, every `docker compose` command in the project stops with `set NEARHOST_CA_CERT to Nearhost's root certificate`, so nobody runs the service without the certificate by mistake.
+Each developer sets `NEARHOST_CA_CERT` to the certificate's path in their shell profile, or in `.env` when the project does not commit `.env`, so the Compose file holds no one's path. Compose reads only `.env` and the shell, not `.env.local`. Until the variable is set, every `docker compose` command that reads this Compose file stops with `set NEARHOST_CA_CERT to Nearhost's root certificate`, so nobody runs the service without the certificate by mistake.
 
 `NODE_EXTRA_CA_CERTS` adds the certificate to Node's own. `SSL_CERT_FILE`, `AWS_CA_BUNDLE` and `REQUESTS_CA_BUNDLE` replace the default bundle instead, so point them at a bundle that includes the certificate, or have the image run `update-ca-certificates`.
 
-`nearhost doctor` reports a service that calls a name Nearhost serves and does not trust the certificate, as `docker.ca`. A service that sets `SSL_CERT_FILE`, `NODE_EXTRA_CA_CERTS`, `AWS_CA_BUNDLE`, `REQUESTS_CA_BUNDLE` or `CURL_CA_BUNDLE`, or mounts the certificate's path, counts as set up.
+`nearhost doctor` reports a service that calls a name Nearhost serves and does not trust the certificate, as `docker.ca`. A service that sets `SSL_CERT_FILE`, `NODE_EXTRA_CA_CERTS`, `AWS_CA_BUNDLE`, `REQUESTS_CA_BUNDLE` or `CURL_CA_BUNDLE`, or mounts the certificate's path, counts as set up. The doctor checks only that the setting is there, not that the runtime trusts the certificate, so a worker in another language needs the setting its runtime reads.
 
 ## Being let in
 
 Nearhost serves its projects only to this machine. A request from anywhere else is dropped without an answer. On Linux, a container's request comes from its address on a Docker network, not from loopback, so Nearhost drops it.
 
-`docker_clients: true` in the project's [`.nearhostrc`](/docs/reference/nearhostrc/#docker-clients) serves the project to the networks the Docker daemon has on this machine as well. Nearhost asks Docker for them when the project starts, and again every 30 seconds while it runs, so a network Compose creates later is let in too. Until Docker first answers, it accepts requests from `172.16.0.0/12`, the private block most of Docker's default networks come from. The project's log says which networks it accepts requests from.
+`docker_clients: true` in the project's [`.nearhostrc`](/docs/reference/nearhostrc/#docker-clients) serves the project to the networks the Docker daemon has on this machine as well. Nearhost asks Docker for them when the project starts, and again every 30 seconds while it runs, so a network Compose creates later is let in too. Until Docker first answers, it accepts requests from `172.16.0.0/12`, the private block most of Docker's default networks come from, which can also take in other machines on that block your machine can reach. The project's log says which networks it accepts requests from.
 
 - It works only for a project on this machine. On a project on a server, the file is an error.
 - It always needs your approval, as a real domain does. See [Approval](/docs/reference/nearhostrc/#approval).
@@ -117,7 +117,7 @@ services:
       - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
 ```
 
-Approve `api.local.example.com` and `docker_clients` when you add the project, or when Nearhost asks after the file changes. See [What needs approval](/docs/concepts/multi-host-projects/#what-needs-approval). Then restart the worker with `docker compose up -d worker`.
+Approve `api.local.example.com` and `docker_clients` when you add the project, or when Nearhost asks after the file changes. See [Approval](/docs/reference/nearhostrc/#approval). Then restart the worker with `docker compose up -d worker`.
 
 ## Check it works
 

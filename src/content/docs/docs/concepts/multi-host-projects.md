@@ -43,7 +43,7 @@ A host can be served by only one enabled project. Two exact hosts clash when the
 
 Each exact host gets its own certificate. A name under a pattern gets one the first time it is visited. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/#per-name-certificates).
 
-An exact host goes in the hosts file while its project is enabled. One that does not end in `.test` is left out when DNS already points it at loopback, and `localhost` is never added. Patterns never go in the hosts file, because the file cannot hold them, so a pattern's names need DNS that points them at this machine. `nearhost doctor` reports a pattern that does not resolve here as `hosts.unresolved-pattern`. See [The hosts file](/docs/concepts/the-hosts-file/).
+An exact host goes in the hosts file while its project is enabled. One that does not end in `.test` is left out when DNS already points it only at loopback addresses, and `localhost` is never added. Patterns never go in the hosts file, because the file cannot hold them, so a pattern's names need DNS that points them at this machine. `nearhost doctor` reports a pattern that does not resolve here as `hosts.unresolved-pattern`. See [The hosts file](/docs/concepts/the-hosts-file/).
 
 ## What needs approval
 
@@ -70,7 +70,7 @@ Inferred hosts are fixed when the project is added or edited. Changing `APP_URL`
 
 ## Where the URLs show
 
-The project view in the interface lists every URL under the project's name. A pattern is shown dim, since a browser cannot open it. For a coding agent, `/nearhost status` reports the project's `url` and every other one in `urls`. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+The project view in the interface lists every URL under the project's name. A pattern is shown dim, since a browser cannot open it. For a coding agent, `/nearhost status` reports the main URL as `url`, and every URL the project serves, the main one first, as `urls`. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
 
 ## An example
 
