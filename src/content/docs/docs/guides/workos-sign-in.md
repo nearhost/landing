@@ -2,7 +2,7 @@
 title: WorkOS sign-in on a remote dev server
 description: Give a WorkOS AuthKit app an HTTPS redirect URI in local dev, such as https://local.myapp.com/authenticate, when the dev server runs on another machine.
 sidebar:
-  order: 1
+  order: 4
 ---
 
 :::note
@@ -101,7 +101,7 @@ The starter kit's `bootstrap/app.php` already has a `withMiddleware` closure. Ad
 
 `'*'` trusts the forwarded headers from any address. If this file also runs in production behind a known load balancer, list that load balancer's addresses there instead.
 
-If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/).
+If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, set `server.hmr.host` to `'localhost'` in `vite.config.js`, because the forward listens on `127.0.0.1` only. See [Vite on the IPv6 loopback address](/docs/guides/ngrok-assets-on-localhost/#vite-on-the-ipv6-loopback-address).
 
 On another stack the idea is the same. Set the app's public URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to WorkOS matches the one you registered.
 

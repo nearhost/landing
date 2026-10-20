@@ -2,7 +2,7 @@
 title: Cognito sign-in on a remote dev server
 description: Give an Amazon Cognito app client an HTTPS callback URL in local dev, such as https://local.myapp.com/auth/cognito/callback, when the dev server runs on another machine.
 sidebar:
-  order: 3
+  order: 6
 ---
 
 :::note
@@ -171,7 +171,7 @@ $middleware->trustProxies(at: '*');
 
 The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) explains it, and what to list instead of `'*'` if the file also runs in production behind a known load balancer.
 
-If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/).
+If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, set `server.hmr.host` to `'localhost'` in `vite.config.js`, because the forward listens on `127.0.0.1` only. See [Vite on the IPv6 loopback address](/docs/guides/ngrok-assets-on-localhost/#vite-on-the-ipv6-loopback-address).
 
 On another stack the idea is the same. Use any OpenID Connect client with the pool's domain and the app client's ID and secret. Set the app's public URL and its callback URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to Cognito matches the one you listed.
 
