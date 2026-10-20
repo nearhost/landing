@@ -28,6 +28,15 @@ function textFiles(dir) {
   return filesMatching(dir, ['.html', '.css', '.js', '.mjs', '.json', '.txt', '.xml', '.svg']);
 }
 
+/** The @type of each node in a JSON-LD @graph, or none when it does not parse. */
+function graphTypes(json) {
+  try {
+    return JSON.parse(json)['@graph'].map((node) => node['@type']);
+  } catch {
+    return [];
+  }
+}
+
 check(existsSync(dist), 'verify-dist: dist/ does not exist; run the build first');
 if (failures.length) {
   console.error(failures.join('\n'));
@@ -97,15 +106,12 @@ if (existsSync(index)) {
     'footer version is neither a tag nor "latest"',
   );
   const ld = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
-  let software;
-  try {
-    software = ld && JSON.parse(ld);
-  } catch {
-    // Reported below.
-  }
+  const types = graphTypes(ld);
   check(
-    software?.['@type'] === 'SoftwareApplication' && software?.name === 'Nearhost',
-    'landing page must carry SoftwareApplication JSON-LD that parses',
+    ['SoftwareApplication', 'SoftwareSourceCode', 'Organization', 'Person', 'WebSite'].every(
+      (type) => types.includes(type),
+    ),
+    `landing page JSON-LD must describe the app, its source, maker and site; found ${types}`,
   );
   // The nav menu, the copy button and the interface demo.
   const components = new Set([...html.matchAll(/component-url="([^"]*)"/g)].map((m) => m[1]));
@@ -120,11 +126,15 @@ if (existsSync(index)) {
   );
 }
 
-// 5. The docs entry point exists.
-check(
-  existsSync(join(dist, 'docs', 'getting-started', 'install', 'index.html')),
-  'docs install page is missing',
-);
+// 5. The docs entry point exists, dated as a technical article.
+const installPage = join(dist, 'docs', 'getting-started', 'install', 'index.html');
+check(existsSync(installPage), 'docs install page is missing');
+if (existsSync(installPage)) {
+  const html = readFileSync(installPage, 'utf8');
+  const ld = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+  check(graphTypes(ld).includes('TechArticle'), 'docs pages must carry TechArticle JSON-LD');
+  check(/"dateModified":"\d{4}-/.test(ld ?? ''), 'docs JSON-LD must have a dateModified');
+}
 
 // 6. Every provider guide says which Nearhost it needs and when it was checked.
 const guidesDir = join(dist, 'docs', 'guides');

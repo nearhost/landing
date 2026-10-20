@@ -3,6 +3,7 @@ import { url } from '../lib/url';
 import { ogPath } from '../lib/og.mjs';
 import { plausibleInit, plausibleSrc, tracked } from '../lib/plausible.mjs';
 import { latestVersion } from '../lib/version';
+import { entities, ids } from '../lib/structured-data.mjs';
 import groteskFont from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 import sansFont from '@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?url';
 import monoFont from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2?url';
@@ -23,22 +24,41 @@ const image = new URL(url(ogPath('index')), Astro.site);
 const analytics = tracked(import.meta.env.BASE_URL, import.meta.env.PROD);
 const version = await latestVersion();
 
-// Tells search engines what the page is about: a free, open source developer tool.
-const software = {
+// Tells search engines what the page is about: a free, open source developer tool, its
+// source code and who makes it.
+const id = ids(Astro.site!);
+const structuredData = {
   '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'Nearhost',
-  description,
-  url: canonical.href,
-  image: image.href,
-  applicationCategory: 'DeveloperApplication',
-  operatingSystem: 'macOS, Linux',
-  ...(version === 'latest' ? {} : { softwareVersion: version.replace(/^v/, '') }),
-  downloadUrl: new URL(url('/docs/getting-started/install/'), Astro.site).href,
-  license: 'https://opensource.org/licenses/MIT',
-  isAccessibleForFree: true,
-  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-  sameAs: ['https://github.com/nearhost/nearhost'],
+  '@graph': [
+    {
+      '@type': 'SoftwareApplication',
+      '@id': id.software,
+      name: 'Nearhost',
+      description,
+      url: canonical.href,
+      image: image.href,
+      applicationCategory: 'DeveloperApplication',
+      operatingSystem: 'macOS, Linux',
+      ...(version === 'latest' ? {} : { softwareVersion: version.replace(/^v/, '') }),
+      downloadUrl: new URL(url('/docs/getting-started/install/'), Astro.site).href,
+      license: 'https://opensource.org/licenses/MIT',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      author: { '@id': id.person },
+      publisher: { '@id': id.organization },
+      sameAs: ['https://github.com/nearhost/nearhost'],
+    },
+    {
+      '@type': 'SoftwareSourceCode',
+      name: 'Nearhost source code',
+      codeRepository: 'https://github.com/nearhost/nearhost',
+      programmingLanguage: 'Go',
+      license: 'https://opensource.org/licenses/MIT',
+      author: { '@id': id.person },
+      targetProduct: { '@id': id.software },
+    },
+    ...entities(Astro.site!),
+  ],
 };
 ---
 
@@ -68,7 +88,7 @@ const software = {
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={image} />
     <meta name="twitter:image:alt" content="Nearhost: Run it anywhere. Open it here." />
-    <script type="application/ld+json" set:html={JSON.stringify(software)} />
+    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
     {analytics && (
       <>
         <script is:inline async src={plausibleSrc} />
