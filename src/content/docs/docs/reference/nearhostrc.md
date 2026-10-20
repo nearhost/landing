@@ -137,6 +137,8 @@ A change that needs no approval, such as a port moved in `.env`, a new label or 
 
 Nearhost answers only this machine. On Linux, a request from a container comes from a Docker network, not from this machine's loopback address, so Nearhost drops it. `docker_clients: true` also serves the project to the networks Docker has on this machine, while other projects stay loopback-only. It works only for a project on this machine, and it always needs your approval. Docker Desktop on macOS already delivers container requests from 127.0.0.1, so this matters on Linux.
 
+A container also needs to find the host and trust the local certificate authority. See [Callbacks from Docker containers to a local HTTPS domain](/docs/guides/container-callbacks/).
+
 ## A file without routes
 
 :::note
