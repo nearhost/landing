@@ -53,6 +53,7 @@ export default defineConfig({
           label: 'Getting started',
           items: [{ autogenerate: { directory: 'docs/getting-started' } }],
         },
+        { label: 'Guides', items: [{ autogenerate: { directory: 'docs/guides' } }] },
         { label: 'Concepts', items: [{ autogenerate: { directory: 'docs/concepts' } }] },
         { label: 'Reference', items: [{ autogenerate: { directory: 'docs/reference' } }] },
         {

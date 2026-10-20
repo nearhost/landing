@@ -126,7 +126,29 @@ check(
   'docs install page is missing',
 );
 
-// 6. Every internal link in every page resolves to a file in dist/.
+// 6. Every provider guide says which Nearhost it needs and when it was checked.
+const guidesDir = join(dist, 'docs', 'guides');
+const guides = existsSync(guidesDir)
+  ? readdirSync(guidesDir)
+      .filter((name) => name.endsWith('-sign-in'))
+      .map((name) => join(guidesDir, name, 'index.html'))
+      .filter((file) => existsSync(file))
+  : [];
+check(guides.length > 0, 'no sign-in guides in dist/docs/guides/');
+for (const file of guides) {
+  const html = readFileSync(file, 'utf8');
+  const note = html.match(/<aside aria-label="Checked against"[\s\S]*?<\/aside>/)?.[0] ?? '';
+  check(
+    /\d{4}-\d{2}-\d{2}/.test(note),
+    `${file} must have a "Checked against" note with a YYYY-MM-DD date`,
+  );
+  check(
+    /Needs Nearhost \d+\.\d+\.\d+ or later/.test(html.replace(/<[^>]*>/g, '')),
+    `${file} must say "Needs Nearhost X.Y.Z or later"`,
+  );
+}
+
+// 7. Every internal link in every page resolves to a file in dist/.
 // Links are resolved the way a browser would, against the page's own URL on the site's origin.
 // Absolute links to the site point at production, which has no base.
 const origin = 'https://nearhost.dev';
