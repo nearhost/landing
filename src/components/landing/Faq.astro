@@ -6,7 +6,7 @@ import { jsonLd } from '../../lib/structured-data.mjs';
 const faqs = [
   {
     q: 'Does Nearhost install anything on the server?',
-    a: 'No. Nearhost runs on your laptop and shells out to OpenSSH, and leaves your project and its config untouched. It reads files such as <code>.env</code> over SFTP. The server needs SSH that connects without a prompt, with SFTP and TCP forwarding allowed, as most servers do.',
+    a: 'No. Nearhost runs on your laptop and shells out to OpenSSH. It reads files such as <code>.env</code> over SFTP, and adds only a private <code>~/.nearhost</code> folder holding a socket, so a coding agent on the server can reach it. It writes a <code>.nearhostrc</code> to your project only when you run <code>nearhost export</code>. The server needs SSH that connects without a prompt, with SFTP and TCP forwarding allowed, as most servers do.',
   },
   {
     q: 'Which operating systems does it run on?',
