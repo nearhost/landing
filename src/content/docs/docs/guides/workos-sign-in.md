@@ -100,7 +100,7 @@ The starter kit's `bootstrap/app.php` already has a `withMiddleware` closure. Ad
 
 `'*'` trusts the forwarded headers from any address. If this file also runs in production behind a known load balancer, list that load balancer's addresses plus `127.0.0.1`, or the Docker network's gateway under Sail, instead, or read the list from an environment variable. Nearhost's forward arrives from `127.0.0.1`, or from the Docker network's gateway under Sail, so leaving it out stops Laravel trusting it and brings back `http://` links.
 
-If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. On older versions it listens on `127.0.0.1` only, so set `server.hmr.host` to `'localhost'` in `vite.config.js`, or run `nearhost update`.
+If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. With an older Nearhost, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
 
 On another stack the idea is the same. Set the app's public URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to WorkOS matches the one you registered.
 

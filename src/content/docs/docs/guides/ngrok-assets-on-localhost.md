@@ -55,7 +55,7 @@ When the dev server runs on another machine, Nearhost serves it on your laptop a
 
 ### Vite on the IPv6 loopback address
 
-From Nearhost 0.7.0, a loopback forward answers on both `127.0.0.1` and `[::1]`, so a `public/hot` that says `http://[::1]:5173` works as it is. On Nearhost older than 0.7.0, set `server.hmr.host` to `'localhost'` in `vite.config.js` and restart `npm run dev`, or run `nearhost update`.
+A Vite dev server that listens on `::1` makes `laravel-vite-plugin` write `http://[::1]:5173` to `public/hot`. A loopback forward answers on both `127.0.0.1` and `[::1]`, so that works as it is. This needs Nearhost 0.7.0 or later and a laptop with the IPv6 loopback, which every Mac and almost every Linux machine has. Otherwise, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
 
 ## The guides
 
