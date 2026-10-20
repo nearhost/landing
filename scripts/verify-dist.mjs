@@ -31,7 +31,8 @@ function textFiles(dir) {
 /** The nodes of a JSON-LD @graph, or none when it does not parse. */
 function graphNodes(json) {
   try {
-    return JSON.parse(json)['@graph'] ?? [];
+    const graph = JSON.parse(json)['@graph'];
+    return Array.isArray(graph) ? graph : [];
   } catch {
     return [];
   }
