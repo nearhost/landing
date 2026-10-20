@@ -54,6 +54,9 @@ export default defineConfig({
             '- [ngrok loads the page, but assets point at localhost](https://nearhost.dev/docs/guides/ngrok-assets-on-localhost/)',
             '- [Vite hot reload fails over SSH port forwarding](https://nearhost.dev/docs/guides/vite-hot-reload-over-ssh/)',
             '- [Forward several ports over SSH without retyping -L](https://nearhost.dev/docs/guides/forward-ports-over-ssh/)',
+            '- [WorkOS sign-in on a remote dev server](https://nearhost.dev/docs/guides/workos-sign-in/)',
+            '- [Clerk sign-in on a remote dev server](https://nearhost.dev/docs/guides/clerk-sign-in/)',
+            '- [Cognito sign-in on a remote dev server](https://nearhost.dev/docs/guides/cognito-sign-in/)',
           ].join('\n'),
           // The docs in reading order, not alphabetical: getting started, then guides, then concepts.
           promote: [
