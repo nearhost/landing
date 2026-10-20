@@ -148,7 +148,17 @@ for (const file of guides) {
   );
 }
 
-// 7. Every internal link in every page resolves to a file in dist/.
+// 7. The llms.txt files for AI assistants exist and carry no page chrome.
+for (const name of ['llms.txt', 'llms-full.txt', 'llms-small.txt']) {
+  const file = join(dist, name);
+  check(existsSync(file), `dist/${name} is missing`);
+  if (!existsSync(file)) continue;
+  const text = readFileSync(file, 'utf8');
+  check(/^(<SYSTEM>.*<\/SYSTEM>\s*)?# /.test(text), `dist/${name} must start with a heading`);
+  check(!text.includes('Section titled'), `dist/${name} contains heading anchor text`);
+}
+
+// 8. Every internal link in every page resolves to a file in dist/.
 // Links are resolved the way a browser would, against the page's own URL on the site's origin.
 // Absolute links to the site point at production, which has no base.
 const origin = 'https://nearhost.dev';
