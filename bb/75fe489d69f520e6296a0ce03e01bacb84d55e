@@ -1,0 +1,23 @@
+src/content/docs/docs/guides/clerk-sign-in.md
+  s_89a63a3c1fa7d2::t_8b768928b3a538 60
+src/content/docs/docs/guides/cognito-sign-in.md
+  s_89a63a3c1fa7d2::t_cc45dfcf395c0d 63
+src/content/docs/docs/guides/workos-sign-in.md
+  s_89a63a3c1fa7d2::t_189c0f8136e0f1 56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "bb75fe489d69f520e6296a0ce03e01bacb84d55e",
+  "prompts": {},
+  "sessions": {
+    "s_89a63a3c1fa7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ade858e5-1767-41c6-b0b0-fdd74aba68cf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
