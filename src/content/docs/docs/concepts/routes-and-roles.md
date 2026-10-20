@@ -30,7 +30,7 @@ For a project on a server, Nearhost picks an ephemeral local port for the forwar
 
 ## loopback
 
-A raw TCP forward to `127.0.0.1:<port>` on the laptop, using the same port number as the remote. Use it for a dev server whose URLs point at `localhost`, such as Vite behind a backend framework.
+A raw TCP forward to `127.0.0.1:<port>` on the laptop, using the same port number as the remote. From Nearhost 0.7.0, it answers on `[::1]:<port>` too. Use it for a dev server whose URLs point at `localhost`, such as Vite behind a backend framework.
 
 A loopback route means nothing for local projects, because the port is already local, so a local route is either `web` or `ignore`. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) for when you need one.
 
