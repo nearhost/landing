@@ -1,0 +1,39 @@
+src/content/docs/docs/concepts/multi-host-projects.md
+  s_89a63a3c1fa7d2::t_ae2f599b7a34b6 67
+  s_89a63a3c1fa7d2::t_d492626c8e9988 40
+  s_89a63a3c1fa7d2::t_0ddd5f2ae70c8b 1-39,41-66,68-97
+src/content/docs/docs/concepts/dev-servers-and-hot-reload.md
+  s_89a63a3c1fa7d2::t_a15a52d1f05a1c 5
+src/content/docs/docs/concepts/discovery.md
+  s_89a63a3c1fa7d2::t_0ba614833519c9 5
+src/content/docs/docs/concepts/presets-and-registries.md
+  s_89a63a3c1fa7d2::t_bd31b78aab8248 5,31-33
+src/content/docs/docs/concepts/ssh-transport.md
+  s_89a63a3c1fa7d2::t_d7900e986cef4c 5
+src/content/docs/docs/concepts/the-hosts-file.md
+  s_89a63a3c1fa7d2::t_d9e4d85f038b8d 5
+src/content/docs/docs/concepts/the-request-log.md
+  s_89a63a3c1fa7d2::t_68a44fecfa0854 5
+src/content/docs/docs/concepts/tls-and-the-proxy.md
+  s_89a63a3c1fa7d2::t_57a35e0f27d90c 5
+src/content/docs/docs/getting-started/add-a-project.md
+  s_89a63a3c1fa7d2::t_460680d5710646 88-89
+src/content/docs/docs/reference/keyboard-shortcuts.md
+  s_89a63a3c1fa7d2::t_d78394d565f9d8 42,99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c65d5be2a4a14a5ef8c58251e9b0ebeee4a29fee",
+  "prompts": {},
+  "sessions": {
+    "s_89a63a3c1fa7d2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ade858e5-1767-41c6-b0b0-fdd74aba68cf",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
