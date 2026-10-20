@@ -3,6 +3,9 @@ import { url } from '../lib/url';
 import { ogPath } from '../lib/og.mjs';
 import { plausibleInit, plausibleSrc, tracked } from '../lib/plausible.mjs';
 import { latestVersion } from '../lib/version';
+import groteskFont from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
+import sansFont from '@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?url';
+import monoFont from '@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2?url';
 import '@fontsource-variable/space-grotesk/index.css';
 import '@fontsource-variable/dm-sans/index.css';
 import '@fontsource/ibm-plex-mono/400.css';
@@ -48,6 +51,10 @@ const software = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+    <!-- The fonts above the fold, fetched before the CSS that asks for them. -->
+    <link rel="preload" href={groteskFont} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={sansFont} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={monoFont} as="font" type="font/woff2" crossorigin />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
