@@ -7,7 +7,7 @@ sidebar:
 
 The file is `~/.config/nearhost/config.yaml`, or `$XDG_CONFIG_HOME/nearhost/config.yaml` when that variable is set. `--config <file>` points any command at another file.
 
-Nearhost writes the file whenever you add or change something in the interface, or run `nearhost add`, `nearhost preset` or `nearhost preset registry`. It reads the file again first, so hand edits are kept, but comments and formatting are not.
+Nearhost writes the file whenever you add or change something in the interface, or run `nearhost add`, `nearhost preset` or `nearhost preset registry`. `nearhost up` writes it too, when a project's `.nearhostrc` has changed in a way that needs no approval. It reads the file again first, so hand edits are kept, but comments and formatting are not.
 
 ```yaml
 servers:
@@ -40,25 +40,27 @@ presets:
 
 ## Keys
 
-| Key                         | Type    | Meaning                                                                                    |
-| --------------------------- | ------- | ------------------------------------------------------------------------------------------ |
-| `servers[].name`            | string  | Free text. `local` is reserved.                                                            |
-| `servers[].ssh_host`        | string  | An alias from `~/.ssh/config`, or `user@host`. For another port, use an alias with `Port`. |
-| `projects[].name`           | string  | The project name.                                                                          |
-| `projects[].server`         | string  | The `name` of a server, or `local`.                                                        |
-| `projects[].path`           | string  | The project directory on that server.                                                      |
-| `projects[].alias`          | string  | The project's main name, served over HTTPS. `<name>.test` unless you change it. See below. |
-| `projects[].enabled`        | boolean | Start the project automatically when Nearhost launches.                                    |
-| `projects[].routes[].port`  | integer | The port on the server.                                                                    |
-| `projects[].routes[].role`  | string  | One of `web`, `loopback` or `ignore`.                                                      |
-| `projects[].routes[].label` | string  | Optional. A description, usually from discovery.                                           |
-| `registries[].alias`        | string  | The name a registry's presets are known by, as in `nearhost/vite`.                         |
-| `registries[].repo`         | string  | The registry's GitHub repository, as `owner/name`.                                         |
-| `registry_prompt`           | boolean | `false` stops Nearhost offering to trust the official registry. Absent means ask.          |
-| `notifications`             | boolean | `false` stops the terminal notification when an agent proposes a project. Absent means on. |
-| `presets[].name`            | string  | An enabled preset: `<registry>/<name>`, or a plain name for a local file.                  |
-| `presets[].ref`             | string  | For a registry preset, the commit it was installed from.                                   |
-| `presets[].sha256`          | string  | For a registry preset, the hash of its file.                                               |
+| Key                         | Type    | Meaning                                                                                        |
+| --------------------------- | ------- | ---------------------------------------------------------------------------------------------- |
+| `servers[].name`            | string  | Free text. `local` is reserved.                                                                |
+| `servers[].ssh_host`        | string  | An alias from `~/.ssh/config`, or `user@host`. For another port, use an alias with `Port`.     |
+| `projects[].name`           | string  | The project name.                                                                              |
+| `projects[].server`         | string  | The `name` of a server, or `local`.                                                            |
+| `projects[].path`           | string  | The project directory on that server.                                                          |
+| `projects[].alias`          | string  | The project's main name, served over HTTPS. `<name>.test` unless you change it. See below.     |
+| `projects[].enabled`        | boolean | Start the project automatically when Nearhost launches.                                        |
+| `projects[].routes[].port`  | integer | The port on the server.                                                                        |
+| `projects[].routes[].role`  | string  | One of `web`, `loopback` or `ignore`.                                                          |
+| `projects[].routes[].label` | string  | Optional. A description, usually from discovery.                                               |
+| `projects[].routes[].hosts` | list    | Optional, web routes only. More names to serve the route at: exact names or wildcard patterns. |
+| `projects[].nearhostrc`     | map     | Written by Nearhost: the project's `.nearhostrc` as Nearhost last applied it. Do not edit it.  |
+| `registries[].alias`        | string  | The name a registry's presets are known by, as in `nearhost/vite`.                             |
+| `registries[].repo`         | string  | The registry's GitHub repository, as `owner/name`.                                             |
+| `registry_prompt`           | boolean | `false` stops Nearhost offering to trust the official registry. Absent means ask.              |
+| `notifications`             | boolean | `false` stops the terminal notification when an agent proposes a project. Absent means on.     |
+| `presets[].name`            | string  | An enabled preset: `<registry>/<name>`, or a plain name for a local file.                      |
+| `presets[].ref`             | string  | For a registry preset, the commit it was installed from.                                       |
+| `presets[].sha256`          | string  | For a registry preset, the hash of its file.                                                   |
 
 Use `nearhost preset` and `nearhost preset registry` rather than editing the last five by hand. See [Presets and registries](/docs/concepts/presets-and-registries/).
 
@@ -91,7 +93,9 @@ alias: ${APP_HOST:-app.local.example.com}
 - Server names are unique, each server has a host, and `local` is not used as a name.
 - Project names are unique, and each project's server exists.
 - Aliases are unique across projects, ignoring case. An alias that is not a valid main name does not start, and `nearhost doctor` reports it.
-- Each project has exactly one `web` route. Ports are from 1 to 65535.
+- Each project has at least one `web` route. The first is served at the main name. Every other web route needs at least one host. Ports are from 1 to 65535.
+- Only web routes have hosts, and a project serves each host once.
+- `docker_clients` in a `.nearhostrc` works only for projects on `local`.
 - Loopback ports are unique across enabled projects.
 - Registry aliases are lowercase letters, digits and single hyphens. Each preset's registry is trusted. Registry presets have `ref` and `sha256`, and local ones do not.
 

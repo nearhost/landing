@@ -19,7 +19,7 @@ Three environment variables change what it does:
 
 | Variable               | Effect                                                   |
 | ---------------------- | -------------------------------------------------------- |
-| `NEARHOST_VERSION`     | Install this release instead of the latest, as `v0.4.0`. |
+| `NEARHOST_VERSION`     | Install this release instead of the latest, as `v0.6.0`. |
 | `NEARHOST_INSTALL_DIR` | Install into this folder.                                |
 | `NEARHOST_SKIP_SETCAP` | Set to `1` to skip the Linux port step below.            |
 

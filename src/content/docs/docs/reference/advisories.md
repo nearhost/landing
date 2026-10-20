@@ -61,7 +61,7 @@ export default defineConfig({
 
 ## APP_URL mismatch
 
-`app-url`, from `nearhost/laravel`. Appears when `APP_URL` in `.env` is missing or is not `https://<alias>`. Generated links use that value, so set it to the alias:
+`app-url`, from `nearhost/laravel`. Appears when `APP_URL` in `.env` is missing, is not `https://`, has a port, or names a host the project does not serve. Generated links use that value, so set it to one of the project's addresses, with `https` and no port. The suggested line keeps the host when the project serves it, and uses the alias otherwise:
 
 ```sh
 APP_URL=https://myapp.test

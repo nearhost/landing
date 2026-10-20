@@ -14,7 +14,7 @@ Press `n`. A box titled "Add project" opens over the screen. Its steps are count
 1. **Server.** Pick `local` for this machine, or a server you have added. The selected server, or the selected project's, is chosen already. **New server…** adds one on the way. See [Add a server](/docs/getting-started/add-a-server/).
 2. **Path.** The project's directory. On `local` it starts as the folder you ran `nearhost` in, and on a server as `~/`. See [Typing a path](#typing-a-path).
 3. **Presets.** Nearhost reads ports from `.env` by itself. While no preset registry is trusted, it asks once whether to trust the official presets, which add Compose files, Vite and Laravel Sail. Choose Yes, No, or Don't ask again. With a registry trusted, it lists the presets that suit this project, ticked. `space` unticks one, and `enter` enables the rest. See [Presets and registries](/docs/concepts/presets-and-registries/).
-4. **Routes.** The ports found, with a role and a label for each. Ticked ports are served. `space` ticks or unticks a port, and `←` or `→` changes its role. One port must be `web`. If no ports were found, give the web port yourself.
+4. **Routes.** The ports found, with a role and a label for each. Ticked ports are served. `space` ticks or unticks a port, and `←` or `→` changes its role. At least one port must be `web`. If no ports were found, give the web port yourself.
 5. **Name.** The project's name and its alias, which follows the name until you change it. `tab` moves between them. Names and aliases must be unique. The alias is the project's [main name](/docs/reference/config/#main-name) and can be any lowercase domain name, such as `local.myapp.com`, but not a wildcard, `localhost` or an IP address. A real domain asks for approval, which typing it here gives. One that comes from the project's `.nearhostrc` is asked about on the last step.
 6. **Confirm.** The server, path, address and routes, with any advice. `enter` adds the project.
 
@@ -60,7 +60,7 @@ Start it with `nearhost up`.
 
 With no registry trusted, only the `.env` port variables are found, and every port but the web one is `ignore`. Here the Vite port should reach the browser as `localhost:5174`, so change it to `loopback` afterwards: select the project, press `tab`, choose the route and press `space`. The [Vite and Sail presets](/docs/concepts/presets-and-registries/) do that for you.
 
-At a terminal it asks what the interface asks: whether to trust the official presets, which suggested presets to enable, and which port is the web app when that is not clear. It also offers to add a server it does not know. Without a terminal it takes the defaults, and stops if it cannot tell which port is web.
+At a terminal it asks what the interface asks: whether to trust the official presets, which suggested presets to enable, and which port is the web app when that is not clear. It also offers to add a server it does not know, and asks you to approve any real domain, wildcard, `localhost` or Docker access that the project's `.nearhostrc` or presets ask for. Without a terminal it takes the defaults, and stops if it cannot tell which port is web or if something needs approval.
 
 | Flag              | Effect                                                                                                                                                 |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -68,6 +68,7 @@ At a terminal it asks what the interface asks: whether to trust the official pre
 | `--name <name>`   | The project name. The default is the directory's name.                                                                                                 |
 | `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost` or an IP address. Typing it approves it. |
 | `--web <port>`    | The port to serve at the alias.                                                                                                                        |
+| `--host <host>`   | Add this host to the web route. Repeat for more. Typing it approves it.                                                                                |
 | `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                    |
 | `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
 | `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
@@ -76,11 +77,11 @@ A `~` in the path means the server's home directory, even when your shell has al
 
 ## Route roles
 
-| Role       | What happens                                                                           |
-| ---------- | -------------------------------------------------------------------------------------- |
-| `web`      | Served at `https://<alias>` through the proxy. Exactly one per project.                |
-| `loopback` | Raw forward to the same port on your laptop's `127.0.0.1`. Skipped for local projects. |
-| `ignore`   | Listed, not forwarded.                                                                 |
+| Role       | What happens                                                                                             |
+| ---------- | -------------------------------------------------------------------------------------------------------- |
+| `web`      | Served through the proxy. The first is served at `https://<alias>`, and each later one at its own hosts. |
+| `loopback` | Raw forward to the same port on your laptop's `127.0.0.1`. Skipped for local projects.                   |
+| `ignore`   | Listed, not forwarded.                                                                                   |
 
 Discovery proposes the roles, and you can change them at any time. See [Routes and roles](/docs/concepts/routes-and-roles/).
 

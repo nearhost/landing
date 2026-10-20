@@ -21,12 +21,14 @@ Presets combine. On a Sail project with a Vite frontend, `sail`, `laravel` and `
 
 The official registry is [nearhost/presets](https://github.com/nearhost/presets).
 
-| Preset             | Turns on when                                                               | What it adds                                                                                                                                       |
-| ------------------ | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nearhost/compose` | The project has a Compose file                                              | A route for every TCP port the Compose file publishes, labelled with its service. A service on container port 80 becomes the web route.            |
-| `nearhost/laravel` | The project has an `artisan` file                                           | Advice when `APP_URL` is not `https://<alias>`, since generated links use it.                                                                      |
-| `nearhost/sail`    | The Compose file mentions `laravel/sail`, a `sail-` image or `LARAVEL_SAIL` | Compose's published ports, with the Vite dev server forwarded to `localhost` through `VITE_PORT`. Vite advice that fits a container.               |
-| `nearhost/vite`    | A `vite.config.*` file exists, or `package.json` depends on `vite`          | The dev server port from `server.port` as a route. Advice when the port is the default 5173, or when `server.allowedHosts` would reject the alias. |
+| Preset             | Turns on when                                                               | What it adds                                                                                                                                                                                                                      |
+| ------------------ | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nearhost/compose` | The project has a Compose file                                              | A route for every TCP port the Compose file publishes, labelled with its service. A service on container port 80 becomes the web route.                                                                                           |
+| `nearhost/laravel` | The project has an `artisan` file                                           | Advice when `APP_URL` is not one of the project's addresses, with `https` and no port, since generated links use it.                                                                                                              |
+| `nearhost/sail`    | The Compose file mentions `laravel/sail`, a `sail-` image or `LARAVEL_SAIL` | Compose's published ports, with the Vite dev server forwarded to `localhost` through `VITE_PORT`. The hosts in `APP_URL`, `REVERB_HOST` and `FILES_URL` or `MINIO_URL`, served on their ports. Vite advice that fits a container. |
+| `nearhost/vite`    | A `vite.config.*` file exists, or `package.json` depends on `vite`          | The dev server port from `server.port` as a route. Advice when the port is the default 5173, or when `server.allowedHosts` would reject the alias.                                                                                |
+
+`nearhost add` serves the hosts a preset finds. A project's `.nearhostrc` wins over them, a real domain among them is asked about first, and one that another enabled project serves is left out with a note.
 
 ## Trusting a registry
 

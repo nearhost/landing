@@ -5,9 +5,11 @@ sidebar:
   order: 5
 ---
 
-Caddy runs inside the Nearhost process, with its storage under `~/.config/nearhost/caddy`. It listens on 443 for HTTPS and on 80 only to redirect to HTTPS. To use other ports, run Nearhost with `--https-port` and `--http-port`.
+Caddy runs inside the Nearhost process, with its storage under `~/.config/nearhost/caddy`. It listens on 443 for HTTPS and on 80 only to redirect to HTTPS, with a 308. To use other ports, run Nearhost with `--https-port` and `--http-port`.
 
-It answers only this machine. A request from another computer, or for a name Nearhost does not serve, has its connection closed with no answer.
+It answers only this machine, and, for a project whose `.nearhostrc` sets `docker_clients`, containers on this machine's Docker networks. A request from another computer, or for a name Nearhost does not serve, has its connection closed with no answer.
+
+While any project runs, `https://localhost` shows Nearhost's own page, unless a project serves `localhost` itself.
 
 ## The local CA
 
@@ -19,13 +21,13 @@ Trust it from the welcome box the first time you start Nearhost, or at any time 
 
 Home shows whether it is trusted and when it expires. The date turns amber in the last 30 days.
 
-## Per-alias certificates
+## Per-name certificates
 
-Leaf certificates are issued automatically, one per alias. Because the CA is created on your machine, nobody else holds a key that can sign for your `.test` names.
+Leaf certificates are issued automatically. Each exact name a project serves gets its own. A name under a wildcard pattern gets one the first time it is visited. Because the CA is created on your machine, nobody else holds a key that can sign for your `.test` names.
 
 ## What the proxy sets
 
-Each running project is a site, `https://<alias>`, proxied to the web route's local forward, or for a local project to its web port.
+Each web route of a running project is served at its hosts, and the first one also at `https://<alias>`. Requests go to the route's local forward, or for a local project to its port.
 
 - The `Host` header is passed through unchanged.
 - `X-Forwarded-Proto: https` and `X-Forwarded-For` are set.

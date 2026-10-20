@@ -9,10 +9,11 @@ sidebar:
 nearhost                       the interface
 nearhost up [project...]       start projects without the interface, until Ctrl-C
 nearhost add [path]            add a project, discovering its ports
+nearhost export [project]      write a project's setup to its .nearhostrc
 nearhost ls                    list projects
 nearhost trust | untrust       the local CA in the system and browser stores
 nearhost hosts apply | clean   the nearhost block in /etc/hosts
-nearhost doctor                check ports, the CA, the hosts block and servers
+nearhost doctor                check ports, the CA, the hosts block, servers and projects
 nearhost preset ...            presets, which say what a framework's ports mean
 nearhost preset registry ...   the preset registries you trust
 nearhost update                update to the latest release
@@ -44,7 +45,7 @@ When the hosts block needs to change, it asks for your password in the terminal.
 
 ## nearhost add
 
-Adds a project. It discovers the routes from the project's files, prints them and saves the project. At a terminal it asks when it needs to: whether to trust the official presets, which suggested presets to enable, which port is the web app, and whether to add a server it does not know. It starts nothing and changes no file in the project.
+Adds a project. It discovers the routes from the project's files, prints them and saves the project. At a terminal it asks when it needs to: whether to trust the official presets, which suggested presets to enable, which port is the web app, whether to add a server it does not know, and whether to approve hosts, a main name or Docker access that the project's `.nearhostrc` or presets ask for. Without a terminal it stops rather than approve them. It starts nothing and changes no file in the project.
 
 | Flag              | Effect                                                                                                                                                 |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -52,6 +53,7 @@ Adds a project. It discovers the routes from the project's files, prints them an
 | `--name <name>`   | The project name. The default is the directory's name.                                                                                                 |
 | `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost` or an IP address. Typing it approves it. |
 | `--web <port>`    | The port to serve at the alias.                                                                                                                        |
+| `--host <host>`   | Add this host to the web route. Repeat for more. Typing it approves it.                                                                                |
 | `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                    |
 | `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
 | `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
@@ -79,7 +81,7 @@ Both take `--file <path>` to work on another file than `/etc/hosts`. See [The ho
 
 ## nearhost doctor
 
-Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. It takes `--https-port`, `--http-port` and `--no-hosts`.
+Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project's files and setup and lists what it finds. An error there also makes it exit non-zero. It takes `--https-port`, `--http-port` and `--no-hosts`, and `--json` prints all of it as one JSON object.
 
 | Check                 | What it looks at                                                                                                       |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
@@ -137,4 +139,4 @@ Nearhost also checks for a new release at most once a day, in the background, an
 
 ## nearhost version
 
-Prints the version, as `nearhost 0.4.0`.
+Prints the version, as `nearhost 0.6.0`.
