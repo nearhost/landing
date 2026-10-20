@@ -1,0 +1,24 @@
+src/components/landing/Faq.astro
+  s_f73a4dba9f7d00::t_d4c70c1036212a 45-50
+  s_f73a4dba9f7d00::t_1d8e4e8875ac94 1-44,51-110
+src/pages/index.astro
+  s_f73a4dba9f7d00::t_d4c70c1036212a 13,32
+scripts/verify-dist.mjs
+  s_f73a4dba9f7d00::t_d4c70c1036212a 116-128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c40fb909575cb8d117d2ff8423a5f567622210c6",
+  "prompts": {},
+  "sessions": {
+    "s_f73a4dba9f7d00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4d7d22e-aeb2-4a9a-ae19-70c1b770f423",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
