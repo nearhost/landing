@@ -1,6 +1,6 @@
 // Checks the built site for things a green build can still get wrong.
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -127,33 +127,41 @@ check(
 );
 
 // 6. Every internal link in every page resolves to a file in dist/.
+// Links are resolved the way a browser would, against the page's own URL on a stand-in origin.
+const origin = 'https://site.invalid';
 for (const file of pages) {
   const html = readFileSync(file, 'utf8');
+  const page = new URL(base + relative(dist, file).split(sep).join('/'), origin);
   const hrefs = new Set(
     [...html.matchAll(/<a\s[^>]*?href=(?:"([^"]*)"|'([^']*)')/gi)].map((m) => m[1] ?? m[2]),
   );
   for (const href of hrefs) {
-    if (href.startsWith('//')) continue;
-    if (!href.startsWith(base)) {
-      if (base !== '/' && href.startsWith('/')) {
-        failures.push(`${file} links to ${href}, which skips the site base ${base}`);
-      }
+    // Other schemes, other hosts and links within the page.
+    if (/^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith('//') || href.startsWith('#')) continue;
+    if (base !== '/' && href.startsWith('/') && !href.startsWith(base)) {
+      failures.push(`${file} links to ${href}, which skips the site base ${base}`);
       continue;
     }
     let path;
     try {
-      path = decodeURIComponent(href.split('#')[0].split('?')[0].slice(base.length));
+      const { pathname } = new URL(href, page);
+      if (!pathname.startsWith(base)) {
+        failures.push(`${file} links to ${href}, which is outside the site base ${base}`);
+        continue;
+      }
+      path = decodeURIComponent(pathname.slice(base.length));
     } catch {
       failures.push(`${file} links to ${href}, which is not a valid URL path`);
       continue;
     }
     const target =
       path === '' || path.endsWith('/') ? join(dist, path, 'index.html') : join(dist, path);
-    if (
-      !existsSync(target) ||
-      (statSync(target).isDirectory() && !existsSync(join(target, 'index.html')))
-    ) {
+    if (!target.startsWith(dist)) {
+      failures.push(`${file} links to ${href}, which is outside dist/`);
+    } else if (!existsSync(target)) {
       failures.push(`${file} links to ${href}, which is not in dist/`);
+    } else if (statSync(target).isDirectory()) {
+      failures.push(`${file} links to ${href}, a directory; end the link with a slash`);
     }
   }
 }
