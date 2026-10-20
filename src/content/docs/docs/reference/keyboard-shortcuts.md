@@ -2,7 +2,7 @@
 title: Keyboard shortcuts
 description: Every key in the Nearhost interface, by screen.
 sidebar:
-  order: 3
+  order: 4
 ---
 
 The footer always shows the keys that work where you are. When the window is narrow it leaves some out and shows `? more`, and `?` lists them all.

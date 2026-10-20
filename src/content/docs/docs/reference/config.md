@@ -79,14 +79,7 @@ The hosts file treats the two kinds differently:
 
 A project has one main name. If you switch to a real domain, the `<name>.test` address stops working.
 
-A `.nearhostrc` file can set the main name with `alias:`. It accepts `${VAR}` and `${VAR:-default}`, filled from `.env.local` and then `.env`, so each worktree can have its own name:
-
-```yaml
-version: 1
-alias: ${APP_HOST:-app.local.example.com}
-```
-
-`nearhost add --alias` wins over the file, and the file wins over `<name>.test`. Removing `alias:` from the file leaves the current name as it is.
+A project's `.nearhostrc` can set the main name with `alias:`, filled from the project's `.env` so each worktree can have its own. `nearhost add --alias` wins over the file, and the file wins over `<name>.test`. See [`.nearhostrc`](/docs/reference/nearhostrc/#keys).
 
 ## Validation
 

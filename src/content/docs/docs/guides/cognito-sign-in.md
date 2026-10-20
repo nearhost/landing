@@ -49,7 +49,7 @@ Start it with `nearhost up`.
 
 A name that does not end in `.test` needs your approval, because it can hide the real site. Typing it with `--alias` counts as approval.
 
-To keep the name with the project, put it in a `.nearhostrc` in the project's root:
+To keep the name with the project, put it in a [`.nearhostrc`](/docs/reference/nearhostrc/) in the project's root:
 
 ```yaml
 version: 1
