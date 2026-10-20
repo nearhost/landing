@@ -67,7 +67,7 @@ Do this in the WorkOS staging environment, which is meant for development. Its A
 1. In the dashboard, open **Applications**, then your application, then the **Redirects** tab.
 2. Add the redirect URI `https://local.myapp.com/authenticate`, and make it the default. With `laravel/workos` the callback route is `/authenticate`. No trailing slash.
 3. Set the sign-in endpoint, which WorkOS's docs also call the initiate login URI, to `https://local.myapp.com/login`. AuthKit sends people there when sign-in starts outside your app, such as from a password reset or an invitation link.
-4. On the same tab, add the sign-out URI `https://local.myapp.com/` and make it the default. Without one, WorkOS shows an error after sign-out. The older App homepage URL setting is deprecated, and only kept as a fallback for existing apps.
+4. On the same tab, add the sign-out URI `https://local.myapp.com/` and make it the default. Without a sign-out URI, WorkOS shows an error after sign-out, unless the app still has the older App homepage URL set. That setting is deprecated, and only kept as a fallback for existing apps.
 
 Then copy the staging environment's client ID and API key into the app's `.env`, after `APP_URL`, which the redirect URL builds on:
 
