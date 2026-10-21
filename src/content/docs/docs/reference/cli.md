@@ -30,12 +30,13 @@ Opens the interface, at a terminal. It starts the proxy and every enabled projec
 | --------------------- | ------------------------------------------------------------------------------------------------ |
 | `--https-port <port>` | Serve HTTPS on this port instead of 443.                                                         |
 | `--http-port <port>`  | Redirect HTTP on this port instead of 80.                                                        |
+| `--web-port <port>`   | Serve the web interface at `https://localhost:<port>` instead of 6327. `0` turns it off.         |
 | `--no-hosts`          | Leave `/etc/hosts` alone. Add the aliases yourself.                                              |
 | `--no-capture`        | Keep no requests or responses in memory. See [The request log](/docs/concepts/the-request-log/). |
 
 ## nearhost up
 
-Starts the named projects, or every enabled project when none is named, and serves them until Ctrl-C. A second Ctrl-C stops at once. It takes the same four flags as `nearhost`.
+Starts the named projects, or every enabled project when none is named, and serves them until Ctrl-C. A second Ctrl-C stops at once. It takes the same five flags as `nearhost`.
 
 ```sh
 nearhost up myapp
@@ -145,7 +146,7 @@ Both take `--file <path>` to work on another file than `/etc/hosts`. See [The ho
 
 ## nearhost doctor
 
-Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project's files and setup and lists what it finds. See [Project checks](#project-checks). An error there also makes it exit non-zero. It takes `--https-port`, `--http-port` and `--no-hosts`, and `--json` prints all of it as one JSON object. See [JSON output](#json-output).
+Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project's files and setup and lists what it finds. See [Project checks](#project-checks). An error there also makes it exit non-zero. It takes `--https-port`, `--http-port`, `--web-port` and `--no-hosts`, and `--json` prints all of it as one JSON object. See [JSON output](#json-output).
 
 | Check                 | What it looks at                                                                                                       |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------------- |

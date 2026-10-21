@@ -1433,6 +1433,11 @@
                   <span class="d">·</span> http :80
                 </div>
                 <div class="l">
+                  <span class="d">{pad('web UI', 10)}</span><span class="b"
+                    >https://localhost:6327</span
+                  >
+                </div>
+                <div class="l">
                   <span class="d">{pad('local CA', 10)}</span><span class="b">●</span> trusted
                   <span class="d">· expires 2036-10-13</span>
                 </div>

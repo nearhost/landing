@@ -5,11 +5,11 @@ sidebar:
   order: 6
 ---
 
-Caddy runs inside the Nearhost process, with its storage under `~/.config/nearhost/caddy`. It listens on 443 for HTTPS and on 80 only to redirect to HTTPS, with a 308. To use other ports, run Nearhost with `--https-port` and `--http-port`.
+Caddy runs inside the Nearhost process, with its storage under `~/.config/nearhost/caddy`. It listens on 443 for HTTPS, on 80 only to redirect to HTTPS, with a 308, and on 6327 for its web interface. To use other ports, run Nearhost with `--https-port`, `--http-port` and `--web-port`.
 
 It answers only this machine, and, for a project whose `.nearhostrc` sets `docker_clients`, containers on this machine's Docker networks. A request from another computer, or for a name Nearhost does not serve, has its connection closed with no answer.
 
-While Nearhost runs, even with no projects, `https://localhost` shows Nearhost's own page, unless a project serves `localhost` itself.
+While Nearhost runs, even with no projects, `https://localhost:6327` shows Nearhost's own page, its web interface. That port is Nearhost's alone, so the page is always there. `https://localhost` shows the same page too, unless a project serves `localhost` itself. `--web-port 0` turns the port off.
 
 ## The local CA
 

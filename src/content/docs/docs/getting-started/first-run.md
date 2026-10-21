@@ -22,7 +22,7 @@ n  add a project on this machine or a server
 s  add a server you reach over SSH
 ```
 
-Below them are the folder you started in, whether the certificate authority is trusted, and the proxy's ports. Press `n` to serve a project from this machine, or from a server you have added. Press `s` first if the project is on a machine you reach over SSH. See [Add a server](/docs/getting-started/add-a-server/) and [Add a project](/docs/getting-started/add-a-project/).
+Below them are the folder you started in, whether the certificate authority is trusted, the proxy's ports, and a link to the web interface at `https://localhost:6327`. Press `n` to serve a project from this machine, or from a server you have added. Press `s` first if the project is on a machine you reach over SSH. See [Add a server](/docs/getting-started/add-a-server/) and [Add a project](/docs/getting-started/add-a-project/).
 
 ## Welcome to Nearhost
 
@@ -87,6 +87,7 @@ With it on, Nearhost may still ask for your password the first time, then use To
 Once a project exists, the screen has a sidebar on the left, with Home at the top and each server's projects below, and the selected row's details on the right. Home shows:
 
 - `proxy`: whether it is serving, and on which ports
+- `web UI`: a link to the web interface at `https://localhost:6327`, once the proxy is serving
 - `local CA`: whether it is trusted, and when it expires
 - `hosts`: whether `/etc/hosts` has every project's name
 - `config`: the path of the config file
