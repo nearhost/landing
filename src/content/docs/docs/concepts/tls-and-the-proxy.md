@@ -9,7 +9,7 @@ Caddy runs inside the Nearhost process, with its storage under `~/.config/nearho
 
 It answers only this machine, and, for a project whose `.nearhostrc` sets `docker_clients`, containers on this machine's Docker networks. A request from another computer, or for a name Nearhost does not serve, has its connection closed with no answer.
 
-While Nearhost runs, even with no projects, `https://localhost:6327` shows Nearhost's own page, its web interface. That port is Nearhost's alone, so the page is always there. `https://localhost` shows the same page too, unless a project serves `localhost` itself. `--web-port 0` turns the port off.
+While Nearhost runs, even with no projects, `https://localhost:6327` shows Nearhost's own page, its web interface. No project uses that port, so the page is there whatever the projects serve. `https://localhost` shows the same page too, unless a project serves `localhost` itself. `--web-port` moves the port, and `--web-port 0` turns it off, leaving only `https://localhost`. The web port needs Nearhost 0.8.0 or later.
 
 ## The local CA
 

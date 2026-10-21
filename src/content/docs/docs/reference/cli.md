@@ -148,17 +148,17 @@ Both take `--file <path>` to work on another file than `/etc/hosts`. See [The ho
 
 Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project's files and setup and lists what it finds. See [Project checks](#project-checks). An error there also makes it exit non-zero. It takes `--https-port`, `--http-port`, `--web-port` and `--no-hosts`, and `--json` prints all of it as one JSON object. See [JSON output](#json-output).
 
-| Check                 | What it looks at                                                                                                       |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `config`              | Whether the config file reads and is valid.                                                                            |
-| `port 443`, `port 80` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too.                                 |
-| `privileged ports`    | On Linux, whether the binary may bind ports below 1024.                                                                |
-| `local CA`            | Whether it exists, whether the system trusts it, and when it expires.                                                  |
-| `browser stores`      | Whether the Firefox and Chromium stores trust it.                                                                      |
-| `aliases`             | Only shown when a main name is not a valid domain. It fails, and the project does not start.                           |
-| `hosts block`         | Whether `/etc/hosts` has every name it needs: main names and web hosts, less any DNS already resolves to this machine. |
-| `server <name>`       | Whether `ssh <host>` connects without a prompt, for each server.                                                       |
-| `agents on <name>`    | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.                                  |
+| Check                              | What it looks at                                                                                                                                                                 |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `config`                           | Whether the config file reads and is valid.                                                                                                                                      |
+| `port 443`, `port 80`, `port 6327` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too. 6327 is the web port, or the one `--web-port` gives, and is left out with `--web-port 0`. |
+| `privileged ports`                 | On Linux, whether the binary may bind ports below 1024.                                                                                                                          |
+| `local CA`                         | Whether it exists, whether the system trusts it, and when it expires.                                                                                                            |
+| `browser stores`                   | Whether the Firefox and Chromium stores trust it.                                                                                                                                |
+| `aliases`                          | Only shown when a main name is not a valid domain. It fails, and the project does not start.                                                                                     |
+| `hosts block`                      | Whether `/etc/hosts` has every name it needs: main names and web hosts, less any DNS already resolves to this machine.                                                           |
+| `server <name>`                    | Whether `ssh <host>` connects without a prompt, for each server.                                                                                                                 |
+| `agents on <name>`                 | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.                                                                                            |
 
 ### Project checks
 
