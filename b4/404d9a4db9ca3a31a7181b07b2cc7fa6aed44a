@@ -6,6 +6,7 @@ src/content/docs/docs/concepts/the-hosts-file.md
   s_e8c5d245e902d9::t_9387ffe07b5f87 17,19,23,33,43
 src/content/docs/docs/concepts/tls-and-the-proxy.md
   s_e8c5d245e902d9::t_7d695c1b88a8bb 20-26
+  s_e8c5d245e902d9::t_0478733e609aa4 8
 src/content/docs/docs/getting-started/first-run.md
   s_e8c5d245e902d9::t_0aa56abfd64f36 14
 src/content/docs/docs/getting-started/install.md
@@ -14,6 +15,7 @@ src/content/docs/docs/guides/container-callbacks.md
   s_e8c5d245e902d9::t_d35679aecb251f 67
 src/content/docs/docs/reference/cli.md
   s_e8c5d245e902d9::t_e72f709ed09bb0 15,20,23,138,145,309
+  s_e8c5d245e902d9::t_f10d7f3e91ec9c 157
 src/content/docs/docs/troubleshooting/troubleshooting.md
   s_e8c5d245e902d9::t_5b491d08bcdfcb 52-59
 ---
