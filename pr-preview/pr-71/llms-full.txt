@@ -2613,10 +2613,11 @@ If the file is not valid YAML, Nearhost exits with the error and its line. If it
 
 The folder that holds `config.yaml` also holds:
 
-* `caddy/`: the proxy’s storage, including the local certificate authority
 * `presets/`: installed presets
 * `registry/`: each trusted registry’s cached index
 * `run/`: the SSH control sockets
+
+The proxy’s storage, including the local certificate authority, is not in this folder. It is the `caddy` folder in Nearhost’s data directory: `~/Library/Application Support/nearhost/caddy` on macOS, and `$XDG_DATA_HOME/nearhost/caddy` on Linux, which is `~/.local/share/nearhost/caddy` when that variable is not set. From Nearhost 0.8.0, `XDG_DATA_HOME` moves it on macOS too, when it is set to an absolute path. Nearhost 0.7 and earlier kept it beside the config. See [The local CA](/pr-preview/pr-71/docs/concepts/tls-and-the-proxy/#the-local-ca).
 
 ## The local server
 
