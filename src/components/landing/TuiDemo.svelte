@@ -725,12 +725,19 @@
         } else if (k === 'ArrowLeft' || k === 'ArrowRight') {
           const r = f.routes[f.routeRow];
           const step = k === 'ArrowRight' ? 1 : 2;
-          const role = roles[(roles.indexOf(r.role) + step) % 3];
-          if (role === 'web') for (const o of f.routes) if (o.role === 'web') o.role = 'loopback';
-          r.role = role;
+          r.role = roles[(roles.indexOf(r.role) + step) % 3];
+          flash = '';
         } else if (k === 'Enter') {
-          if (!f.routes.some((r) => r.role === 'web')) {
+          const web = f.routes.filter((r) => r.role === 'web');
+          if (!web.length) {
             say('Pick a web route: it is what the address serves.');
+            return true;
+          }
+          if (web.length > 1) {
+            const ports = web.map((r) => r.port);
+            say(
+              `Only one web route can go without names of its own, and ports ${ports.slice(0, -1).join(', ')} and ${ports.at(-1)} have none.`,
+            );
             return true;
           }
           f.field = 0;
