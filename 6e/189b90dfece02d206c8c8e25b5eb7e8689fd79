@@ -1,0 +1,14 @@
+src/content/docs/docs/reference/keyboard-shortcuts.md
+  h_13c4e797d6e9d2 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6e189b90dfece02d206c8c8e25b5eb7e8689fd79",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
