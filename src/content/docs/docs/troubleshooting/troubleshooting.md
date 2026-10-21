@@ -49,6 +49,14 @@ nearhost trust
 
 Firefox, and Chromium-based browsers on Linux, need `certutil` too. See [Install](/docs/getting-started/install/). The CA's expiry date turns amber 30 days before it runs out.
 
+## Doctor warns about an old CA copy or a hosts block without IPv6
+
+Both come from an upgrade, and both are warnings, not failures.
+
+`old CA copy` means `~/.config/nearhost/caddy`, where Nearhost 0.7 and earlier kept the local CA, is still there beside the new folder in Nearhost's data folder. It holds a copy of the CA's private key. Check that `nearhost doctor` shows the CA as trusted, then delete the old folder. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
+
+`hosts block` saying the block has no IPv6 (`::1`) entries means an older Nearhost wrote it. Run `nearhost up`, which rewrites the block with the `::1` lines and asks for your password.
+
 ## SSH keeps reconnecting
 
 The server shows `reconnecting · attempt N · next in Ns`, and its projects show `degraded`. Caddy returns 502 meanwhile. Nearhost keeps trying by itself.

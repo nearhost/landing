@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-Caddy runs inside the Nearhost process, with its storage under `~/.config/nearhost/caddy`. It listens on 443 for HTTPS, on 80 only to redirect to HTTPS, with a 308, and on 6327 for Nearhost's page. To use other ports, run Nearhost with `--https-port`, `--http-port` and `--web-port`.
+Caddy runs inside the Nearhost process, with its storage in Nearhost's data folder, under `nearhost/caddy`: `~/Library/Application Support/nearhost/caddy` on macOS, and `$XDG_DATA_HOME/nearhost/caddy` on Linux, which is `~/.local/share/nearhost/caddy` when that variable is not set. It listens on 443 for HTTPS, on 80 only to redirect to HTTPS, with a 308, and on 6327 for Nearhost's page. To use other ports, run Nearhost with `--https-port`, `--http-port` and `--web-port`.
 
 It answers only this machine, and, for a project whose `.nearhostrc` sets `docker_clients`, containers on this machine's Docker networks. A request from another computer, or for a name Nearhost does not serve, has its connection closed with no answer.
 
@@ -17,7 +17,13 @@ The internal certificate authority, "Nearhost Local CA", is created the first ti
 
 Trusting it puts its root into the system trust store, which asks for your password once: the System keychain on macOS, your distribution's certificate store on Linux. It also updates the separate stores that Firefox and Linux Chromium-based browsers use, when `certutil` is installed. If the system already trusts it, only the browser stores are updated, with no password.
 
-Trust it from the welcome box the first time you start Nearhost, or at any time with `nearhost trust`. `nearhost untrust` reverses all of it. See [First run](/docs/getting-started/first-run/) and, for Linux and Firefox, [Install](/docs/getting-started/install/).
+### Where its key is kept
+
+The CA's private key is in the `caddy` folder named above, under `pki/authorities/local`. Anyone who has it can sign certificates that your browser trusts, so keep that folder out of dotfiles repositories and shared backups. Your config, `~/.config/nearhost/config.yaml`, holds no keys and is safe to share.
+
+From Nearhost 0.8.0 the key is in the data folder. Earlier versions kept it in `~/.config/nearhost/caddy`. The next time you run `nearhost`, `nearhost up` or `nearhost trust`, Nearhost moves an existing `~/.config/nearhost/caddy` there, so the CA you already trust stays the same. It does not move it while another Nearhost is running. If a copy of the old folder is left behind, `nearhost doctor` warns with `old CA copy` and says which folder to delete.
+
+Trust it from the welcome box the first time you start Nearhost, or at any time with `nearhost trust`. `nearhost untrust` removes the CA from the system and browser stores. It leaves the key's folder where it is. See [First run](/docs/getting-started/first-run/) and, for Linux and Firefox, [Install](/docs/getting-started/install/).
 
 Home shows whether it is trusted and when it expires. The date turns amber in the last 30 days.
 

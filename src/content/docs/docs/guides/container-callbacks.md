@@ -64,7 +64,7 @@ List every name the service calls. `nearhost doctor` reports a service that call
 
 Nearhost's certificates are signed by its own local certificate authority. Your system trusts it, but a container has its own trust store, so the call fails with a certificate error.
 
-Mount the root certificate into the container and point the service at it. The certificate is at `~/.config/nearhost/caddy/pki/authorities/local/root.crt`, or under `$XDG_CONFIG_HOME/nearhost` when that is set, and `nearhost doctor` prints the path on your machine. The doctor's snippet, for a Node service:
+Mount the root certificate into the container and point the service at it. The certificate is at `pki/authorities/local/root.crt` under Nearhost's `caddy` folder, which is `~/Library/Application Support/nearhost/caddy` on macOS and `${XDG_DATA_HOME:-~/.local/share}/nearhost/caddy` on Linux, and `nearhost doctor` prints the path on your machine. Earlier versions kept it under `~/.config/nearhost/caddy`. Mount only `root.crt`, never the folder: the key is beside it. The doctor's snippet, for a Node service:
 
 ```yaml
 services:

@@ -12,15 +12,15 @@ nearhost add [path]            add a project, discovering its ports
 nearhost export [project]      write a project's setup to its .nearhostrc
 nearhost ls                    list projects
 nearhost trust | untrust       the local CA in the system and browser stores
-nearhost hosts apply | clean   the nearhost block in /etc/hosts
+nearhost hosts clean           remove the nearhost block from /etc/hosts
 nearhost doctor                check ports, the CA, the hosts block, servers and projects
 nearhost preset ...            presets, which say what a framework's ports mean
 nearhost preset registry ...   the preset registries you trust
 nearhost update                update to the latest release
-nearhost version               print the version
+nearhost version               print the version (also nearhost --version)
 ```
 
-Every command takes `--config <file>` to use another config file.
+Every command takes `--config <file>` to use another config file. A mistyped command gets a suggestion, as `Did you mean this?` with the closest command names.
 
 ## nearhost
 
@@ -135,14 +135,14 @@ Installs the local CA root into the system trust store, which asks for your pass
 
 ## nearhost untrust
 
-Reverses `trust`.
+Reverses `trust`: removes the local CA from the system and browser stores. It asks for your password. The CA's key stays in its folder, so `nearhost trust` can add the same CA again. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
 
 ## nearhost hosts
 
 - `apply` sets the nearhost block to the aliases read from stdin, one per line. It writes the file itself, so it runs as root: Nearhost calls it through `sudo`.
 - `clean` removes the block, and asks for your password through `sudo`.
 
-Both take `--file <path>` to work on another file than `/etc/hosts`. See [The hosts file](/docs/concepts/the-hosts-file/).
+`apply` is left out of `nearhost --help`, because Nearhost runs it itself through `sudo`. Both take `--file <path>` to work on another file than `/etc/hosts`. See [The hosts file](/docs/concepts/the-hosts-file/).
 
 ## nearhost doctor
 
@@ -154,6 +154,7 @@ Checks the setup and changes nothing, apart from creating `~/.nearhost` on each 
 | `port 443`, `port 80`, `port 6327` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too. 6327 is Nearhost's page, or the port `--web-port` gives, and is left out with `--web-port 0`. A busy 6327 only warns. The 6327 check is from Nearhost 0.8.0. |
 | `privileged ports`                 | On Linux, whether the binary may bind ports below 1024.                                                                                                                                                                                             |
 | `local CA`                         | Whether it exists, whether the system trusts it, and when it expires.                                                                                                                                                                               |
+| `old CA copy`                      | Only shown when `~/.config/nearhost/caddy`, where Nearhost 0.7 and earlier kept the CA, is still there beside the new one. It warns, and the fix is to delete the old folder.                                                                       |
 | `browser stores`                   | Whether the Firefox and Chromium stores trust it.                                                                                                                                                                                                   |
 | `aliases`                          | Only shown when a main name is not a valid domain. It fails, and the project does not start.                                                                                                                                                        |
 | `hosts block`                      | Whether `/etc/hosts` has every name it needs: main names and web hosts, less any DNS already resolves to this machine.                                                                                                                              |
@@ -305,4 +306,4 @@ Nearhost also checks for a new release at most once a day, in the background, an
 
 ## nearhost version
 
-Prints the version, as `nearhost 0.7.0`.
+Prints the version, as `nearhost 0.8.0`. `nearhost --version` prints the same line.
