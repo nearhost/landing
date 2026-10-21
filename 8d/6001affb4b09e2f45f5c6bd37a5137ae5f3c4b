@@ -1,0 +1,19 @@
+src/content/docs/docs/getting-started/add-a-project.md
+  s_97d6a9a0f6828b::t_ae1223d277743f 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8d6001affb4b09e2f45f5c6bd37a5137ae5f3c4b",
+  "prompts": {},
+  "sessions": {
+    "s_97d6a9a0f6828b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "57996611-a4a8-4725-97ac-1660bfc58ed8",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
