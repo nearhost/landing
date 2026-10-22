@@ -13,6 +13,8 @@ The proxy does not start. Home shows `proxy down`, names the port and, where it 
 
 Quit that program, or run Nearhost with `--https-port` and `--http-port`. Another local proxy is the usual cause: nginx, Caddy, Herd or Valet. On Linux, also check that the binary may bind low ports. See [Install](/docs/getting-started/install/).
 
+If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary; run it, then start Nearhost again. From Nearhost 0.8.0.
+
 ## A loopback port is already bound
 
 The project goes into `error`, naming the port and the program holding it on this machine. Its other routes still start.
