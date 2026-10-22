@@ -45,6 +45,10 @@ Press `enter` on the project to try again. Or add the alias to `/etc/hosts` your
 
 On a Mac you can use Touch ID instead of typing it. See [First run](/docs/getting-started/first-run/#touch-id-on-a-mac).
 
+## No root-owned sudo
+
+`nearhost trust`, `nearhost untrust` and changes to `/etc/hosts` stop with `no root-owned sudo in /usr/bin, /bin, /usr/local/bin or /run/wrappers/bin`. From Nearhost 0.8.0, Nearhost runs only a `sudo` in one of those folders that root owns, so a `sudo` elsewhere on your `PATH` is never handed your password. Install sudo there, or run the command as root.
+
 ## The CA is not trusted
 
 The proxy still runs, but browsers warn about the certificate. Home shows `local CA ● not trusted. Run nearhost trust`. Run:
