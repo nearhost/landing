@@ -415,13 +415,16 @@
 
   const HELP = [
     {
-      title: 'move',
+      title: 'move · mouse',
       keys: [
         ['j/k', 'up and down'],
         ['h', 'home'],
         ['tab', 'routes'],
         ['/', 'filter by name'],
         ['esc', 'clear filter'],
+        ['drag', 'copy text'],
+        ['2click', 'copy a word'],
+        ['click', 'open an address'],
       ],
     },
     {
@@ -432,6 +435,9 @@
         ['e', 'edit'],
         ['d', 'remove'],
         ['y', 'copy advice'],
+        ['i', 'show or hide ignored ports'],
+        ['r', 're-read .nearhostrc'],
+        ['a', 'review .nearhostrc'],
       ],
     },
     {
@@ -448,6 +454,7 @@
       title: 'nearhost',
       keys: [
         ['n', 'add project'],
+        ['p', 'review proposal'],
         ['l', 'full-screen log'],
         ['?', 'close help'],
         ['q', 'quit'],
