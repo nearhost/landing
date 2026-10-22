@@ -13,11 +13,11 @@ The proxy does not start. Home shows `proxy down`, names the port and, where it 
 
 Quit that program, or run Nearhost with `--https-port` and `--http-port`. Another local proxy is the usual cause: nginx, Caddy, Herd or Valet. On Linux, also check that the binary may bind low ports. See [Install](/docs/getting-started/install/).
 
-If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary; run it, then start Nearhost again. From Nearhost 0.8.0.
+If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary, as in [Allow binding ports 80 and 443](/docs/getting-started/install/#allow-binding-ports-80-and-443); run it, then start Nearhost again. For an npm install, use the command `nearhost doctor` prints, which names the real binary. From Nearhost 0.8.0.
 
 ## Port 6327 already in use
 
-Nearhost starts, serves every project and leaves out Nearhost's page, and the log says `port 6327 is in use; serving without Nearhost's page`. `nearhost doctor` warns about it. Another Nearhost already running is the usual cause. Otherwise pass `--web-port` with a free port, or `--web-port 0` to do without the page. From Nearhost 0.8.0.
+Nearhost starts, serves every project and leaves out Nearhost's page, and the log says `port 6327 is in use; serving without Nearhost's page`. `nearhost doctor` warns about it. Another Nearhost already running is the usual cause. Otherwise pass `--web-port` with a free port, or `--web-port 0` to turn off the page's own port, leaving it at `https://localhost`. From Nearhost 0.8.0.
 
 ## A loopback port is already bound
 

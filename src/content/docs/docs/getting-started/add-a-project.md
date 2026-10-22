@@ -73,7 +73,7 @@ At a terminal it asks what the interface asks: whether to trust the official pre
 | `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
 | `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
 
-A directory whose name has letters or digits outside ASCII, such as `café`, needs `--name` or `--alias`, or an `alias` in its `.nearhostrc`. From Nearhost 0.8.0, `nearhost add` stops and says so.
+A directory whose name has letters or digits outside ASCII, such as `café`, needs `--name` with only a-z, 0-9 and `-`, or `--alias`, or an `alias` in its `.nearhostrc`. From Nearhost 0.8.0, `nearhost add` stops and says so.
 
 A `~` in the path means the server's home directory, even when your shell has already turned it into this machine's.
 

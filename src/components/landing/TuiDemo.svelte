@@ -625,7 +625,8 @@
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
-    return (slug || 'project') + '.test';
+    // An empty name saves as shop, so its alias is shop.test too.
+    return (slug || 'shop') + '.test';
   }
 
   // The names web route i is served at on the routes step: the alias on the
