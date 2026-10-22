@@ -199,6 +199,7 @@
   let collapsed = $state<Record<string, boolean>>({});
   let routeFocus = $state(false);
   let routeRow = $state(0);
+  let showIgnored = $state(false); // ignored routes fold into one line until i shows them
   let filtering = $state(false);
   let query = $state('');
   let showHelp = $state(false);
@@ -997,6 +998,10 @@
       case 'o':
         if (selProject) say(`Opens https://${selProject.alias} in your browser.`);
         return true;
+      case 'i':
+        // With the routes focused every route shows, so i changes nothing.
+        if (selProject && !routeFocus) showIgnored = !showIgnored;
+        return true;
     }
     return false;
   }
@@ -1367,20 +1372,41 @@
                     >status</span
                   >
                 </div>
+                {@const fold = !showIgnored && !routeFocus}
+                {@const ignored = p.routes.filter((r) => r.role === 'ignore').map((r) => r.port)}
                 {#each p.routes as r, i (r.port)}
-                  {@const [dot, tone] = routeDot(p, r)}
-                  <div
-                    class="l routes"
-                    class:d={r.role === 'ignore'}
-                    class:sel={routeFocus && i === routeRow}
-                  >
-                    <span class="b">{routeFocus && i === routeRow ? '▌' : ' '}</span><span
-                      class="c8">{r.port}</span
-                    ><span class="c12 {r.role === 'web' ? 'b' : ''}">{r.role}</span><span
-                      class="grow">{r.label}</span
-                    ><span class="c10">{localPort(p, r)}</span><span class="stc {tone}">{dot}</span>
-                  </div>
+                  {#if !(fold && r.role === 'ignore')}
+                    {@const [dot, tone] = routeDot(p, r)}
+                    <div
+                      class="l routes"
+                      class:d={r.role === 'ignore'}
+                      class:sel={routeFocus && i === routeRow}
+                    >
+                      <span class="b">{routeFocus && i === routeRow ? '▌' : ' '}</span><span
+                        class="c8">{r.port}</span
+                      ><span class="c12 {r.role === 'web' ? 'b' : ''}">{r.role}</span><span
+                        class="grow">{r.label}</span
+                      ><span class="c10">{localPort(p, r)}</span><span class="stc {tone}"
+                        >{dot}</span
+                      >
+                    </div>
+                  {/if}
                 {/each}
+                {#if ignored.length && !routeFocus}
+                  {#if fold}
+                    <div class="l d">
+                      {' '}{ignored.length} ignored: {ignored.join(' ')}{'  ·  '}<span class="b"
+                        >i</span
+                      > show
+                    </div>
+                  {:else}
+                    <div class="l">
+                      {' '}<span class="b">i</span><span class="d"
+                        >{` hide the ${ignored.length} ignored`}</span
+                      >
+                    </div>
+                  {/if}
+                {/if}
                 {#if p.advice}
                   <div class="l"></div>
                   <div class="advice">
