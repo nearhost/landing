@@ -224,7 +224,7 @@ For a project whose `.nearhostrc` has a mistyped key, with a route that also ser
       "name": "hosts block",
       "level": "fail",
       "detail": "missing api.local.example.com, shop.test, www.example.com",
-      "fix": "run `nearhost up`; it updates the block and asks for your password"
+      "fix": "Run `nearhost up`; it updates the block and asks for your password"
     }
   ],
   "findings": [
