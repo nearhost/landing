@@ -229,6 +229,7 @@
     routeRow: number;
     name: string;
     alias: string;
+    aliasEdited: boolean; // the alias was typed, so it no longer follows the name
     field: number;
     busy: string;
   }
@@ -611,9 +612,20 @@
       routeRow: 0,
       name: 'shop',
       alias: 'shop.test',
+      aliasEdited: false,
       field: 0,
       busy: '',
     };
+  }
+
+  // The .test name a project name gives, as the alias follows the name.
+  function aliasFor(name: string) {
+    const slug = name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    return (slug || 'project') + '.test';
   }
 
   // The names web route i is served at on the routes step: the alias on the
@@ -815,12 +827,15 @@
         else if (k === 'Enter') {
           if (f.field === 0) f.field = 1;
           else f.step = 6;
-        } else if (k === 'Backspace') {
-          if (f.field === 0) f.name = f.name.slice(0, -1);
-          else f.alias = f.alias.slice(0, -1);
-        } else if (k.length === 1 && !ev.metaKey && !ev.ctrlKey) {
-          if (f.field === 0) f.name += k;
-          else f.alias += k;
+        } else if (k === 'Backspace' || (k.length === 1 && !ev.metaKey && !ev.ctrlKey)) {
+          const typed = (s: string) => (k === 'Backspace' ? s.slice(0, -1) : s + k);
+          if (f.field === 1) {
+            f.alias = typed(f.alias);
+            f.aliasEdited = true;
+          } else {
+            f.name = typed(f.name);
+            if (!f.aliasEdited) f.alias = aliasFor(f.name); // the alias follows the name
+          }
         } else return false;
         return true;
       }
@@ -1718,11 +1733,22 @@
                 >
                 </span>{/if}
             </div>
+            <div class="wrap hint d">
+              What Nearhost calls the project: in the sidebar, the log and `nearhost up {f.name.trim() ||
+                '<name>'}`.
+            </div>
+            <div class="l"></div>
             <div class="l">
-              <span class="d">{pad('alias', 10)}</span>{f.alias}{#if f.field === 1}<span
+              <span class="d">{pad('alias', 10)}https://</span>{f.alias}{#if f.field === 1}<span
                   class="caret"
                 >
                 </span>{/if}
+            </div>
+            <div class="wrap hint d">
+              The address your browser opens. Any lowercase domain works, such as myapp.test or
+              myapp.local.example.com.{f.aliasEdited
+                ? ''
+                : ' It follows the name until you change it.'}
             </div>
           {:else if f.step === 6}
             <div class="l">
@@ -2092,6 +2118,9 @@
   }
   .wrap {
     white-space: normal;
+  }
+  .hint {
+    padding-left: 10ch;
   }
   .formkeys {
     margin-top: auto;
