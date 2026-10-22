@@ -103,7 +103,7 @@ With Go:
 go install github.com/nearhost/nearhost/cmd/nearhost@latest
 ```
 
-Nearhost needs Go 1.27.3 or later, the version the release binaries are built with. Go 1.21 to 1.27.2 downloads it first, unless `GOTOOLCHAIN` is set to `local`.
+Nearhost needs Go 1.27.3 or later, the version the release binaries are built with. Go 1.21 to 1.27.2 downloads it first, unless `GOTOOLCHAIN` forbids it (some distributions’ Go packages set it to `local`).
 
 ## npm
 
