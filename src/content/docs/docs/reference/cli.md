@@ -135,9 +135,11 @@ Lists the projects in the config, with their server, alias, whether they are ena
 
 Installs the local CA root into the system trust store, which asks for your password. It then reports on the browser stores that Firefox and Linux Chromium-based browsers use, and updates them when `certutil` is installed. Run it again at any time; it only does what is missing.
 
+It runs `sudo` from `/usr/bin`, `/bin`, `/usr/local/bin` or `/run/wrappers/bin`, and only a copy owned by root. Without one, it stops and says so, unless you run it as root. From Nearhost 0.8.0.
+
 ## nearhost untrust
 
-Reverses `trust`: removes the local CA from the system and browser stores. It asks for your password. The CA's key stays in its folder, so `nearhost trust` can add the same CA again. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
+Reverses `trust`: removes the local CA from the system and browser stores. It asks for your password, and runs `sudo` under the same rule as `trust`. The CA's key stays in its folder, so `nearhost trust` can add the same CA again. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
 
 ## nearhost hosts
 
