@@ -1,0 +1,24 @@
+src/content/docs/docs/concepts/tls-and-the-proxy.md
+  s_e8c5d245e902d9::t_20e0cd8c3cc76b 12
+src/content/docs/docs/getting-started/first-run.md
+  s_e8c5d245e902d9::t_20e0cd8c3cc76b 90
+src/content/docs/docs/reference/cli.md
+  s_e8c5d245e902d9::t_20e0cd8c3cc76b 33
+  s_e8c5d245e902d9::t_774259606834ec 29-32,34-35,151-161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8a65b70669a620fb627761376fc7d12ec41d0361",
+  "prompts": {},
+  "sessions": {
+    "s_e8c5d245e902d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5838b929-4de2-4f9c-a293-db115e94d8e0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
