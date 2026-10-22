@@ -1,6 +1,6 @@
 <script lang="ts">
   /* eslint-disable svelte/no-useless-mustaches -- a row's spaces are what lines it up, as in a terminal */
-  // A working mock-up of the nearhost interface (0.4.0): the same screens,
+  // A working mock-up of the nearhost interface (0.8.0): the same screens,
   // keys and footer as the real one, driven by made-up projects and requests.
   import { onMount } from 'svelte';
 
@@ -199,6 +199,7 @@
   let collapsed = $state<Record<string, boolean>>({});
   let routeFocus = $state(false);
   let routeRow = $state(0);
+  let showIgnored = $state(false); // ignored routes fold into one line until i shows them
   let filtering = $state(false);
   let query = $state('');
   let showHelp = $state(false);
@@ -228,6 +229,7 @@
     routeRow: number;
     name: string;
     alias: string;
+    aliasEdited: boolean; // the alias was typed, so it no longer follows the name
     field: number;
     busy: string;
   }
@@ -415,13 +417,16 @@
 
   const HELP = [
     {
-      title: 'move',
+      title: 'move · mouse',
       keys: [
         ['j/k', 'up and down'],
         ['h', 'home'],
         ['tab', 'routes'],
         ['/', 'filter by name'],
         ['esc', 'clear filter'],
+        ['drag', 'copy text'],
+        ['2click', 'copy a word'],
+        ['click', 'open an address'],
       ],
     },
     {
@@ -432,6 +437,9 @@
         ['e', 'edit'],
         ['d', 'remove'],
         ['y', 'copy advice'],
+        ['i', 'show or hide ignored ports'],
+        ['r', 're-read .nearhostrc'],
+        ['a', 'review .nearhostrc'],
       ],
     },
     {
@@ -448,6 +456,7 @@
       title: 'nearhost',
       keys: [
         ['n', 'add project'],
+        ['p', 'review proposal'],
         ['l', 'full-screen log'],
         ['?', 'close help'],
         ['q', 'quit'],
@@ -603,9 +612,78 @@
       routeRow: 0,
       name: 'shop',
       alias: 'shop.test',
+      aliasEdited: false,
       field: 0,
       busy: '',
     };
+  }
+
+  // The .test name a project name gives, as the alias follows the name.
+  function aliasFor(name: string) {
+    const slug = name
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    // An empty name saves as shop, so its alias is shop.test too.
+    return (slug || 'shop') + '.test';
+  }
+
+  // The names web route i is served at on the routes step: the alias on the
+  // first web route, and none on another, since the demo gives no hosts.
+  function webNames(f: Form, i: number) {
+    const primary = f.routes.findIndex((r) => r.role === 'web');
+    return i === primary && f.alias ? [f.alias] : [];
+  }
+
+  // What route i opens on this machine.
+  function opens(f: Form, i: number) {
+    const r = f.routes[i];
+    if (r.role === 'web') {
+      const names = webNames(f, i);
+      return names.length ? 'https://' + names[0] : '–';
+    }
+    return r.role === 'loopback' ? `localhost:${r.port}` : '–';
+  }
+
+  // What the selected route's role does, in full: [tone, text, link, rest].
+  function roleLine(f: Form): [Tone, string, string, string] {
+    const r = f.routes[f.routeRow];
+    const where = f.server === 'local' ? 'on this machine' : 'on ' + f.server;
+    const more =
+      " One port is the project's web port. To serve another port as well, give it names of its own with h.";
+    if (r.role === 'web') {
+      const names = webNames(f, f.routeRow);
+      const primary = f.routeRow === f.routes.findIndex((x) => x.role === 'web');
+      if (!names.length && !primary)
+        return [
+          'a',
+          `web: port ${r.port} has no names of its own, and only one web route can go without, served at the alias. Give it names with h, or change its role with ← or →.`,
+          '',
+          '',
+        ];
+      if (!names.length)
+        return [
+          'd',
+          `web: Nearhost serves port ${r.port} ${where} at the project's alias, which the next step sets.${more}`,
+          '',
+          '',
+        ];
+      return [
+        'd',
+        'web: your browser opens ',
+        'https://' + names[0],
+        `, and Nearhost sends it to port ${r.port} ${where}.${more}`,
+      ];
+    }
+    if (r.role === 'loopback')
+      return [
+        'd',
+        `loopback: localhost:${r.port} on this machine reaches port ${r.port} ${where}, for what the app's pages load from that port themselves, such as Vite's dev server.`,
+        '',
+        '',
+      ];
+    return ['d', `ignore: Nearhost opens nothing for port ${r.port}.`, '', ''];
   }
 
   function formBusy(text: string, ms: number, then: () => void) {
@@ -750,12 +828,15 @@
         else if (k === 'Enter') {
           if (f.field === 0) f.field = 1;
           else f.step = 6;
-        } else if (k === 'Backspace') {
-          if (f.field === 0) f.name = f.name.slice(0, -1);
-          else f.alias = f.alias.slice(0, -1);
-        } else if (k.length === 1 && !ev.metaKey && !ev.ctrlKey) {
-          if (f.field === 0) f.name += k;
-          else f.alias += k;
+        } else if (k === 'Backspace' || (k.length === 1 && !ev.metaKey && !ev.ctrlKey)) {
+          const typed = (s: string) => (k === 'Backspace' ? s.slice(0, -1) : s + k);
+          if (f.field === 1) {
+            f.alias = typed(f.alias);
+            f.aliasEdited = true;
+          } else {
+            f.name = typed(f.name);
+            if (!f.aliasEdited) f.alias = aliasFor(f.name); // the alias follows the name
+          }
         } else return false;
         return true;
       }
@@ -989,6 +1070,10 @@
         return true;
       case 'o':
         if (selProject) say(`Opens https://${selProject.alias} in your browser.`);
+        return true;
+      case 'i':
+        // With the routes focused every route shows, so i changes nothing.
+        if (selProject && !routeFocus) showIgnored = !showIgnored;
         return true;
     }
     return false;
@@ -1279,9 +1364,8 @@
                   {' '}{projects.filter((p) => matches(p.name)).length} of {projects.length} match
                 </div>
               {/if}
-              {#each rows as r, i (r.key)}
+              {#each rows as r (r.key)}
                 {@const on = r.key === sel}
-                {#if r.kind === 'server' && (i > 0 || filtering || query)}<div class="l"></div>{/if}
                 <button type="button" class="f rowbtn" class:sel={on} onclick={() => clickRow(r)}>
                   {#if r.kind === 'home'}
                     <span
@@ -1317,6 +1401,7 @@
                     >
                   {/if}
                 </button>
+                {#if r.kind === 'home'}<div class="l"></div>{/if}
               {/each}
             </nav>
 
@@ -1335,7 +1420,6 @@
                     {p.state}{#if up}<span class="d">{` · up ${up}`}</span>{/if}</span
                   >
                 </div>
-                <div class="l"></div>
                 <div class="l meta">
                   <span
                     ><span class="d">server</span>
@@ -1360,20 +1444,41 @@
                     >status</span
                   >
                 </div>
+                {@const fold = !showIgnored && !routeFocus}
+                {@const ignored = p.routes.filter((r) => r.role === 'ignore').map((r) => r.port)}
                 {#each p.routes as r, i (r.port)}
-                  {@const [dot, tone] = routeDot(p, r)}
-                  <div
-                    class="l routes"
-                    class:d={r.role === 'ignore'}
-                    class:sel={routeFocus && i === routeRow}
-                  >
-                    <span class="b">{routeFocus && i === routeRow ? '▌' : ' '}</span><span
-                      class="c8">{r.port}</span
-                    ><span class="c12 {r.role === 'web' ? 'b' : ''}">{r.role}</span><span
-                      class="grow">{r.label}</span
-                    ><span class="c10">{localPort(p, r)}</span><span class="stc {tone}">{dot}</span>
-                  </div>
+                  {#if !(fold && r.role === 'ignore')}
+                    {@const [dot, tone] = routeDot(p, r)}
+                    <div
+                      class="l routes"
+                      class:d={r.role === 'ignore'}
+                      class:sel={routeFocus && i === routeRow}
+                    >
+                      <span class="b">{routeFocus && i === routeRow ? '▌' : ' '}</span><span
+                        class="c8">{r.port}</span
+                      ><span class="c12 {r.role === 'web' ? 'b' : ''}">{r.role}</span><span
+                        class="grow">{r.label}</span
+                      ><span class="c10">{localPort(p, r)}</span><span class="stc {tone}"
+                        >{dot}</span
+                      >
+                    </div>
+                  {/if}
                 {/each}
+                {#if ignored.length && !routeFocus}
+                  {#if fold}
+                    <div class="l d">
+                      {' '}{ignored.length} ignored: {ignored.join(' ')}{'  ·  '}<span class="b"
+                        >i</span
+                      > show
+                    </div>
+                  {:else}
+                    <div class="l">
+                      {' '}<span class="b">i</span><span class="d"
+                        >{` hide the ${ignored.length} ignored`}</span
+                      >
+                    </div>
+                  {/if}
+                {/if}
                 {#if p.advice}
                   <div class="l"></div>
                   <div class="advice">
@@ -1427,13 +1532,12 @@
                 </div>
               {:else}
                 <div class="l s">Nearhost</div>
-                <div class="l"></div>
                 <div class="l">
                   <span class="d">{pad('proxy', 10)}</span><span class="b">●</span> https :443
                   <span class="d">·</span> http :80
                 </div>
                 <div class="l">
-                  <span class="d">{pad('page', 10)}</span><span class="b"
+                  <span class="d">{pad('page', 10)}</span><span class="b u"
                     >https://localhost:6327</span
                   >
                 </div>
@@ -1598,7 +1702,12 @@
           {:else if f.step === 4}
             <div class="l">Found {f.routes.length} ports. Pick what to serve.</div>
             <div class="l"></div>
-            <div class="l d">{'      port    role          label'}</div>
+            {@const opened = f.routes.map((_, i) => opens(f, i))}
+            {@const opensWidth = Math.max(5, ...opened.map((o) => Math.min(o.length, 28)))}
+            {@const [tone, said, link, rest] = roleLine(f)}
+            <div class="l d">
+              {'      port    role          ' + pad('opens', opensWidth + 2) + 'label'}
+            </div>
             {#each f.routes as r, i (r.port)}
               {@const on = i === f.routeRow}
               <div class="l" class:sel={on} class:d={r.role === 'ignore'}>
@@ -1607,17 +1716,14 @@
                 >
                 {pad(r.port, 8)}<span class:b={on || r.role === 'web'}
                   >{pad(on ? `‹ ${r.role} ›` : r.role, 14)}</span
-                >{r.label}
+                >{pad(opened[i], opensWidth + 2)}{r.label}
               </div>
             {/each}
             <div class="l"></div>
             <div class="wrap">
-              <span class="d">{'web is what '}</span><span class="b">https://{f.alias}</span><span
-                class="d"
-                >{' serves.'}{f.server === 'local'
-                  ? ''
-                  : ' loopback ports open on 127.0.0.1 here too, so the browser reaches them.'}</span
-              >
+              <span class={tone}>{said}</span>{#if link}<span class="b">{link}</span><span class="d"
+                  >{rest}</span
+                >{/if}
             </div>
           {:else if f.step === 5}
             <div class="l">
@@ -1626,11 +1732,22 @@
                 >
                 </span>{/if}
             </div>
+            <div class="wrap hint d">
+              What Nearhost calls the project: in the sidebar, the log and `nearhost up {f.name.trim() ||
+                '<name>'}`.
+            </div>
+            <div class="l"></div>
             <div class="l">
-              <span class="d">{pad('alias', 10)}</span>{f.alias}{#if f.field === 1}<span
+              <span class="d">{pad('alias', 10)}https://</span>{f.alias}{#if f.field === 1}<span
                   class="caret"
                 >
                 </span>{/if}
+            </div>
+            <div class="wrap hint d">
+              The address your browser opens. Any lowercase domain works, such as myapp.test or
+              myapp.local.example.com.{f.aliasEdited
+                ? ''
+                : ' It follows the name until you change it.'}
             </div>
           {:else if f.step === 6}
             <div class="l">
@@ -2000,6 +2117,9 @@
   }
   .wrap {
     white-space: normal;
+  }
+  .hint {
+    padding-left: 10ch;
   }
   .formkeys {
     margin-top: auto;

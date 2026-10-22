@@ -13,6 +13,12 @@ The proxy does not start. Home shows `proxy down`, names the port and, where it 
 
 Quit that program, or run Nearhost with `--https-port` and `--http-port`. Another local proxy is the usual cause: nginx, Caddy, Herd or Valet. On Linux, also check that the binary may bind low ports. See [Install](/docs/getting-started/install/).
 
+If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary, as in [Allow binding ports 80 and 443](/docs/getting-started/install/#allow-binding-ports-80-and-443); run it, then start Nearhost again. For an npm install, use the command `nearhost doctor` prints, which names the real binary. From Nearhost 0.8.0.
+
+## Port 6327 already in use
+
+Nearhost starts, serves every project and leaves out Nearhost's page, and the log says `port 6327 is in use; serving without Nearhost's page`. `nearhost doctor` warns about it. Another Nearhost already running is the usual cause. Otherwise pass `--web-port` with a free port, or `--web-port 0` to turn off the page's own port, leaving it at `https://localhost`. From Nearhost 0.8.0.
+
 ## A loopback port is already bound
 
 The project goes into `error`, naming the port and the program holding it on this machine. Its other routes still start.
@@ -39,6 +45,10 @@ Press `enter` on the project to try again. Or add the alias to `/etc/hosts` your
 
 On a Mac you can use Touch ID instead of typing it. See [First run](/docs/getting-started/first-run/#touch-id-on-a-mac).
 
+## No root-owned sudo
+
+`nearhost trust`, `nearhost untrust` and changes to `/etc/hosts` stop with `no root-owned sudo in /usr/bin, /bin, /usr/local/bin or /run/wrappers/bin`. From Nearhost 0.8.0, Nearhost runs only a `sudo` in one of those folders that root owns, so a `sudo` elsewhere on your `PATH` is never handed your password. Install sudo there, or run the command as root.
+
 ## The CA is not trusted
 
 The proxy still runs, but browsers warn about the certificate. Home shows `local CA ● not trusted. Run nearhost trust`. Run:
@@ -53,7 +63,7 @@ Firefox, and Chromium-based browsers on Linux, need `certutil` too. See [Install
 
 Both come from an upgrade, and both are warnings, not failures.
 
-`old CA copy` means `~/.config/nearhost/caddy`, where Nearhost 0.7 and earlier kept the local CA, is still there beside the new folder in Nearhost's data folder. It holds a copy of the CA's private key. Check that `nearhost doctor` shows the CA as trusted, then delete the old folder. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
+`old CA copy` means `~/.config/nearhost/caddy` (or `$XDG_CONFIG_HOME/nearhost/caddy`), where Nearhost 0.7 and earlier kept the local CA, is still there beside the new folder in Nearhost's data folder. It holds a copy of the CA's private key. Check that `nearhost doctor` shows the CA as trusted, then delete the old folder. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
 
 `hosts block` saying the block has no IPv6 (`::1`) entries means an older Nearhost wrote it. Run `nearhost up`, which rewrites the block with the `::1` lines and asks for your password.
 

@@ -19,7 +19,7 @@ Three environment variables change what it does:
 
 | Variable               | Effect                                                   |
 | ---------------------- | -------------------------------------------------------- |
-| `NEARHOST_VERSION`     | Install this release instead of the latest, as `v0.7.0`. |
+| `NEARHOST_VERSION`     | Install this release instead of the latest, as `v0.8.0`. |
 | `NEARHOST_INSTALL_DIR` | Install into this folder.                                |
 | `NEARHOST_SKIP_SETCAP` | Set to `1` to skip the Linux port step below.            |
 
@@ -29,7 +29,7 @@ Check the install with:
 nearhost --version
 ```
 
-`nearhost version` prints the same.
+`nearhost --version` needs Nearhost 0.8.0 or later. `nearhost version` prints the same, and works on releases before 0.8.0 too.
 
 ## Homebrew
 
@@ -73,6 +73,8 @@ The shell installer checks the archive against the release's `checksums.txt`. It
 gh attestation verify <file> --repo nearhost/nearhost
 ```
 
+Each archive comes with a software bill of materials, `<archive>.sbom.json`, listing the modules it was built from. The attestation covers the archives, their SBOMs and `checksums.txt`. From Nearhost 0.8.0.
+
 ## Updating
 
 ```sh
@@ -103,7 +105,7 @@ Installed from npm, `command -v nearhost` finds the Node launcher rather than th
 nearhost trust
 ```
 
-This adds the Nearhost Local CA to the system trust store and asks for your password through `sudo`. It uses your distribution's own tool:
+This adds the Nearhost Local CA to the system trust store and asks for your password through `sudo`, which must be in `/usr/bin`, `/bin`, `/usr/local/bin` or `/run/wrappers/bin` and owned by root, from Nearhost 0.8.0. It uses your distribution's own tool:
 
 | Distribution   | Command it runs           |
 | -------------- | ------------------------- |

@@ -20,7 +20,7 @@ nearhost update                update to the latest release
 nearhost version               print the version (also nearhost --version)
 ```
 
-Every command takes `--config <file>` to use another config file. A mistyped command gets a suggestion, as `Did you mean this?` with the closest command names.
+Every command takes `--config <file>` to use another config file. A mistyped command gets a suggestion, as `Did you mean this?` with the closest command names. From Nearhost 0.8.0.
 
 ## nearhost
 
@@ -59,6 +59,8 @@ Adds a project. It discovers the routes from the project's files, prints them an
 | `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
 | `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
 
+From Nearhost 0.8.0, `nearhost add` refuses a name with letters or digits outside ASCII, such as `café`, since the `.test` name made from it would lose them. Pass `--name` with a-z, 0-9 and `-`, or give the main name with `--alias` or in the project's `.nearhostrc`.
+
 See [Add a project](/docs/getting-started/add-a-project/).
 
 ## nearhost export
@@ -70,6 +72,8 @@ nearhost export [project] [--dry-run] [--force]
 ```
 
 Without a name, it exports the project on this machine whose directory holds the current one. Name the project to export one on a server.
+
+A `.nearhostrc` that is a link is written through, unless it leads outside the project's directory. Then `export` stops and names where the link leads. From Nearhost 0.8.0.
 
 | Flag        | Effect                                                                     |
 | ----------- | -------------------------------------------------------------------------- |
@@ -133,16 +137,18 @@ Lists the projects in the config, with their server, alias, whether they are ena
 
 Installs the local CA root into the system trust store, which asks for your password. It then reports on the browser stores that Firefox and Linux Chromium-based browsers use, and updates them when `certutil` is installed. Run it again at any time; it only does what is missing.
 
+It runs `sudo` from `/usr/bin`, `/bin`, `/usr/local/bin` or `/run/wrappers/bin`, and only a copy owned by root. Without one, it stops and says so, unless you run it as root. From Nearhost 0.8.0.
+
 ## nearhost untrust
 
-Reverses `trust`: removes the local CA from the system and browser stores. It asks for your password. The CA's key stays in its folder, so `nearhost trust` can add the same CA again. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
+Reverses `trust`: removes the local CA from the system and browser stores. It asks for your password, and runs `sudo` under the same rule as `trust`. The CA's key stays in its folder, so `nearhost trust` can add the same CA again. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
 
 ## nearhost hosts
 
 - `apply` sets the nearhost block to the aliases read from stdin, one per line. It writes the file itself, so it runs as root: Nearhost calls it through `sudo`.
 - `clean` removes the block, and asks for your password through `sudo`.
 
-`apply` is left out of `nearhost --help`, because Nearhost runs it itself through `sudo`. Both take `--file <path>` to work on another file than `/etc/hosts`. See [The hosts file](/docs/concepts/the-hosts-file/).
+`apply` is left out of `nearhost --help` from Nearhost 0.8.0, because Nearhost runs it itself through `sudo`. Both take `--file <path>` to work on another file than `/etc/hosts`. See [The hosts file](/docs/concepts/the-hosts-file/).
 
 ## nearhost doctor
 
@@ -154,7 +160,7 @@ Checks the setup and changes nothing, apart from creating `~/.nearhost` on each 
 | `port 443`, `port 80`, `port 6327` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too. 6327 is Nearhost's page, or the port `--web-port` gives, and is left out with `--web-port 0`. A busy 6327 only warns. The 6327 check is from Nearhost 0.8.0. |
 | `privileged ports`                 | On Linux, whether the binary may bind ports below 1024.                                                                                                                                                                                             |
 | `local CA`                         | Whether it exists, whether the system trusts it, and when it expires.                                                                                                                                                                               |
-| `old CA copy`                      | Only shown when `~/.config/nearhost/caddy`, where Nearhost 0.7 and earlier kept the CA, is still there beside the new one. It warns, and the fix is to delete the old folder.                                                                       |
+| `old CA copy`                      | Only shown when `~/.config/nearhost/caddy` (or `$XDG_CONFIG_HOME/nearhost/caddy`), where Nearhost 0.7 and earlier kept the CA, is still there beside the new one. It warns, and the fix is to delete the old folder.                                |
 | `browser stores`                   | Whether the Firefox and Chromium stores trust it.                                                                                                                                                                                                   |
 | `aliases`                          | Only shown when a main name is not a valid domain. It fails, and the project does not start.                                                                                                                                                        |
 | `hosts block`                      | Whether `/etc/hosts` has every name it needs: main names and web hosts, less exact names outside `.test` whose DNS answers are all loopback addresses. A block from Nearhost 0.7 or earlier, with no `::1` lines, warns. `nearhost up` fixes it.    |
@@ -220,7 +226,7 @@ For a project whose `.nearhostrc` has a mistyped key, with a route that also ser
       "name": "hosts block",
       "level": "fail",
       "detail": "missing api.local.example.com, shop.test, www.example.com",
-      "fix": "run `nearhost up`; it updates the block and asks for your password"
+      "fix": "Run `nearhost up`; it updates the block and asks for your password"
     }
   ],
   "findings": [
@@ -302,8 +308,8 @@ Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since
 | `--yes`   | Update without asking.                                         |
 | `--check` | Only report. Exits 1 when a newer release is out, 0 otherwise. |
 
-Nearhost also checks for a new release at most once a day, in the background, and prints a line after the command when one is out. The interface shows it in its log. Set `NEARHOST_NO_UPDATE_CHECK=1` to turn the check off.
+Nearhost also checks for a new release at most once a day, in the background, and prints a line after the command when one is out. The interface shows it in its log. When the day's check has to ask GitHub, a command that has finished waits up to 2 seconds for the answer. Later commands that day read the answer from a cache and don't wait. Set `NEARHOST_NO_UPDATE_CHECK=1` to turn the check off.
 
 ## nearhost version
 
-Prints the version, as `nearhost 0.8.0`. `nearhost --version` prints the same line.
+Prints the version, as `nearhost 0.8.0`. From Nearhost 0.8.0, `nearhost --version` prints the same line.

@@ -58,10 +58,12 @@ Then it runs the doctor again, and stops when nothing is left that it can fix. I
 Nearhost listens on `~/.nearhost/<id>.sock` on your laptop, where `<id>` is six letters and digits made when Nearhost first runs and kept in `~/.config/nearhost/id`. A config directory copied to another machine gets a new id there, so two laptops never share a socket. On each server it is connected to, it forwards a socket of the same name over its own SSH connection:
 
 ```sh
-ssh -S <sock> -O forward -R <home on the server>/.nearhost/<id>.sock:<socket on the laptop> <host>
+ssh -S <sock> -O forward -R <home on the server>/.nearhost/<id>.sock:<socket on the laptop> -- <host>
 ```
 
 A request is answered for the machine its socket belongs to, so an agent on `mini` sees and proposes only projects on `mini`. sshd creates the socket readable by your account only.
+
+A socket path can be at most 103 bytes on macOS and 107 on Linux. With a home directory long enough to pass that, agents can't reach Nearhost. From Nearhost 0.8.0, its log says `socket path is too long`.
 
 - **The one change on a server.** Nearhost creates `~/.nearhost` there, private to your account, and removes its own socket from an earlier run before forwarding again. sshd leaves the socket behind when the connection ends; the skill skips sockets that do not answer.
 - **Two laptops on one account.** Each install has its own id and socket, so both work. When more than one answers, the agent asks which laptop you mean.
