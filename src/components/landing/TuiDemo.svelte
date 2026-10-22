@@ -1,6 +1,6 @@
 <script lang="ts">
   /* eslint-disable svelte/no-useless-mustaches -- a row's spaces are what lines it up, as in a terminal */
-  // A working mock-up of the nearhost interface (0.4.0): the same screens,
+  // A working mock-up of the nearhost interface (0.8.0): the same screens,
   // keys and footer as the real one, driven by made-up projects and requests.
   import { onMount } from 'svelte';
 
