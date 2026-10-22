@@ -11,7 +11,7 @@ Start the interface with:
 nearhost
 ```
 
-It starts the proxy and every enabled project, and creates the local certificate authority, "Nearhost Local CA", under `~/.config/nearhost/caddy` if it does not exist yet.
+It starts the proxy and every enabled project, and creates the local certificate authority, "Nearhost Local CA", if it does not exist yet. Its key is kept in Nearhost's data folder, not in `~/.config`. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
 
 ## Nothing to serve yet
 

@@ -26,8 +26,10 @@ Three environment variables change what it does:
 Check the install with:
 
 ```sh
-nearhost version
+nearhost --version
 ```
+
+`nearhost version` prints the same.
 
 ## Homebrew
 
@@ -35,13 +37,17 @@ nearhost version
 brew install nearhost/tap/nearhost
 ```
 
+The cask removes the quarantine flag from the binary. See [The quarantine flag](#macos-and-the-quarantine-flag).
+
 ## From source
 
-With Go 1.26 or later:
+With Go:
 
 ```sh
 go install github.com/nearhost/nearhost/cmd/nearhost@latest
 ```
+
+Nearhost needs Go 1.27.3 or later, the version the release binaries are built with. Go 1.21 to 1.27.2 downloads it first, unless `GOTOOLCHAIN` forbids it (some distributions' Go packages set it to `local`). Then install Go 1.27.3 or later yourself.
 
 ## npm
 
@@ -50,6 +56,22 @@ npx @nearhost/cli
 ```
 
 or `npm install -g @nearhost/cli` to keep the `nearhost` command. npm installs the binary for your machine as a platform package, such as `@nearhost/cli-linux-x64`, with no install script, so pnpm, bun and `--ignore-scripts` work too.
+
+## macOS and the quarantine flag
+
+The macOS binary is not notarised yet, so Gatekeeper would block it if macOS marked it as downloaded from the internet. The Homebrew cask removes that mark, the quarantine flag, so the binary runs. The shell installer and npm do not need to: macOS only quarantines files that a browser or a similar app downloads, and `curl` and npm are not that, so the binary they put in place runs without a warning. If you download a release archive in a browser, check it first, as [Verifying a download](#verifying-a-download) shows, then run this on the extracted binary:
+
+```sh
+xattr -dr com.apple.quarantine nearhost
+```
+
+## Verifying a download
+
+The shell installer checks the archive against the release's `checksums.txt`. It does not check the attestation. Releases also carry build provenance attestations, and you can check any file you downloaded with the GitHub CLI:
+
+```sh
+gh attestation verify <file> --repo nearhost/nearhost
+```
 
 ## Updating
 
@@ -100,6 +122,8 @@ sudo dnf install nss-tools       # Fedora, RHEL
 ```
 
 Then run `nearhost trust` again. It prints whether the browser stores were updated. Restart the browser afterwards.
+
+The CA's key is not in your config folder. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca) for where it is and how to look after it.
 
 ## macOS and Firefox
 
