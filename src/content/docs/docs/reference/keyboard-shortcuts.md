@@ -9,6 +9,18 @@ The footer always shows the keys that work where you are. When the window is nar
 
 Mouse and keyboard both work. Click a sidebar row to select it, click a footer action to run it, and scroll the log with the wheel.
 
+## Mouse
+
+Nearhost takes the mouse for those clicks, so it selects text and opens links itself:
+
+| Action           | Effect                                                                                                                                       |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Drag             | Selects text within the panel or box where the drag starts, and copies it when you let go. A toast at the bottom right says what was copied. |
+| Double-click     | Copies the word under the pointer.                                                                                                           |
+| Click an address | Opens an `http` or `https` address in your browser, whether it is a link or written in a log line.                                           |
+
+Copies made with a key or the mouse, adds, saves, removals and failures are confirmed in a toast for two seconds and written to the log too. Copies go to the clipboard through the terminal, over OSC 52, and through `pbcopy` on macOS, or `wl-copy`, `xclip` or `xsel` on Linux, so they work in terminals without OSC 52 too. In most terminals, holding Shift hands the mouse back to the terminal for its own selection and links. In Ghostty, Shift+Cmd+click opens a link the terminal's way. Needs Nearhost 0.8.0 or later.
+
 ## Anywhere
 
 `ctrl+c` quits, even from a form or the password box. While Nearhost is stopping, `q` or `ctrl+c` again stops it at once.
@@ -41,7 +53,7 @@ On Home, when a server cannot connect, `r` retries every such server now and `y`
 | `y`     | Copy the snippets of its advice.                                                                              |
 | `r`     | Read its `.nearhostrc` again. A change that needs no approval is applied, which restarts it if it is running. |
 | `a`     | Review a pending `.nearhostrc` change.                                                                        |
-| `i`     | Show or hide its ignored routes, which fold into one line with their ports.                                   |
+| `i`     | Show or hide its ignored routes, which fold into one line with their ports. Needs Nearhost 0.8.0 or later.    |
 
 ## Routes
 
