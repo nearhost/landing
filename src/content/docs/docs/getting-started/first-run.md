@@ -87,7 +87,7 @@ With it on, Nearhost may still ask for your password the first time, then use To
 Once a project exists, the screen has a sidebar on the left, with Home at the top and each server's projects below, and the selected row's details on the right. Home shows:
 
 - `proxy`: whether it is serving, and on which ports
-- `page`: a link to Nearhost's page at `https://localhost:6327`, once the proxy is serving. Needs Nearhost 0.8.0 or later.
+- `page`: a link to Nearhost's page at `https://localhost:6327`, or the port `--web-port` gives, once the proxy is serving. Needs Nearhost 0.8.0 or later.
 - `local CA`: whether it is trusted, and when it expires
 - `hosts`: whether `/etc/hosts` has every project's name
 - `config`: the path of the config file
