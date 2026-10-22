@@ -37,8 +37,6 @@ nearhost --version
 brew install nearhost/tap/nearhost
 ```
 
-The cask removes the quarantine flag from the binary. See [The quarantine flag](#macos-and-the-quarantine-flag).
-
 ## From source
 
 With Go:
@@ -57,14 +55,6 @@ npx @nearhost/cli
 
 or `npm install -g @nearhost/cli` to keep the `nearhost` command. npm installs the binary for your machine as a platform package, such as `@nearhost/cli-linux-x64`, with no install script, so pnpm, bun and `--ignore-scripts` work too.
 
-## macOS and the quarantine flag
-
-The macOS binary is not notarised yet, so Gatekeeper would block it if macOS marked it as downloaded from the internet. The Homebrew cask removes that mark, the quarantine flag, so the binary runs. The shell installer and npm do not need to: macOS only quarantines files that a browser or a similar app downloads, and `curl` and npm are not that, so the binary they put in place runs without a warning. If you download a release archive in a browser, check it first, as [Verifying a download](#verifying-a-download) shows, then run this on the extracted binary:
-
-```sh
-xattr -dr com.apple.quarantine nearhost
-```
-
 ## Verifying a download
 
 The shell installer checks the archive against the release's `checksums.txt`. It does not check the attestation. Releases also carry build provenance attestations, and you can check any file you downloaded with the GitHub CLI:
@@ -74,6 +64,8 @@ gh attestation verify <file> --repo nearhost/nearhost
 ```
 
 Each archive comes with a software bill of materials, `<archive>.sbom.json`, listing the modules it was built from. The attestation covers the archives, their SBOMs and `checksums.txt`. From Nearhost 0.8.0.
+
+The macOS binaries are signed with a Developer ID certificate and notarised by Apple, so Gatekeeper runs them however you download them. A copy downloaded in a browser may need an internet connection the first time it runs, while macOS checks the notarisation with Apple. From Nearhost 0.9.0.
 
 ## Updating
 
