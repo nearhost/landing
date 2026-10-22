@@ -1,0 +1,19 @@
+src/content/docs/docs/reference/cli.md
+  s_5eda9577dfc159::t_9bea7f255c589f 163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "21ff58ef2a2cb3283dd28466a214d80a3eb51dde",
+  "prompts": {},
+  "sessions": {
+    "s_5eda9577dfc159": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a86316572597a9fb1",
+        "model": "unknown"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
