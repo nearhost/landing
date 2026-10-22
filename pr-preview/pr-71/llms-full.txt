@@ -103,7 +103,7 @@ With Go:
 go install github.com/nearhost/nearhost/cmd/nearhost@latest
 ```
 
-Nearhost needs Go 1.27.3 or later, the version the release binaries are built with. Go 1.21 to 1.27.2 downloads it first, unless `GOTOOLCHAIN` forbids it (some distributions’ Go packages set it to `local`).
+Nearhost needs Go 1.27.3 or later, the version the release binaries are built with. Go 1.21 to 1.27.2 downloads it first, unless `GOTOOLCHAIN` forbids it (some distributions’ Go packages set it to `local`). Then install Go 1.27.3 or later yourself.
 
 ## npm
 
@@ -115,7 +115,7 @@ or `npm install -g @nearhost/cli` to keep the `nearhost` command. npm installs t
 
 ## macOS and the quarantine flag
 
-The macOS binary is not notarised yet, so Gatekeeper would block it if macOS marked it as downloaded from the internet. The Homebrew cask removes that mark, the quarantine flag, so the binary runs. The shell installer and npm do not need to: macOS only quarantines files that a browser or a similar app downloads, and `curl` and npm are not that, so the binary they put in place runs without a warning. If you download a release archive in a browser, run this on the extracted binary:
+The macOS binary is not notarised yet, so Gatekeeper would block it if macOS marked it as downloaded from the internet. The Homebrew cask removes that mark, the quarantine flag, so the binary runs. The shell installer and npm do not need to: macOS only quarantines files that a browser or a similar app downloads, and `curl` and npm are not that, so the binary they put in place runs without a warning. If you download a release archive in a browser, check it first, as [Verifying a download](#verifying-a-download) shows, then run this on the extracted binary:
 
 ```sh
 xattr -dr com.apple.quarantine nearhost
@@ -280,7 +280,7 @@ With it on, Nearhost may still ask for your password the first time, then use To
 Once a project exists, the screen has a sidebar on the left, with Home at the top and each server’s projects below, and the selected row’s details on the right. Home shows:
 
 * `proxy`: whether it is serving, and on which ports
-* `page`: a link to Nearhost’s page at `https://localhost:6327`, once the proxy is serving. Needs Nearhost 0.8.0 or later.
+* `page`: a link to Nearhost’s page at `https://localhost:6327`, or the port `--web-port` gives, once the proxy is serving. Needs Nearhost 0.8.0 or later.
 * `local CA`: whether it is trusted, and when it expires
 * `hosts`: whether `/etc/hosts` has every project’s name
 * `config`: the path of the config file
@@ -1009,7 +1009,7 @@ List every name the service calls. `nearhost doctor` reports a service that call
 
 Nearhost’s certificates are signed by its own local certificate authority. Your system trusts it, but a container has its own trust store, so the call fails with a certificate error.
 
-Mount the root certificate into the container and point the service at it. The certificate is at `pki/authorities/local/root.crt` under Nearhost’s `caddy` folder, which is `~/Library/Application Support/nearhost/caddy` on macOS and `${XDG_DATA_HOME:-~/.local/share}/nearhost/caddy` on Linux, and `nearhost doctor` prints the path on your machine. Earlier versions kept it under `~/.config/nearhost/caddy`. Mount only `root.crt`, never the folder: the key is beside it. The doctor’s snippet, for a Node service:
+Mount the root certificate into the container and point the service at it. The certificate is at `pki/authorities/local/root.crt` under Nearhost’s `caddy` folder, which is `~/Library/Application Support/nearhost/caddy` on macOS and `~/.local/share/nearhost/caddy` on Linux, or `$XDG_DATA_HOME/nearhost/caddy` on either when that is set to an absolute path. `nearhost doctor` prints the path on your machine. Earlier versions kept it under `~/.config/nearhost/caddy`, or `$XDG_CONFIG_HOME/nearhost/caddy` when that variable was set. Mount only `root.crt`, never the folder: the key is beside it. The doctor’s snippet, for a Node service:
 
 ```yaml
 services:
@@ -2098,11 +2098,11 @@ It all lives in memory and is gone when Nearhost quits. To keep nothing, run Nea
 
 > How the embedded Caddy proxy and the local certificate authority serve each alias over HTTPS.
 
-Caddy runs inside the Nearhost process, with its storage in Nearhost’s data folder, under `nearhost/caddy`: `~/Library/Application Support/nearhost/caddy` on macOS, and `$XDG_DATA_HOME/nearhost/caddy` on Linux, which is `~/.local/share/nearhost/caddy` when that variable is not set. It listens on 443 for HTTPS, on 80 only to redirect to HTTPS, with a 308, and on 6327 for Nearhost’s page. To use other ports, run Nearhost with `--https-port`, `--http-port` and `--web-port`.
+Caddy runs inside the Nearhost process, with its storage in Nearhost’s data folder, under `nearhost/caddy`: `~/Library/Application Support/nearhost/caddy` on macOS and `~/.local/share/nearhost/caddy` on Linux, or `$XDG_DATA_HOME/nearhost/caddy` on either when that variable is set to an absolute path. It listens on 443 for HTTPS, on 80 only to redirect to HTTPS, with a 308, and on 6327 for Nearhost’s page. To use other ports, run Nearhost with `--https-port`, `--http-port` and `--web-port`.
 
 It answers only this machine, and, for a project whose `.nearhostrc` sets `docker_clients`, containers on this machine’s Docker networks. A request from another computer, or for a name Nearhost does not serve, has its connection closed with no answer.
 
-While Nearhost runs, even with no projects, `https://localhost:6327` shows Nearhost’s own page. No project uses that port, so the page is there whatever the projects serve. `https://localhost` shows the same page too, unless a project serves `localhost` itself. `--web-port` moves the port, and `--web-port 0` turns it off, leaving only `https://localhost`. If the port is taken, Nearhost starts without the page and says so, and `nearhost doctor` warns. Pass `--web-port` to choose another port. Only the page’s port gives way like this: if the HTTPS or HTTP port is taken, 443 and 80 or the ones you passed, Nearhost still does not start the proxy. The page needs Nearhost 0.8.0 or later.
+While Nearhost runs, even with no projects, `https://localhost:6327` shows Nearhost’s own page. No project uses that port, so the page is there whatever the projects serve. `https://localhost` shows the same page too, unless a project serves `localhost` itself. `--web-port` moves the port, and `--web-port 0` turns it off, leaving only `https://localhost`. If the page’s port is taken, Nearhost starts without the page and says so, and `nearhost doctor` warns. Pass `--web-port` to choose another port. A taken HTTPS or HTTP port is different: Nearhost does not start the proxy. The page needs Nearhost 0.8.0 or later.
 
 ## The local CA
 
@@ -2112,9 +2112,9 @@ Trusting it puts its root into the system trust store, which asks for your passw
 
 ### Where its key is kept
 
-The CA’s private key is in the `caddy` folder named above, under `pki/authorities/local`. Anyone who has it can sign certificates that your browser trusts, so keep that folder out of dotfiles repositories and shared backups. Your config, `~/.config/nearhost/config.yaml`, holds no keys and is safe to share.
+The CA’s private key is in the `caddy` folder named above, under `pki/authorities/local`. Anyone who has it can sign certificates that your browser trusts, so keep that folder out of dotfiles repositories and shared backups. Your config, `~/.config/nearhost/config.yaml` (or under `$XDG_CONFIG_HOME` when that is set), holds no keys and is safe to share.
 
-From Nearhost 0.8.0 the key is in the data folder. Earlier versions kept it in `~/.config/nearhost/caddy`. The next time you run `nearhost`, `nearhost up` or `nearhost trust`, Nearhost moves an existing `~/.config/nearhost/caddy` there, so the CA you already trust stays the same. It does not move it while another Nearhost is running. If a copy of the old folder is left behind, `nearhost doctor` warns with `old CA copy` and says which folder to delete.
+From Nearhost 0.8.0 the key is in the data folder. Earlier versions kept it in `~/.config/nearhost/caddy`, or `$XDG_CONFIG_HOME/nearhost/caddy` when that variable is set. The next time you run `nearhost`, `nearhost up` or `nearhost trust`, Nearhost moves an existing old folder there, so the CA you already trust stays the same. It does not move it while another Nearhost is running. If a copy of the old folder is left behind, `nearhost doctor` warns with `old CA copy` and says which folder to delete.
 
 Trust it from the welcome box the first time you start Nearhost, or at any time with `nearhost trust`. `nearhost untrust` removes the CA from the system and browser stores. It leaves the key’s folder where it is. See [First run](/pr-preview/pr-71/docs/getting-started/first-run/) and, for Linux and Firefox, [Install](/pr-preview/pr-71/docs/getting-started/install/).
 
@@ -2240,7 +2240,7 @@ Opens the interface, at a terminal. It starts the proxy and every enabled projec
 | --------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `--https-port <port>` | Serve HTTPS on this port instead of 443.                                                                          |
 | `--http-port <port>`  | Redirect HTTP on this port instead of 80.                                                                         |
-| `--web-port <port>`   | Serve Nearhost’s page at `https://localhost:<port>` instead of 6327. `0` turns it off.                            |
+| `--web-port <port>`   | Serve Nearhost’s page at `https://localhost:<port>` instead of 6327. `0` turns it off. From Nearhost 0.8.0.       |
 | `--no-hosts`          | Leave `/etc/hosts` alone. Add the aliases yourself.                                                               |
 | `--no-capture`        | Keep no requests or responses in memory. See [The request log](/pr-preview/pr-71/docs/concepts/the-request-log/). |
 
@@ -2358,18 +2358,18 @@ Reverses `trust`: removes the local CA from the system and browser stores. It as
 
 Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project’s files and setup and lists what it finds. See [Project checks](#project-checks). An error there also makes it exit non-zero. It takes `--https-port`, `--http-port`, `--web-port` and `--no-hosts`, and `--json` prints all of it as one JSON object. See [JSON output](#json-output).
 
-| Check                              | What it looks at                                                                                                                                                                                                 |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config`                           | Whether the config file reads and is valid.                                                                                                                                                                      |
-| `port 443`, `port 80`, `port 6327` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too. 6327 is Nearhost’s page, or the port `--web-port` gives, and is left out with `--web-port 0`. A busy 6327 only warns.     |
-| `privileged ports`                 | On Linux, whether the binary may bind ports below 1024.                                                                                                                                                          |
-| `local CA`                         | Whether it exists, whether the system trusts it, and when it expires.                                                                                                                                            |
-| `old CA copy`                      | Only shown when `~/.config/nearhost/caddy`, where Nearhost 0.7 and earlier kept the CA, is still there beside the new one. It warns, and the fix is to delete the old folder.                                    |
-| `browser stores`                   | Whether the Firefox and Chromium stores trust it.                                                                                                                                                                |
-| `aliases`                          | Only shown when a main name is not a valid domain. It fails, and the project does not start.                                                                                                                     |
-| `hosts block`                      | Whether `/etc/hosts` has every name it needs: main names and web hosts, less any DNS already resolves to this machine. A block from Nearhost 0.7 or earlier, with no `::1` lines, warns. `nearhost up` fixes it. |
-| `server <name>`                    | Whether `ssh <host>` connects without a prompt, for each server.                                                                                                                                                 |
-| `agents on <name>`                 | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.                                                                                                                            |
+| Check                              | What it looks at                                                                                                                                                                                                                                    |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `config`                           | Whether the config file reads and is valid.                                                                                                                                                                                                         |
+| `port 443`, `port 80`, `port 6327` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too. 6327 is Nearhost’s page, or the port `--web-port` gives, and is left out with `--web-port 0`. A busy 6327 only warns. The 6327 check is from Nearhost 0.8.0. |
+| `privileged ports`                 | On Linux, whether the binary may bind ports below 1024.                                                                                                                                                                                             |
+| `local CA`                         | Whether it exists, whether the system trusts it, and when it expires.                                                                                                                                                                               |
+| `old CA copy`                      | Only shown when `~/.config/nearhost/caddy`, where Nearhost 0.7 and earlier kept the CA, is still there beside the new one. It warns, and the fix is to delete the old folder.                                                                       |
+| `browser stores`                   | Whether the Firefox and Chromium stores trust it.                                                                                                                                                                                                   |
+| `aliases`                          | Only shown when a main name is not a valid domain. It fails, and the project does not start.                                                                                                                                                        |
+| `hosts block`                      | Whether `/etc/hosts` has every name it needs: main names and web hosts, less exact names outside `.test` whose DNS answers are all loopback addresses. A block from Nearhost 0.7 or earlier, with no `::1` lines, warns. `nearhost up` fixes it.    |
+| `server <name>`                    | Whether `ssh <host>` connects without a prompt, for each server.                                                                                                                                                                                    |
+| `agents on <name>`                 | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.                                                                                                                                                               |
 
 ### Project checks
 
@@ -2619,7 +2619,7 @@ The folder that holds `config.yaml` also holds:
 * `registry/`: each trusted registry’s cached index
 * `run/`: the SSH control sockets
 
-The proxy’s storage, including the local certificate authority, is not in this folder. It is the `caddy` folder in Nearhost’s data directory: `~/Library/Application Support/nearhost/caddy` on macOS, and `$XDG_DATA_HOME/nearhost/caddy` on Linux, which is `~/.local/share/nearhost/caddy` when that variable is not set. From Nearhost 0.8.0, `XDG_DATA_HOME` moves it on macOS too, when it is set to an absolute path. Nearhost 0.7 and earlier kept it beside the config. See [The local CA](/pr-preview/pr-71/docs/concepts/tls-and-the-proxy/#the-local-ca).
+The proxy’s storage, including the local certificate authority, is not in this folder. It is the `caddy` folder in Nearhost’s data directory: `~/Library/Application Support/nearhost/caddy` on macOS and `~/.local/share/nearhost/caddy` on Linux, or `$XDG_DATA_HOME/nearhost/caddy` on either when that variable is set to an absolute path. Nearhost 0.7 and earlier kept it beside the config. See [The local CA](/pr-preview/pr-71/docs/concepts/tls-and-the-proxy/#the-local-ca).
 
 ## The local server
 
