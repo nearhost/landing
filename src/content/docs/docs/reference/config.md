@@ -101,6 +101,7 @@ The folder that holds `config.yaml` also holds:
 - `presets/`: installed presets
 - `registry/`: each trusted registry's cached index
 - `run/`: the SSH control sockets
+- `config.yaml.lock`: held while a command or the interface changes the config, so two never save over each other. Leave it in place. From Nearhost 0.8.0.
 
 The proxy's storage, including the local certificate authority, is not in this folder. It is the `caddy` folder in Nearhost's data directory: `~/Library/Application Support/nearhost/caddy` on macOS and `~/.local/share/nearhost/caddy` on Linux, or `$XDG_DATA_HOME/nearhost/caddy` on either when that variable is set to an absolute path. Nearhost 0.7 and earlier kept it beside the config. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
 
