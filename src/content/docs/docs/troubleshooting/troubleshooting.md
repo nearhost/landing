@@ -15,6 +15,10 @@ Quit that program, or run Nearhost with `--https-port` and `--http-port`. Anothe
 
 If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary; run it, then start Nearhost again. From Nearhost 0.8.0.
 
+## Port 6327 already in use
+
+Nearhost starts, serves every project and leaves out Nearhost's page, and the log says `port 6327 is in use; serving without Nearhost's page`. `nearhost doctor` warns about it. Another Nearhost already running is the usual cause. Otherwise pass `--web-port` with a free port, or `--web-port 0` to do without the page. From Nearhost 0.8.0.
+
 ## A loopback port is already bound
 
 The project goes into `error`, naming the port and the program holding it on this machine. Its other routes still start.
