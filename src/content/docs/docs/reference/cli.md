@@ -20,7 +20,7 @@ nearhost update                update to the latest release
 nearhost version               print the version (also nearhost --version)
 ```
 
-Every command takes `--config <file>` to use another config file. A mistyped command gets a suggestion, as `Did you mean this?` with the closest command names.
+Every command takes `--config <file>` to use another config file. A mistyped command gets a suggestion, as `Did you mean this?` with the closest command names. From Nearhost 0.8.0.
 
 ## nearhost
 
@@ -148,7 +148,7 @@ Reverses `trust`: removes the local CA from the system and browser stores. It as
 - `apply` sets the nearhost block to the aliases read from stdin, one per line. It writes the file itself, so it runs as root: Nearhost calls it through `sudo`.
 - `clean` removes the block, and asks for your password through `sudo`.
 
-`apply` is left out of `nearhost --help`, because Nearhost runs it itself through `sudo`. Both take `--file <path>` to work on another file than `/etc/hosts`. See [The hosts file](/docs/concepts/the-hosts-file/).
+`apply` is left out of `nearhost --help` from Nearhost 0.8.0, because Nearhost runs it itself through `sudo`. Both take `--file <path>` to work on another file than `/etc/hosts`. See [The hosts file](/docs/concepts/the-hosts-file/).
 
 ## nearhost doctor
 
@@ -312,4 +312,4 @@ Nearhost also checks for a new release at most once a day, in the background, an
 
 ## nearhost version
 
-Prints the version, as `nearhost 0.8.0`. `nearhost --version` prints the same line.
+Prints the version, as `nearhost 0.8.0`. From Nearhost 0.8.0, `nearhost --version` prints the same line.
