@@ -59,6 +59,8 @@ Adds a project. It discovers the routes from the project's files, prints them an
 | `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
 | `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
 
+From Nearhost 0.8.0, `nearhost add` refuses a name with letters or digits outside ASCII, such as `café`, since the `.test` name made from it would lose them. Pass `--name` with a-z, 0-9 and `-`, or give the main name with `--alias` or in the project's `.nearhostrc`.
+
 See [Add a project](/docs/getting-started/add-a-project/).
 
 ## nearhost export
