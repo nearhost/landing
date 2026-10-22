@@ -19,7 +19,7 @@ Three environment variables change what it does:
 
 | Variable               | Effect                                                   |
 | ---------------------- | -------------------------------------------------------- |
-| `NEARHOST_VERSION`     | Install this release instead of the latest, as `v0.7.0`. |
+| `NEARHOST_VERSION`     | Install this release instead of the latest, as `v0.8.0`. |
 | `NEARHOST_INSTALL_DIR` | Install into this folder.                                |
 | `NEARHOST_SKIP_SETCAP` | Set to `1` to skip the Linux port step below.            |
 
@@ -29,7 +29,7 @@ Check the install with:
 nearhost --version
 ```
 
-`nearhost version` prints the same.
+`nearhost version` prints the same, and works on releases before 0.8.0 too.
 
 ## Homebrew
 
