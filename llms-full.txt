@@ -191,7 +191,7 @@ n  add a project on this machine or a server
 s  add a server you reach over SSH
 ```
 
-Below them are the folder you started in, whether the certificate authority is trusted, and the proxy’s ports. Press `n` to serve a project from this machine, or from a server you have added. Press `s` first if the project is on a machine you reach over SSH. See [Add a server](/docs/getting-started/add-a-server/) and [Add a project](/docs/getting-started/add-a-project/).
+Below them are the folder you started in, whether the certificate authority is trusted, the proxy’s ports, and, from Nearhost 0.8.0, a link to Nearhost’s page at `https://localhost:6327`, or on the port `--web-port` gives. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/). Press `n` to serve a project from this machine, or from a server you have added. Press `s` first if the project is on a machine you reach over SSH. See [Add a server](/docs/getting-started/add-a-server/) and [Add a project](/docs/getting-started/add-a-project/).
 
 ## Welcome to Nearhost
 
@@ -256,6 +256,7 @@ With it on, Nearhost may still ask for your password the first time, then use To
 Once a project exists, the screen has a sidebar on the left, with Home at the top and each server’s projects below, and the selected row’s details on the right. Home shows:
 
 * `proxy`: whether it is serving, and on which ports
+* `page`: a link to Nearhost’s page at `https://localhost:6327`, or the port `--web-port` gives, once the proxy is serving. Needs Nearhost 0.8.0 or later.
 * `local CA`: whether it is trusted, and when it expires
 * `hosts`: whether `/etc/hosts` has every project’s name
 * `config`: the path of the config file
@@ -2071,11 +2072,11 @@ It all lives in memory and is gone when Nearhost quits. To keep nothing, run Nea
 
 > How the embedded Caddy proxy and the local certificate authority serve each alias over HTTPS.
 
-Caddy runs inside the Nearhost process, with its storage under `~/.config/nearhost/caddy`. It listens on 443 for HTTPS and on 80 only to redirect to HTTPS, with a 308. To use other ports, run Nearhost with `--https-port` and `--http-port`.
+Caddy runs inside the Nearhost process, with its storage under `~/.config/nearhost/caddy`. It listens on 443 for HTTPS, on 80 only to redirect to HTTPS, with a 308, and on 6327 for Nearhost’s page. To use other ports, run Nearhost with `--https-port`, `--http-port` and `--web-port`.
 
 It answers only this machine, and, for a project whose `.nearhostrc` sets `docker_clients`, containers on this machine’s Docker networks. A request from another computer, or for a name Nearhost does not serve, has its connection closed with no answer.
 
-While Nearhost runs, even with no projects, `https://localhost` shows Nearhost’s own page, unless a project serves `localhost` itself.
+While Nearhost runs, even with no projects, `https://localhost:6327` shows Nearhost’s own page. No project uses that port, so the page is there whatever the projects serve. `https://localhost` shows the same page too, unless a project serves `localhost` itself. `--web-port` moves the port, and `--web-port 0` turns it off, leaving only `https://localhost`. If the page’s port is taken, Nearhost starts without the page and says so, and `nearhost doctor` warns. Pass `--web-port` to choose another port. A taken HTTPS or HTTP port is different: Nearhost does not start the proxy. The page needs Nearhost 0.8.0 or later.
 
 ## The local CA
 
@@ -2203,16 +2204,17 @@ Every command takes `--config <file>` to use another config file.
 
 Opens the interface, at a terminal. It starts the proxy and every enabled project, and `q` stops them all. See [First run](/docs/getting-started/first-run/).
 
-| Flag                  | Effect                                                                                           |
-| --------------------- | ------------------------------------------------------------------------------------------------ |
-| `--https-port <port>` | Serve HTTPS on this port instead of 443.                                                         |
-| `--http-port <port>`  | Redirect HTTP on this port instead of 80.                                                        |
-| `--no-hosts`          | Leave `/etc/hosts` alone. Add the aliases yourself.                                              |
-| `--no-capture`        | Keep no requests or responses in memory. See [The request log](/docs/concepts/the-request-log/). |
+| Flag                  | Effect                                                                                                      |
+| --------------------- | ----------------------------------------------------------------------------------------------------------- |
+| `--https-port <port>` | Serve HTTPS on this port instead of 443.                                                                    |
+| `--http-port <port>`  | Redirect HTTP on this port instead of 80.                                                                   |
+| `--web-port <port>`   | Serve Nearhost’s page at `https://localhost:<port>` instead of 6327. `0` turns it off. From Nearhost 0.8.0. |
+| `--no-hosts`          | Leave `/etc/hosts` alone. Add the aliases yourself.                                                         |
+| `--no-capture`        | Keep no requests or responses in memory. See [The request log](/docs/concepts/the-request-log/).            |
 
 ## nearhost up
 
-Starts the named projects, or every enabled project when none is named, and serves them until Ctrl-C. A second Ctrl-C stops at once. It takes the same four flags as `nearhost`.
+Starts the named projects, or every enabled project when none is named, and serves them until Ctrl-C. A second Ctrl-C stops at once. It takes the same five flags as `nearhost`.
 
 ```sh
 nearhost up myapp
@@ -2322,19 +2324,19 @@ Both take `--file <path>` to work on another file than `/etc/hosts`. See [The ho
 
 ## nearhost doctor
 
-Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project’s files and setup and lists what it finds. See [Project checks](#project-checks). An error there also makes it exit non-zero. It takes `--https-port`, `--http-port` and `--no-hosts`, and `--json` prints all of it as one JSON object. See [JSON output](#json-output).
+Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project’s files and setup and lists what it finds. See [Project checks](#project-checks). An error there also makes it exit non-zero. It takes `--https-port`, `--http-port`, `--web-port` and `--no-hosts`, and `--json` prints all of it as one JSON object. See [JSON output](#json-output).
 
-| Check                 | What it looks at                                                                                                       |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `config`              | Whether the config file reads and is valid.                                                                            |
-| `port 443`, `port 80` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too.                                 |
-| `privileged ports`    | On Linux, whether the binary may bind ports below 1024.                                                                |
-| `local CA`            | Whether it exists, whether the system trusts it, and when it expires.                                                  |
-| `browser stores`      | Whether the Firefox and Chromium stores trust it.                                                                      |
-| `aliases`             | Only shown when a main name is not a valid domain. It fails, and the project does not start.                           |
-| `hosts block`         | Whether `/etc/hosts` has every name it needs: main names and web hosts, less any DNS already resolves to this machine. |
-| `server <name>`       | Whether `ssh <host>` connects without a prompt, for each server.                                                       |
-| `agents on <name>`    | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.                                  |
+| Check                              | What it looks at                                                                                                                                                                                                                                    |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `config`                           | Whether the config file reads and is valid.                                                                                                                                                                                                         |
+| `port 443`, `port 80`, `port 6327` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too. 6327 is Nearhost’s page, or the port `--web-port` gives, and is left out with `--web-port 0`. A busy 6327 only warns. The 6327 check is from Nearhost 0.8.0. |
+| `privileged ports`                 | On Linux, whether the binary may bind ports below 1024.                                                                                                                                                                                             |
+| `local CA`                         | Whether it exists, whether the system trusts it, and when it expires.                                                                                                                                                                               |
+| `browser stores`                   | Whether the Firefox and Chromium stores trust it.                                                                                                                                                                                                   |
+| `aliases`                          | Only shown when a main name is not a valid domain. It fails, and the project does not start.                                                                                                                                                        |
+| `hosts block`                      | Whether `/etc/hosts` has every name it needs: main names and web hosts, less any DNS already resolves to this machine.                                                                                                                              |
+| `server <name>`                    | Whether `ssh <host>` connects without a prompt, for each server.                                                                                                                                                                                    |
+| `agents on <name>`                 | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.                                                                                                                                                               |
 
 ### Project checks
 
