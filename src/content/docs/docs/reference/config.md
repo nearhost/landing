@@ -83,7 +83,7 @@ A project's `.nearhostrc` can set the main name with `alias:`, filled from the p
 
 ## Validation
 
-- Server names are unique, each server has a host, and `local` is not used as a name.
+- Server names are unique, each server has a host, and `local` is not used as a name. A host may not start with `-`, which `ssh` would read as an option.
 - Project names are unique, and each project's server exists.
 - Aliases are unique across projects, ignoring case. An alias that is not a valid main name does not start, and `nearhost doctor` reports it.
 - Each project has at least one `web` route. The first is served at the main name. Every other web route needs at least one host. Ports are from 1 to 65535.
