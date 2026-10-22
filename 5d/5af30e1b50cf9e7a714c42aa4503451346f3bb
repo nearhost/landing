@@ -1,0 +1,29 @@
+src/content/docs/docs/getting-started/add-a-project.md
+  s_e8c5d245e902d9::t_2e5d52cd042b50 76
+src/components/landing/TuiDemo.svelte
+  s_e8c5d245e902d9::t_2e5d52cd042b50 628-629
+src/content/docs/docs/getting-started/first-run.md
+  s_e8c5d245e902d9::t_2e5d52cd042b50 25
+src/content/docs/docs/getting-started/install.md
+  s_e8c5d245e902d9::t_2e5d52cd042b50 32,108
+src/content/docs/docs/troubleshooting/troubleshooting.md
+  s_e8c5d245e902d9::t_2e5d52cd042b50 16,20
+src/content/docs/docs/guides/container-callbacks.md
+  s_e8c5d245e902d9::t_80d0a6ef53e861 67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5d5af30e1b50cf9e7a714c42aa4503451346f3bb",
+  "prompts": {},
+  "sessions": {
+    "s_e8c5d245e902d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5838b929-4de2-4f9c-a293-db115e94d8e0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
