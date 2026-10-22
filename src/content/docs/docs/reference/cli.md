@@ -306,7 +306,7 @@ Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since
 | `--yes`   | Update without asking.                                         |
 | `--check` | Only report. Exits 1 when a newer release is out, 0 otherwise. |
 
-Nearhost also checks for a new release at most once a day, in the background, and prints a line after the command when one is out. The interface shows it in its log. Set `NEARHOST_NO_UPDATE_CHECK=1` to turn the check off.
+Nearhost also checks for a new release at most once a day, in the background, and prints a line after the command when one is out. The interface shows it in its log. When the day's check has to ask GitHub, a command that has finished waits up to 2 seconds for the answer. Later commands that day read the answer from a cache and don't wait. Set `NEARHOST_NO_UPDATE_CHECK=1` to turn the check off.
 
 ## nearhost version
 
