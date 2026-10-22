@@ -1,0 +1,20 @@
+src/components/landing/TuiDemo.svelte
+  s_e8c5d245e902d9::t_8e729dd53f1b91 232,615,621-630,837-839,1736-1740,1750,1752
+  s_e8c5d245e902d9::t_23d6d2fe9f9297 1742,1747-1749,1751,2122-2124
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5eb7458cd7248fe4aed4aa3228e7bdeac34fac6f",
+  "prompts": {},
+  "sessions": {
+    "s_e8c5d245e902d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5838b929-4de2-4f9c-a293-db115e94d8e0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
