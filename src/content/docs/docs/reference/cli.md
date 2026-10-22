@@ -73,6 +73,8 @@ nearhost export [project] [--dry-run] [--force]
 
 Without a name, it exports the project on this machine whose directory holds the current one. Name the project to export one on a server.
 
+A `.nearhostrc` that is a link is written through, unless it leads outside the project's directory. Then `export` stops and names where the link leads. From Nearhost 0.8.0.
+
 | Flag        | Effect                                                                     |
 | ----------- | -------------------------------------------------------------------------- |
 | `--dry-run` | Print the file instead of writing it. Warnings go to stderr, not the file. |
