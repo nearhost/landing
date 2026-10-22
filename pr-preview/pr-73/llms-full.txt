@@ -85,7 +85,7 @@ Check the install with:
 nearhost --version
 ```
 
-`nearhost version` prints the same, and works on releases before 0.8.0 too.
+`nearhost --version` needs Nearhost 0.8.0 or later. `nearhost version` prints the same, and works on releases before 0.8.0 too.
 
 ## Homebrew
 
@@ -161,7 +161,7 @@ Installed from npm, `command -v nearhost` finds the Node launcher rather than th
 nearhost trust
 ```
 
-This adds the Nearhost Local CA to the system trust store and asks for your password through `sudo`, which must be in `/usr/bin`, `/bin`, `/usr/local/bin` or `/run/wrappers/bin` and owned by root. It uses your distribution’s own tool:
+This adds the Nearhost Local CA to the system trust store and asks for your password through `sudo`, which must be in `/usr/bin`, `/bin`, `/usr/local/bin` or `/run/wrappers/bin` and owned by root, from Nearhost 0.8.0. It uses your distribution’s own tool:
 
 | Distribution   | Command it runs           |
 | -------------- | ------------------------- |
@@ -217,7 +217,7 @@ n  add a project on this machine or a server
 s  add a server you reach over SSH
 ```
 
-Below them are the folder you started in, whether the certificate authority is trusted, the proxy’s ports, and, from Nearhost 0.8.0, a link to Nearhost’s page at `https://localhost:6327`, or on the port `--web-port` gives, unless that port was taken. See [TLS and the proxy](/pr-preview/pr-73/docs/concepts/tls-and-the-proxy/). Press `n` to serve a project from this machine, or from a server you have added. Press `s` first if the project is on a machine you reach over SSH. See [Add a server](/pr-preview/pr-73/docs/getting-started/add-a-server/) and [Add a project](/pr-preview/pr-73/docs/getting-started/add-a-project/).
+Below them are the folder you started in, whether the certificate authority is trusted, the proxy’s ports, and, from Nearhost 0.8.0, a link to Nearhost’s page at `https://localhost:6327`, or on the port `--web-port` gives, unless that port was taken or `--web-port 0` turned it off. See [TLS and the proxy](/pr-preview/pr-73/docs/concepts/tls-and-the-proxy/). Press `n` to serve a project from this machine, or from a server you have added. Press `s` first if the project is on a machine you reach over SSH. See [Add a server](/pr-preview/pr-73/docs/getting-started/add-a-server/) and [Add a project](/pr-preview/pr-73/docs/getting-started/add-a-project/).
 
 ## Welcome to Nearhost
 
@@ -428,7 +428,7 @@ At a terminal it asks what the interface asks: whether to trust the official pre
 | `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
 | `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
 
-A directory whose name has letters or digits outside ASCII, such as `café`, needs `--name` or `--alias`, or an `alias` in its `.nearhostrc`. From Nearhost 0.8.0, `nearhost add` stops and says so.
+A directory whose name has letters or digits outside ASCII, such as `café`, needs `--name` with only a-z, 0-9 and `-`, or `--alias`, or an `alias` in its `.nearhostrc`. From Nearhost 0.8.0, `nearhost add` stops and says so.
 
 A `~` in the path means the server’s home directory, even when your shell has already turned it into this machine’s.
 
@@ -1015,7 +1015,7 @@ List every name the service calls. `nearhost doctor` reports a service that call
 
 Nearhost’s certificates are signed by its own local certificate authority. Your system trusts it, but a container has its own trust store, so the call fails with a certificate error.
 
-Mount the root certificate into the container and point the service at it. The certificate is at `pki/authorities/local/root.crt` under Nearhost’s `caddy` folder, which is `~/Library/Application Support/nearhost/caddy` on macOS and `~/.local/share/nearhost/caddy` on Linux, or `$XDG_DATA_HOME/nearhost/caddy` on either when that is set to an absolute path. `nearhost doctor` prints the path on your machine. Earlier versions kept it under `~/.config/nearhost/caddy`, or `$XDG_CONFIG_HOME/nearhost/caddy` when that variable was set. The first time Nearhost 0.8.0 runs, it moves that folder, so a `NEARHOST_CA_CERT` set for an earlier version points at a file that is gone. Set it to the new path, which `nearhost doctor` prints. Mount only `root.crt`, never the folder: the key is beside it. The doctor’s snippet, for a Node service:
+Mount the root certificate into the container and point the service at it. The certificate is at `pki/authorities/local/root.crt` under Nearhost’s `caddy` folder, which is `~/Library/Application Support/nearhost/caddy` on macOS and `~/.local/share/nearhost/caddy` on Linux, or `$XDG_DATA_HOME/nearhost/caddy` on either when that is set to an absolute path. `nearhost doctor` prints the path on your machine. Earlier versions kept it under `~/.config/nearhost/caddy`, or `$XDG_CONFIG_HOME/nearhost/caddy` when that variable was set. Nearhost 0.8.0 moves that folder the first time it runs while no other Nearhost is running. After that, a `NEARHOST_CA_CERT` set for an earlier version points at a file that is gone, so set it to the new path, which `nearhost doctor` prints. Mount only `root.crt`, never the folder: the key is beside it. The doctor’s snippet, for a Node service:
 
 ```yaml
 services:
@@ -2651,6 +2651,18 @@ The footer always shows the keys that work where you are. When the window is nar
 
 Mouse and keyboard both work. Click a sidebar row to select it, click a footer action to run it, and scroll the log with the wheel.
 
+## Mouse
+
+Nearhost takes the mouse for those clicks, so it selects text and opens links itself:
+
+| Action           | Effect                                                                                                                                       |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Drag             | Selects text within the panel or box where the drag starts, and copies it when you let go. A toast at the bottom right says what was copied. |
+| Double-click     | Copies the word under the pointer.                                                                                                           |
+| Click an address | Opens an `http` or `https` address in your browser, whether it is a link or written in a log line.                                           |
+
+Copies made with a key or the mouse, adds, saves, removals and failures are confirmed in a toast for two seconds and written to the log too. Copies go to the clipboard through the terminal, over OSC 52, and through `pbcopy` on macOS, or `wl-copy`, `xclip` or `xsel` on Linux, so they work in terminals without OSC 52 too. In most terminals, holding Shift hands the mouse back to the terminal for its own selection and links. In Ghostty, Shift+Cmd+click opens a link the terminal’s way. Needs Nearhost 0.8.0 or later.
+
 ## Anywhere
 
 `ctrl+c` quits, even from a form or the password box. While Nearhost is stopping, `q` or `ctrl+c` again stops it at once.
@@ -2683,7 +2695,7 @@ On Home, when a server cannot connect, `r` retries every such server now and `y`
 | `y`     | Copy the snippets of its advice.                                                                              |
 | `r`     | Read its `.nearhostrc` again. A change that needs no approval is applied, which restarts it if it is running. |
 | `a`     | Review a pending `.nearhostrc` change.                                                                        |
-| `i`     | Show or hide its ignored routes, which fold into one line with their ports.                                   |
+| `i`     | Show or hide its ignored routes, which fold into one line with their ports. Needs Nearhost 0.8.0 or later.    |
 
 ## Routes
 
@@ -2920,11 +2932,11 @@ The proxy does not start. Home shows `proxy down`, names the port and, where it 
 
 Quit that program, or run Nearhost with `--https-port` and `--http-port`. Another local proxy is the usual cause: nginx, Caddy, Herd or Valet. On Linux, also check that the binary may bind low ports. See [Install](/pr-preview/pr-73/docs/getting-started/install/).
 
-If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary; run it, then start Nearhost again. From Nearhost 0.8.0.
+If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary, as in [Allow binding ports 80 and 443](/pr-preview/pr-73/docs/getting-started/install/#allow-binding-ports-80-and-443); run it, then start Nearhost again. For an npm install, use the command `nearhost doctor` prints, which names the real binary. From Nearhost 0.8.0.
 
 ## Port 6327 already in use
 
-Nearhost starts, serves every project and leaves out Nearhost’s page, and the log says `port 6327 is in use; serving without Nearhost's page`. `nearhost doctor` warns about it. Another Nearhost already running is the usual cause. Otherwise pass `--web-port` with a free port, or `--web-port 0` to do without the page. From Nearhost 0.8.0.
+Nearhost starts, serves every project and leaves out Nearhost’s page, and the log says `port 6327 is in use; serving without Nearhost's page`. `nearhost doctor` warns about it. Another Nearhost already running is the usual cause. Otherwise pass `--web-port` with a free port, or `--web-port 0` to turn off the page’s own port, leaving it at `https://localhost`. From Nearhost 0.8.0.
 
 ## A loopback port is already bound
 
