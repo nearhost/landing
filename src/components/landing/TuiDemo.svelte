@@ -616,6 +616,63 @@
     };
   }
 
+  // The names web route i is served at on the routes step: the alias on the
+  // first web route, and none on another, since the demo gives no hosts.
+  function webNames(f: Form, i: number) {
+    const primary = f.routes.findIndex((r) => r.role === 'web');
+    return i === primary && f.alias ? [f.alias] : [];
+  }
+
+  // What route i opens on this machine.
+  function opens(f: Form, i: number) {
+    const r = f.routes[i];
+    if (r.role === 'web') {
+      const names = webNames(f, i);
+      return names.length ? 'https://' + names[0] : '–';
+    }
+    return r.role === 'loopback' ? `localhost:${r.port}` : '–';
+  }
+
+  // What the selected route's role does, in full: [tone, text, link, rest].
+  function roleLine(f: Form): [Tone, string, string, string] {
+    const r = f.routes[f.routeRow];
+    const where = f.server === 'local' ? 'on this machine' : 'on ' + f.server;
+    const more =
+      " One port is the project's web port. To serve another port as well, give it names of its own with h.";
+    if (r.role === 'web') {
+      const names = webNames(f, f.routeRow);
+      const primary = f.routeRow === f.routes.findIndex((x) => x.role === 'web');
+      if (!names.length && !primary)
+        return [
+          'a',
+          `web: port ${r.port} has no names of its own, and only one web route can go without, served at the alias. Give it names with h, or change its role with ← or →.`,
+          '',
+          '',
+        ];
+      if (!names.length)
+        return [
+          'd',
+          `web: Nearhost serves port ${r.port} ${where} at the project's alias, which the next step sets.${more}`,
+          '',
+          '',
+        ];
+      return [
+        'd',
+        'web: your browser opens ',
+        'https://' + names[0],
+        `, and Nearhost sends it to port ${r.port} ${where}.${more}`,
+      ];
+    }
+    if (r.role === 'loopback')
+      return [
+        'd',
+        `loopback: localhost:${r.port} on this machine reaches port ${r.port} ${where}, for what the app's pages load from that port themselves, such as Vite's dev server.`,
+        '',
+        '',
+      ];
+    return ['d', `ignore: Nearhost opens nothing for port ${r.port}.`, '', ''];
+  }
+
   function formBusy(text: string, ms: number, then: () => void) {
     if (!form) return;
     form.busy = text;
@@ -1631,7 +1688,12 @@
           {:else if f.step === 4}
             <div class="l">Found {f.routes.length} ports. Pick what to serve.</div>
             <div class="l"></div>
-            <div class="l d">{'      port    role          label'}</div>
+            {@const opened = f.routes.map((_, i) => opens(f, i))}
+            {@const opensWidth = Math.max(5, ...opened.map((o) => Math.min(o.length, 28)))}
+            {@const [tone, said, link, rest] = roleLine(f)}
+            <div class="l d">
+              {'      port    role          ' + pad('opens', opensWidth + 2) + 'label'}
+            </div>
             {#each f.routes as r, i (r.port)}
               {@const on = i === f.routeRow}
               <div class="l" class:sel={on} class:d={r.role === 'ignore'}>
@@ -1640,17 +1702,14 @@
                 >
                 {pad(r.port, 8)}<span class:b={on || r.role === 'web'}
                   >{pad(on ? `‹ ${r.role} ›` : r.role, 14)}</span
-                >{r.label}
+                >{pad(opened[i], opensWidth + 2)}{r.label}
               </div>
             {/each}
             <div class="l"></div>
             <div class="wrap">
-              <span class="d">{'web is what '}</span><span class="b">https://{f.alias}</span><span
-                class="d"
-                >{' serves.'}{f.server === 'local'
-                  ? ''
-                  : ' loopback ports open on 127.0.0.1 here too, so the browser reaches them.'}</span
-              >
+              <span class={tone}>{said}</span>{#if link}<span class="b">{link}</span><span class="d"
+                  >{rest}</span
+                >{/if}
             </div>
           {:else if f.step === 5}
             <div class="l">
