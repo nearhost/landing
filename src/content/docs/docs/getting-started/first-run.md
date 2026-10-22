@@ -22,7 +22,7 @@ n  add a project on this machine or a server
 s  add a server you reach over SSH
 ```
 
-Below them are the folder you started in, whether the certificate authority is trusted, the proxy's ports, and, from Nearhost 0.8.0, a link to Nearhost's page at `https://localhost:6327`, or on the port `--web-port` gives. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/). Press `n` to serve a project from this machine, or from a server you have added. Press `s` first if the project is on a machine you reach over SSH. See [Add a server](/docs/getting-started/add-a-server/) and [Add a project](/docs/getting-started/add-a-project/).
+Below them are the folder you started in, whether the certificate authority is trusted, the proxy's ports, and, from Nearhost 0.8.0, a link to Nearhost's page at `https://localhost:6327`, or on the port `--web-port` gives, unless that port was taken. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/). Press `n` to serve a project from this machine, or from a server you have added. Press `s` first if the project is on a machine you reach over SSH. See [Add a server](/docs/getting-started/add-a-server/) and [Add a project](/docs/getting-started/add-a-project/).
 
 ## Welcome to Nearhost
 
@@ -87,7 +87,7 @@ With it on, Nearhost may still ask for your password the first time, then use To
 Once a project exists, the screen has a sidebar on the left, with Home at the top and each server's projects below, and the selected row's details on the right. Home shows:
 
 - `proxy`: whether it is serving, and on which ports
-- `page`: a link to Nearhost's page at `https://localhost:6327`, or the port `--web-port` gives, once the proxy is serving. Needs Nearhost 0.8.0 or later.
+- `page`: a link to Nearhost's page at `https://localhost:6327`, or the port `--web-port` gives, once the proxy is serving. It is left out when that port was taken. Needs Nearhost 0.8.0 or later.
 - `local CA`: whether it is trusted, and when it expires
 - `hosts`: whether `/etc/hosts` has every project's name
 - `config`: the path of the config file
