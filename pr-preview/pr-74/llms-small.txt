@@ -47,7 +47,7 @@ npx @nearhost/cli
 ```sh
 gh attestation verify <file> --repo nearhost/nearhost
 ```
- Each archive comes with a software bill of materials, `<archive>.sbom.json`, listing the modules it was built from. The attestation covers the archives, their SBOMs and `checksums.txt`. From Nearhost 0.8.0. The macOS binaries are signed with a Developer ID certificate and notarised by Apple, so Gatekeeper runs them however you download them. From Nearhost 0.9.0. ## Updating 
+ Each archive comes with a software bill of materials, `<archive>.sbom.json`, listing the modules it was built from. The attestation covers the archives, their SBOMs and `checksums.txt`. From Nearhost 0.8.0. The macOS binaries are signed with a Developer ID certificate and notarised by Apple, so Gatekeeper runs them however you download them. A copy downloaded in a browser may need an internet connection the first time it runs, while macOS checks the notarisation with Apple. From Nearhost 0.9.0. ## Updating 
 ```sh
 nearhost update
 ```
