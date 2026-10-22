@@ -53,7 +53,7 @@ On Home, when a server cannot connect, `r` retries every such server now and `y`
 | `y`     | Copy the snippets of its advice.                                                                              |
 | `r`     | Read its `.nearhostrc` again. A change that needs no approval is applied, which restarts it if it is running. |
 | `a`     | Review a pending `.nearhostrc` change.                                                                        |
-| `i`     | Show or hide its ignored routes, which fold into one line with their ports.                                   |
+| `i`     | Show or hide its ignored routes, which fold into one line with their ports. Needs Nearhost 0.8.0 or later.    |
 
 ## Routes
 
