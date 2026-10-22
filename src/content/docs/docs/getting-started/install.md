@@ -105,7 +105,7 @@ Installed from npm, `command -v nearhost` finds the Node launcher rather than th
 nearhost trust
 ```
 
-This adds the Nearhost Local CA to the system trust store and asks for your password through `sudo`. It uses your distribution's own tool:
+This adds the Nearhost Local CA to the system trust store and asks for your password through `sudo`, which must be in `/usr/bin`, `/bin`, `/usr/local/bin` or `/run/wrappers/bin` and owned by root. It uses your distribution's own tool:
 
 | Distribution   | Command it runs           |
 | -------------- | ------------------------- |
