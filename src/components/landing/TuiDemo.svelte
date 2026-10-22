@@ -1363,9 +1363,8 @@
                   {' '}{projects.filter((p) => matches(p.name)).length} of {projects.length} match
                 </div>
               {/if}
-              {#each rows as r, i (r.key)}
+              {#each rows as r (r.key)}
                 {@const on = r.key === sel}
-                {#if r.kind === 'server' && (i > 0 || filtering || query)}<div class="l"></div>{/if}
                 <button type="button" class="f rowbtn" class:sel={on} onclick={() => clickRow(r)}>
                   {#if r.kind === 'home'}
                     <span
@@ -1401,6 +1400,7 @@
                     >
                   {/if}
                 </button>
+                {#if r.kind === 'home'}<div class="l"></div>{/if}
               {/each}
             </nav>
 
@@ -1419,7 +1419,6 @@
                     {p.state}{#if up}<span class="d">{` · up ${up}`}</span>{/if}</span
                   >
                 </div>
-                <div class="l"></div>
                 <div class="l meta">
                   <span
                     ><span class="d">server</span>
@@ -1532,13 +1531,12 @@
                 </div>
               {:else}
                 <div class="l s">Nearhost</div>
-                <div class="l"></div>
                 <div class="l">
                   <span class="d">{pad('proxy', 10)}</span><span class="b">●</span> https :443
                   <span class="d">·</span> http :80
                 </div>
                 <div class="l">
-                  <span class="d">{pad('page', 10)}</span><span class="b"
+                  <span class="d">{pad('page', 10)}</span><span class="b u"
                     >https://localhost:6327</span
                   >
                 </div>
