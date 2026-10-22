@@ -37,6 +37,7 @@ Each web route of a running project is served at its hosts, and the first one al
 
 - The `Host` header is passed through unchanged.
 - `X-Forwarded-Proto: https` and `X-Forwarded-For` are set.
+- `Via` names Nearhost and its version, as `1.1 Nearhost (0.8.0)`, on the request and the response. Entries from other proxies are kept. From Nearhost 0.8.0; earlier versions said `Caddy`.
 - WebSocket upgrades pass through.
 - Responses are not buffered.
 
