@@ -93,8 +93,6 @@ nearhost --version
 brew install nearhost/tap/nearhost
 ```
 
-The cask removes the quarantine flag from the binary. See [The quarantine flag](#macos-and-the-quarantine-flag).
-
 ## From source
 
 With Go:
@@ -113,14 +111,6 @@ npx @nearhost/cli
 
 or `npm install -g @nearhost/cli` to keep the `nearhost` command. npm installs the binary for your machine as a platform package, such as `@nearhost/cli-linux-x64`, with no install script, so pnpm, bun and `--ignore-scripts` work too.
 
-## macOS and the quarantine flag
-
-The macOS binary is not notarised yet, so Gatekeeper would block it if macOS marked it as downloaded from the internet. The Homebrew cask removes that mark, the quarantine flag, so the binary runs. The shell installer and npm do not need to: macOS only quarantines files that a browser or a similar app downloads, and `curl` and npm are not that, so the binary they put in place runs without a warning. If you download a release archive in a browser, check it first, as [Verifying a download](#verifying-a-download) shows, then run this on the extracted binary:
-
-```sh
-xattr -dr com.apple.quarantine nearhost
-```
-
 ## Verifying a download
 
 The shell installer checks the archive against the release’s `checksums.txt`. It does not check the attestation. Releases also carry build provenance attestations, and you can check any file you downloaded with the GitHub CLI:
@@ -130,6 +120,8 @@ gh attestation verify <file> --repo nearhost/nearhost
 ```
 
 Each archive comes with a software bill of materials, `<archive>.sbom.json`, listing the modules it was built from. The attestation covers the archives, their SBOMs and `checksums.txt`. From Nearhost 0.8.0.
+
+The macOS binaries are signed with a Developer ID certificate and notarised by Apple, so Gatekeeper runs them however you download them. A copy downloaded in a browser may need an internet connection the first time it runs, while macOS checks the notarisation with Apple. From Nearhost 0.9.0.
 
 ## Updating
 
@@ -572,1020 +564,6 @@ Add this to the [config](/docs/reference/config/):
 ```yaml
 notifications: false
 ```
-
-# Clerk sign-in on a remote dev server
-
-> Run a Clerk and Next.js app at a local HTTPS domain, such as https://local.myapp.com, with hot reload working, when the dev server runs on another machine.
-
-Note
-
-Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. A `.nearhostrc` that sets only that name, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
-
-New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
-
-This guide gets Clerk sign-in working at `https://local.myapp.com` while your Next.js app runs on another machine. The worked example uses Clerk’s Next.js SDK, `@clerk/nextjs`, with a Clerk development instance. The Clerk and Nearhost steps are the same for any stack.
-
-## The symptom
-
-A Clerk development instance is relaxed about where your app runs. It is built for an app on `localhost`, and it does not ask you to register a domain or a callback URL. When the app runs on a server or a VM, though, `localhost` in your browser is not where the app is.
-
-A tunnel such as ngrok gets the page on screen, but often not much more. The page loads at the ngrok address, and then hot reload never connects. Recent versions of Next.js block requests for its dev resources, hot reload included, from any host it was not told about, and logs `Blocked cross-origin request to Next.js dev resource` on the server. Anything the app builds from a URL in its environment, such as an app URL set to `http://localhost:3000`, still points there. And the app is on the public internet while you work on it.
-
-Nearhost serves the remote app on your laptop at a name you choose, with a trusted certificate, over SSH. The browser sees one stable HTTPS origin, the page and its hot reload connection come from that origin, and nothing is public.
-
-If you only need one app and plain HTTP, forwarding port 3000 with `ssh -L` gets you `http://localhost:3000`, which a development instance accepts. Nearhost is for when you want HTTPS, a name per project, or a setup shaped like production.
-
-## Pick a name
-
-Use a name under a domain you own, such as `local.myapp.com`. It needs no DNS record: Nearhost points it at your laptop through `/etc/hosts` while the project is enabled. When the project is disabled, the name resolves as it normally would.
-
-A real-domain name is shaped like production, where Clerk’s Frontend API lives on a subdomain of your domain. Clerk’s documentation does not say which local names a development instance accepts beyond `localhost`, so this guide uses a domain you own.
-
-If your production app already uses Clerk on `myapp.com`, use a name under a different domain you own, such as `local.myapp-dev.com`. Clerk’s docs say a separate setup will not work on the production domain, even on a separate subdomain. The examples below use `local.myapp.com`; swap in your name.
-
-## Add the project
-
-On the command line, give the name with `--alias`:
-
-```sh
-nearhost add --server mini '~/code/myapp' --alias local.myapp.com
-```
-
-```text
-Added myapp on mini at https://local.myapp.com
-Start it with `nearhost up`.
-```
-
-A name that does not end in `.test` needs your approval, because it can hide the real site. Typing it with `--alias` counts as approval.
-
-To keep the name with the project, put it in a [`.nearhostrc`](/docs/reference/nearhostrc/) in the project’s root:
-
-```yaml
-version: 1
-alias: local.myapp.com
-```
-
-Run `nearhost add` without `--alias`, and it asks before using the name, since you did not type it:
-
-```text
-$ nearhost add --server mini '~/code/myapp'
-This project asks for these, which need your approval:
-  local.myapp.com on port 3000 (a real domain)
-Approve these? [y/N]
-```
-
-The port is the one `next dev` listens on, 3000 unless you changed it. Give it the `web` role. The Next.js dev server serves pages, assets and hot reload from that one port, so it needs no `loopback` route.
-
-See [Add a project](/docs/getting-started/add-a-project/) for the rest of the add flow, and [Main name](/docs/reference/config/#main-name) for how the name is approved and written to the hosts file.
-
-## Set up Clerk
-
-Use a development instance. It is the default for a new Clerk application, and its publishable key starts with `pk_test_`.
-
-A development instance has nothing to register for the new name. There is no redirect URI or allowed domain to add. Its Frontend API lives at a Clerk address ending in `accounts.dev`, and your app talks to it across sites whatever the app’s own name is. Clerk’s own docs use development keys on preview domains such as `*.vercel.app` in the same way.
-
-The **allowed origins** setting in Clerk’s API is for browser extensions and similar apps, not for a web app on a development instance. Leave it alone.
-
-In the Clerk Dashboard, open the **API keys** page and copy the keys into the app’s `.env.local`:
-
-```ini
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-```
-
-These are the names `@clerk/nextjs` reads. If you set the app up with Clerk’s `init` command, they are already there.
-
-## Set up the app
-
-Recent versions of Next.js only let their dev resources be requested from `localhost` and from the hostname `next dev` was started with. A page at `https://local.myapp.com` asks for them from `local.myapp.com`, so add that name to `allowedDevOrigins` in `next.config.ts`:
-
-```ts
-import type { NextConfig } from 'next';
-
-
-const nextConfig: NextConfig = {
-  allowedDevOrigins: ['local.myapp.com'],
-};
-
-
-export default nextConfig;
-```
-
-Write the hostname alone, without `https://` or a port. Restart `next dev` after changing it. The setting only affects development, so it is safe to commit.
-
-Clerk’s middleware stays as the quickstart has it: `clerkMiddleware()` in `proxy.ts` on Next.js 16 and later, or `middleware.ts` on Next.js 15 and earlier, at the root of the project or in `src/`. If you pass it `authorizedParties`, add the new origin, with the scheme:
-
-```ts
-export default clerkMiddleware({
-  authorizedParties: ['https://local.myapp.com'],
-});
-```
-
-Nearhost’s proxy passes the `Host` header through unchanged and sets `X-Forwarded-Proto: https`, so the app sees the name you browse to. If the app keeps its own public URL in an environment variable, such as `NEXT_PUBLIC_APP_URL`, set it to `https://local.myapp.com`.
-
-On another stack the idea is the same. Clerk needs nothing new, and the dev server needs to accept the new hostname. Vite, for example, wants it in `server.allowedHosts`. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/).
-
-## Check it works
-
-Start the project with `nearhost up`, or from the interface, and open `https://local.myapp.com`. The page should load, Clerk’s sign-in button should appear, and signing in should bring you back signed in. Edit a component, and the page should update without a reload.
-
-When it does not:
-
-* **The page loads, but edits do not show until you reload.** Next.js is blocking hot reload from the new name. The server log shows `Blocked cross-origin request to Next.js dev resource` with the hostname it saw. Add that hostname to `allowedDevOrigins` and restart `next dev`.
-* **You sign in, but come back signed out, or requests return 401.** If `clerkMiddleware()` has `authorizedParties`, check that it lists `https://local.myapp.com` exactly, with `https` and no port. Check too that the publishable and secret keys come from the same instance.
-* **Links or redirects you build yourself go to `localhost`.** They come from an environment variable that still says `http://localhost:3000`. Change it to `https://local.myapp.com`.
-
-## Testing with production keys
-
-Clerk’s production keys only work on your production domain. Clerk describes a way round that for debugging, with a local subdomain over HTTPS on port 443, which Nearhost provides, but calls it strongly discouraged. See [using production keys in local development](https://clerk.com/docs/guides/development/troubleshooting/using-production-keys-in-development).
-
-## When you still need ngrok
-
-Nearhost is local-only. The name works in your browser on your laptop, and nowhere else. Use a public tunnel when:
-
-* **Clerk sends webhooks.** Clerk sends them through Svix, from its servers, which cannot reach your laptop. Point the endpoint on the dashboard’s **Webhooks** page at a tunnel to the server, such as `https://<your-tunnel>/api/webhooks`. Clerk’s CLI also has `clerk webhooks listen --forward-to`, a relay that forwards deliveries to a local URL. Run it on the server, next to the app.
-* **Someone outside needs the link.** A colleague or a client cannot open `local.myapp.com` from their machine.
-
-You can run both: Nearhost for your own browser, and a tunnel just for the webhook endpoint.
-
-Checked against
-
-These pages, on 2026-10-19:
-
-* [Clerk: Next.js quickstart](https://clerk.com/docs/nextjs/getting-started/quickstart)
-* [Clerk: Express quickstart](https://clerk.com/docs/expressjs/getting-started/quickstart) (the API keys page)
-* [Clerk: clerkMiddleware()](https://clerk.com/docs/reference/nextjs/clerk-middleware)
-* [Clerk: environment variables](https://clerk.com/docs/guides/development/clerk-environment-variables)
-* [Clerk: development and production instances](https://clerk.com/docs/guides/development/managing-environments)
-* [Clerk: how Clerk works](https://clerk.com/docs/guides/how-clerk-works/overview)
-* [Clerk: update an instance](https://clerk.com/docs/reference/backend/instance/update) (allowed origins)
-* [Clerk: using production keys in local development](https://clerk.com/docs/guides/development/troubleshooting/using-production-keys-in-development)
-* [Clerk: webhooks overview](https://clerk.com/docs/guides/development/webhooks/overview) and [syncing data with webhooks](https://clerk.com/docs/guides/development/webhooks/syncing)
-* [Clerk changelog: CLI webhooks](https://clerk.com/changelog/2026-07-09-clerk-cli-webhooks-and-impersonate)
-* [Next.js: allowedDevOrigins](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins)
-
-If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
-
-# Cognito sign-in on a remote dev server
-
-> Give an Amazon Cognito app client an HTTPS callback URL in local dev, such as https://local.myapp.com/auth/cognito/callback, when the dev server runs on another machine.
-
-Note
-
-Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. A `.nearhostrc` that sets only that name, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
-
-New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
-
-This guide gets Amazon Cognito sign-in working at `https://local.myapp.com` while your Laravel app runs on another machine. The worked example uses Laravel Socialite with the community `socialiteproviders/cognito` provider and Cognito’s managed login pages. The Cognito and Nearhost steps are the same for any stack.
-
-## The symptom
-
-Cognito sends the browser back to your app at a callback URL you list on the app client. Every callback URL has to use HTTPS, with one exception: `http://localhost`, which Cognito allows for testing. When the app runs on your laptop, that exception is all you need.
-
-When the app runs on a server or a VM, `localhost` in your browser is not where the app is. You can forward a port with `ssh -L` and use `http://localhost:8080`, and for one app that works. It stops being enough when:
-
-* **You run more than one app.** Browsers do not separate cookies by port, so two apps on `localhost` can overwrite each other’s session cookies.
-* **The app shares cookies across subdomains.** An app that sets cookies for `myapp.com`, or talks to an API on another subdomain, only behaves as it does on staging when it runs under that domain.
-* **You want local dev to match staging.** Staging’s callback is HTTPS on your domain. With `http://localhost`, the scheme, the host and the cookie rules all differ from what you deploy.
-* **The page uses browser APIs that need a secure context**, such as service workers or the clipboard. Browsers count `http://localhost` as secure, so these work there, but on any other name, such as the server’s own address, they need HTTPS.
-
-A tunnel such as ngrok gives you HTTPS, but each new tunnel name is one more callback URL to add, and the app still builds its links from its own idea of where it lives. It also puts the app on the public internet while you work on it.
-
-Nearhost serves the remote app on your laptop at a name you choose, with a trusted certificate, over SSH. The browser sees one stable HTTPS origin, and that is the origin you list on the Cognito app client.
-
-## Pick a name
-
-Use a name under a domain you own, such as `local.myapp.com`. It needs no DNS record: Nearhost points it at your laptop through `/etc/hosts` while the project is enabled. When the project is disabled, the name resolves as it normally would.
-
-A real-domain name keeps the callback URL shaped like the one on staging and in production. Cognito’s documentation asks for HTTPS but does not say whether it accepts `.test` names, so this guide uses a domain you own.
-
-## Add the project
-
-On the command line, give the name with `--alias`:
-
-```sh
-nearhost add --server mini '~/code/myapp' --alias local.myapp.com
-```
-
-```text
-Added myapp on mini at https://local.myapp.com
-Start it with `nearhost up`.
-```
-
-A name that does not end in `.test` needs your approval, because it can hide the real site. Typing it with `--alias` counts as approval.
-
-To keep the name with the project, put it in a [`.nearhostrc`](/docs/reference/nearhostrc/) in the project’s root:
-
-```yaml
-version: 1
-alias: local.myapp.com
-```
-
-Run `nearhost add` without `--alias`, and it asks before using the name, since you did not type it:
-
-```text
-$ nearhost add --server mini '~/code/myapp'
-This project asks for these, which need your approval:
-  local.myapp.com on port 8080 (a real domain)
-Approve these? [y/N]
-```
-
-See [Add a project](/docs/getting-started/add-a-project/) for the rest of the add flow, and [Main name](/docs/reference/config/#main-name) for how the name is approved and written to the hosts file.
-
-## Set up Cognito
-
-Use a user pool for development, separate from production’s. Its users, app clients and settings are its own.
-
-1. The pool needs a domain for its sign-in pages. In the [Amazon Cognito console](https://console.aws.amazon.com/cognito/home), open the user pool, then **Domain** under **Branding**. If there is no domain, choose **Actions**, then **Create Cognito domain**, and pick a prefix. The domain looks like `https://myapp-dev.auth.eu-west-2.amazoncognito.com`. Either branding version, **Managed login** or **Hosted UI (classic)**, works for this guide.
-2. Open **App clients** and create an app client with the application type **Traditional web application**. That type gives the client a secret, which Socialite needs. You cannot add a secret to an existing client later, so if yours has none, create a new one. When it asks for a **Return URL**, enter `https://local.myapp.com/auth/cognito/callback`.
-3. Open the app client, then the **Login pages** tab. Under **Managed login pages configuration**, choose **Edit**.
-4. Check that **Allowed callback URLs** has `https://local.myapp.com/auth/cognito/callback`. It must match the URL your app sends exactly: `https`, the host, the path, no trailing slash.
-5. Add `https://local.myapp.com/` to **Allowed sign-out URLs**. Cognito only sends people back after sign-out to a URL on this list.
-6. Under **Identity providers**, keep the user pool’s own sign-in, or whichever providers your users sign in with. Under **OAuth grant types**, choose **Authorization code grant**. Under **OpenID Connect scopes**, choose `openid`, `email` and `profile`. Save the changes.
-
-Then set `APP_URL` in the app’s `.env` to the new name, and copy the domain and the app client’s ID and secret below it. The last two lines build on `APP_URL`, so they have to come after it:
-
-```ini
-APP_URL=https://local.myapp.com
-
-
-COGNITO_HOST=https://myapp-dev.auth.eu-west-2.amazoncognito.com
-COGNITO_CLIENT_ID=your-client-id
-COGNITO_CLIENT_SECRET=your-client-secret
-COGNITO_CALLBACK_URL="${APP_URL}/auth/cognito/callback"
-COGNITO_SIGN_OUT_URL="${APP_URL}/"
-```
-
-These are the names in the provider’s README. `COGNITO_HOST` is the full domain with `https://` and no trailing slash.
-
-## Set up the app
-
-Install the provider, which brings in Socialite:
-
-```sh
-composer require socialiteproviders/cognito
-```
-
-Add the Cognito entry to `config/services.php`:
-
-```php
-'cognito' => [
-    'host' => env('COGNITO_HOST'),
-    'client_id' => env('COGNITO_CLIENT_ID'),
-    'client_secret' => env('COGNITO_CLIENT_SECRET'),
-    'redirect' => env('COGNITO_CALLBACK_URL'),
-    'logout_uri' => env('COGNITO_SIGN_OUT_URL'),
-],
-```
-
-The README’s version also has a `scope` line. The provider does not read it, so this guide sets scopes in code instead.
-
-Register the provider in the `boot` method of `app/Providers/AppServiceProvider.php` (Laravel 11 and later):
-
-```php
-use Illuminate\Support\Facades\Event;
-use SocialiteProviders\Cognito\Provider;
-use SocialiteProviders\Manager\SocialiteWasCalled;
-
-
-public function boot(): void
-{
-    Event::listen(function (SocialiteWasCalled $event) {
-        $event->extendSocialite('cognito', Provider::class);
-    });
-}
-```
-
-Then add the routes to `routes/web.php`. The provider asks for `openid` and `profile` by default; `scopes()` adds `email` to them:
-
-```php
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
-use Laravel\Socialite\Socialite;
-
-
-Route::get('/auth/cognito/redirect', function () {
-    return Socialite::driver('cognito')->scopes(['email'])->redirect();
-});
-
-
-Route::get('/auth/cognito/callback', function () {
-    $cognitoUser = Socialite::driver('cognito')->user();
-
-
-    // Find or create your user from $cognitoUser, then Auth::login($user).
-
-
-    return redirect('/dashboard');
-});
-
-
-Route::post('/auth/cognito/logout', function (Request $request) {
-    Auth::logout();
-
-
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-
-    return redirect(Socialite::driver('cognito')->logoutCognitoUser());
-});
-```
-
-`logoutCognitoUser()` sends the browser to Cognito’s sign-out page with `COGNITO_SIGN_OUT_URL`, and Cognito sends it back there.
-
-With `APP_URL` set to `https://local.myapp.com`, the callback and sign-out URLs follow it. If you have cached the config, run `php artisan config:clear`.
-
-Nearhost’s proxy ends HTTPS on your laptop and passes plain HTTP to the server, with `X-Forwarded-Proto: https`. Laravel ignores that header until it trusts the proxy, so it thinks the request was `http://`. The callback is unaffected while `COGNITO_CALLBACK_URL` is a full URL, because Socialite uses it as it is. A path such as `/auth/cognito/callback` would be built from the request instead, as `http://`, and Cognito would refuse it. What goes wrong either way is everything Laravel builds from the request: `route()` and `url()` links, the redirect to `/dashboard` after sign-in, and `asset()` URLs.
-
-The fix is one line in the `withMiddleware` closure in `bootstrap/app.php`:
-
-```php
-$middleware->trustProxies(at: '*');
-```
-
-The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) explains it, and what to list instead of `'*'` if the file also runs in production behind a known load balancer.
-
-If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. With an older Nearhost, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
-
-On another stack the idea is the same. Use any OpenID Connect client with the pool’s domain and the app client’s ID and secret. Set the app’s public URL and its callback URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to Cognito matches the one you listed.
-
-## Check it works
-
-Start the project with `nearhost up`, or from the interface, and open `https://local.myapp.com/auth/cognito/redirect`. You should land on Cognito’s sign-in page, and after signing in come back to `https://local.myapp.com/auth/cognito/callback` and on to the dashboard.
-
-When it does not:
-
-* **Cognito shows an error page instead of the sign-in page.** Usually the callback URL your app sent is not in **Allowed callback URLs** on the app client whose ID you use. Compare them character by character: `https`, the host, `/auth/cognito/callback`, no trailing slash. Check that `COGNITO_CALLBACK_URL` and `APP_URL` are what you expect.
-* **You come back with `error=invalid_scope` in the address.** The app asked for a scope the app client does not allow. Add `openid`, `email` and `profile` under **OpenID Connect scopes**, or ask for fewer.
-* **The callback fails with `InvalidStateException`.** Socialite keeps a state value in the session when you start sign-in, and refuses the callback when the session does not come back with it. Start sign-in at `https://local.myapp.com`, not at another address for the same app, and leave `SESSION_DOMAIN` unset (`null`) or set it to `local.myapp.com`. A cookie set for another domain never reaches this one.
-* **Links, the redirect after sign-in, or asset URLs use `http://`.** Laravel does not trust the proxy yet. Add `trustProxies` as above. Nearhost redirects `http://` to HTTPS, so a link may still seem to work, but `http://` scripts and styles on an HTTPS page are blocked as mixed content. Look for those warnings in the console.
-* **Sign-out does not come back to `https://local.myapp.com/`.** Cognito only redirects to a URL in **Allowed sign-out URLs**. Check that `COGNITO_SIGN_OUT_URL` is on that list exactly, trailing slash included.
-
-## When you still need ngrok
-
-Nearhost is local-only. The name works in your browser on your laptop, and nowhere else.
-
-Cognito itself does not need to reach your app. The browser carries the sign-in there and back, and your server calls Cognito, not the other way round. Cognito’s hooks into sign-up and sign-in are Lambda triggers, which run in AWS, not webhooks sent to your app. Use a public tunnel when:
-
-* **Something in AWS calls your app.** A Lambda trigger, or anything else running in AWS, cannot reach your laptop or your dev server. If a trigger calls your app’s API, point it at a tunnel.
-* **Someone outside needs the link.** A colleague or a client cannot open `local.myapp.com` from their machine.
-
-You can run both: Nearhost for your own browser, and a tunnel just for whatever AWS has to call.
-
-Checked against
-
-These pages, on 2026-10-19:
-
-* [socialiteproviders/cognito README](https://github.com/SocialiteProviders/Providers/blob/master/src/Cognito/README.md) and [provider source](https://github.com/SocialiteProviders/Providers/blob/master/src/Cognito/Provider.php)
-* [SocialiteProviders Manager: how provider config is read](https://github.com/SocialiteProviders/Manager/blob/master/src/Helpers/ConfigRetriever.php) and [how the redirect URL is formatted](https://github.com/SocialiteProviders/Manager/blob/master/src/Config.php)
-* [Laravel Socialite](https://laravel.com/docs/13.x/socialite)
-* [Laravel HTTP requests: configuring trusted proxies](https://laravel.com/docs/13.x/requests#configuring-trusted-proxies)
-* [Amazon Cognito: application-specific settings with app clients](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html)
-* [Amazon Cognito: user pool managed login](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-managed-login.html)
-* [Amazon Cognito: using the prefix domain for managed login](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-assign-domain-prefix.html)
-* [Amazon Cognito: the authorize endpoint](https://docs.aws.amazon.com/cognito/latest/developerguide/authorization-endpoint.html)
-* [Amazon Cognito: the logout endpoint](https://docs.aws.amazon.com/cognito/latest/developerguide/logout-endpoint.html)
-* [Amazon Cognito: OIDC identity providers](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-oidc-idp.html) (the **Login pages** tab)
-* [Amazon Cognito: Lambda triggers](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-working-with-lambda-triggers.html)
-
-If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
-
-# Callbacks from Docker containers to a local HTTPS domain
-
-> Let a Docker Compose service, such as a queue worker or a LocalStack job, call your app at its Nearhost HTTPS name on this machine.
-
-Note
-
-Needs Nearhost 0.6.0 or later, which can serve a project to Docker containers. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
-
-A service in your Compose file often calls the app back: a queue worker reports a finished job, or a LocalStack job delivers an event to a webhook. Point it at the app’s Nearhost name, such as `https://api.local.example.com/webhooks/jobs`, and the call fails, even though the same URL works in your browser.
-
-Three things stand between the container and Nearhost. The container cannot find the host, it does not trust the local certificate authority, and on Linux Nearhost does not let it in. The fixes go in the project’s files, which you commit. Each developer then sets one variable, for the certificate’s path, and approves the opt-in on their own machine.
-
-This works only for a project on this machine. A container on an SSH server cannot reach the proxy on your laptop.
-
-## The example
-
-The project is named `shop`, and its worker is a Node service. Its app listens on port 8000 and is served at `api.local.example.com`. Its `.nearhostrc`:
-
-```yaml
-version: 1
-routes:
-  - port: ${APP_PORT:-8000}
-    label: app
-    hosts: [api.local.example.com]
-docker_clients: true
-```
-
-`hosts` serves the route at a name of your own, besides the project’s main name. See [Multi-host projects](/docs/concepts/multi-host-projects/). `docker_clients` is explained in [Being let in](#being-let-in). Its Compose file runs the app and a worker that calls it:
-
-```yaml
-services:
-  app:
-    build: .
-    ports:
-      - '${APP_PORT:-8000}:8000'
-  worker:
-    build: .
-    command: ['./worker']
-    environment:
-      WEBHOOK_URL: https://api.local.example.com/webhooks/jobs
-```
-
-Nothing here depends on the stack. Any service that reads a URL naming a host Nearhost serves, from its `environment`, its `env_file` files, or the project’s `.env` or `.env.local` when it mounts the project directory, has the same three problems.
-
-## Reaching the host
-
-Nearhost puts `api.local.example.com` in your machine’s [hosts file](/docs/concepts/the-hosts-file/), pointing at loopback. A container does not read that file, and inside it loopback is the container itself. So the name resolves to nothing, to the public internet, or, where DNS points it at 127.0.0.1, back to the container.
-
-Map the name to the host with `extra_hosts`. `host-gateway` is Docker’s name for the host’s address as seen from a container:
-
-```yaml
-services:
-  worker:
-    extra_hosts:
-      - 'api.local.example.com:host-gateway'
-```
-
-List every name the service calls. `nearhost doctor` reports a service that calls a name without this mapping, as `docker.host-gateway`, and its fix is this snippet for the names it found.
-
-## Trusting the local CA
-
-Nearhost’s certificates are signed by its own local certificate authority. Your system trusts it, but a container has its own trust store, so the call fails with a certificate error.
-
-Mount the root certificate into the container and point the service at it. The certificate is at `pki/authorities/local/root.crt` under Nearhost’s `caddy` folder, which is `~/Library/Application Support/nearhost/caddy` on macOS and `~/.local/share/nearhost/caddy` on Linux, or `$XDG_DATA_HOME/nearhost/caddy` on either when that is set to an absolute path. `nearhost doctor` prints the path on your machine. Earlier versions kept it under `~/.config/nearhost/caddy`, or `$XDG_CONFIG_HOME/nearhost/caddy` when that variable was set. Nearhost 0.8.0 moves that folder the first time it runs while no other Nearhost is running. After that, a `NEARHOST_CA_CERT` set for an earlier version points at a file that is gone, so set it to the new path, which `nearhost doctor` prints. Mount only `root.crt`, never the folder: the key is beside it. The doctor’s snippet, for a Node service:
-
-```yaml
-services:
-  worker:
-    environment:
-      NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/nearhost.crt
-    volumes:
-      - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
-```
-
-Each developer sets `NEARHOST_CA_CERT` to the certificate’s path in their shell profile, or in `.env` when the project does not commit `.env`, so the Compose file holds no one’s path. Compose reads only `.env` and the shell, not `.env.local`. Until the variable is set, every `docker compose` command that reads this Compose file stops with `set NEARHOST_CA_CERT to Nearhost's root certificate`, so nobody runs the service without the certificate by mistake.
-
-`NODE_EXTRA_CA_CERTS` adds the certificate to Node’s own. `SSL_CERT_FILE`, `AWS_CA_BUNDLE` and `REQUESTS_CA_BUNDLE` replace the default bundle instead, so point them at a bundle that includes the certificate, or have the image run `update-ca-certificates`.
-
-`nearhost doctor` reports a service that calls a name Nearhost serves and does not trust the certificate, as `docker.ca`. A service that sets `SSL_CERT_FILE`, `NODE_EXTRA_CA_CERTS`, `AWS_CA_BUNDLE`, `REQUESTS_CA_BUNDLE` or `CURL_CA_BUNDLE`, or mounts the certificate’s path, counts as set up. The doctor checks only that the setting is there, not that the runtime trusts the certificate, so a worker in another language needs the setting its runtime reads.
-
-## Being let in
-
-Nearhost serves its projects only to this machine. A request from anywhere else is dropped without an answer. On Linux, a container’s request comes from its address on a Docker network, not from loopback, so Nearhost drops it.
-
-`docker_clients: true` in the project’s [`.nearhostrc`](/docs/reference/nearhostrc/#docker-clients) serves the project to the networks the Docker daemon has on this machine as well. Nearhost asks Docker for them when the project starts, and again every 30 seconds while it runs, so a network Compose creates later is let in too. It finds Docker through `DOCKER_HOST` or the current docker context, then the usual sockets of Docker Desktop, OrbStack, Rancher Desktop, Colima and Podman. From Nearhost 0.8.0. Until Docker first answers, it accepts requests from `172.16.0.0/12`, the private block most of Docker’s default networks come from, which can also take in other machines on that block your machine can reach. The project’s log says which networks it accepts requests from.
-
-* It works only for a project on this machine. On a project on a server, the file is an error.
-* It always needs your approval, as a real domain does. See [Approval](/docs/reference/nearhostrc/#approval).
-* Other projects stay loopback-only. Only the project that opts in is served to Docker’s networks.
-
-With no `.nearhostrc` yet, `nearhost export` writes one from the project’s current setup, and you add the line to it.
-
-Docker Desktop on macOS already delivers container requests from 127.0.0.1, so this matters on Linux. On a Mac, the project is reached without it. Keep it in a committed `.nearhostrc` if anyone on the team uses Linux.
-
-`nearhost doctor` reports a project whose containers call a name it serves without the opt-in, as `docker.clients`. It is a warning on Linux, and only a note on macOS.
-
-## The finished Compose file
-
-```yaml
-services:
-  app:
-    build: .
-    ports:
-      - '${APP_PORT:-8000}:8000'
-  worker:
-    build: .
-    command: ['./worker']
-    environment:
-      WEBHOOK_URL: https://api.local.example.com/webhooks/jobs
-      NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/nearhost.crt
-    extra_hosts:
-      - 'api.local.example.com:host-gateway'
-    volumes:
-      - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
-```
-
-Approve `api.local.example.com` and `docker_clients` when you add the project, or when Nearhost asks after the file changes. See [Approval](/docs/reference/nearhostrc/#approval). Then restart the worker with `docker compose up -d worker`.
-
-## Check it works
-
-Run `nearhost doctor`. After the machine checks, it lists what it finds in each enabled project. For the example before any of the fixes, with `docker_clients` not yet in its `.nearhostrc`, on a Mac, these are the first lines of its three findings, without their fixes:
-
-```text
-warn  shop             worker calls a name Nearhost serves, and does not trust Nearhost's root certificate
-warn  shop             worker uses api.local.example.com, which a container resolves to itself or to the public internet, not to Nearhost
-info  shop             a container calls a name Nearhost serves, and Nearhost does not accept requests from Docker's network
-```
-
-Under each, a `fix:` line says what to do, followed by the snippet to paste. These are `docker.ca`, `docker.host-gateway` and `docker.clients`, and `nearhost doctor --json` gives each finding’s `id`. On Linux the last one is a warning too. When the project is fixed, none of them is shown. See [nearhost doctor](/docs/reference/cli/#nearhost-doctor).
-
-The doctor only reads the files. To see the call work, run the worker and watch the request arrive in Nearhost.
-
-## When a public tunnel is still the right tool
-
-This is for services you run yourself, on this machine. A webhook from a real provider, such as a payment or source control service, comes from its servers, which cannot reach your laptop. Use a public tunnel, such as ngrok, for that. See [ngrok loads the page, but assets point at localhost](/docs/guides/ngrok-assets-on-localhost/).
-
-# Forward several ports over SSH without retyping -L
-
-> Ways to reach a remote app, its asset server and its other ports from your laptop over SSH, from stacked -L flags to forwards added to a running connection, and what each leaves for you to do.
-
-A web project on a remote machine rarely uses one port. There is the app, the asset dev server, perhaps a mail catcher or a queue dashboard, and the next project wants the same set again. Typing one `-L` flag per port works until the connection drops, a port changes, or a second project needs a port the first one already holds.
-
-## Stack the flags on one connection
-
-One `ssh` command takes as many `-L` flags as you need. `-N` keeps it to forwarding, with no remote shell:
-
-```sh
-ssh -N -L 8000:localhost:8000 -L 5173:localhost:5173 -L 8025:localhost:8025 myserver
-```
-
-Each flag reads `local port:host:remote port`, and the host is resolved on the server, so `localhost` means the server itself. Your laptop listens on loopback only, unless you set `GatewayPorts`.
-
-## Put them in your SSH config
-
-`LocalForward` lines in `~/.ssh/config` set the same forwards whenever you connect:
-
-```plaintext
-Host myserver
-  LocalForward 8000 localhost:8000
-  LocalForward 5173 localhost:5173
-  LocalForward 8025 localhost:8025
-  ExitOnForwardFailure yes
-  ServerAliveInterval 15
-```
-
-`ExitOnForwardFailure` makes `ssh` stop when a port is taken on your laptop, rather than connect without that forward. `ServerAliveInterval` makes a dead connection end, after about 45 seconds with the default `ServerAliveCountMax` of 3, instead of hanging. The catch: every interactive `ssh myserver` now tries the same ports, and the second one fails while the first is open. A separate `Host` alias just for the forwards avoids that.
-
-## Add forwards to a running connection
-
-With connection sharing, one master connection carries every session to a server, and `ssh -O` changes its forwards while it runs:
-
-```plaintext
-Host myserver
-  ControlMaster auto
-  ControlPath ~/.ssh/cm-%C
-  ControlPersist 10m
-```
-
-```sh
-ssh -O forward -L 5173:localhost:5173 myserver   # add a forward
-ssh -O cancel -L 5173:localhost:5173 myserver    # remove it
-```
-
-No reconnect, and no restart of the forwards already open. Nothing re-adds them if the master exits, though.
-
-## Use one SOCKS proxy instead
-
-`ssh -N -D 1080 myserver` opens a SOCKS proxy, and a browser set to use it reaches every port on the server’s network. But Chrome and Firefox send `localhost` straight to your own machine, never through the proxy, so a dev server that listens only on the server’s loopback stays out of reach. It also proxies every site the browser opens, unless you set it per profile.
-
-## What every plain-SSH option leaves to you
-
-* **Reconnecting.** When the connection drops, the forwards go with it. `autossh` or a shell loop brings back a fixed set.
-* **Port clashes.** Two projects that both use 5173 cannot both forward it to 5173 on your laptop. Change one project’s port, or forward it to another local port where the page does not hard-code it.
-* **The address.** Each app is `http://localhost:<port>`. Cookies ignore the port, so every project shares one cookie jar and signing in to one can sign you out of another, and an OAuth callback or cookie domain set up for a real name does not match. See [HTTPS on a local dev domain](/docs/guides/https-on-a-local-dev-domain/).
-
-## How Nearhost does it
-
-New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
-
-Nearhost uses the same OpenSSH mechanism as above: one supervised master per server, with forwards added and cancelled with `-O forward` and `-O cancel` as projects start and stop. On top of that:
-
-* **It finds the ports.** It reads them from the project’s `.env`, and presets add Docker Compose, Vite and Laravel Sail. You choose which port is the web app, which need the same port on your laptop, and which to ignore.
-* **It reconnects.** If the master exits, Nearhost starts it again with backoff and puts every forward back before the server shows as connected.
-* **It warns about clashes** before they happen, and suggests a free port when the port comes from a variable.
-* **It gives each project a name.** The web port is served at a trusted `https://myapp.test`, so you stop tracking which port is which project.
-
-See [SSH transport](/docs/concepts/ssh-transport/) for the exact commands it runs, and [Routes and roles](/docs/concepts/routes-and-roles/) for how ports become routes.
-
-Checked against
-
-These, on 2026-10-20:
-
-* [OpenSSH: ssh(1)](https://man.openbsd.org/ssh), for `-L`, `-N`, `-D` and `-O`
-* [OpenSSH: ssh_config(5)](https://man.openbsd.org/ssh_config), for `LocalForward`, `GatewayPorts`, `ExitOnForwardFailure`, `ServerAliveInterval` and the `Control*` options
-* [Chromium: proxy support](https://chromium.googlesource.com/chromium/src/+/HEAD/net/docs/proxy.md), for the implicit `localhost` bypass
-
-If something here no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
-
-# HTTPS on a local dev domain
-
-> Serve local development at a trusted HTTPS name, such as myapp.test or local.myapp.com, so secure-context browser APIs and Secure cookies work, and choose which kind of name to use.
-
-Note
-
-Names under your own domain, such as `local.myapp.com`, need Nearhost 0.6.0 or later. `.test` names work on every version. Run `nearhost update` to get the latest. See [CLI](/docs/reference/cli/#nearhost-update).
-
-Some things in local development only work over HTTPS. On your laptop you rarely notice, because browsers treat `http://localhost` as secure. Once you browse to the dev server by its address or by a name instead of `localhost`, which is usual when it runs on another machine, plain HTTP stops being enough.
-
-## What needs HTTPS
-
-Browsers give some features only to a secure context: a page served over HTTPS, or from `localhost`, `127.0.0.1` or a `*.localhost` name. On `http://192.168.1.20:8080` or `http://myapp.test`, these are missing:
-
-* **Service workers.** `navigator.serviceWorker` is undefined, so offline support and push notifications cannot be tested.
-* **The clipboard.** `navigator.clipboard` is undefined, so copy buttons fail.
-* **Web Crypto.** `crypto.subtle` is undefined, which breaks libraries that hash or sign in the browser.
-* **The camera and microphone.** `navigator.mediaDevices` is undefined.
-* **Passkeys and geolocation.** WebAuthn and the Geolocation API refuse to run.
-
-Cookies have the same rule. Browsers do not set a cookie marked `Secure` over plain HTTP. Chrome and Firefox make an exception for `localhost`, but Safari does not, so test secure cookies over HTTPS. That rules out `SameSite=None` cookies, which must be `Secure`, and the `__Host-` and `__Secure-` cookie prefixes. If your app sets these in production, it behaves differently in development without HTTPS.
-
-A self-signed certificate is not a fix. The browser warns on every visit, and some features, such as service workers, refuse to load over a certificate it does not trust.
-
-## Choosing a name
-
-You need a name the browser resolves to the dev server, and a certificate for it that the browser trusts.
-
-**A `.test` name, such as `myapp.test`.** `.test` is reserved for testing and never exists on the public internet, so it cannot clash with a real site. It is Nearhost’s default, and works with no setup. Some third-party services, such as sign-in providers, may not accept a `.test` callback, or do not say whether they do.
-
-**A name under your own domain, such as `local.myapp.com`.** It is shaped like production, so cookie scoping, cross-subdomain requests and provider settings behave as they do on staging. It needs no DNS record. Two things to know:
-
-* Cookies your production site sets for the whole domain, with `Domain=myapp.com`, are sent to `local.myapp.com` too, if your browser has them.
-* Nearhost writes the name to `/etc/hosts` only while the project is enabled. Disable the project, and the name reaches the real site again, if there is one. See [Main name](/docs/reference/config/#main-name).
-
-Avoid `.dev`, which is a real top-level domain whose every name browsers force to HTTPS, and `.local`, which macOS and many Linux systems resolve with multicast DNS, and which can be slow to look up.
-
-## Setting it up
-
-If the dev server runs on your laptop, a tool such as mkcert and a line in `/etc/hosts` are enough. You make a local certificate authority, trust it, issue a certificate for the name, and point the dev server at it.
-
-If the dev server runs on another machine, Nearhost does all of this on your laptop. It creates a local certificate authority the first time it starts, which you trust once with your password, and it issues a certificate for each project’s name. Its proxy serves the name over HTTPS and forwards to the dev server over SSH. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/).
-
-New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
-
-Add the project with the name you chose:
-
-```sh
-nearhost add --server mini '~/code/myapp' --alias local.myapp.com
-```
-
-Leave out `--alias` to use `myapp.test`. Then tell the app it lives at the HTTPS name: set its public URL, such as `APP_URL`, and trust the proxy’s `X-Forwarded-Proto` header. The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) shows both for Laravel. Single-port dev servers also need the name allowed: `allowedDevOrigins` in Next.js, `server.allowedHosts` in Vite. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/).
-
-## Sign-in providers
-
-Sign-in providers are the most common reason to want a real HTTPS name. The guides set one up end to end:
-
-* [WorkOS sign-in](/docs/guides/workos-sign-in/)
-* [Clerk sign-in](/docs/guides/clerk-sign-in/)
-* [Cognito sign-in](/docs/guides/cognito-sign-in/)
-
-If the callback is what fails, see [SSO callback fails on a remote dev server](/docs/guides/sso-callback-on-a-remote-dev-server/).
-
-## When ngrok is still the right tool
-
-A Nearhost name only works on your laptop. Its proxy answers no other machine. Use a public tunnel, such as ngrok, when:
-
-* **Another device needs the page,** such as your phone, to test a camera or a service worker on mobile.
-* **Someone outside needs the link,** such as a colleague or a client.
-* **A service sends webhooks,** from servers that cannot reach your laptop.
-
-# ngrok loads the page, but assets point at localhost
-
-> Why a dev site behind ngrok still loads its scripts, redirects or hot reload from localhost or http://, how to patch each one, and how to skip the tunnel when the dev server runs on another machine.
-
-You put your dev server behind ngrok and open the tunnel’s address. The HTML arrives, and then something still points somewhere else: the scripts and styles try `localhost`, a redirect takes you to `http://localhost:8000`, or the page never updates when you edit a file. Sometimes the dev server refuses the request outright.
-
-The tunnel did its job. It forwarded the request. The problem is that the page and the dev server still describe themselves with the addresses in their own config, and those addresses mean nothing in the browser that opened the tunnel.
-
-## Why it happens
-
-Three different things build URLs, and each one gets it wrong in its own way.
-
-### The asset dev server
-
-A backend framework that uses Vite renders the HTML itself, and the page loads its scripts from the Vite dev server on a separate port. In Laravel, the `@vite` directive reads the `public/hot` file, which `laravel-vite-plugin` writes when `npm run dev` starts. That file holds the dev server’s own address, such as `http://localhost:5173` under Sail or `http://[::1]:5173` elsewhere, and every script tag on the page points there.
-
-Your browser resolves that address on your laptop. If the dev server runs on another machine, nothing listens there, so scripts and styles fail to load and hot reload never connects. Even where something does answer, the Vite dev server only allows requests from the origins `laravel-vite-plugin` lists: `localhost`, `*.test`, `*.localhost` and your `APP_URL`. An ngrok address is none of them unless you put it in `APP_URL`.
-
-Rails, Django and other backends that pair with Vite work the same way.
-
-### Links and redirects
-
-Most frameworks build absolute URLs from the request, or from a URL in their config.
-
-* **From the request.** ngrok ends HTTPS at its edge and forwards to your dev server, adding `X-Forwarded-Proto: https`. A framework that does not trust the proxy ignores that header and builds `http://` links and redirects. If you started ngrok with `--host-header=rewrite`, the app sees the local address’s hostname, usually `localhost`, and builds links to that.
-* **From config.** Anything built from `APP_URL` or a similar setting, such as emails, queued jobs, or an OAuth redirect URI, uses whatever that setting says, usually `http://localhost:8000`.
-
-### Host checks in single-port dev servers
-
-Next.js and plain Vite serve pages, assets and hot reload from one port, so their assets use relative paths. What gets in the way is the dev server’s host check:
-
-* **Next.js** serves the page, assets included. Recent versions block its dev resources, hot reload included, from hostnames it was not told about, and log `Blocked cross-origin request to Next.js dev resource` on the server. The page loads, but edits never show.
-* **Vite** refuses every request whose `Host` it does not recognise, the page included, and answers with `Blocked request. This host ("…") is not allowed.`, naming the host. Nothing loads until the host is in `server.allowedHosts`.
-
-## Patching it with ngrok
-
-Each patch fixes one of the three.
-
-* **Assets.** Stop the dev server, which deletes `public/hot`, and run `npm run build`. Laravel then serves the built files from the app’s own origin. You lose hot reload. On other backends, build the assets or tunnel the Vite port. Keeping hot reload means a second tunnel for port 5173, with Vite told to advertise that tunnel’s address through `server.origin` and `server.hmr`, and that tunnel’s hostname added to `server.allowedHosts`. Once `server.origin` is set, Laravel’s Vite plugin allows only that origin through CORS, so also set `server.cors.origin` to the app tunnel’s address, or the browser blocks the scripts.
-* **Links and redirects.** Set `APP_URL` to the tunnel’s address and make the framework trust the proxy. The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) shows the one-line `trustProxies` change for Laravel. If the tunnel name changes each time you start it, so does `APP_URL`.
-* **Host checks.** Add the tunnel’s hostname to `allowedDevOrigins` in `next.config.ts`, or to `server.allowedHosts` in Vite’s config.
-
-## How Nearhost avoids it
-
-New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
-
-When the dev server runs on another machine, Nearhost serves it on your laptop at a name such as `https://myapp.test`, with a trusted certificate, over SSH. Nothing is public, and the name stays the same every time.
-
-* **Assets.** A `loopback` route forwards the Vite port, so `http://localhost:5173` in your browser reaches port 5173 on the remote machine. `.test` names are already on the Vite dev server’s allowed origins. Under Laravel Sail, Nearhost proposes the route for you. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/).
-* **Links and redirects.** The proxy passes the `Host` header through unchanged and sets `X-Forwarded-Proto: https`. Set `APP_URL` to the Nearhost name once, and trust the proxy as above.
-* **Host checks.** Add the Nearhost name to `allowedDevOrigins` or `server.allowedHosts` once. It does not change between runs.
-
-### Vite on the IPv6 loopback address
-
-A Vite dev server that listens on `::1` makes `laravel-vite-plugin` write `http://[::1]:5173` to `public/hot`. A loopback forward answers on both `127.0.0.1` and `[::1]`, so that works as it is. This needs Nearhost 0.7.0 or later and a laptop with the IPv6 loopback, which every Mac and almost every Linux machine has. Otherwise, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
-
-## The guides
-
-The sign-in guides walk through all of this for one app each, at a name under your own domain:
-
-* [WorkOS sign-in](/docs/guides/workos-sign-in/), with Laravel
-* [Clerk sign-in](/docs/guides/clerk-sign-in/), with Next.js
-* [Cognito sign-in](/docs/guides/cognito-sign-in/), with Laravel
-
-## When ngrok is still the right tool
-
-Nearhost only answers your own laptop. Keep a tunnel for:
-
-* **Webhooks.** A payment provider, an auth provider or GitHub sends them from its own servers, which cannot reach your laptop.
-* **Sharing a link.** A colleague, a client, or your phone cannot open a Nearhost name.
-
-You can run both: Nearhost for your own browser, and a tunnel for the one endpoint that the outside world has to reach.
-
-# SSO callback fails on a remote dev server
-
-> Why an SSO or OAuth sign-in callback fails, or lands on localhost or the wrong origin, when your dev server runs on a server or VM, and how to give it one HTTPS address that works.
-
-Note
-
-The fix on this page uses a name under your own domain, which needs Nearhost 0.6.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
-
-Sign-in works when the app runs on your laptop. Move the dev server to a server or a VM, and it falls apart: the provider shows a redirect URI error, or you sign in and land on `localhost` with nothing there, or you come back to the app and it says the sign-in state is invalid.
-
-## Why it happens
-
-Sign-in with an SSO or OAuth provider is a round trip through your browser. The app sends the browser to the provider with a callback URL. The provider checks that URL against the list you registered, and after sign-in sends the browser back to it. The callback has to be right three times over: the app has to send it, the provider has to accept it, and your browser has to reach the app at it.
-
-A remote dev server breaks one of those, depending on the address you use.
-
-* **`http://localhost`.** Most providers accept it for development, and the app sends it happily. But your browser resolves `localhost` on your laptop, so after sign-in it lands where nothing is listening. Forwarding the port with `ssh -L` fixes that for one app.
-* **The server’s own address,** such as `http://192.168.1.20:8080`. The browser reaches it, but providers that allow plain HTTP usually allow it only for `localhost`. Cognito, for example, requires HTTPS for every other callback.
-* **A tunnel,** such as ngrok. It gives you HTTPS, but each new tunnel name is one more callback to register, and the app still builds its callback from its own config. If that says `http://localhost`, or the app does not trust the tunnel and builds `http://`, the URL it sends does not match the one you registered. See [ngrok loads the page, but assets point at localhost](/docs/guides/ngrok-assets-on-localhost/).
-
-There is a fourth failure that looks the same. Most integrations store a state value in a session cookie when sign-in starts, and check it on the callback. If you start sign-in at one address and come back at another, the cookie does not come with you, and the callback is refused. In Laravel, `laravel/workos` answers with a 403, and Socialite throws an `InvalidStateException`.
-
-## The fix: one HTTPS address everywhere
-
-New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
-
-Pick one address and use it in all three places: the URL your browser opens, the callback the app sends, and the callback the provider has registered. It has to be HTTPS, and your browser has to reach the remote app at it.
-
-Nearhost gives you that address. It serves the remote dev server on your laptop at a name you choose, such as `https://local.myapp.com`, with a trusted certificate, over SSH. Add the project with that name:
-
-```sh
-nearhost add --server mini '~/code/myapp' --alias local.myapp.com
-```
-
-Then, on the app and provider side:
-
-1. **Register the callback** with the provider, on that name: for example `https://local.myapp.com/auth/callback`. Use the provider’s development or staging environment.
-2. **Set the app’s public URL** to `https://local.myapp.com`, in `APP_URL` or whatever your framework reads, so the callback the app sends matches.
-3. **Trust the proxy.** Nearhost ends HTTPS on your laptop and sets `X-Forwarded-Proto: https`. A framework that ignores the header builds `http://` links and redirects. In Laravel, that is one `trustProxies` line; the [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) shows it.
-4. **Start sign-in at the same name.** Open `https://local.myapp.com`, not the server’s address or an old tunnel, so the state cookie comes back.
-
-## The guides
-
-Each provider has its own setup, and its own way of failing. The guides cover them step by step:
-
-* [WorkOS sign-in](/docs/guides/workos-sign-in/): the redirect URI on the **Redirects** tab, with Laravel and `laravel/workos`.
-* [Clerk sign-in](/docs/guides/clerk-sign-in/): a development instance needs no callback registered at all, and what breaks is the dev server’s hot reload. With Next.js.
-* [Cognito sign-in](/docs/guides/cognito-sign-in/): **Allowed callback URLs** on the app client, with Laravel and Socialite.
-
-For other providers, such as Auth0, Okta or Google, the same four steps apply. Find where the provider lists allowed callback or redirect URLs, and add the HTTPS one.
-
-## When ngrok is still the right tool
-
-Nearhost is local-only. The name works in your browser on your laptop, and nowhere else. The sign-in round trip goes through your browser, so it does not need a tunnel. Keep one for:
-
-* **Webhooks.** A provider that sends events to your app does so from its own servers, which cannot reach your laptop.
-* **Sharing a link.** A colleague or a client cannot open `local.myapp.com` from their machine.
-
-# Vite hot reload fails over SSH port forwarding
-
-> Why Vite's scripts or hot reload fail when the dev server runs on another machine and you reach it through ssh -L, which port each setup has to forward, and how to keep it working without retyping forwards.
-
-You run `npm run dev` on a server or a VM and forward a port to your laptop with `ssh -L`. The page loads, but edits never show up. Or the page loads without its styles and scripts. The browser console says `[vite] failed to connect to websocket`, or `[vite] server connection lost. Polling for restart...`, or the page is replaced by `Blocked request. This host ("…") is not allowed.`
-
-The first two mean the browser is asking for an address the forward does not cover. Which address depends on whether Vite serves the page itself or sits beside a backend. The third means the forward works: the request reached Vite, and Vite refused the name you used, which `server.allowedHosts` fixes.
-
-## Why it happens
-
-Vite’s hot reload client opens a WebSocket to the host and port its own script came from, unless `server.ws` says otherwise (`server.hmr` in older Vite). So hot reload works wherever the scripts load, and fails wherever they do not. If your config sets a separate WebSocket port, such as `server.ws.clientPort`, forward that port too.
-
-### Vite serves the page
-
-A plain Vite app, or a framework built on it, serves the page, its scripts and the hot reload socket from one port. Forward that port and the browser reaches all three:
-
-```sh
-ssh -L 5173:localhost:5173 myserver
-```
-
-Open `http://localhost:5173` and hot reload works. Two things still break it:
-
-* **Opening it by another name.** Vite checks the `Host` header and refuses names it does not know, the page included, with `Blocked request. This host ("…") is not allowed.` `localhost`, `*.localhost` names and IP addresses are always allowed. For any other name, add it to `server.allowedHosts` in `vite.config.js`.
-* **The connection dropping.** When `ssh` exits, so does the forward. The console says `server connection lost`, and nothing reloads until you run `ssh -L` again.
-
-### Vite sits beside a backend
-
-Laravel, Rails, Django and other backends render the HTML themselves, and the page loads its scripts from the Vite dev server on a second port, at an address such as `http://localhost:5173`. In Laravel, `laravel-vite-plugin` writes that address to `public/hot` when `npm run dev` starts, and every script tag on the page uses it.
-
-Forwarding only the backend’s port loads the HTML, and then the scripts fail, because your browser asks for `localhost:5173` on your laptop and nothing listens there. Forward the Vite port too, to the same port number on your laptop:
-
-```sh
-ssh -L 8000:localhost:8000 -L 5173:localhost:5173 myserver
-```
-
-The number has to match on both ends. `-L 3000:localhost:5173` reaches Vite, but the page still asks for 5173. If you run several projects, each needs its own Vite port, because two forwards cannot share 5173 on your laptop.
-
-## Keeping it working with plain SSH
-
-* **List the forwards in `~/.ssh/config`,** so one `ssh myserver` sets them all up:
-
-  ```plaintext
-  Host myserver
-    LocalForward 8000 localhost:8000
-    LocalForward 5173 localhost:5173
-    ServerAliveInterval 15
-  ```
-
-* **Reconnect when it drops,** with `autossh` or a loop around `ssh -N`. With `ServerAliveInterval 15`, `ssh` notices a dead connection after about 45 seconds instead of hanging.
-
-* **Add each new name** to `server.allowedHosts` if you open the app by a name other than `localhost` or a `*.localhost` name.
-
-## How Nearhost handles it
-
-New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
-
-Nearhost serves the project at a name such as `https://myapp.test`, over one SSH connection per server that it reconnects by itself, putting every forward back.
-
-* **Vite serves the page.** Give its port the `web` role. The proxy passes the hot reload WebSocket through on the same origin. Add the name to `server.allowedHosts` once; with the `nearhost/vite` preset enabled, Nearhost shows the exact lines.
-* **Vite sits beside a backend.** Give the Vite port the `loopback` role. Nearhost forwards it to the same port number on your laptop, so the page’s `http://localhost:5173` reaches the remote dev server. Under Laravel Sail, discovery proposes this route for you. The page at `https://myapp.test` now loads its scripts from another origin, and Vite’s default CORS policy allows only `localhost` pages. `laravel-vite-plugin` also allows `*.test` names and your `APP_URL`; with another integration, add the name to `server.cors.origin`.
-* **Several projects.** Nearhost warns about two projects that want the same loopback port before they clash, and suggests a free one when the port comes from a variable.
-
-A loopback forward answers on both `127.0.0.1` and `[::1]`, so it also works when Vite listens on `::1` and `public/hot` says `http://[::1]:5173`. This needs Nearhost 0.7.0 or later and a laptop with the IPv6 loopback, which every Mac and almost every Linux machine has. Otherwise, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
-
-For the details, see [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) and [Routes and roles](/docs/concepts/routes-and-roles/).
-
-Checked against
-
-These, on 2026-10-20:
-
-* The Vite 8.3 hot reload client and host check, in `vite/dist/client/client.mjs` and `vite/dist/node`
-* [Vite: server options](https://vite.dev/config/server-options.html), for `server.ws`, `server.hmr`, `server.cors` and `server.allowedHosts`
-* [OpenSSH: ssh_config(5)](https://man.openbsd.org/ssh_config), for `LocalForward`, `ServerAliveInterval` and `ServerAliveCountMax`
-
-If something here no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
-
-# WorkOS sign-in on a remote dev server
-
-> Give a WorkOS AuthKit app an HTTPS redirect URI in local dev, such as https://local.myapp.com/authenticate, when the dev server runs on another machine.
-
-Note
-
-Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. A `.nearhostrc` that sets only that name, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
-
-New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
-
-This guide gets WorkOS AuthKit sign-in working at `https://local.myapp.com` while your Laravel app runs on another machine. The worked example uses the `laravel/workos` package from the Laravel starter kits, but the WorkOS and Nearhost steps are the same for any stack.
-
-## The symptom
-
-WorkOS sends the browser back to your app at a redirect URI you register in its dashboard. It has to match the URI your app sends exactly, including `https://` and the path. The staging environment accepts `http://localhost`, which is fine when the app runs on your laptop. When it runs on a server or a VM, `localhost` in your browser is not where the app is.
-
-A tunnel such as ngrok gets the page on screen, but often not much more. The app still builds its links and assets from its own idea of where it lives, so redirects and scripts point back at `localhost` or at `http://`. Each tunnel name is one more redirect URI to register, and WorkOS’s advice is to use a stable custom domain if you must use a tunnel at all.
-
-Nearhost serves the remote app on your laptop at a name you choose, with a trusted certificate, over SSH. The browser sees one stable HTTPS origin, and that is the origin you register with WorkOS.
-
-## Pick a name
-
-Use a name under a domain you own, such as `local.myapp.com`. It needs no DNS record: Nearhost points it at your laptop through `/etc/hosts` while the project is enabled. When the project is disabled, the name resolves as it normally would.
-
-A real-domain name keeps the redirect URI shaped like the one in production. WorkOS’s documentation does not say whether it accepts `.test` names, so this guide uses a domain you own.
-
-## Add the project
-
-On the command line, give the name with `--alias`:
-
-```sh
-nearhost add --server mini '~/code/myapp' --alias local.myapp.com
-```
-
-```text
-Added myapp on mini at https://local.myapp.com
-Start it with `nearhost up`.
-```
-
-A name that does not end in `.test` needs your approval, because it can hide the real site. Typing it with `--alias` counts as approval.
-
-To keep the name with the project, put it in a [`.nearhostrc`](/docs/reference/nearhostrc/) in the project’s root:
-
-```yaml
-version: 1
-alias: local.myapp.com
-```
-
-Run `nearhost add` without `--alias`, and it asks before using the name, since you did not type it:
-
-```text
-$ nearhost add --server mini '~/code/myapp'
-This project asks for these, which need your approval:
-  local.myapp.com on port 8080 (a real domain)
-Approve these? [y/N]
-```
-
-See [Add a project](/docs/getting-started/add-a-project/) for the rest of the add flow, and [Main name](/docs/reference/config/#main-name) for how the name is approved and written to the hosts file.
-
-## Set up WorkOS
-
-Do this in the WorkOS staging environment, which is meant for development. Its API keys, users and settings are separate from production’s.
-
-1. In the dashboard, open **Applications**, then your application, then the **Redirects** tab.
-2. Add the redirect URI `https://local.myapp.com/authenticate`, and make it the default. With `laravel/workos` the callback route is `/authenticate`. No trailing slash.
-3. Set the sign-in endpoint, which WorkOS’s docs also call the initiate login URI, to `https://local.myapp.com/login`. AuthKit sends people there when sign-in starts outside your app, such as from a password reset or an invitation link.
-4. On the same tab, add the sign-out URI `https://local.myapp.com/` and make it the default. Without a sign-out URI, WorkOS shows an error after sign-out, unless the app still has the older App homepage URL set. That setting is deprecated, and only kept as a fallback for existing apps.
-
-Then copy the staging environment’s client ID and API key into the app’s `.env`, after `APP_URL`, which the redirect URL builds on:
-
-```ini
-APP_URL=https://local.myapp.com
-WORKOS_CLIENT_ID=your-client-id
-WORKOS_API_KEY=your-api-key
-WORKOS_REDIRECT_URL="${APP_URL}/authenticate"
-```
-
-These are the names the starter kits read in `config/services.php`.
-
-## Set up the app
-
-`APP_URL` is set to the new name above, so the redirect URL follows it. If `APP_URL` is already further down the file, move it above `WORKOS_REDIRECT_URL`, which reads it.
-
-If you have cached the config, run `php artisan config:clear`.
-
-Nearhost’s proxy ends HTTPS on your laptop and passes plain HTTP to the server, with `X-Forwarded-Proto: https`. Laravel ignores that header until it trusts the proxy, so it thinks the request was `http://`. The WorkOS callback is unaffected, because `laravel/workos` reads it from `WORKOS_REDIRECT_URL`. What goes wrong is everything Laravel builds from the request: `route()` and `url()` links, the redirect to the dashboard after sign-in, and `asset()` URLs.
-
-The starter kit’s `bootstrap/app.php` already has a `withMiddleware` closure. Add one line inside it (Laravel 11 and later):
-
-```php
-->withMiddleware(function (Middleware $middleware): void {
-    $middleware->trustProxies(at: '*');
-
-
-    // The lines already there stay as they are.
-})
-```
-
-`'*'` trusts the forwarded headers from any address. If this file also runs in production behind a known load balancer, list that load balancer’s addresses plus `127.0.0.1`, or the Docker network’s gateway under Sail, instead, or read the list from an environment variable. Nearhost’s forward arrives from `127.0.0.1`, or from the Docker network’s gateway under Sail, so leaving it out stops Laravel trusting it and brings back `http://` links.
-
-If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. With an older Nearhost, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
-
-On another stack the idea is the same. Set the app’s public URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to WorkOS matches the one you registered.
-
-## Check it works
-
-Start the project with `nearhost up`, or from the interface, and open `https://local.myapp.com/login`. You should land on the AuthKit sign-in page, and after signing in come back to `https://local.myapp.com/authenticate` and on to the dashboard.
-
-When it does not:
-
-* **WorkOS shows an error instead of the sign-in page.** Usually the redirect URI your app sent is not on the Redirects tab of the environment whose keys you use. Compare them character by character: `https`, the host, `/authenticate`, no trailing slash. Check that `WORKOS_REDIRECT_URL` and `APP_URL` are what you expect, and that the keys are the staging ones.
-* **Links, the redirect after sign-in, or asset URLs use `http://`.** Laravel does not trust the proxy yet. Add `trustProxies` as above. Nearhost redirects `http://` to HTTPS, so a link may still seem to work, but `http://` scripts and styles on an HTTPS page are blocked as mixed content. Look for those warnings in the console.
-* **`/authenticate` returns 403.** `laravel/workos` keeps a state value in the session when you start sign-in, and refuses the callback when the session does not come back with it. Start sign-in at `https://local.myapp.com`, not at another address for the same app, and leave `SESSION_DOMAIN` unset (`null`) or set it to `local.myapp.com`. A cookie set for another domain never reaches this one.
-
-## When you still need ngrok
-
-Nearhost is local-only. The name works in your browser on your laptop, and nowhere else. Use a public tunnel when:
-
-* **WorkOS sends webhooks.** They come from WorkOS’s servers, which cannot reach your laptop. Point the staging webhook endpoint at a tunnel. Or use WorkOS’s events API, where your app fetches events from WorkOS rather than receiving them.
-* **Someone outside needs the link.** A colleague or a client cannot open `local.myapp.com` from their machine.
-
-You can run both: Nearhost for your own browser, and a tunnel just for the webhook endpoint.
-
-Checked against
-
-These pages, on 2026-10-19:
-
-* [Laravel starter kits: WorkOS AuthKit authentication](https://laravel.com/docs/13.x/starter-kits#workos)
-* [Laravel HTTP requests: configuring trusted proxies](https://laravel.com/docs/13.x/requests#configuring-trusted-proxies)
-* [laravel/workos](https://github.com/laravel/workos) and the [React starter kit’s WorkOS branch](https://github.com/laravel/react-starter-kit/tree/workos)
-* [WorkOS: Redirect URIs](https://workos.com/docs/sso/redirect-uris)
-* [WorkOS AuthKit: sessions](https://workos.com/docs/authkit/sessions) (sign-out URIs)
-* [WorkOS: Staging and production environments](https://workos.com/docs/authkit/environments)
-* [WorkOS AuthKit: configure your project](https://workos.com/docs/authkit/vanilla/nodejs/1-configure-your-project)
-* [WorkOS: Redirect URIs for local, staging and production](https://workos.com/blog/redirect-uris-for-local-staging-and-production)
-* [WorkOS: Data syncing with the events API or webhooks](https://workos.com/docs/events/data-syncing)
-
-If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
 
 # Dev servers and hot reload
 
@@ -3017,3 +1995,1017 @@ The routes step says no ports were found and asks for the web port. Enter it, or
 ## Config file invalid
 
 Nearhost exits naming the file and the problem, with the line for a YAML error. Fix it in `~/.config/nearhost/config.yaml`. `nearhost doctor` reports the same without exiting. See [config.yaml](/docs/reference/config/).
+
+# Clerk sign-in on a remote dev server
+
+> Run a Clerk and Next.js app at a local HTTPS domain, such as https://local.myapp.com, with hot reload working, when the dev server runs on another machine.
+
+Note
+
+Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. A `.nearhostrc` that sets only that name, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
+This guide gets Clerk sign-in working at `https://local.myapp.com` while your Next.js app runs on another machine. The worked example uses Clerk’s Next.js SDK, `@clerk/nextjs`, with a Clerk development instance. The Clerk and Nearhost steps are the same for any stack.
+
+## The symptom
+
+A Clerk development instance is relaxed about where your app runs. It is built for an app on `localhost`, and it does not ask you to register a domain or a callback URL. When the app runs on a server or a VM, though, `localhost` in your browser is not where the app is.
+
+A tunnel such as ngrok gets the page on screen, but often not much more. The page loads at the ngrok address, and then hot reload never connects. Recent versions of Next.js block requests for its dev resources, hot reload included, from any host it was not told about, and logs `Blocked cross-origin request to Next.js dev resource` on the server. Anything the app builds from a URL in its environment, such as an app URL set to `http://localhost:3000`, still points there. And the app is on the public internet while you work on it.
+
+Nearhost serves the remote app on your laptop at a name you choose, with a trusted certificate, over SSH. The browser sees one stable HTTPS origin, the page and its hot reload connection come from that origin, and nothing is public.
+
+If you only need one app and plain HTTP, forwarding port 3000 with `ssh -L` gets you `http://localhost:3000`, which a development instance accepts. Nearhost is for when you want HTTPS, a name per project, or a setup shaped like production.
+
+## Pick a name
+
+Use a name under a domain you own, such as `local.myapp.com`. It needs no DNS record: Nearhost points it at your laptop through `/etc/hosts` while the project is enabled. When the project is disabled, the name resolves as it normally would.
+
+A real-domain name is shaped like production, where Clerk’s Frontend API lives on a subdomain of your domain. Clerk’s documentation does not say which local names a development instance accepts beyond `localhost`, so this guide uses a domain you own.
+
+If your production app already uses Clerk on `myapp.com`, use a name under a different domain you own, such as `local.myapp-dev.com`. Clerk’s docs say a separate setup will not work on the production domain, even on a separate subdomain. The examples below use `local.myapp.com`; swap in your name.
+
+## Add the project
+
+On the command line, give the name with `--alias`:
+
+```sh
+nearhost add --server mini '~/code/myapp' --alias local.myapp.com
+```
+
+```text
+Added myapp on mini at https://local.myapp.com
+Start it with `nearhost up`.
+```
+
+A name that does not end in `.test` needs your approval, because it can hide the real site. Typing it with `--alias` counts as approval.
+
+To keep the name with the project, put it in a [`.nearhostrc`](/docs/reference/nearhostrc/) in the project’s root:
+
+```yaml
+version: 1
+alias: local.myapp.com
+```
+
+Run `nearhost add` without `--alias`, and it asks before using the name, since you did not type it:
+
+```text
+$ nearhost add --server mini '~/code/myapp'
+This project asks for these, which need your approval:
+  local.myapp.com on port 3000 (a real domain)
+Approve these? [y/N]
+```
+
+The port is the one `next dev` listens on, 3000 unless you changed it. Give it the `web` role. The Next.js dev server serves pages, assets and hot reload from that one port, so it needs no `loopback` route.
+
+See [Add a project](/docs/getting-started/add-a-project/) for the rest of the add flow, and [Main name](/docs/reference/config/#main-name) for how the name is approved and written to the hosts file.
+
+## Set up Clerk
+
+Use a development instance. It is the default for a new Clerk application, and its publishable key starts with `pk_test_`.
+
+A development instance has nothing to register for the new name. There is no redirect URI or allowed domain to add. Its Frontend API lives at a Clerk address ending in `accounts.dev`, and your app talks to it across sites whatever the app’s own name is. Clerk’s own docs use development keys on preview domains such as `*.vercel.app` in the same way.
+
+The **allowed origins** setting in Clerk’s API is for browser extensions and similar apps, not for a web app on a development instance. Leave it alone.
+
+In the Clerk Dashboard, open the **API keys** page and copy the keys into the app’s `.env.local`:
+
+```ini
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+```
+
+These are the names `@clerk/nextjs` reads. If you set the app up with Clerk’s `init` command, they are already there.
+
+## Set up the app
+
+Recent versions of Next.js only let their dev resources be requested from `localhost` and from the hostname `next dev` was started with. A page at `https://local.myapp.com` asks for them from `local.myapp.com`, so add that name to `allowedDevOrigins` in `next.config.ts`:
+
+```ts
+import type { NextConfig } from 'next';
+
+
+const nextConfig: NextConfig = {
+  allowedDevOrigins: ['local.myapp.com'],
+};
+
+
+export default nextConfig;
+```
+
+Write the hostname alone, without `https://` or a port. Restart `next dev` after changing it. The setting only affects development, so it is safe to commit.
+
+Clerk’s middleware stays as the quickstart has it: `clerkMiddleware()` in `proxy.ts` on Next.js 16 and later, or `middleware.ts` on Next.js 15 and earlier, at the root of the project or in `src/`. If you pass it `authorizedParties`, add the new origin, with the scheme:
+
+```ts
+export default clerkMiddleware({
+  authorizedParties: ['https://local.myapp.com'],
+});
+```
+
+Nearhost’s proxy passes the `Host` header through unchanged and sets `X-Forwarded-Proto: https`, so the app sees the name you browse to. If the app keeps its own public URL in an environment variable, such as `NEXT_PUBLIC_APP_URL`, set it to `https://local.myapp.com`.
+
+On another stack the idea is the same. Clerk needs nothing new, and the dev server needs to accept the new hostname. Vite, for example, wants it in `server.allowedHosts`. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/).
+
+## Check it works
+
+Start the project with `nearhost up`, or from the interface, and open `https://local.myapp.com`. The page should load, Clerk’s sign-in button should appear, and signing in should bring you back signed in. Edit a component, and the page should update without a reload.
+
+When it does not:
+
+* **The page loads, but edits do not show until you reload.** Next.js is blocking hot reload from the new name. The server log shows `Blocked cross-origin request to Next.js dev resource` with the hostname it saw. Add that hostname to `allowedDevOrigins` and restart `next dev`.
+* **You sign in, but come back signed out, or requests return 401.** If `clerkMiddleware()` has `authorizedParties`, check that it lists `https://local.myapp.com` exactly, with `https` and no port. Check too that the publishable and secret keys come from the same instance.
+* **Links or redirects you build yourself go to `localhost`.** They come from an environment variable that still says `http://localhost:3000`. Change it to `https://local.myapp.com`.
+
+## Testing with production keys
+
+Clerk’s production keys only work on your production domain. Clerk describes a way round that for debugging, with a local subdomain over HTTPS on port 443, which Nearhost provides, but calls it strongly discouraged. See [using production keys in local development](https://clerk.com/docs/guides/development/troubleshooting/using-production-keys-in-development).
+
+## When you still need ngrok
+
+Nearhost is local-only. The name works in your browser on your laptop, and nowhere else. Use a public tunnel when:
+
+* **Clerk sends webhooks.** Clerk sends them through Svix, from its servers, which cannot reach your laptop. Point the endpoint on the dashboard’s **Webhooks** page at a tunnel to the server, such as `https://<your-tunnel>/api/webhooks`. Clerk’s CLI also has `clerk webhooks listen --forward-to`, a relay that forwards deliveries to a local URL. Run it on the server, next to the app.
+* **Someone outside needs the link.** A colleague or a client cannot open `local.myapp.com` from their machine.
+
+You can run both: Nearhost for your own browser, and a tunnel just for the webhook endpoint.
+
+Checked against
+
+These pages, on 2026-10-19:
+
+* [Clerk: Next.js quickstart](https://clerk.com/docs/nextjs/getting-started/quickstart)
+* [Clerk: Express quickstart](https://clerk.com/docs/expressjs/getting-started/quickstart) (the API keys page)
+* [Clerk: clerkMiddleware()](https://clerk.com/docs/reference/nextjs/clerk-middleware)
+* [Clerk: environment variables](https://clerk.com/docs/guides/development/clerk-environment-variables)
+* [Clerk: development and production instances](https://clerk.com/docs/guides/development/managing-environments)
+* [Clerk: how Clerk works](https://clerk.com/docs/guides/how-clerk-works/overview)
+* [Clerk: update an instance](https://clerk.com/docs/reference/backend/instance/update) (allowed origins)
+* [Clerk: using production keys in local development](https://clerk.com/docs/guides/development/troubleshooting/using-production-keys-in-development)
+* [Clerk: webhooks overview](https://clerk.com/docs/guides/development/webhooks/overview) and [syncing data with webhooks](https://clerk.com/docs/guides/development/webhooks/syncing)
+* [Clerk changelog: CLI webhooks](https://clerk.com/changelog/2026-07-09-clerk-cli-webhooks-and-impersonate)
+* [Next.js: allowedDevOrigins](https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins)
+
+If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
+
+# Cognito sign-in on a remote dev server
+
+> Give an Amazon Cognito app client an HTTPS callback URL in local dev, such as https://local.myapp.com/auth/cognito/callback, when the dev server runs on another machine.
+
+Note
+
+Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. A `.nearhostrc` that sets only that name, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
+This guide gets Amazon Cognito sign-in working at `https://local.myapp.com` while your Laravel app runs on another machine. The worked example uses Laravel Socialite with the community `socialiteproviders/cognito` provider and Cognito’s managed login pages. The Cognito and Nearhost steps are the same for any stack.
+
+## The symptom
+
+Cognito sends the browser back to your app at a callback URL you list on the app client. Every callback URL has to use HTTPS, with one exception: `http://localhost`, which Cognito allows for testing. When the app runs on your laptop, that exception is all you need.
+
+When the app runs on a server or a VM, `localhost` in your browser is not where the app is. You can forward a port with `ssh -L` and use `http://localhost:8080`, and for one app that works. It stops being enough when:
+
+* **You run more than one app.** Browsers do not separate cookies by port, so two apps on `localhost` can overwrite each other’s session cookies.
+* **The app shares cookies across subdomains.** An app that sets cookies for `myapp.com`, or talks to an API on another subdomain, only behaves as it does on staging when it runs under that domain.
+* **You want local dev to match staging.** Staging’s callback is HTTPS on your domain. With `http://localhost`, the scheme, the host and the cookie rules all differ from what you deploy.
+* **The page uses browser APIs that need a secure context**, such as service workers or the clipboard. Browsers count `http://localhost` as secure, so these work there, but on any other name, such as the server’s own address, they need HTTPS.
+
+A tunnel such as ngrok gives you HTTPS, but each new tunnel name is one more callback URL to add, and the app still builds its links from its own idea of where it lives. It also puts the app on the public internet while you work on it.
+
+Nearhost serves the remote app on your laptop at a name you choose, with a trusted certificate, over SSH. The browser sees one stable HTTPS origin, and that is the origin you list on the Cognito app client.
+
+## Pick a name
+
+Use a name under a domain you own, such as `local.myapp.com`. It needs no DNS record: Nearhost points it at your laptop through `/etc/hosts` while the project is enabled. When the project is disabled, the name resolves as it normally would.
+
+A real-domain name keeps the callback URL shaped like the one on staging and in production. Cognito’s documentation asks for HTTPS but does not say whether it accepts `.test` names, so this guide uses a domain you own.
+
+## Add the project
+
+On the command line, give the name with `--alias`:
+
+```sh
+nearhost add --server mini '~/code/myapp' --alias local.myapp.com
+```
+
+```text
+Added myapp on mini at https://local.myapp.com
+Start it with `nearhost up`.
+```
+
+A name that does not end in `.test` needs your approval, because it can hide the real site. Typing it with `--alias` counts as approval.
+
+To keep the name with the project, put it in a [`.nearhostrc`](/docs/reference/nearhostrc/) in the project’s root:
+
+```yaml
+version: 1
+alias: local.myapp.com
+```
+
+Run `nearhost add` without `--alias`, and it asks before using the name, since you did not type it:
+
+```text
+$ nearhost add --server mini '~/code/myapp'
+This project asks for these, which need your approval:
+  local.myapp.com on port 8080 (a real domain)
+Approve these? [y/N]
+```
+
+See [Add a project](/docs/getting-started/add-a-project/) for the rest of the add flow, and [Main name](/docs/reference/config/#main-name) for how the name is approved and written to the hosts file.
+
+## Set up Cognito
+
+Use a user pool for development, separate from production’s. Its users, app clients and settings are its own.
+
+1. The pool needs a domain for its sign-in pages. In the [Amazon Cognito console](https://console.aws.amazon.com/cognito/home), open the user pool, then **Domain** under **Branding**. If there is no domain, choose **Actions**, then **Create Cognito domain**, and pick a prefix. The domain looks like `https://myapp-dev.auth.eu-west-2.amazoncognito.com`. Either branding version, **Managed login** or **Hosted UI (classic)**, works for this guide.
+2. Open **App clients** and create an app client with the application type **Traditional web application**. That type gives the client a secret, which Socialite needs. You cannot add a secret to an existing client later, so if yours has none, create a new one. When it asks for a **Return URL**, enter `https://local.myapp.com/auth/cognito/callback`.
+3. Open the app client, then the **Login pages** tab. Under **Managed login pages configuration**, choose **Edit**.
+4. Check that **Allowed callback URLs** has `https://local.myapp.com/auth/cognito/callback`. It must match the URL your app sends exactly: `https`, the host, the path, no trailing slash.
+5. Add `https://local.myapp.com/` to **Allowed sign-out URLs**. Cognito only sends people back after sign-out to a URL on this list.
+6. Under **Identity providers**, keep the user pool’s own sign-in, or whichever providers your users sign in with. Under **OAuth grant types**, choose **Authorization code grant**. Under **OpenID Connect scopes**, choose `openid`, `email` and `profile`. Save the changes.
+
+Then set `APP_URL` in the app’s `.env` to the new name, and copy the domain and the app client’s ID and secret below it. The last two lines build on `APP_URL`, so they have to come after it:
+
+```ini
+APP_URL=https://local.myapp.com
+
+
+COGNITO_HOST=https://myapp-dev.auth.eu-west-2.amazoncognito.com
+COGNITO_CLIENT_ID=your-client-id
+COGNITO_CLIENT_SECRET=your-client-secret
+COGNITO_CALLBACK_URL="${APP_URL}/auth/cognito/callback"
+COGNITO_SIGN_OUT_URL="${APP_URL}/"
+```
+
+These are the names in the provider’s README. `COGNITO_HOST` is the full domain with `https://` and no trailing slash.
+
+## Set up the app
+
+Install the provider, which brings in Socialite:
+
+```sh
+composer require socialiteproviders/cognito
+```
+
+Add the Cognito entry to `config/services.php`:
+
+```php
+'cognito' => [
+    'host' => env('COGNITO_HOST'),
+    'client_id' => env('COGNITO_CLIENT_ID'),
+    'client_secret' => env('COGNITO_CLIENT_SECRET'),
+    'redirect' => env('COGNITO_CALLBACK_URL'),
+    'logout_uri' => env('COGNITO_SIGN_OUT_URL'),
+],
+```
+
+The README’s version also has a `scope` line. The provider does not read it, so this guide sets scopes in code instead.
+
+Register the provider in the `boot` method of `app/Providers/AppServiceProvider.php` (Laravel 11 and later):
+
+```php
+use Illuminate\Support\Facades\Event;
+use SocialiteProviders\Cognito\Provider;
+use SocialiteProviders\Manager\SocialiteWasCalled;
+
+
+public function boot(): void
+{
+    Event::listen(function (SocialiteWasCalled $event) {
+        $event->extendSocialite('cognito', Provider::class);
+    });
+}
+```
+
+Then add the routes to `routes/web.php`. The provider asks for `openid` and `profile` by default; `scopes()` adds `email` to them:
+
+```php
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Socialite;
+
+
+Route::get('/auth/cognito/redirect', function () {
+    return Socialite::driver('cognito')->scopes(['email'])->redirect();
+});
+
+
+Route::get('/auth/cognito/callback', function () {
+    $cognitoUser = Socialite::driver('cognito')->user();
+
+
+    // Find or create your user from $cognitoUser, then Auth::login($user).
+
+
+    return redirect('/dashboard');
+});
+
+
+Route::post('/auth/cognito/logout', function (Request $request) {
+    Auth::logout();
+
+
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+
+    return redirect(Socialite::driver('cognito')->logoutCognitoUser());
+});
+```
+
+`logoutCognitoUser()` sends the browser to Cognito’s sign-out page with `COGNITO_SIGN_OUT_URL`, and Cognito sends it back there.
+
+With `APP_URL` set to `https://local.myapp.com`, the callback and sign-out URLs follow it. If you have cached the config, run `php artisan config:clear`.
+
+Nearhost’s proxy ends HTTPS on your laptop and passes plain HTTP to the server, with `X-Forwarded-Proto: https`. Laravel ignores that header until it trusts the proxy, so it thinks the request was `http://`. The callback is unaffected while `COGNITO_CALLBACK_URL` is a full URL, because Socialite uses it as it is. A path such as `/auth/cognito/callback` would be built from the request instead, as `http://`, and Cognito would refuse it. What goes wrong either way is everything Laravel builds from the request: `route()` and `url()` links, the redirect to `/dashboard` after sign-in, and `asset()` URLs.
+
+The fix is one line in the `withMiddleware` closure in `bootstrap/app.php`:
+
+```php
+$middleware->trustProxies(at: '*');
+```
+
+The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) explains it, and what to list instead of `'*'` if the file also runs in production behind a known load balancer.
+
+If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. With an older Nearhost, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
+
+On another stack the idea is the same. Use any OpenID Connect client with the pool’s domain and the app client’s ID and secret. Set the app’s public URL and its callback URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to Cognito matches the one you listed.
+
+## Check it works
+
+Start the project with `nearhost up`, or from the interface, and open `https://local.myapp.com/auth/cognito/redirect`. You should land on Cognito’s sign-in page, and after signing in come back to `https://local.myapp.com/auth/cognito/callback` and on to the dashboard.
+
+When it does not:
+
+* **Cognito shows an error page instead of the sign-in page.** Usually the callback URL your app sent is not in **Allowed callback URLs** on the app client whose ID you use. Compare them character by character: `https`, the host, `/auth/cognito/callback`, no trailing slash. Check that `COGNITO_CALLBACK_URL` and `APP_URL` are what you expect.
+* **You come back with `error=invalid_scope` in the address.** The app asked for a scope the app client does not allow. Add `openid`, `email` and `profile` under **OpenID Connect scopes**, or ask for fewer.
+* **The callback fails with `InvalidStateException`.** Socialite keeps a state value in the session when you start sign-in, and refuses the callback when the session does not come back with it. Start sign-in at `https://local.myapp.com`, not at another address for the same app, and leave `SESSION_DOMAIN` unset (`null`) or set it to `local.myapp.com`. A cookie set for another domain never reaches this one.
+* **Links, the redirect after sign-in, or asset URLs use `http://`.** Laravel does not trust the proxy yet. Add `trustProxies` as above. Nearhost redirects `http://` to HTTPS, so a link may still seem to work, but `http://` scripts and styles on an HTTPS page are blocked as mixed content. Look for those warnings in the console.
+* **Sign-out does not come back to `https://local.myapp.com/`.** Cognito only redirects to a URL in **Allowed sign-out URLs**. Check that `COGNITO_SIGN_OUT_URL` is on that list exactly, trailing slash included.
+
+## When you still need ngrok
+
+Nearhost is local-only. The name works in your browser on your laptop, and nowhere else.
+
+Cognito itself does not need to reach your app. The browser carries the sign-in there and back, and your server calls Cognito, not the other way round. Cognito’s hooks into sign-up and sign-in are Lambda triggers, which run in AWS, not webhooks sent to your app. Use a public tunnel when:
+
+* **Something in AWS calls your app.** A Lambda trigger, or anything else running in AWS, cannot reach your laptop or your dev server. If a trigger calls your app’s API, point it at a tunnel.
+* **Someone outside needs the link.** A colleague or a client cannot open `local.myapp.com` from their machine.
+
+You can run both: Nearhost for your own browser, and a tunnel just for whatever AWS has to call.
+
+Checked against
+
+These pages, on 2026-10-19:
+
+* [socialiteproviders/cognito README](https://github.com/SocialiteProviders/Providers/blob/master/src/Cognito/README.md) and [provider source](https://github.com/SocialiteProviders/Providers/blob/master/src/Cognito/Provider.php)
+* [SocialiteProviders Manager: how provider config is read](https://github.com/SocialiteProviders/Manager/blob/master/src/Helpers/ConfigRetriever.php) and [how the redirect URL is formatted](https://github.com/SocialiteProviders/Manager/blob/master/src/Config.php)
+* [Laravel Socialite](https://laravel.com/docs/13.x/socialite)
+* [Laravel HTTP requests: configuring trusted proxies](https://laravel.com/docs/13.x/requests#configuring-trusted-proxies)
+* [Amazon Cognito: application-specific settings with app clients](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-client-apps.html)
+* [Amazon Cognito: user pool managed login](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-managed-login.html)
+* [Amazon Cognito: using the prefix domain for managed login](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-assign-domain-prefix.html)
+* [Amazon Cognito: the authorize endpoint](https://docs.aws.amazon.com/cognito/latest/developerguide/authorization-endpoint.html)
+* [Amazon Cognito: the logout endpoint](https://docs.aws.amazon.com/cognito/latest/developerguide/logout-endpoint.html)
+* [Amazon Cognito: OIDC identity providers](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-oidc-idp.html) (the **Login pages** tab)
+* [Amazon Cognito: Lambda triggers](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-working-with-lambda-triggers.html)
+
+If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
+
+# Callbacks from Docker containers to a local HTTPS domain
+
+> Let a Docker Compose service, such as a queue worker or a LocalStack job, call your app at its Nearhost HTTPS name on this machine.
+
+Note
+
+Needs Nearhost 0.6.0 or later, which can serve a project to Docker containers. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+
+A service in your Compose file often calls the app back: a queue worker reports a finished job, or a LocalStack job delivers an event to a webhook. Point it at the app’s Nearhost name, such as `https://api.local.example.com/webhooks/jobs`, and the call fails, even though the same URL works in your browser.
+
+Three things stand between the container and Nearhost. The container cannot find the host, it does not trust the local certificate authority, and on Linux Nearhost does not let it in. The fixes go in the project’s files, which you commit. Each developer then sets one variable, for the certificate’s path, and approves the opt-in on their own machine.
+
+This works only for a project on this machine. A container on an SSH server cannot reach the proxy on your laptop.
+
+## The example
+
+The project is named `shop`, and its worker is a Node service. Its app listens on port 8000 and is served at `api.local.example.com`. Its `.nearhostrc`:
+
+```yaml
+version: 1
+routes:
+  - port: ${APP_PORT:-8000}
+    label: app
+    hosts: [api.local.example.com]
+docker_clients: true
+```
+
+`hosts` serves the route at a name of your own, besides the project’s main name. See [Multi-host projects](/docs/concepts/multi-host-projects/). `docker_clients` is explained in [Being let in](#being-let-in). Its Compose file runs the app and a worker that calls it:
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - '${APP_PORT:-8000}:8000'
+  worker:
+    build: .
+    command: ['./worker']
+    environment:
+      WEBHOOK_URL: https://api.local.example.com/webhooks/jobs
+```
+
+Nothing here depends on the stack. Any service that reads a URL naming a host Nearhost serves, from its `environment`, its `env_file` files, or the project’s `.env` or `.env.local` when it mounts the project directory, has the same three problems.
+
+## Reaching the host
+
+Nearhost puts `api.local.example.com` in your machine’s [hosts file](/docs/concepts/the-hosts-file/), pointing at loopback. A container does not read that file, and inside it loopback is the container itself. So the name resolves to nothing, to the public internet, or, where DNS points it at 127.0.0.1, back to the container.
+
+Map the name to the host with `extra_hosts`. `host-gateway` is Docker’s name for the host’s address as seen from a container:
+
+```yaml
+services:
+  worker:
+    extra_hosts:
+      - 'api.local.example.com:host-gateway'
+```
+
+List every name the service calls. `nearhost doctor` reports a service that calls a name without this mapping, as `docker.host-gateway`, and its fix is this snippet for the names it found.
+
+## Trusting the local CA
+
+Nearhost’s certificates are signed by its own local certificate authority. Your system trusts it, but a container has its own trust store, so the call fails with a certificate error.
+
+Mount the root certificate into the container and point the service at it. The certificate is at `pki/authorities/local/root.crt` under Nearhost’s `caddy` folder, which is `~/Library/Application Support/nearhost/caddy` on macOS and `~/.local/share/nearhost/caddy` on Linux, or `$XDG_DATA_HOME/nearhost/caddy` on either when that is set to an absolute path. `nearhost doctor` prints the path on your machine. Earlier versions kept it under `~/.config/nearhost/caddy`, or `$XDG_CONFIG_HOME/nearhost/caddy` when that variable was set. Nearhost 0.8.0 moves that folder the first time it runs while no other Nearhost is running. After that, a `NEARHOST_CA_CERT` set for an earlier version points at a file that is gone, so set it to the new path, which `nearhost doctor` prints. Mount only `root.crt`, never the folder: the key is beside it. The doctor’s snippet, for a Node service:
+
+```yaml
+services:
+  worker:
+    environment:
+      NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/nearhost.crt
+    volumes:
+      - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
+```
+
+Each developer sets `NEARHOST_CA_CERT` to the certificate’s path in their shell profile, or in `.env` when the project does not commit `.env`, so the Compose file holds no one’s path. Compose reads only `.env` and the shell, not `.env.local`. Until the variable is set, every `docker compose` command that reads this Compose file stops with `set NEARHOST_CA_CERT to Nearhost's root certificate`, so nobody runs the service without the certificate by mistake.
+
+`NODE_EXTRA_CA_CERTS` adds the certificate to Node’s own. `SSL_CERT_FILE`, `AWS_CA_BUNDLE` and `REQUESTS_CA_BUNDLE` replace the default bundle instead, so point them at a bundle that includes the certificate, or have the image run `update-ca-certificates`.
+
+`nearhost doctor` reports a service that calls a name Nearhost serves and does not trust the certificate, as `docker.ca`. A service that sets `SSL_CERT_FILE`, `NODE_EXTRA_CA_CERTS`, `AWS_CA_BUNDLE`, `REQUESTS_CA_BUNDLE` or `CURL_CA_BUNDLE`, or mounts the certificate’s path, counts as set up. The doctor checks only that the setting is there, not that the runtime trusts the certificate, so a worker in another language needs the setting its runtime reads.
+
+## Being let in
+
+Nearhost serves its projects only to this machine. A request from anywhere else is dropped without an answer. On Linux, a container’s request comes from its address on a Docker network, not from loopback, so Nearhost drops it.
+
+`docker_clients: true` in the project’s [`.nearhostrc`](/docs/reference/nearhostrc/#docker-clients) serves the project to the networks the Docker daemon has on this machine as well. Nearhost asks Docker for them when the project starts, and again every 30 seconds while it runs, so a network Compose creates later is let in too. It finds Docker through `DOCKER_HOST` or the current docker context, then the usual sockets of Docker Desktop, OrbStack, Rancher Desktop, Colima and Podman. From Nearhost 0.8.0. Until Docker first answers, it accepts requests from `172.16.0.0/12`, the private block most of Docker’s default networks come from, which can also take in other machines on that block your machine can reach. The project’s log says which networks it accepts requests from.
+
+* It works only for a project on this machine. On a project on a server, the file is an error.
+* It always needs your approval, as a real domain does. See [Approval](/docs/reference/nearhostrc/#approval).
+* Other projects stay loopback-only. Only the project that opts in is served to Docker’s networks.
+
+With no `.nearhostrc` yet, `nearhost export` writes one from the project’s current setup, and you add the line to it.
+
+Docker Desktop on macOS already delivers container requests from 127.0.0.1, so this matters on Linux. On a Mac, the project is reached without it. Keep it in a committed `.nearhostrc` if anyone on the team uses Linux.
+
+`nearhost doctor` reports a project whose containers call a name it serves without the opt-in, as `docker.clients`. It is a warning on Linux, and only a note on macOS.
+
+## The finished Compose file
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - '${APP_PORT:-8000}:8000'
+  worker:
+    build: .
+    command: ['./worker']
+    environment:
+      WEBHOOK_URL: https://api.local.example.com/webhooks/jobs
+      NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/nearhost.crt
+    extra_hosts:
+      - 'api.local.example.com:host-gateway'
+    volumes:
+      - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
+```
+
+Approve `api.local.example.com` and `docker_clients` when you add the project, or when Nearhost asks after the file changes. See [Approval](/docs/reference/nearhostrc/#approval). Then restart the worker with `docker compose up -d worker`.
+
+## Check it works
+
+Run `nearhost doctor`. After the machine checks, it lists what it finds in each enabled project. For the example before any of the fixes, with `docker_clients` not yet in its `.nearhostrc`, on a Mac, these are the first lines of its three findings, without their fixes:
+
+```text
+warn  shop             worker calls a name Nearhost serves, and does not trust Nearhost's root certificate
+warn  shop             worker uses api.local.example.com, which a container resolves to itself or to the public internet, not to Nearhost
+info  shop             a container calls a name Nearhost serves, and Nearhost does not accept requests from Docker's network
+```
+
+Under each, a `fix:` line says what to do, followed by the snippet to paste. These are `docker.ca`, `docker.host-gateway` and `docker.clients`, and `nearhost doctor --json` gives each finding’s `id`. On Linux the last one is a warning too. When the project is fixed, none of them is shown. See [nearhost doctor](/docs/reference/cli/#nearhost-doctor).
+
+The doctor only reads the files. To see the call work, run the worker and watch the request arrive in Nearhost.
+
+## When a public tunnel is still the right tool
+
+This is for services you run yourself, on this machine. A webhook from a real provider, such as a payment or source control service, comes from its servers, which cannot reach your laptop. Use a public tunnel, such as ngrok, for that. See [ngrok loads the page, but assets point at localhost](/docs/guides/ngrok-assets-on-localhost/).
+
+# Forward several ports over SSH without retyping -L
+
+> Ways to reach a remote app, its asset server and its other ports from your laptop over SSH, from stacked -L flags to forwards added to a running connection, and what each leaves for you to do.
+
+A web project on a remote machine rarely uses one port. There is the app, the asset dev server, perhaps a mail catcher or a queue dashboard, and the next project wants the same set again. Typing one `-L` flag per port works until the connection drops, a port changes, or a second project needs a port the first one already holds.
+
+## Stack the flags on one connection
+
+One `ssh` command takes as many `-L` flags as you need. `-N` keeps it to forwarding, with no remote shell:
+
+```sh
+ssh -N -L 8000:localhost:8000 -L 5173:localhost:5173 -L 8025:localhost:8025 myserver
+```
+
+Each flag reads `local port:host:remote port`, and the host is resolved on the server, so `localhost` means the server itself. Your laptop listens on loopback only, unless you set `GatewayPorts`.
+
+## Put them in your SSH config
+
+`LocalForward` lines in `~/.ssh/config` set the same forwards whenever you connect:
+
+```plaintext
+Host myserver
+  LocalForward 8000 localhost:8000
+  LocalForward 5173 localhost:5173
+  LocalForward 8025 localhost:8025
+  ExitOnForwardFailure yes
+  ServerAliveInterval 15
+```
+
+`ExitOnForwardFailure` makes `ssh` stop when a port is taken on your laptop, rather than connect without that forward. `ServerAliveInterval` makes a dead connection end, after about 45 seconds with the default `ServerAliveCountMax` of 3, instead of hanging. The catch: every interactive `ssh myserver` now tries the same ports, and the second one fails while the first is open. A separate `Host` alias just for the forwards avoids that.
+
+## Add forwards to a running connection
+
+With connection sharing, one master connection carries every session to a server, and `ssh -O` changes its forwards while it runs:
+
+```plaintext
+Host myserver
+  ControlMaster auto
+  ControlPath ~/.ssh/cm-%C
+  ControlPersist 10m
+```
+
+```sh
+ssh -O forward -L 5173:localhost:5173 myserver   # add a forward
+ssh -O cancel -L 5173:localhost:5173 myserver    # remove it
+```
+
+No reconnect, and no restart of the forwards already open. Nothing re-adds them if the master exits, though.
+
+## Use one SOCKS proxy instead
+
+`ssh -N -D 1080 myserver` opens a SOCKS proxy, and a browser set to use it reaches every port on the server’s network. But Chrome and Firefox send `localhost` straight to your own machine, never through the proxy, so a dev server that listens only on the server’s loopback stays out of reach. It also proxies every site the browser opens, unless you set it per profile.
+
+## What every plain-SSH option leaves to you
+
+* **Reconnecting.** When the connection drops, the forwards go with it. `autossh` or a shell loop brings back a fixed set.
+* **Port clashes.** Two projects that both use 5173 cannot both forward it to 5173 on your laptop. Change one project’s port, or forward it to another local port where the page does not hard-code it.
+* **The address.** Each app is `http://localhost:<port>`. Cookies ignore the port, so every project shares one cookie jar and signing in to one can sign you out of another, and an OAuth callback or cookie domain set up for a real name does not match. See [HTTPS on a local dev domain](/docs/guides/https-on-a-local-dev-domain/).
+
+## How Nearhost does it
+
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
+Nearhost uses the same OpenSSH mechanism as above: one supervised master per server, with forwards added and cancelled with `-O forward` and `-O cancel` as projects start and stop. On top of that:
+
+* **It finds the ports.** It reads them from the project’s `.env`, and presets add Docker Compose, Vite and Laravel Sail. You choose which port is the web app, which need the same port on your laptop, and which to ignore.
+* **It reconnects.** If the master exits, Nearhost starts it again with backoff and puts every forward back before the server shows as connected.
+* **It warns about clashes** before they happen, and suggests a free port when the port comes from a variable.
+* **It gives each project a name.** The web port is served at a trusted `https://myapp.test`, so you stop tracking which port is which project.
+
+See [SSH transport](/docs/concepts/ssh-transport/) for the exact commands it runs, and [Routes and roles](/docs/concepts/routes-and-roles/) for how ports become routes.
+
+Checked against
+
+These, on 2026-10-20:
+
+* [OpenSSH: ssh(1)](https://man.openbsd.org/ssh), for `-L`, `-N`, `-D` and `-O`
+* [OpenSSH: ssh_config(5)](https://man.openbsd.org/ssh_config), for `LocalForward`, `GatewayPorts`, `ExitOnForwardFailure`, `ServerAliveInterval` and the `Control*` options
+* [Chromium: proxy support](https://chromium.googlesource.com/chromium/src/+/HEAD/net/docs/proxy.md), for the implicit `localhost` bypass
+
+If something here no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
+
+# HTTPS on a local dev domain
+
+> Serve local development at a trusted HTTPS name, such as myapp.test or local.myapp.com, so secure-context browser APIs and Secure cookies work, and choose which kind of name to use.
+
+Note
+
+Names under your own domain, such as `local.myapp.com`, need Nearhost 0.6.0 or later. `.test` names work on every version. Run `nearhost update` to get the latest. See [CLI](/docs/reference/cli/#nearhost-update).
+
+Some things in local development only work over HTTPS. On your laptop you rarely notice, because browsers treat `http://localhost` as secure. Once you browse to the dev server by its address or by a name instead of `localhost`, which is usual when it runs on another machine, plain HTTP stops being enough.
+
+## What needs HTTPS
+
+Browsers give some features only to a secure context: a page served over HTTPS, or from `localhost`, `127.0.0.1` or a `*.localhost` name. On `http://192.168.1.20:8080` or `http://myapp.test`, these are missing:
+
+* **Service workers.** `navigator.serviceWorker` is undefined, so offline support and push notifications cannot be tested.
+* **The clipboard.** `navigator.clipboard` is undefined, so copy buttons fail.
+* **Web Crypto.** `crypto.subtle` is undefined, which breaks libraries that hash or sign in the browser.
+* **The camera and microphone.** `navigator.mediaDevices` is undefined.
+* **Passkeys and geolocation.** WebAuthn and the Geolocation API refuse to run.
+
+Cookies have the same rule. Browsers do not set a cookie marked `Secure` over plain HTTP. Chrome and Firefox make an exception for `localhost`, but Safari does not, so test secure cookies over HTTPS. That rules out `SameSite=None` cookies, which must be `Secure`, and the `__Host-` and `__Secure-` cookie prefixes. If your app sets these in production, it behaves differently in development without HTTPS.
+
+A self-signed certificate is not a fix. The browser warns on every visit, and some features, such as service workers, refuse to load over a certificate it does not trust.
+
+## Choosing a name
+
+You need a name the browser resolves to the dev server, and a certificate for it that the browser trusts.
+
+**A `.test` name, such as `myapp.test`.** `.test` is reserved for testing and never exists on the public internet, so it cannot clash with a real site. It is Nearhost’s default, and works with no setup. Some third-party services, such as sign-in providers, may not accept a `.test` callback, or do not say whether they do.
+
+**A name under your own domain, such as `local.myapp.com`.** It is shaped like production, so cookie scoping, cross-subdomain requests and provider settings behave as they do on staging. It needs no DNS record. Two things to know:
+
+* Cookies your production site sets for the whole domain, with `Domain=myapp.com`, are sent to `local.myapp.com` too, if your browser has them.
+* Nearhost writes the name to `/etc/hosts` only while the project is enabled. Disable the project, and the name reaches the real site again, if there is one. See [Main name](/docs/reference/config/#main-name).
+
+Avoid `.dev`, which is a real top-level domain whose every name browsers force to HTTPS, and `.local`, which macOS and many Linux systems resolve with multicast DNS, and which can be slow to look up.
+
+## Setting it up
+
+If the dev server runs on your laptop, a tool such as mkcert and a line in `/etc/hosts` are enough. You make a local certificate authority, trust it, issue a certificate for the name, and point the dev server at it.
+
+If the dev server runs on another machine, Nearhost does all of this on your laptop. It creates a local certificate authority the first time it starts, which you trust once with your password, and it issues a certificate for each project’s name. Its proxy serves the name over HTTPS and forwards to the dev server over SSH. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/).
+
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
+Add the project with the name you chose:
+
+```sh
+nearhost add --server mini '~/code/myapp' --alias local.myapp.com
+```
+
+Leave out `--alias` to use `myapp.test`. Then tell the app it lives at the HTTPS name: set its public URL, such as `APP_URL`, and trust the proxy’s `X-Forwarded-Proto` header. The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) shows both for Laravel. Single-port dev servers also need the name allowed: `allowedDevOrigins` in Next.js, `server.allowedHosts` in Vite. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/).
+
+## Sign-in providers
+
+Sign-in providers are the most common reason to want a real HTTPS name. The guides set one up end to end:
+
+* [WorkOS sign-in](/docs/guides/workos-sign-in/)
+* [Clerk sign-in](/docs/guides/clerk-sign-in/)
+* [Cognito sign-in](/docs/guides/cognito-sign-in/)
+
+If the callback is what fails, see [SSO callback fails on a remote dev server](/docs/guides/sso-callback-on-a-remote-dev-server/).
+
+## When ngrok is still the right tool
+
+A Nearhost name only works on your laptop. Its proxy answers no other machine. Use a public tunnel, such as ngrok, when:
+
+* **Another device needs the page,** such as your phone, to test a camera or a service worker on mobile.
+* **Someone outside needs the link,** such as a colleague or a client.
+* **A service sends webhooks,** from servers that cannot reach your laptop.
+
+# ngrok loads the page, but assets point at localhost
+
+> Why a dev site behind ngrok still loads its scripts, redirects or hot reload from localhost or http://, how to patch each one, and how to skip the tunnel when the dev server runs on another machine.
+
+You put your dev server behind ngrok and open the tunnel’s address. The HTML arrives, and then something still points somewhere else: the scripts and styles try `localhost`, a redirect takes you to `http://localhost:8000`, or the page never updates when you edit a file. Sometimes the dev server refuses the request outright.
+
+The tunnel did its job. It forwarded the request. The problem is that the page and the dev server still describe themselves with the addresses in their own config, and those addresses mean nothing in the browser that opened the tunnel.
+
+## Why it happens
+
+Three different things build URLs, and each one gets it wrong in its own way.
+
+### The asset dev server
+
+A backend framework that uses Vite renders the HTML itself, and the page loads its scripts from the Vite dev server on a separate port. In Laravel, the `@vite` directive reads the `public/hot` file, which `laravel-vite-plugin` writes when `npm run dev` starts. That file holds the dev server’s own address, such as `http://localhost:5173` under Sail or `http://[::1]:5173` elsewhere, and every script tag on the page points there.
+
+Your browser resolves that address on your laptop. If the dev server runs on another machine, nothing listens there, so scripts and styles fail to load and hot reload never connects. Even where something does answer, the Vite dev server only allows requests from the origins `laravel-vite-plugin` lists: `localhost`, `*.test`, `*.localhost` and your `APP_URL`. An ngrok address is none of them unless you put it in `APP_URL`.
+
+Rails, Django and other backends that pair with Vite work the same way.
+
+### Links and redirects
+
+Most frameworks build absolute URLs from the request, or from a URL in their config.
+
+* **From the request.** ngrok ends HTTPS at its edge and forwards to your dev server, adding `X-Forwarded-Proto: https`. A framework that does not trust the proxy ignores that header and builds `http://` links and redirects. If you started ngrok with `--host-header=rewrite`, the app sees the local address’s hostname, usually `localhost`, and builds links to that.
+* **From config.** Anything built from `APP_URL` or a similar setting, such as emails, queued jobs, or an OAuth redirect URI, uses whatever that setting says, usually `http://localhost:8000`.
+
+### Host checks in single-port dev servers
+
+Next.js and plain Vite serve pages, assets and hot reload from one port, so their assets use relative paths. What gets in the way is the dev server’s host check:
+
+* **Next.js** serves the page, assets included. Recent versions block its dev resources, hot reload included, from hostnames it was not told about, and log `Blocked cross-origin request to Next.js dev resource` on the server. The page loads, but edits never show.
+* **Vite** refuses every request whose `Host` it does not recognise, the page included, and answers with `Blocked request. This host ("…") is not allowed.`, naming the host. Nothing loads until the host is in `server.allowedHosts`.
+
+## Patching it with ngrok
+
+Each patch fixes one of the three.
+
+* **Assets.** Stop the dev server, which deletes `public/hot`, and run `npm run build`. Laravel then serves the built files from the app’s own origin. You lose hot reload. On other backends, build the assets or tunnel the Vite port. Keeping hot reload means a second tunnel for port 5173, with Vite told to advertise that tunnel’s address through `server.origin` and `server.hmr`, and that tunnel’s hostname added to `server.allowedHosts`. Once `server.origin` is set, Laravel’s Vite plugin allows only that origin through CORS, so also set `server.cors.origin` to the app tunnel’s address, or the browser blocks the scripts.
+* **Links and redirects.** Set `APP_URL` to the tunnel’s address and make the framework trust the proxy. The [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) shows the one-line `trustProxies` change for Laravel. If the tunnel name changes each time you start it, so does `APP_URL`.
+* **Host checks.** Add the tunnel’s hostname to `allowedDevOrigins` in `next.config.ts`, or to `server.allowedHosts` in Vite’s config.
+
+## How Nearhost avoids it
+
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
+When the dev server runs on another machine, Nearhost serves it on your laptop at a name such as `https://myapp.test`, with a trusted certificate, over SSH. Nothing is public, and the name stays the same every time.
+
+* **Assets.** A `loopback` route forwards the Vite port, so `http://localhost:5173` in your browser reaches port 5173 on the remote machine. `.test` names are already on the Vite dev server’s allowed origins. Under Laravel Sail, Nearhost proposes the route for you. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/).
+* **Links and redirects.** The proxy passes the `Host` header through unchanged and sets `X-Forwarded-Proto: https`. Set `APP_URL` to the Nearhost name once, and trust the proxy as above.
+* **Host checks.** Add the Nearhost name to `allowedDevOrigins` or `server.allowedHosts` once. It does not change between runs.
+
+### Vite on the IPv6 loopback address
+
+A Vite dev server that listens on `::1` makes `laravel-vite-plugin` write `http://[::1]:5173` to `public/hot`. A loopback forward answers on both `127.0.0.1` and `[::1]`, so that works as it is. This needs Nearhost 0.7.0 or later and a laptop with the IPv6 loopback, which every Mac and almost every Linux machine has. Otherwise, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
+
+## The guides
+
+The sign-in guides walk through all of this for one app each, at a name under your own domain:
+
+* [WorkOS sign-in](/docs/guides/workos-sign-in/), with Laravel
+* [Clerk sign-in](/docs/guides/clerk-sign-in/), with Next.js
+* [Cognito sign-in](/docs/guides/cognito-sign-in/), with Laravel
+
+## When ngrok is still the right tool
+
+Nearhost only answers your own laptop. Keep a tunnel for:
+
+* **Webhooks.** A payment provider, an auth provider or GitHub sends them from its own servers, which cannot reach your laptop.
+* **Sharing a link.** A colleague, a client, or your phone cannot open a Nearhost name.
+
+You can run both: Nearhost for your own browser, and a tunnel for the one endpoint that the outside world has to reach.
+
+# SSO callback fails on a remote dev server
+
+> Why an SSO or OAuth sign-in callback fails, or lands on localhost or the wrong origin, when your dev server runs on a server or VM, and how to give it one HTTPS address that works.
+
+Note
+
+The fix on this page uses a name under your own domain, which needs Nearhost 0.6.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+
+Sign-in works when the app runs on your laptop. Move the dev server to a server or a VM, and it falls apart: the provider shows a redirect URI error, or you sign in and land on `localhost` with nothing there, or you come back to the app and it says the sign-in state is invalid.
+
+## Why it happens
+
+Sign-in with an SSO or OAuth provider is a round trip through your browser. The app sends the browser to the provider with a callback URL. The provider checks that URL against the list you registered, and after sign-in sends the browser back to it. The callback has to be right three times over: the app has to send it, the provider has to accept it, and your browser has to reach the app at it.
+
+A remote dev server breaks one of those, depending on the address you use.
+
+* **`http://localhost`.** Most providers accept it for development, and the app sends it happily. But your browser resolves `localhost` on your laptop, so after sign-in it lands where nothing is listening. Forwarding the port with `ssh -L` fixes that for one app.
+* **The server’s own address,** such as `http://192.168.1.20:8080`. The browser reaches it, but providers that allow plain HTTP usually allow it only for `localhost`. Cognito, for example, requires HTTPS for every other callback.
+* **A tunnel,** such as ngrok. It gives you HTTPS, but each new tunnel name is one more callback to register, and the app still builds its callback from its own config. If that says `http://localhost`, or the app does not trust the tunnel and builds `http://`, the URL it sends does not match the one you registered. See [ngrok loads the page, but assets point at localhost](/docs/guides/ngrok-assets-on-localhost/).
+
+There is a fourth failure that looks the same. Most integrations store a state value in a session cookie when sign-in starts, and check it on the callback. If you start sign-in at one address and come back at another, the cookie does not come with you, and the callback is refused. In Laravel, `laravel/workos` answers with a 403, and Socialite throws an `InvalidStateException`.
+
+## The fix: one HTTPS address everywhere
+
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
+Pick one address and use it in all three places: the URL your browser opens, the callback the app sends, and the callback the provider has registered. It has to be HTTPS, and your browser has to reach the remote app at it.
+
+Nearhost gives you that address. It serves the remote dev server on your laptop at a name you choose, such as `https://local.myapp.com`, with a trusted certificate, over SSH. Add the project with that name:
+
+```sh
+nearhost add --server mini '~/code/myapp' --alias local.myapp.com
+```
+
+Then, on the app and provider side:
+
+1. **Register the callback** with the provider, on that name: for example `https://local.myapp.com/auth/callback`. Use the provider’s development or staging environment.
+2. **Set the app’s public URL** to `https://local.myapp.com`, in `APP_URL` or whatever your framework reads, so the callback the app sends matches.
+3. **Trust the proxy.** Nearhost ends HTTPS on your laptop and sets `X-Forwarded-Proto: https`. A framework that ignores the header builds `http://` links and redirects. In Laravel, that is one `trustProxies` line; the [WorkOS guide](/docs/guides/workos-sign-in/#set-up-the-app) shows it.
+4. **Start sign-in at the same name.** Open `https://local.myapp.com`, not the server’s address or an old tunnel, so the state cookie comes back.
+
+## The guides
+
+Each provider has its own setup, and its own way of failing. The guides cover them step by step:
+
+* [WorkOS sign-in](/docs/guides/workos-sign-in/): the redirect URI on the **Redirects** tab, with Laravel and `laravel/workos`.
+* [Clerk sign-in](/docs/guides/clerk-sign-in/): a development instance needs no callback registered at all, and what breaks is the dev server’s hot reload. With Next.js.
+* [Cognito sign-in](/docs/guides/cognito-sign-in/): **Allowed callback URLs** on the app client, with Laravel and Socialite.
+
+For other providers, such as Auth0, Okta or Google, the same four steps apply. Find where the provider lists allowed callback or redirect URLs, and add the HTTPS one.
+
+## When ngrok is still the right tool
+
+Nearhost is local-only. The name works in your browser on your laptop, and nowhere else. The sign-in round trip goes through your browser, so it does not need a tunnel. Keep one for:
+
+* **Webhooks.** A provider that sends events to your app does so from its own servers, which cannot reach your laptop.
+* **Sharing a link.** A colleague or a client cannot open `local.myapp.com` from their machine.
+
+# Vite hot reload fails over SSH port forwarding
+
+> Why Vite's scripts or hot reload fail when the dev server runs on another machine and you reach it through ssh -L, which port each setup has to forward, and how to keep it working without retyping forwards.
+
+You run `npm run dev` on a server or a VM and forward a port to your laptop with `ssh -L`. The page loads, but edits never show up. Or the page loads without its styles and scripts. The browser console says `[vite] failed to connect to websocket`, or `[vite] server connection lost. Polling for restart...`, or the page is replaced by `Blocked request. This host ("…") is not allowed.`
+
+The first two mean the browser is asking for an address the forward does not cover. Which address depends on whether Vite serves the page itself or sits beside a backend. The third means the forward works: the request reached Vite, and Vite refused the name you used, which `server.allowedHosts` fixes.
+
+## Why it happens
+
+Vite’s hot reload client opens a WebSocket to the host and port its own script came from, unless `server.ws` says otherwise (`server.hmr` in older Vite). So hot reload works wherever the scripts load, and fails wherever they do not. If your config sets a separate WebSocket port, such as `server.ws.clientPort`, forward that port too.
+
+### Vite serves the page
+
+A plain Vite app, or a framework built on it, serves the page, its scripts and the hot reload socket from one port. Forward that port and the browser reaches all three:
+
+```sh
+ssh -L 5173:localhost:5173 myserver
+```
+
+Open `http://localhost:5173` and hot reload works. Two things still break it:
+
+* **Opening it by another name.** Vite checks the `Host` header and refuses names it does not know, the page included, with `Blocked request. This host ("…") is not allowed.` `localhost`, `*.localhost` names and IP addresses are always allowed. For any other name, add it to `server.allowedHosts` in `vite.config.js`.
+* **The connection dropping.** When `ssh` exits, so does the forward. The console says `server connection lost`, and nothing reloads until you run `ssh -L` again.
+
+### Vite sits beside a backend
+
+Laravel, Rails, Django and other backends render the HTML themselves, and the page loads its scripts from the Vite dev server on a second port, at an address such as `http://localhost:5173`. In Laravel, `laravel-vite-plugin` writes that address to `public/hot` when `npm run dev` starts, and every script tag on the page uses it.
+
+Forwarding only the backend’s port loads the HTML, and then the scripts fail, because your browser asks for `localhost:5173` on your laptop and nothing listens there. Forward the Vite port too, to the same port number on your laptop:
+
+```sh
+ssh -L 8000:localhost:8000 -L 5173:localhost:5173 myserver
+```
+
+The number has to match on both ends. `-L 3000:localhost:5173` reaches Vite, but the page still asks for 5173. If you run several projects, each needs its own Vite port, because two forwards cannot share 5173 on your laptop.
+
+## Keeping it working with plain SSH
+
+* **List the forwards in `~/.ssh/config`,** so one `ssh myserver` sets them all up:
+
+  ```plaintext
+  Host myserver
+    LocalForward 8000 localhost:8000
+    LocalForward 5173 localhost:5173
+    ServerAliveInterval 15
+  ```
+
+* **Reconnect when it drops,** with `autossh` or a loop around `ssh -N`. With `ServerAliveInterval 15`, `ssh` notices a dead connection after about 45 seconds instead of hanging.
+
+* **Add each new name** to `server.allowedHosts` if you open the app by a name other than `localhost` or a `*.localhost` name.
+
+## How Nearhost handles it
+
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
+Nearhost serves the project at a name such as `https://myapp.test`, over one SSH connection per server that it reconnects by itself, putting every forward back.
+
+* **Vite serves the page.** Give its port the `web` role. The proxy passes the hot reload WebSocket through on the same origin. Add the name to `server.allowedHosts` once; with the `nearhost/vite` preset enabled, Nearhost shows the exact lines.
+* **Vite sits beside a backend.** Give the Vite port the `loopback` role. Nearhost forwards it to the same port number on your laptop, so the page’s `http://localhost:5173` reaches the remote dev server. Under Laravel Sail, discovery proposes this route for you. The page at `https://myapp.test` now loads its scripts from another origin, and Vite’s default CORS policy allows only `localhost` pages. `laravel-vite-plugin` also allows `*.test` names and your `APP_URL`; with another integration, add the name to `server.cors.origin`.
+* **Several projects.** Nearhost warns about two projects that want the same loopback port before they clash, and suggests a free one when the port comes from a variable.
+
+A loopback forward answers on both `127.0.0.1` and `[::1]`, so it also works when Vite listens on `::1` and `public/hot` says `http://[::1]:5173`. This needs Nearhost 0.7.0 or later and a laptop with the IPv6 loopback, which every Mac and almost every Linux machine has. Otherwise, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
+
+For the details, see [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/) and [Routes and roles](/docs/concepts/routes-and-roles/).
+
+Checked against
+
+These, on 2026-10-20:
+
+* The Vite 8.3 hot reload client and host check, in `vite/dist/client/client.mjs` and `vite/dist/node`
+* [Vite: server options](https://vite.dev/config/server-options.html), for `server.ws`, `server.hmr`, `server.cors` and `server.allowedHosts`
+* [OpenSSH: ssh_config(5)](https://man.openbsd.org/ssh_config), for `LocalForward`, `ServerAliveInterval` and `ServerAliveCountMax`
+
+If something here no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
+
+# WorkOS sign-in on a remote dev server
+
+> Give a WorkOS AuthKit app an HTTPS redirect URI in local dev, such as https://local.myapp.com/authenticate, when the dev server runs on another machine.
+
+Note
+
+Needs Nearhost 0.6.0 or later, which lets a project’s main name be a domain that does not end in `.test`. A `.nearhostrc` that sets only that name, as below, needs 0.7.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+
+New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server](/docs/getting-started/add-a-server/) first.
+
+This guide gets WorkOS AuthKit sign-in working at `https://local.myapp.com` while your Laravel app runs on another machine. The worked example uses the `laravel/workos` package from the Laravel starter kits, but the WorkOS and Nearhost steps are the same for any stack.
+
+## The symptom
+
+WorkOS sends the browser back to your app at a redirect URI you register in its dashboard. It has to match the URI your app sends exactly, including `https://` and the path. The staging environment accepts `http://localhost`, which is fine when the app runs on your laptop. When it runs on a server or a VM, `localhost` in your browser is not where the app is.
+
+A tunnel such as ngrok gets the page on screen, but often not much more. The app still builds its links and assets from its own idea of where it lives, so redirects and scripts point back at `localhost` or at `http://`. Each tunnel name is one more redirect URI to register, and WorkOS’s advice is to use a stable custom domain if you must use a tunnel at all.
+
+Nearhost serves the remote app on your laptop at a name you choose, with a trusted certificate, over SSH. The browser sees one stable HTTPS origin, and that is the origin you register with WorkOS.
+
+## Pick a name
+
+Use a name under a domain you own, such as `local.myapp.com`. It needs no DNS record: Nearhost points it at your laptop through `/etc/hosts` while the project is enabled. When the project is disabled, the name resolves as it normally would.
+
+A real-domain name keeps the redirect URI shaped like the one in production. WorkOS’s documentation does not say whether it accepts `.test` names, so this guide uses a domain you own.
+
+## Add the project
+
+On the command line, give the name with `--alias`:
+
+```sh
+nearhost add --server mini '~/code/myapp' --alias local.myapp.com
+```
+
+```text
+Added myapp on mini at https://local.myapp.com
+Start it with `nearhost up`.
+```
+
+A name that does not end in `.test` needs your approval, because it can hide the real site. Typing it with `--alias` counts as approval.
+
+To keep the name with the project, put it in a [`.nearhostrc`](/docs/reference/nearhostrc/) in the project’s root:
+
+```yaml
+version: 1
+alias: local.myapp.com
+```
+
+Run `nearhost add` without `--alias`, and it asks before using the name, since you did not type it:
+
+```text
+$ nearhost add --server mini '~/code/myapp'
+This project asks for these, which need your approval:
+  local.myapp.com on port 8080 (a real domain)
+Approve these? [y/N]
+```
+
+See [Add a project](/docs/getting-started/add-a-project/) for the rest of the add flow, and [Main name](/docs/reference/config/#main-name) for how the name is approved and written to the hosts file.
+
+## Set up WorkOS
+
+Do this in the WorkOS staging environment, which is meant for development. Its API keys, users and settings are separate from production’s.
+
+1. In the dashboard, open **Applications**, then your application, then the **Redirects** tab.
+2. Add the redirect URI `https://local.myapp.com/authenticate`, and make it the default. With `laravel/workos` the callback route is `/authenticate`. No trailing slash.
+3. Set the sign-in endpoint, which WorkOS’s docs also call the initiate login URI, to `https://local.myapp.com/login`. AuthKit sends people there when sign-in starts outside your app, such as from a password reset or an invitation link.
+4. On the same tab, add the sign-out URI `https://local.myapp.com/` and make it the default. Without a sign-out URI, WorkOS shows an error after sign-out, unless the app still has the older App homepage URL set. That setting is deprecated, and only kept as a fallback for existing apps.
+
+Then copy the staging environment’s client ID and API key into the app’s `.env`, after `APP_URL`, which the redirect URL builds on:
+
+```ini
+APP_URL=https://local.myapp.com
+WORKOS_CLIENT_ID=your-client-id
+WORKOS_API_KEY=your-api-key
+WORKOS_REDIRECT_URL="${APP_URL}/authenticate"
+```
+
+These are the names the starter kits read in `config/services.php`.
+
+## Set up the app
+
+`APP_URL` is set to the new name above, so the redirect URL follows it. If `APP_URL` is already further down the file, move it above `WORKOS_REDIRECT_URL`, which reads it.
+
+If you have cached the config, run `php artisan config:clear`.
+
+Nearhost’s proxy ends HTTPS on your laptop and passes plain HTTP to the server, with `X-Forwarded-Proto: https`. Laravel ignores that header until it trusts the proxy, so it thinks the request was `http://`. The WorkOS callback is unaffected, because `laravel/workos` reads it from `WORKOS_REDIRECT_URL`. What goes wrong is everything Laravel builds from the request: `route()` and `url()` links, the redirect to the dashboard after sign-in, and `asset()` URLs.
+
+The starter kit’s `bootstrap/app.php` already has a `withMiddleware` closure. Add one line inside it (Laravel 11 and later):
+
+```php
+->withMiddleware(function (Middleware $middleware): void {
+    $middleware->trustProxies(at: '*');
+
+
+    // The lines already there stay as they are.
+})
+```
+
+`'*'` trusts the forwarded headers from any address. If this file also runs in production behind a known load balancer, list that load balancer’s addresses plus `127.0.0.1`, or the Docker network’s gateway under Sail, instead, or read the list from an environment variable. Nearhost’s forward arrives from `127.0.0.1`, or from the Docker network’s gateway under Sail, so leaving it out stops Laravel trusting it and brings back `http://` links.
+
+If the page loads its scripts from Vite at `http://localhost:5173`, that port needs a `loopback` route so your browser can reach it. See [Dev servers and hot reload](/docs/concepts/dev-servers-and-hot-reload/). If `public/hot` says `http://[::1]:5173` instead, the forward answers there too from Nearhost 0.7.0. With an older Nearhost, see [Vite on `[::1]`](/docs/concepts/dev-servers-and-hot-reload/#vite-on-1).
+
+On another stack the idea is the same. Set the app’s public URL to `https://local.myapp.com`, and tell the framework to trust `X-Forwarded-Proto` from the proxy, so it builds `https://` links and the callback URL it sends to WorkOS matches the one you registered.
+
+## Check it works
+
+Start the project with `nearhost up`, or from the interface, and open `https://local.myapp.com/login`. You should land on the AuthKit sign-in page, and after signing in come back to `https://local.myapp.com/authenticate` and on to the dashboard.
+
+When it does not:
+
+* **WorkOS shows an error instead of the sign-in page.** Usually the redirect URI your app sent is not on the Redirects tab of the environment whose keys you use. Compare them character by character: `https`, the host, `/authenticate`, no trailing slash. Check that `WORKOS_REDIRECT_URL` and `APP_URL` are what you expect, and that the keys are the staging ones.
+* **Links, the redirect after sign-in, or asset URLs use `http://`.** Laravel does not trust the proxy yet. Add `trustProxies` as above. Nearhost redirects `http://` to HTTPS, so a link may still seem to work, but `http://` scripts and styles on an HTTPS page are blocked as mixed content. Look for those warnings in the console.
+* **`/authenticate` returns 403.** `laravel/workos` keeps a state value in the session when you start sign-in, and refuses the callback when the session does not come back with it. Start sign-in at `https://local.myapp.com`, not at another address for the same app, and leave `SESSION_DOMAIN` unset (`null`) or set it to `local.myapp.com`. A cookie set for another domain never reaches this one.
+
+## When you still need ngrok
+
+Nearhost is local-only. The name works in your browser on your laptop, and nowhere else. Use a public tunnel when:
+
+* **WorkOS sends webhooks.** They come from WorkOS’s servers, which cannot reach your laptop. Point the staging webhook endpoint at a tunnel. Or use WorkOS’s events API, where your app fetches events from WorkOS rather than receiving them.
+* **Someone outside needs the link.** A colleague or a client cannot open `local.myapp.com` from their machine.
+
+You can run both: Nearhost for your own browser, and a tunnel just for the webhook endpoint.
+
+Checked against
+
+These pages, on 2026-10-19:
+
+* [Laravel starter kits: WorkOS AuthKit authentication](https://laravel.com/docs/13.x/starter-kits#workos)
+* [Laravel HTTP requests: configuring trusted proxies](https://laravel.com/docs/13.x/requests#configuring-trusted-proxies)
+* [laravel/workos](https://github.com/laravel/workos) and the [React starter kit’s WorkOS branch](https://github.com/laravel/react-starter-kit/tree/workos)
+* [WorkOS: Redirect URIs](https://workos.com/docs/sso/redirect-uris)
+* [WorkOS AuthKit: sessions](https://workos.com/docs/authkit/sessions) (sign-out URIs)
+* [WorkOS: Staging and production environments](https://workos.com/docs/authkit/environments)
+* [WorkOS AuthKit: configure your project](https://workos.com/docs/authkit/vanilla/nodejs/1-configure-your-project)
+* [WorkOS: Redirect URIs for local, staging and production](https://workos.com/blog/redirect-uris-for-local-staging-and-production)
+* [WorkOS: Data syncing with the events API or webhooks](https://workos.com/docs/events/data-syncing)
+
+If a step no longer matches, please [open an issue](https://github.com/nearhost/landing/issues).
