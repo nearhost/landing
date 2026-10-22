@@ -58,7 +58,7 @@ Then it runs the doctor again, and stops when nothing is left that it can fix. I
 Nearhost listens on `~/.nearhost/<id>.sock` on your laptop, where `<id>` is six letters and digits made when Nearhost first runs and kept in `~/.config/nearhost/id`. A config directory copied to another machine gets a new id there, so two laptops never share a socket. On each server it is connected to, it forwards a socket of the same name over its own SSH connection:
 
 ```sh
-ssh -S <sock> -O forward -R <home on the server>/.nearhost/<id>.sock:<socket on the laptop> <host>
+ssh -S <sock> -O forward -R <home on the server>/.nearhost/<id>.sock:<socket on the laptop> -- <host>
 ```
 
 A request is answered for the machine its socket belongs to, so an agent on `mini` sees and proposes only projects on `mini`. sshd creates the socket readable by your account only.

@@ -16,7 +16,7 @@ ssh -N -M -S ~/.config/nearhost/run/<server>.sock \
     -o BatchMode=yes -o ExitOnForwardFailure=yes \
     -o ServerAliveInterval=15 -o ServerAliveCountMax=3 \
     -o ControlPersist=no -o ClearAllForwardings=yes \
-    -o RemoteCommand=none <host>
+    -o RemoteCommand=none -- <host>
 ```
 
 The last three options keep the master to Nearhost's own forwards: `LocalForward` and `RemoteForward` lines in your config are left out, and a `RemoteCommand` is not run. The `local` server needs no transport.
@@ -28,8 +28,8 @@ Discovery and the add forms open a separate connection of their own, so reading 
 Forwards are added and removed on the running master, with no reconnect:
 
 ```sh
-ssh -S <sock> -O forward -L 127.0.0.1:<local>:localhost:<remote> <host>
-ssh -S <sock> -O cancel -L 127.0.0.1:<local>:localhost:<remote> <host>
+ssh -S <sock> -O forward -L 127.0.0.1:<local>:localhost:<remote> -- <host>
+ssh -S <sock> -O cancel -L 127.0.0.1:<local>:localhost:<remote> -- <host>
 ```
 
 The forward always listens on `127.0.0.1`. From Nearhost 0.7.0, a `loopback` route also gets a relay that Nearhost runs on `[::1]:<port>` and passes to that forward, so the port answers on both loopback addresses. On a machine without the IPv6 loopback, it answers on `127.0.0.1` only. A program already listening on `[::1]:<port>` counts as holding the port.
