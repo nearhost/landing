@@ -73,6 +73,8 @@ The shell installer checks the archive against the release's `checksums.txt`. It
 gh attestation verify <file> --repo nearhost/nearhost
 ```
 
+Each archive comes with a software bill of materials, `<archive>.sbom.json`, listing the modules it was built from. The attestation covers the archives, their SBOMs and `checksums.txt`. From Nearhost 0.8.0.
+
 ## Updating
 
 ```sh
