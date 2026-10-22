@@ -58,7 +58,7 @@ export default defineConfig({
             '- [Clerk sign-in on a remote dev server](https://nearhost.dev/docs/guides/clerk-sign-in/)',
             '- [Cognito sign-in on a remote dev server](https://nearhost.dev/docs/guides/cognito-sign-in/)',
           ].join('\n'),
-          // The docs in reading order, not alphabetical: getting started, then guides, then concepts.
+          // The docs in reading order, as the sidebar has them; the guides come last.
           promote: [
             'docs/getting-started/introduction',
             'docs/getting-started/install',
@@ -66,8 +66,9 @@ export default defineConfig({
             'docs/getting-started/add-a-server',
             'docs/getting-started/add-a-project',
             'docs/getting-started/use-a-coding-agent',
-            'docs/guides/**',
             'docs/concepts/**',
+            'docs/reference/**',
+            'docs/troubleshooting/**',
           ],
           // Starlight's heading anchors would add a "Section titled" line under every heading.
           customSelectors: { all: ['.sl-anchor-link'] },
@@ -99,13 +100,13 @@ export default defineConfig({
           label: 'Getting started',
           items: [{ autogenerate: { directory: 'docs/getting-started' } }],
         },
-        { label: 'Guides', items: [{ autogenerate: { directory: 'docs/guides' } }] },
         { label: 'Concepts', items: [{ autogenerate: { directory: 'docs/concepts' } }] },
         { label: 'Reference', items: [{ autogenerate: { directory: 'docs/reference' } }] },
         {
           label: 'Troubleshooting',
           items: [{ autogenerate: { directory: 'docs/troubleshooting' } }],
         },
+        { label: 'Guides', items: [{ autogenerate: { directory: 'docs/guides' } }] },
       ],
     }),
     svelte(),
