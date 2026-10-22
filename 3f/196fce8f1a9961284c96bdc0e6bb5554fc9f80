@@ -1,0 +1,19 @@
+src/content/docs/docs/reference/keyboard-shortcuts.md
+  s_e8c5d245e902d9::t_da9272b06e24b2 56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3f196fce8f1a9961284c96bdc0e6bb5554fc9f80",
+  "prompts": {},
+  "sessions": {
+    "s_e8c5d245e902d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5838b929-4de2-4f9c-a293-db115e94d8e0",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
