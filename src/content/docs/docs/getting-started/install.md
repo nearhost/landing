@@ -41,11 +41,13 @@ The cask removes the quarantine flag from the binary. See [The quarantine flag](
 
 ## From source
 
-With Go 1.26 or later:
+With Go:
 
 ```sh
 go install github.com/nearhost/nearhost/cmd/nearhost@latest
 ```
+
+Nearhost needs Go 1.27.3 or later, the version the release binaries are built with. Go 1.21 to 1.27.2 downloads it first, unless `GOTOOLCHAIN` is set to `local`.
 
 ## npm
 
