@@ -19,6 +19,8 @@ ssh -N -M -S ~/.config/nearhost/run/<server>.sock \
     -o RemoteCommand=none -- <host>
 ```
 
+The control socket is in `run/` in Nearhost's config folder, which is `~/.config/nearhost`, or `$XDG_CONFIG_HOME/nearhost` when that variable is an absolute path. When that path would be too long for a Unix socket, the socket is named `h-<hash>.sock` instead.
+
 The last three options keep the master to Nearhost's own forwards: `LocalForward` and `RemoteForward` lines in your config are left out, and a `RemoteCommand` is not run. The `local` server needs no transport.
 
 Discovery and the add forms open a separate connection of their own, so reading a project's files never disturbs a running one.

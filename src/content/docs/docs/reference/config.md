@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-The file is `~/.config/nearhost/config.yaml`, or `$XDG_CONFIG_HOME/nearhost/config.yaml` when that variable is set. `--config <file>` points any command at another file.
+The file is `~/.config/nearhost/config.yaml`, or `$XDG_CONFIG_HOME/nearhost/config.yaml` when that variable is an absolute path. `--config <file>` points any command at another file.
 
 Nearhost writes the file whenever you add or change something in the interface, or run `nearhost add`, `nearhost preset` or `nearhost preset registry`. `nearhost up` writes it too, when a project's `.nearhostrc` has changed in a way that needs no approval. It reads the file again first, so hand edits are kept, but comments and formatting are not.
 

@@ -74,7 +74,7 @@ Presets from a registry are named after it, as in `nearhost/vite`, so you can se
 
 ## Where they live
 
-Presets are files beside the config, under `~/.config/nearhost/presets/`. One from a registry is `presets/<alias>/<name>.yaml`. A local preset is `presets/<name>.yaml`, with a plain name, and is enabled with `nearhost preset enable <name>`.
+Presets are files beside the config, under `presets/` in Nearhost's config folder: `~/.config/nearhost/presets/`, or under `$XDG_CONFIG_HOME/nearhost` when that variable is an absolute path. Each registry's cached index is beside them, at `registry/<alias>/index.yaml`. One from a registry is `presets/<alias>/<name>.yaml`. A local preset is `presets/<name>.yaml`, with a plain name, and is enabled with `nearhost preset enable <name>`.
 
 The config records what is trusted and enabled:
 
