@@ -1,0 +1,23 @@
+src/components/landing/Trust.astro
+  s_c5536fb18c5739::t_ab8e25ae484d90 2,34-36,110-118
+src/content/docs/docs/concepts/what-nearhost-changes.md
+  s_c5536fb18c5739::t_ab8e25ae484d90 12-14,16-17
+  s_c5536fb18c5739::t_602088b0f2066d 1-11,15,18-83,85-93
+  s_c5536fb18c5739::t_5dca999ccdb7e6 84
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "45d8f895aa7bf8f58713d572b2fd2a660d9a4165",
+  "prompts": {},
+  "sessions": {
+    "s_c5536fb18c5739": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b76797d9-8413-4828-bfb8-a9666479d966",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
