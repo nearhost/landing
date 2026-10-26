@@ -1,4 +1,5 @@
 ---
+import { url } from '../../lib/url';
 ---
 
 <section class="trust">
@@ -30,6 +31,9 @@
           </span>
         </li>
       </ul>
+      <a class="more" href={url('/docs/concepts/what-nearhost-changes/')}>
+        Everything Nearhost changes on your machine
+      </a>
     </div>
     <pre class="hosts"><span class="faint"># /etc/hosts</span>
 
@@ -102,6 +106,15 @@
   .arrow {
     color: var(--nh-accent);
     font-family: var(--nh-font-mono);
+  }
+  .more {
+    color: var(--nh-accent);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .more:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
   .hosts {
     flex: 1 1 380px;
