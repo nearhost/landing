@@ -18,14 +18,14 @@ Nearhost asks for your password, trusts a certificate authority and edits `/etc/
 
 An absolute `XDG_CONFIG_HOME`, `XDG_DATA_HOME` or `XDG_CACHE_HOME` moves the first three. The install id is six random characters plus a hash of the machine id. It never leaves your machine.
 
-Nearhost writes no log files. Its log is shown in the interface, or printed by `nearhost up`. Nothing in your projects changes unless you run `nearhost export`, which writes a `.nearhostrc`.
+Nearhost writes no log files. Its log is shown in the interface, or printed by `nearhost up`. Nearhost writes nothing to your projects unless you run `nearhost export`, which writes a `.nearhostrc`. A coding agent edits files itself, not through Nearhost.
 
 ## What runs as root
 
-Nearhost never runs as root itself. It uses `sudo` for two things, and only the `sudo` in a system directory, such as `/usr/bin`, never one found on your `PATH`.
+Nearhost never runs as root itself. It uses `sudo` for two things, and from Nearhost 0.8.0 only the `sudo` in a system directory, such as `/usr/bin`, never one found on your `PATH`.
 
 - **The hosts file.** When a project starts and the [block Nearhost owns](/docs/concepts/the-hosts-file/) in `/etc/hosts` is not what it should be, Nearhost runs its own binary as root, `sudo nearhost hosts apply --file /etc/hosts`, which rewrites that block and nothing else. If `sudo` still holds your password from the last few minutes, this happens without asking again. `--no-hosts` turns it off.
-- **Trusting the certificate authority.** Only when you run `nearhost trust` or accept the welcome box. On macOS it adds the root certificate to the System keychain with `security add-trusted-cert`. On Linux it copies the certificate into your distribution's anchors folder and runs `update-ca-certificates`, `update-ca-trust` or `trust extract-compat`. Firefox's and Chromium's own stores are updated with `certutil`, as you, with no password.
+- **Trusting the certificate authority.** Only when you run `nearhost trust` or accept the welcome box. On macOS it adds the root certificate to the System keychain with `security add-trusted-cert`. On Linux it copies the certificate into your distribution's anchors folder and runs `update-ca-certificates`, `update-ca-trust` or `trust extract-compat`. When `certutil` is installed, it also updates the stores that Firefox and, on Linux, Chromium-based browsers keep for themselves, as you, with no password.
 
 On Linux, binding ports 80 and 443 needs `cap_net_bind_service`. Nearhost never sets it. The installer and `nearhost doctor` print the `setcap` command for you to run.
 
@@ -42,7 +42,7 @@ While Nearhost runs, it listens on:
 - **443** for HTTPS, over TCP and, for HTTP/3, UDP
 - **80**, only to redirect to HTTPS
 - **6327** for [Nearhost's page](/docs/concepts/tls-and-the-proxy/)
-- one loopback port per forwarded route, on `127.0.0.1` and `::1`
+- one port on `127.0.0.1` per forwarded route, and for a `loopback` route the same port on `::1` too, when the machine has IPv6 loopback
 
 The first three listen on every interface, because macOS lets a program that is not root bind a low port only that way. They answer only this machine: another computer's connection is closed before it gets a certificate or a response. A project with `docker_clients` in its [`.nearhostrc`](/docs/reference/nearhostrc/) is also answered for your Docker networks. Until Docker first reports them, Nearhost uses Docker's default range, `172.16.0.0/12`, which some home and office networks share.
 
@@ -57,6 +57,7 @@ Nearhost makes these requests and no others. It has no telemetry, no analytics a
 - **Preset registries.** Only registries you have chosen to trust, from `raw.githubusercontent.com`, when you add a project or manage presets. Each preset is checked against the hash in the registry's index. With no trusted registry, Nearhost requests nothing. See [Presets and registries](/docs/concepts/presets-and-registries/).
 - **DNS.** To decide which names need a hosts entry, Nearhost asks your configured nameserver for names that do not end in `.test`.
 - **Docker**, through its local socket, for projects with `docker_clients`.
+- **`nearhost update`**, only when you run it. It asks GitHub for the latest release, then runs your package manager or the install script, which download it.
 
 ## Requests through the proxy
 
@@ -75,7 +76,7 @@ When Nearhost quits, the forwards and the connection close. `~/.nearhost` stays,
 
 ## What coding agents can do
 
-A coding agent reaches Nearhost through a socket that only your user can open, and sees only the projects of the machine it runs on. Without asking you, it can list those projects, run `nearhost doctor` on a folder, and reload a project's `.nearhostrc`. A reload applies changes such as ports and new `.test` hosts straight away. Anything else, including other domains, wildcards, `localhost` and `docker_clients`, waits for you to approve it. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+A coding agent reaches Nearhost through a socket that only your user can open, and sees only the projects of the machine it runs on. Without asking you, it can list those projects, run `nearhost doctor` on a folder, and ask Nearhost to reload a project's `.nearhostrc`. Nearhost applies changes such as ports and new `.test` hosts straight away and saves them to `config.yaml`; the agent never edits that file itself. Anything else, including other domains, wildcards, `localhost` and `docker_clients`, waits for you to approve it. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
 
 ## Undo everything
 
