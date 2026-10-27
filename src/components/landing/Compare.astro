@@ -4,7 +4,7 @@ import { url } from '../../lib/url';
 
 <section class="container compare">
   <div class="intro">
-    <h2>How it compares to ssh -L, editor forwarding, VPNs and tunnels.</h2>
+    <h2>How it compares to ssh -L, mkcert, local dev apps, VPNs and tunnels.</h2>
     <p>
       Nearhost is for your own machines and your own browser. It is the wrong tool for showing work
       to someone else.
@@ -25,6 +25,18 @@ import { url } from '../../lib/url';
       </p>
     </div>
     <div class="row">
+      <h3>mkcert</h3>
+      <p>
+        Creates a local certificate authority and the certificates it signs. The rest is up to you:
+        a server or proxy set up with them, a hosts file entry, and for a project on another
+        machine, an SSH forward.
+      </p>
+      <p class="diff">
+        Nearhost does all of that. It creates its own certificate authority on first run, so you do
+        not need mkcert, and signs a certificate for each name you add.
+      </p>
+    </div>
+    <div class="row">
       <h3>VS Code and other editor port forwarding</h3>
       <p>
         Convenient while the editor window is open. You get <code>localhost:port</code> URLs, so
@@ -33,6 +45,18 @@ import { url } from '../../lib/url';
       <p class="diff">
         Nearhost runs in a terminal, independent of any editor, and each project keeps the same
         HTTPS name every day.
+      </p>
+    </div>
+    <div class="row">
+      <h3>Laravel Herd, OrbStack and other local dev apps</h3>
+      <p>
+        Herd serves PHP sites from this Mac or PC at <code>.test</code>. OrbStack gives each
+        container on this Mac an HTTPS name under <code>.orb.local</code>. Both serve what runs on
+        the machine in front of you.
+      </p>
+      <p class="diff">
+        Nearhost serves projects on this machine and on any other you reach with <code>ssh</code>,
+        for any stack, at names you choose, on macOS and Linux.
       </p>
     </div>
     <div class="row">
