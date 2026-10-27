@@ -1,0 +1,19 @@
+src/content/docs/docs/getting-started/use-a-coding-agent.md
+  s_81ad364fe15b72::t_3c36d089e42995 80,85,117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "39debf187359decb55bcf26da5fafd9aca780c20",
+  "prompts": {},
+  "sessions": {
+    "s_81ad364fe15b72": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "047f1bbe-a859-4471-ae3c-0288f1e01a7a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
