@@ -1,0 +1,19 @@
+src/content/docs/docs/concepts/what-nearhost-changes.md
+  s_c5536fb18c5739::t_520e5fdb3f6e42 30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3bee18e95d270aef84d5504452e1d003af48c530",
+  "prompts": {},
+  "sessions": {
+    "s_c5536fb18c5739": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b76797d9-8413-4828-bfb8-a9666479d966",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
