@@ -853,7 +853,7 @@ Presets from a registry are named after it, as in `nearhost/vite`, so you can se
 
 ## Where they live
 
-Presets are files beside the config, under `~/.config/nearhost/presets/`. One from a registry is `presets/<alias>/<name>.yaml`. A local preset is `presets/<name>.yaml`, with a plain name, and is enabled with `nearhost preset enable <name>`.
+Presets are files beside the config, under `presets/` in Nearhost’s config folder: `~/.config/nearhost/presets/`, or under `$XDG_CONFIG_HOME/nearhost` when that variable is an absolute path. Each registry’s cached index is beside them, at `registry/<alias>/index.yaml`. One from a registry is `presets/<alias>/<name>.yaml`. A local preset is `presets/<name>.yaml`, with a plain name, and is enabled with `nearhost preset enable <name>`.
 
 The config records what is trusted and enabled:
 
@@ -946,6 +946,8 @@ ssh -N -M -S ~/.config/nearhost/run/<server>.sock \
     -o ControlPersist=no -o ClearAllForwardings=yes \
     -o RemoteCommand=none -- <host>
 ```
+
+The control socket is in `run/` in Nearhost’s config folder. The example shows the default, `~/.config/nearhost`; with an absolute `XDG_CONFIG_HOME`, it is `$XDG_CONFIG_HOME/nearhost/run` instead. When the socket’s path would be too long for a Unix socket, it is named `h-<hash>.sock`.
 
 The last three options keep the master to Nearhost’s own forwards: `LocalForward` and `RemoteForward` lines in your config are left out, and a `RemoteCommand` is not run. The `local` server needs no transport.
 
@@ -1607,7 +1609,7 @@ Prints the version, as `nearhost 0.8.0`. From Nearhost 0.8.0, `nearhost --versio
 
 > Every key in the Nearhost configuration file.
 
-The file is `~/.config/nearhost/config.yaml`, or `$XDG_CONFIG_HOME/nearhost/config.yaml` when that variable is set. `--config <file>` points any command at another file.
+The file is `~/.config/nearhost/config.yaml`, or `$XDG_CONFIG_HOME/nearhost/config.yaml` when that variable is an absolute path. `--config <file>` points any command at another file.
 
 Nearhost writes the file whenever you add or change something in the interface, or run `nearhost add`, `nearhost preset` or `nearhost preset registry`. `nearhost up` writes it too, when a project’s `.nearhostrc` has changed in a way that needs no approval. It reads the file again first, so hand edits are kept, but comments and formatting are not.
 
