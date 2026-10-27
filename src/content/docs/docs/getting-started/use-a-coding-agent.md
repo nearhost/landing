@@ -72,6 +72,44 @@ A socket path can be at most 103 bytes on macOS and 107 on Linux. With a home di
 
 To use one socket explicitly, set `NEARHOST_SOCKET` to its path where the agent runs.
 
+## Browser previews from a server
+
+An agent on a server can start a dev server, but you cannot see it in your browser until its port is forwarded to your laptop. With a passthrough, the agent asks Nearhost to forward that one port for the rest of the session, and you approve it first. The preview then opens on your laptop. It works for any HTTP dev server, whatever it is built with.
+
+1. The agent asks for a port, and Nearhost opens a prompt over the interface: `Claude Code on mini wants to open port 5173 on this laptop (browser preview).` If that port is taken on the laptop, the prompt says which port it will use instead. The prompt queues with proposals, and Home shows the same hint.
+2. Press `y` to allow it, `n` to refuse, or `a` for Always allow. `esc` counts as No. A prompt that waits 10 minutes expires.
+3. Once you allow it, Nearhost forwards the port and the agent gives you the laptop URL. Asking again for a port that is already open returns the same passthrough, without a second prompt.
+
+Always allow covers one tool on one server: Claude Code on `mini`, say, but not Claude Code on another server, and not another tool on `mini`. Only Claude Code is offered it. Codex documents no variable that identifies it, so Codex and every other agent are shown as `An agent`, are always prompted and are never offered Always allow.
+
+On a server's panel, press `tab` to move focus between the server's projects, its open passthroughs and its Always allowed rows. Press `x` on a passthrough to close it, or on an Always allowed row to revoke it, and confirm. Home shows a `passthroughs` count while any are open.
+
+### What the token protects
+
+When you choose Always allow, Nearhost makes a token for that tool on that server. The skill keeps the token on the server, in `${XDG_STATE_HOME:-~/.local/state}/nearhost/tokens/<laptop id>/<requester>`, readable by your account only. The skill sends it with later requests, so Nearhost does not ask again. The laptop keeps only a SHA-256 hash of the token, in `grants.json` beside the install id in `~/.config/nearhost` (or under `XDG_CONFIG_HOME`).
+
+The token stops a different tool from borrowing an approval, and it stops anything from using one after you revoke it. It does not protect against anything else running as your account on the server: such a process can read the token file and use the approval. Treat Always allow as trust in everything that runs as you on that server. A wrong or revoked token gets a `401`; the skill drops it and asks again, so you are prompted.
+
+### When a passthrough ends
+
+A passthrough ends when any of these happens:
+
+- the session ends, which Claude Code's `SessionEnd` hook reports;
+- the server is disconnected, or its connection fails;
+- the server has been away for 10 minutes in a row;
+- the forwarded port stops answering for 5 minutes, checked every 30 seconds while the server is connected;
+- you close it, or Nearhost quits.
+
+The `SessionEnd` hook ships with the Claude Code plugin, so it runs only for plugin installs. With the skill installed through the skills CLI, or in another agent, the other conditions apply. If the laptop port was taken by something else while the server was away, that passthrough closes when the server comes back.
+
+### Without Nearhost connected
+
+When Nearhost is not connected to the server, the agent cannot ask for a passthrough. It tells you to select the server in Nearhost and press `c`, then ask again, or to forward the port yourself from the laptop:
+
+```sh
+ssh -N -L <port>:localhost:<port> <server>
+```
+
 ## Agent API
 
 The skill's script talks to Nearhost over that socket, with `curl --unix-socket`. Nearhost answers JSON for the machine the socket belongs to. These calls are the ones the doctor uses:
