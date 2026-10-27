@@ -283,7 +283,7 @@ ssh -N -M -S ~/.config/nearhost/run/<server>.sock \
     -o ControlPersist=no -o ClearAllForwardings=yes \
     -o RemoteCommand=none -- <host>
 ```
- The control socket is in `run/` in Nearhost’s config folder, which is `~/.config/nearhost`, or `$XDG_CONFIG_HOME/nearhost` when that variable is an absolute path. When that path would be too long for a Unix socket, the socket is named `h-<hash>.sock` instead. The last three options keep the master to Nearhost’s own forwards: `LocalForward` and `RemoteForward` lines in your config are left out, and a `RemoteCommand` is not run. The `local` server needs no transport. Discovery and the add forms open a separate connection of their own, so reading a project’s files never disturbs a running one. ## Forwards added live Forwards are added and removed on the running master, with no reconnect: 
+ The control socket is in `run/` in Nearhost’s config folder. The example shows the default, `~/.config/nearhost`; with an absolute `XDG_CONFIG_HOME`, it is `$XDG_CONFIG_HOME/nearhost/run` instead. When the socket’s path would be too long for a Unix socket, it is named `h-<hash>.sock`. The last three options keep the master to Nearhost’s own forwards: `LocalForward` and `RemoteForward` lines in your config are left out, and a `RemoteCommand` is not run. The `local` server needs no transport. Discovery and the add forms open a separate connection of their own, so reading a project’s files never disturbs a running one. ## Forwards added live Forwards are added and removed on the running master, with no reconnect: 
 ```sh
 ssh -S <sock> -O forward -L 127.0.0.1:<local>:localhost:<remote> -- <host>
 ssh -S <sock> -O cancel -L 127.0.0.1:<local>:localhost:<remote> -- <host>
