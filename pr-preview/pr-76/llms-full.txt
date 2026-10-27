@@ -1154,7 +1154,7 @@ Nearhost never runs as root itself. It uses `sudo` for two things, and from Near
 * **The hosts file.** When a project starts and the [block Nearhost owns](/pr-preview/pr-76/docs/concepts/the-hosts-file/) in `/etc/hosts` is not what it should be, Nearhost runs its own binary as root, `sudo nearhost hosts apply --file /etc/hosts`, which rewrites that block and nothing else. If `sudo` still holds your password from the last few minutes, this happens without asking again. `--no-hosts` turns it off.
 * **Trusting the certificate authority.** Only when you run `nearhost trust` or accept the welcome box. On macOS it adds the root certificate to the System keychain with `security add-trusted-cert`. On Linux it copies the certificate into your distribution’s anchors folder and runs `update-ca-certificates`, `update-ca-trust` or `trust extract-compat`. When `certutil` is installed, it also updates the stores that Firefox and, on Linux, Chromium-based browsers keep for themselves, as you, with no password.
 
-On Linux, binding ports 80 and 443 needs `cap_net_bind_service`. Nearhost never sets it. The installer and `nearhost doctor` print the `setcap` command for you to run.
+On Linux, binding ports 80 and 443 needs `cap_net_bind_service`. Nearhost itself never sets it. The install script offers to run `sudo setcap` when you run a downloaded copy from a terminal, and asks first. Through `curl | sh`, or `nearhost update`, it only prints the command, as `nearhost doctor` does.
 
 ## The certificate authority
 
