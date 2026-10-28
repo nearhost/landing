@@ -24,5 +24,26 @@ test('an unknown anchor goes to the overview', () => {
 });
 
 test('every heading of the old page has a move', () => {
-  assert.equal(Object.keys(moves).length, 17); // 16 anchors in the spec's table, plus ''
+  assert.deepEqual(
+    Object.keys(moves).sort(),
+    [
+      '',
+      'install-the-skill',
+      'add-a-project',
+      'fix-a-project',
+      'how-the-agent-reaches-nearhost',
+      'browser-previews-from-a-server',
+      'what-the-token-protects',
+      'when-a-passthrough-ends',
+      'without-nearhost-connected',
+      'documents-from-coding-agents',
+      'what-is-served',
+      'documents-cannot-reach-your-other-pages',
+      'always-allow',
+      'when-a-served-folder-goes-away',
+      'agent-api',
+      'when-agents-cannot-reach-nearhost',
+      'turn-notifications-off',
+    ].sort(),
+  );
 });

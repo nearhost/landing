@@ -7,7 +7,7 @@ sidebar:
 
 This page explains the socket an agent talks to Nearhost on, and the calls it makes.
 
-Nearhost listens on `~/.nearhost/<id>.sock` on your laptop, where `<id>` is six letters and digits made when Nearhost first runs and kept in `~/.config/nearhost/id`. A config directory copied to another machine gets a new id there, so two laptops never share a socket. On each server it is connected to, it forwards a socket of the same name over its own SSH connection:
+Nearhost listens on `~/.nearhost/<id>.sock` on your laptop, where `<id>` is six letters and digits made when Nearhost first runs and kept in `~/.config/nearhost/id` with a fingerprint of the machine. A config directory copied to another machine gets a new id there, so two laptops never share a socket. On each server it is connected to, it forwards a socket of the same name over its own SSH connection:
 
 ```sh
 ssh -S <sock> -O forward -R <home on the server>/.nearhost/<id>.sock:<socket on the laptop> -- <host>
@@ -28,6 +28,6 @@ To use one socket explicitly, set `NEARHOST_SOCKET` to its path where the agent 
 
 The skill's script talks to Nearhost over that socket, with `curl --unix-socket`. Nearhost answers JSON for the machine the socket belongs to. These calls are the ones the doctor uses:
 
-- `GET /v1` says which API this is. Its `capabilities` list names the calls added since the first release of API 1: `doctor`, `reload` and `passthrough`. An older Nearhost leaves them out, and the skill tells you to update it. When passthroughs are available it also gives `id`, the laptop's install id, which the skill uses to keep a token per laptop.
+- `GET /v1` says which API this is. Its `capabilities` list names the calls added since the first release of API 1: `doctor`, `reload`, `passthrough` and `documents`. An older Nearhost leaves them out, and the skill tells you to update it. When passthroughs are available it also gives `id`, the laptop's install id, which the skill uses to keep a token per laptop.
 - `GET /v1/doctor?path=…` returns `project` and `findings` for the project holding the absolute path, in the shape that [`nearhost doctor --json`](/docs/reference/cli/#json-output) gives its findings. For a project already in Nearhost, it first reads the project's `.nearhostrc` again, as a reload does: a change that needs no approval is applied, restarting the project if it runs under `nearhost up`, and one that needs approval waits in Nearhost. For a directory that is not in Nearhost yet, `project` is `null`, each finding's `project` is empty, and the findings are for the project as it would be added.
 - `POST /v1/projects/reload`, with `{"path": "/abs/dir"}`, asks Nearhost to read the `.nearhostrc` of the project holding the path again. The project must be added first. It answers `applied` when nothing needs approval, or `pending` with an `id` the agent waits on, as it does for a proposal, while you decide. A change you declined stays declined until the file changes or Nearhost restarts.

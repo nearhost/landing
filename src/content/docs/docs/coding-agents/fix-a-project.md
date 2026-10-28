@@ -5,7 +5,7 @@ sidebar:
   order: 3
 ---
 
-Ask your coding agent to find and fix what stops a project being served.
+With the [`nearhost` skill installed](/docs/coding-agents/#install-the-skill), ask your coding agent to find and fix what stops a project being served.
 
 When a project is not served as you expect, run `/nearhost doctor` in its directory, or `$nearhost doctor` in Codex. The agent asks Nearhost to run the same [project checks](/docs/reference/cli/#project-checks) as `nearhost doctor` on this project, and works through the errors, then the warnings. Unlike `nearhost doctor`, this first reads the project's `.nearhostrc` again, as described under [Agent API](/docs/coding-agents/how-it-works/#agent-api). Each finding's fix has a kind, and the agent handles each kind in its own way:
 

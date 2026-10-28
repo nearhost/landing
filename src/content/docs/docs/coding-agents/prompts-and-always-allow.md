@@ -9,7 +9,7 @@ Browser previews and documents ask you first, in the same way. This page covers 
 
 ## The prompt
 
-Press `y` to allow it, `n` to refuse, or `a` for Always allow. `esc` counts as No. A prompt that waits 10 minutes expires. The prompt queues with proposals and passthroughs, and Home shows the same hint.
+Press `y` to allow it, `n` to refuse, or `a` for Always allow. `esc` counts as No. A prompt that waits 10 minutes expires. The prompt queues with proposals and passthroughs, and Home shows the same hint as for a [proposal](/docs/coding-agents/add-a-project/).
 
 ## Always allow
 
@@ -17,7 +17,7 @@ Always allow covers one tool on one server: Claude Code on `mini`, say, but not 
 
 Previews and documents are approved separately, so revoking one leaves the other working.
 
-To revoke one, press `tab` on the server's panel to reach its `always allowed` section, which also lists the Always allowed rows, and `x` on a row. Nearhost asks you to confirm first. Revoking leaves open passthroughs and documents in place.
+To revoke one, press `tab` on the server's panel to reach its `always allowed` section, and `x` on a row. Nearhost asks you to confirm first. Revoking leaves open passthroughs and documents in place.
 
 ## What the token protects
 
@@ -31,7 +31,7 @@ If `grants.json` cannot be read, Nearhost still serves coding agents but turns p
 
 ## Turn notifications off
 
-Add this to the [config](/docs/reference/config/):
+Nearhost notifies the terminal when an agent asks to add a project, open a preview or show a document. To stop that, add this to the [config](/docs/reference/config/). The prompts still open in Nearhost:
 
 ```yaml
 notifications: false

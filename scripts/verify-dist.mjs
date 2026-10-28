@@ -250,6 +250,10 @@ for (const name of ['llms.txt', 'llms-full.txt', 'llms-small.txt']) {
   const text = readFileSync(file, 'utf8');
   check(/^(<SYSTEM>.*<\/SYSTEM>\s*)?# /.test(text), `dist/${name} must start with a heading`);
   check(!text.includes('Section titled'), `dist/${name} contains heading anchor text`);
+  check(
+    !text.includes('use-a-coding-agent'),
+    `dist/${name} mentions the old coding agent page, which only redirects`,
+  );
 }
 
 // 8. Every sitemap entry carries the date its page last changed.
@@ -274,7 +278,20 @@ for (const file of pages) {
     [...html.matchAll(/<a\s[^>]*?href=(?:"([^"]*)"|'([^']*)')/gi)].map((m) => m[1] ?? m[2]),
   );
   for (const href of hrefs) {
-    if (href.startsWith('#')) continue;
+    if (href.startsWith('#')) {
+      // A link within the page: its anchor must be on the page.
+      let fragment;
+      try {
+        fragment = decodeURIComponent(href.slice(1));
+      } catch {
+        failures.push(`${file} links to ${href}, which is not a valid URL fragment`);
+        continue;
+      }
+      if (fragment && !html.includes(`id="${fragment}"`)) {
+        failures.push(`${file} links to ${href}, but the page has no #${fragment}`);
+      }
+      continue;
+    }
     const absolute = /^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith('//');
     const prefix = absolute ? '/' : base;
     if (!absolute && base !== '/' && href.startsWith('/') && !href.startsWith(base)) {
@@ -282,6 +299,7 @@ for (const file of pages) {
       continue;
     }
     let path;
+    let fragment;
     try {
       const url = new URL(href, page);
       // Other schemes and other hosts.
@@ -291,6 +309,7 @@ for (const file of pages) {
         continue;
       }
       path = decodeURIComponent(url.pathname.slice(prefix.length));
+      fragment = decodeURIComponent(url.hash.slice(1));
     } catch {
       failures.push(`${file} links to ${href}, which is not a valid URL path`);
       continue;
@@ -303,6 +322,12 @@ for (const file of pages) {
       failures.push(`${file} links to ${href}, which is not in dist/`);
     } else if (statSync(target).isDirectory()) {
       failures.push(`${file} links to ${href}, a directory; end the link with a slash`);
+    } else if (
+      fragment &&
+      target.endsWith('.html') &&
+      !readFileSync(target, 'utf8').includes(`id="${fragment}"`)
+    ) {
+      failures.push(`${file} links to ${href}, but the page has no #${fragment}`);
     }
   }
 }
@@ -335,13 +360,23 @@ if (!existsSync(oldPage)) {
     html.includes(`href="${base}docs/coding-agents/"`),
     'the old coding agent page does not link to the overview',
   );
+  // The redirect script, inline or bundled, carries the base as a string.
+  const scripts = [...html.matchAll(/<script\b([^>]*)>([^<]*)<\/script>/gi)]
+    .map(([, attrs, body]) => {
+      const src = attrs.match(/\ssrc="([^"]+)"/)?.[1];
+      const file = src && join(dist, src.slice(base.length));
+      return src ? (file && existsSync(file) ? readFileSync(file, 'utf8') : '') : body;
+    })
+    .filter((script) => script.includes('location.replace'));
   check(
-    html.includes(`const base = ${JSON.stringify(base)};`),
+    scripts.some((script) =>
+      new RegExp(`[\`'"]${base.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}[\`'"]`).test(script),
+    ),
     'the old coding agent page does not redirect through the site base',
   );
 }
+// Section 8 fails when the sitemap is missing.
 const sitemap = join(dist, 'sitemap-0.xml');
-check(existsSync(sitemap), 'dist/sitemap-0.xml does not exist');
 if (existsSync(sitemap)) {
   check(
     !readFileSync(sitemap, 'utf8').includes('use-a-coding-agent'),

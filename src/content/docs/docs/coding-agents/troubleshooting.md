@@ -7,7 +7,7 @@ sidebar:
 
 Two things can stop an agent reaching Nearhost: the server's sshd, or the agent's own sandbox.
 
-**The server refuses the forward.** Its sshd has `AllowStreamLocalForwarding no`. The server's panel shows `agents unavailable` with sshd's message, and so does `nearhost doctor`. Set `AllowStreamLocalForwarding yes` in the server's `sshd_config` and press `r` on the server to reconnect. Projects serve either way, and `r` on Home leaves such a server connected.
+**The server refuses the forward.** Its sshd has `AllowStreamLocalForwarding no`. The server's panel shows `agents unavailable` with sshd's message, and so does `nearhost doctor`. Set `AllowStreamLocalForwarding yes` in the server's `sshd_config`, reload sshd and press `r` on the server to reconnect. Projects serve either way, and `r` on Home leaves such a server connected.
 
 **The agent's sandbox blocks the socket.** Agents that run commands in a sandbox block Unix sockets by default, so the skill's script cannot reach `~/.nearhost`. Allow only what Nearhost needs.
 
@@ -15,7 +15,7 @@ Two things can stop an agent reaching Nearhost: the server's sshd, or the agent'
 - **Claude Code on macOS** can allow the one socket by its full path, which `ls ~/.nearhost` shows, in `~/.claude/settings.json` where the agent runs:
 
   ```json
-  { "sandbox": { "network": { "allowUnixSockets": ["/home/dev/.nearhost/k3f9q2.sock"] } } }
+  { "sandbox": { "network": { "allowUnixSockets": ["/Users/dev/.nearhost/k3f9q2.sock"] } } }
   ```
 
 Two settings also work, but open far more than Nearhost:

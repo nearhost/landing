@@ -17,11 +17,17 @@ const canonical = new URL(overview, Astro.site).href;
     <title>Coding agents | Nearhost</title>
     <meta name="robots" content="noindex" />
     <link rel="canonical" href={canonical} />
-    <meta http-equiv="refresh" content={`0; url=${overview}`} />
-    <script is:inline define:vars={{ moves, base }}>
-      // Same lookup as newPath() in src/lib/coding-agents-redirect.mjs.
-      const key = location.hash.replace(/^#/, '');
-      location.replace(base + (Object.hasOwn(moves, key) ? moves[key] : moves['']));
+    <noscript>
+      <meta http-equiv="refresh" content={`0; url=${overview}`} />
+    </noscript>
+    <script>
+      import { newPath } from '../../../lib/coding-agents-redirect.mjs';
+
+      // The query string, such as utm_ tags, comes along.
+      const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+      const to = new URL(base + newPath(location.hash), location.href);
+      to.search = location.search;
+      location.replace(to);
     </script>
   </head>
   <body>
