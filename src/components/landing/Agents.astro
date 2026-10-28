@@ -207,7 +207,15 @@ const tour = JSON.stringify(
       tablist,
       ...section.querySelectorAll<HTMLElement>('[data-controls], [data-caption-block]'),
     ];
-    const showPanel = (id: string) => panels.forEach((p) => (p.hidden = p.dataset.panel !== id));
+    // The panels share one grid cell, so the stage keeps the tallest one's height; the others
+    // stay laid out but invisible and out of reach.
+    const showPanel = (id: string) =>
+      panels.forEach((p) => {
+        const off = p.dataset.panel !== id;
+        p.inert = off;
+        if (off) p.setAttribute('aria-hidden', 'true');
+        else p.removeAttribute('aria-hidden');
+      });
     const toggle = section.querySelector<HTMLButtonElement>('[data-toggle]')!;
     let current = 0;
 
@@ -390,7 +398,8 @@ const tour = JSON.stringify(
     color: var(--nh-accent);
   }
 
-  /* One panel per scene: the script shows the current one, and without it they stack. */
+  /* One panel per scene. Without the script they stack; with it they share one cell, so the
+     stage keeps the tallest panel's height, and only the current one is visible. */
   .stage {
     display: flex;
     flex-direction: column;
@@ -428,6 +437,17 @@ const tour = JSON.stringify(
   .stage[data-step='3'] :global(.key) {
     background: #d6f26b;
     color: #0f1210;
+  }
+  .stage.live {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .stage.live > [data-panel] {
+    grid-area: 1 / 1;
+    min-width: 0;
+  }
+  .stage.live > [data-panel][inert] {
+    visibility: hidden;
   }
 
   /* The caption for the current scene, and the tour's controls. */
