@@ -173,7 +173,7 @@ import Terminal from './Terminal.astro';
     flex: none;
   }
   .rule {
-    margin-inline: -1ch;
+    margin-inline: -2ch;
     height: 1.5em;
     background: linear-gradient(#89b4fa, #89b4fa) 0 50% / 100% 1px no-repeat;
   }
@@ -191,10 +191,14 @@ import Terminal from './Terminal.astro';
   [data-typed]:not(:empty) ~ .placeholder {
     display: none;
   }
-  /* The real TUI shows its logo only at 87 columns or more. The tips line goes too, so the
-     scene is no taller than Codex's on a phone and the stage keeps one height. */
-  @media (max-width: 900px) {
-    .logo,
+  /* The real TUI drops its logo below 87 columns; here that is below 1200px. */
+  @media (max-width: 1199px) {
+    .logo {
+      display: none;
+    }
+  }
+  /* Without the tips line the scene is no taller than Codex's, so the stage keeps one height. */
+  @media (max-width: 959px) {
     .tips {
       display: none;
     }

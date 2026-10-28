@@ -201,8 +201,21 @@ if (existsSync(index)) {
   check(tabs.includes('codex'), 'the Codex scene is missing');
   check(tabs.includes('qwen'), 'the Qwen Code scene is missing');
   check(
-    decode(agents).includes('An agent on mini wants to show docs/plans/2026-10-28-checkout.md'),
+    decode(agents).includes(
+      'An agent on mini wants to show docs/plans/2026-10-28-checkout.md (plan)',
+    ) &&
+      decode(agents).includes(
+        'Nearhost will serve files in /home/ecs/code/myapp, except dotfiles.',
+      ),
     'the documents prompt text changed',
+  );
+  // The Codex and Qwen prompts offer y and n only, as the real ones do.
+  const keyLines = [...agents.matchAll(/<span class="key[^>]*>y<\/span>[^\n]*?<\/div>/g)].map(
+    (m) => m[0],
+  );
+  check(
+    keyLines.length >= 2 && keyLines.every((line) => !line.includes('esc')),
+    'a Codex or Qwen prompt shows an esc key',
   );
   // Every scene's caption link reaches a page, and the heading it names, as section 9 resolves
   // links.
