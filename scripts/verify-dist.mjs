@@ -280,7 +280,13 @@ for (const file of pages) {
   for (const href of hrefs) {
     if (href.startsWith('#')) {
       // A link within the page: its anchor must be on the page.
-      const fragment = decodeURIComponent(href.slice(1));
+      let fragment;
+      try {
+        fragment = decodeURIComponent(href.slice(1));
+      } catch {
+        failures.push(`${file} links to ${href}, which is not a valid URL fragment`);
+        continue;
+      }
       if (fragment && !html.includes(`id="${fragment}"`)) {
         failures.push(`${file} links to ${href}, but the page has no #${fragment}`);
       }
