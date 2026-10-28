@@ -1,0 +1,42 @@
+package.json
+  h_13c4e797d6e9d2 23-24
+scripts/verify-dist.mjs
+  h_13c4e797d6e9d2 150,164-233
+src/components/landing/Agents.astro
+  h_13c4e797d6e9d2 2-7,10-12,15-18,20-22,31-33,40-134,136,138-139,143,148,156,159-163,183-187,189-195,197-218,220-222,224-270,272-282,284,286-335,357,363,380-381,383-386,390,392-401,405-406,408-412,414,416-420,422-423,425-429,431-433,435-436,439-441,444,446-448,450-452,454-455,457-465,467-468,470-471,473-474,476-477,479-480,482-484,486-488,491-492,495-498,500-506,508-511,513,515-516,518-521,523-533,535-536,538-540,542-547,605-608,610-614
+src/components/landing/Hero.astro
+  h_13c4e797d6e9d2 19-21
+src/components/landing/Nav.astro
+  h_13c4e797d6e9d2 9
+src/components/landing/agents/BrowserWindow.astro
+  h_13c4e797d6e9d2 1-76
+src/components/landing/agents/ClaudeScene.astro
+  h_13c4e797d6e9d2 1-201
+src/components/landing/agents/CodexScene.astro
+  h_13c4e797d6e9d2 1-225
+src/components/landing/agents/NearhostWindow.astro
+  h_13c4e797d6e9d2 1-77
+src/components/landing/agents/Scene.astro
+  h_13c4e797d6e9d2 1-47
+src/components/landing/agents/Terminal.astro
+  h_13c4e797d6e9d2 1-111
+src/components/landing/agents/scenes.ts
+  h_13c4e797d6e9d2 1-52
+src/lib/agent-tour.mjs
+  h_13c4e797d6e9d2 1-96
+src/lib/agent-tour.test.mjs
+  h_13c4e797d6e9d2 1-112
+src/pages/index.astro
+  h_13c4e797d6e9d2 26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "33716901fdb839e343213e40087be7b0a459518f",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
