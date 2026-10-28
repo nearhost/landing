@@ -554,7 +554,7 @@ With Always allow, the document opens in your browser at once, and Nearhost show
 
 ## What is served
 
-Nearhost serves the document’s git repository, so its images, stylesheets and linked documents work. A document that is not in a repository serves its own folder. A document directly in your home folder, or in `/`, is refused with `save the document in a project or a folder of its own`. Nearhost never serves dotfiles or the contents of dot folders inside that folder, and never follows a link out of it. A second document in the same folder reuses the address without a prompt for the agent you approved, and prompts any other.
+Nearhost serves the document’s git repository, so its images, stylesheets and linked documents work. A document that is not in a repository serves its own folder. A repository at your home folder, or above it, is never served whole: Nearhost serves the document’s own folder instead. A document directly in your home folder, or in `/`, is refused with `save the document in a project or a folder of its own`. Nearhost never serves dotfiles or the contents of dot folders inside that folder, and never follows a link out of it. A second document in the same folder reuses the address without a prompt for the agent you approved, and prompts any other.
 
 Nearhost keeps no copies. Each time the page loads, it reads the file again, from the laptop or over the server’s SSH connection, so reloading shows the current file. A file that has moved or gone shows as missing, never as an old version. A server that is not connected shows a page saying so; select it in Nearhost and press `c`.
 
@@ -572,7 +572,7 @@ Nearhost lists served folders on each server’s panel; press `tab` to reach its
 
 Disconnecting a server does not remove its folders. Their pages say the server is not connected until it reconnects. The agent’s session ending does not remove them either, so you can read yesterday’s plan again while Nearhost runs. Home’s web page also lists the folders served since Nearhost started, with links to each document.
 
-If a project holds `localhost` and you started Nearhost with `--web-port 0`, there is no page to serve from, and the agent is told so.
+If Nearhost has no web port, because `--web-port 0` turned it off or the port was taken, and a project holds `localhost`, there is no page to serve from, and the agent is told so.
 
 # Fix a project
 
