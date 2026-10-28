@@ -1,0 +1,14 @@
+src/components/landing/agents/QwenScene.astro
+  h_13c4e797d6e9d2 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "391dd2b49581b0e58241b0eaec707401bd17d2a9",
+  "prompts": {},
+  "humans": {
+    "h_13c4e797d6e9d2": {
+      "author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
