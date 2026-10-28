@@ -2,6 +2,7 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { moves } from '../src/lib/coding-agents-redirect.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const failures = [];
@@ -303,6 +304,56 @@ for (const file of pages) {
     } else if (statSync(target).isDirectory()) {
       failures.push(`${file} links to ${href}, a directory; end the link with a slash`);
     }
+  }
+}
+
+// 10. The old coding agent page still sends readers to the right place.
+// Every target in the anchor map exists in the build, with its anchor.
+const oldPage = join(dist, 'docs/getting-started/use-a-coding-agent/index.html');
+for (const [anchor, target] of Object.entries(moves)) {
+  const [targetPath, fragment] = target.split('#');
+  const label = anchor ? `#${anchor}` : 'no anchor';
+  const file = join(dist, targetPath, 'index.html');
+  if (!existsSync(file)) {
+    failures.push(`old coding agent page: ${label} points at ${target}, which is not in dist/`);
+  } else if (fragment && !readFileSync(file, 'utf8').includes(`id="${fragment}"`)) {
+    failures.push(
+      `old coding agent page: ${label} points at ${target}, but the page has no #${fragment}`,
+    );
+  }
+}
+if (!existsSync(oldPage)) {
+  failures.push('the old coding agent page is not in dist/');
+} else {
+  const html = readFileSync(oldPage, 'utf8');
+  check(html.includes('noindex'), 'the old coding agent page is missing noindex');
+  check(
+    html.includes('http-equiv="refresh"'),
+    'the old coding agent page is missing its meta refresh',
+  );
+  check(
+    html.includes(`href="${base}docs/coding-agents/"`),
+    'the old coding agent page does not link to the overview',
+  );
+  check(
+    html.includes(`const base = ${JSON.stringify(base)};`),
+    'the old coding agent page does not redirect through the site base',
+  );
+}
+const sitemap = join(dist, 'sitemap-0.xml');
+check(existsSync(sitemap), 'dist/sitemap-0.xml does not exist');
+if (existsSync(sitemap)) {
+  check(
+    !readFileSync(sitemap, 'utf8').includes('use-a-coding-agent'),
+    'sitemap-0.xml lists the old coding agent page',
+  );
+}
+// Nothing else links to the old URL.
+for (const file of pages) {
+  if (file === oldPage) continue;
+  const html = readFileSync(file, 'utf8');
+  if (/<a\s[^>]*?href=["'][^"']*use-a-coding-agent/i.test(html)) {
+    failures.push(`${file} links to the old coding agent page`);
   }
 }
 
