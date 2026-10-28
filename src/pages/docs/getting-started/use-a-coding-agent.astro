@@ -17,7 +17,9 @@ const canonical = new URL(overview, Astro.site).href;
     <title>Coding agents | Nearhost</title>
     <meta name="robots" content="noindex" />
     <link rel="canonical" href={canonical} />
-    <meta http-equiv="refresh" content={`0; url=${overview}`} />
+    <noscript>
+      <meta http-equiv="refresh" content={`0; url=${overview}`} />
+    </noscript>
     <script is:inline define:vars={{ moves, base }}>
       // Same lookup as newPath() in src/lib/coding-agents-redirect.mjs.
       const key = location.hash.replace(/^#/, '');
