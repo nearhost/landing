@@ -1,0 +1,19 @@
+src/components/landing/Agents.astro
+  s_f4e5f254be91ba::t_aaf19ec172635a 380-381,384-385,613
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "0784dada00f13fef0af9beb569645ddd199e8082",
+  "prompts": {},
+  "sessions": {
+    "s_f4e5f254be91ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a44b06e0-2635-49c9-9f5c-26fe1b6ff124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
