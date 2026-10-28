@@ -344,7 +344,7 @@ Select the server in the sidebar to see its host, its projects and its log.
 
 From the command line, `nearhost add --server <name>` run at a terminal offers to add a server it does not know yet.
 
-Nothing is installed on the remote machine. Nearhost makes a private `~/.nearhost` folder there and keeps a socket in it, so a coding agent on the server can reach Nearhost. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/). The only file it ever writes to a project is a `.nearhostrc`, and only when you run [`nearhost export`](/docs/reference/cli/#nearhost-export).
+Nothing is installed on the remote machine. Nearhost makes a private `~/.nearhost` folder there and keeps a socket in it, so a coding agent on the server can reach Nearhost. See [How agents reach Nearhost](/docs/coding-agents/how-it-works/). The only file it ever writes to a project is a `.nearhostrc`, and only when you run [`nearhost export`](/docs/reference/cli/#nearhost-export).
 
 # Add a project
 
@@ -457,11 +457,18 @@ projects:
 
 See [config.yaml](/docs/reference/config/) for every key.
 
-# Use a coding agent
+# Coding agents
 
-> Let Claude Code or Codex add the project it is working in, on this machine or on a server, for you to review.
+> Let Claude Code, Codex or another coding agent add projects, open browser previews and show documents through Nearhost, on this machine or on a server, with your approval.
 
 A coding agent can ask Nearhost to add the project it is working in, can read whether a project is served and where, and can find and fix what stops it being served. It works the same when the agent runs on your laptop or on a server Nearhost is connected to, for example in an SSH session. The agent proposes and you decide: every add opens the add form in Nearhost, filled in, for you to save or dismiss.
+
+* [Add a project](/docs/coding-agents/add-a-project/): the agent proposes the project, and Nearhost opens the add form, filled in, for you to save.
+* [Fix a project](/docs/coding-agents/fix-a-project/): the agent runs Nearhost’s checks on the project and fixes what it can, with your agreement.
+* [Browser previews from a server](/docs/coding-agents/browser-previews/): the agent asks to forward its dev server’s port, and the preview opens in your laptop’s browser.
+* [Documents from coding agents](/docs/coding-agents/documents/): the agent asks to show a plan, spec or mockup it wrote, and Nearhost opens it in your browser.
+
+Nothing happens until you say yes in Nearhost. See [Prompts and Always allow](/docs/coding-agents/prompts-and-always-allow/).
 
 ## Install the skill
 
@@ -481,7 +488,11 @@ In Claude Code you can install it as a plugin instead:
 
 The skill needs `sh` and `curl`, and nothing else. Nothing is installed with it.
 
-## Add a project
+# Add a project
+
+> Ask a coding agent to add the project it is working in, then save or dismiss the add form Nearhost fills in.
+
+Ask your coding agent to serve the project it is working in, and Nearhost opens the add form for you to review.
 
 In the project’s directory, run `/nearhost add` in Claude Code, or `$nearhost add` in Codex. Asking in your own words, such as “serve this with Nearhost”, works too.
 
@@ -489,7 +500,7 @@ In the project’s directory, run `/nearhost add` in Claude Code, or `$nearhost 
 2. Nearhost notifies the terminal it runs in: `Agent on mini wants to add /home/dev/code/myapp`. Most terminals show it only when Nearhost is not the window or tab in front.
 3. The add form opens over the view with the server and path filled in, and the line `Proposed by an agent on mini`. Nearhost reads the project as it does for any add, and you choose the routes and the name as usual.
 4. Save it, and the agent reports `https://myapp.test`. Press `esc` on the path, and the agent is told you declined.
-5. The agent waits up to 30 seconds for the project to start, then runs the doctor on it and offers to work through any errors or warnings it finds. See [Fix a project](#fix-a-project).
+5. The agent waits up to 30 seconds for the project to start, then runs the doctor on it and offers to work through any errors or warnings it finds. See [Fix a project](/docs/coding-agents/fix-a-project/).
 
 If a form is already open, the proposal waits, and Home shows `1 proposal waiting · p to review`. It opens when the form closes, or when you press `p`. An agent waits 10 minutes for an answer.
 
@@ -497,9 +508,79 @@ If a form is already open, the proposal waits, and Home shows `1 proposal waitin
 
 Proposals need the full-screen interface. Under `nearhost up`, an agent can read the status but is told to open `nearhost` to propose.
 
-## Fix a project
+# Browser previews from a server
 
-When a project is not served as you expect, run `/nearhost doctor` in its directory, or `$nearhost doctor` in Codex. The agent asks Nearhost to run the same [project checks](/docs/reference/cli/#project-checks) as `nearhost doctor` on this project, and works through the errors, then the warnings. Unlike `nearhost doctor`, this first reads the project’s `.nearhostrc` again, as described under [Agent API](#agent-api). Each finding’s fix has a kind, and the agent handles each kind in its own way:
+> Let a coding agent on a server open its dev server's preview in your laptop's browser, after you allow it in Nearhost.
+
+An agent on a server can start a dev server, but you cannot see it in your browser until its port is forwarded to your laptop. With a passthrough, the agent asks Nearhost to forward that one port for the rest of the session, and you approve it first. The preview then opens on your laptop. It works for any HTTP dev server, whatever it is built with. Needs Nearhost 0.10.0 or later; an older Nearhost answers without passthrough, and the agent tells you to update it.
+
+1. The agent asks for a port, and Nearhost opens a prompt over the interface: `Claude Code on mini wants to open port 5173 on this laptop (browser preview).` If that port is in use on the laptop, the prompt says so and that it will open on another port; the agent reports the laptop URL once it opens.
+2. Answer the prompt. See [Prompts and Always allow](/docs/coding-agents/prompts-and-always-allow/#the-prompt) for the keys, and [Always allow](/docs/coding-agents/prompts-and-always-allow/#always-allow) to stop being asked. If you allow it and the port cannot be opened, the prompt shows why, and the agent is told it failed rather than that you refused, so it passes the reason on. If the port opens but Always allow cannot be saved, the passthrough stays open and the log says Always allow was not saved. If the request has ended by then, because it expired or the agent’s session ended, pressing `y` or `a` tells you so; `n` or `esc` closes the prompt.
+3. Once you allow it, Nearhost forwards the port and the agent gives you the laptop URL. Asking again for a port that is already open, from the same agent session, returns the same passthrough without a second prompt. A port that a running project already forwards is answered at once, with no prompt.
+
+On a server’s panel, press `tab` to move to the server’s open passthroughs, which are shown only when there are any. When there are more than fit, they scroll with the selection, and a `+N more` line says how many are hidden above or below. Use `j` and `k` or the arrow keys to move, and `tab` or `esc` to leave. Press `x` on a passthrough to close it at once. Home shows a `passthroughs` count while any are open.
+
+## When a passthrough ends
+
+A passthrough ends when any of these happens:
+
+* the session ends, which Claude Code’s `SessionEnd` hook reports;
+* you disconnect the server in Nearhost, remove it, or its connection fails (for example, authentication);
+* the server has been away for 10 minutes in a row;
+* the forwarded port stops answering for 5 minutes, checked every 30 seconds while the server is connected;
+* you close it, or Nearhost quits.
+
+The `SessionEnd` hook ships with the Claude Code plugin, so it runs only for plugin installs. With the skill installed through the skills CLI, or in another agent, the other conditions apply. If the laptop port was taken by something else while the server was away, that passthrough closes when the server comes back. If closing a passthrough’s forward fails, Nearhost keeps its laptop port and tries again on each check until it closes.
+
+## Without Nearhost connected
+
+When Nearhost is not connected to the server, the agent cannot ask for a passthrough. It tells you to select the server in Nearhost and press `c`, then ask again, or to forward the port yourself from the laptop. Adding `-o ExitOnForwardFailure=yes` to the command it gives makes `ssh` stop with an error when the laptop port is already taken, rather than stay connected without the forward:
+
+```sh
+ssh -N -o ExitOnForwardFailure=yes -L <port>:localhost:<port> <server>
+```
+
+# Documents from coding agents
+
+> Let a coding agent show a plan, spec or mockup it wrote in your laptop's browser, after you allow it in Nearhost.
+
+When an agent writes a plan, spec, report or HTML mockup for you to read, it can ask Nearhost to show it. Nearhost serves the document at an address on your laptop and opens it in your browser. This works for an agent on the laptop and for one on a server Nearhost is connected to, so you no longer need a second terminal to read a path on a server. Markdown is shown as a page; HTML is served as written. Agents offer this only for documents they wrote for you, never for code or config files. You can also ask directly with `/nearhost open <path>`. Needs Nearhost 0.11.0 or later; an older one answers without them, and the agent tells you to update it.
+
+1. The agent asks, and Nearhost opens a prompt over the interface: `Claude Code on mini wants to show plans/2026-10-28-x.md`, with a line saying which folder Nearhost will serve.
+2. Answer the prompt. See [Prompts and Always allow](/docs/coding-agents/prompts-and-always-allow/#the-prompt) for the keys, and [Always allow](/docs/coding-agents/prompts-and-always-allow/#always-allow) to stop being asked. If you refuse, the agent does not offer that folder again in the session and only gives you the path.
+3. Once you allow it, your browser opens the document and the agent gives you the address. It looks like `https://localhost:<web port>/d/<random>/plans/2026-10-28-x.md`, where `<web port>` is Nearhost’s web port, and `<random>` is a long random string that other pages cannot guess.
+
+With Always allow, the document opens in your browser at once, and Nearhost shows `Claude Code on mini opened plans/2026-10-28-x.md` in the status line.
+
+## What is served
+
+Nearhost serves the document’s git repository, so its images, stylesheets and linked documents work. A document that is not in a repository serves its own folder. A document directly in your home folder, or in `/`, is refused with `save the document in a project or a folder of its own`. Nearhost never serves dotfiles or the contents of dot folders inside that folder, and never follows a link out of it. A second document in the same folder reuses the address without a prompt for the agent you approved, and prompts any other.
+
+Nearhost keeps no copies. Each time the page loads, it reads the file again, from the laptop or over the server’s SSH connection, so reloading shows the current file. A file that has moved or gone shows as missing, never as an old version. A server that is not connected shows a page saying so; select it in Nearhost and press `c`.
+
+## Documents cannot reach your other pages
+
+Every file Nearhost serves from a document’s folder is sandboxed by the browser. Its scripts run, but they cannot read other pages on `localhost`, your projects’ cookies or storage, or other documents. Rendered markdown runs no scripts at all. Pages also send no referrer, so the address does not leak to sites a document links to.
+
+## When a served folder goes away
+
+Nearhost lists served folders on each server’s panel; press `tab` to reach its `documents` section. Home shows a count in its `agents` line. A folder stays served until:
+
+* Nearhost quits, as nothing is saved across restarts;
+* you press `x` on it in the server’s panel and confirm;
+* you remove the server from Nearhost, or rename it.
+
+Disconnecting a server does not remove its folders. Their pages say the server is not connected until it reconnects. The agent’s session ending does not remove them either, so you can read yesterday’s plan again while Nearhost runs. Home’s web page also lists the folders served since Nearhost started, with links to each document.
+
+If a project holds `localhost` and you started Nearhost with `--web-port 0`, there is no page to serve from, and the agent is told so.
+
+# Fix a project
+
+> Let a coding agent run Nearhost's project checks and fix what stops the project being served.
+
+Ask your coding agent to find and fix what stops a project being served.
+
+When a project is not served as you expect, run `/nearhost doctor` in its directory, or `$nearhost doctor` in Codex. The agent asks Nearhost to run the same [project checks](/docs/reference/cli/#project-checks) as `nearhost doctor` on this project, and works through the errors, then the warnings. Unlike `nearhost doctor`, this first reads the project’s `.nearhostrc` again, as described under [Agent API](/docs/coding-agents/how-it-works/#agent-api). Each finding’s fix has a kind, and the agent handles each kind in its own way:
 
 * **`project`.** The agent shows you the change, the snippet and where it goes, and makes it in the project’s files once you agree. When the setup is more than Nearhost can work out for itself, such as several hosts, a pattern, `localhost` or callbacks from Docker, it writes or edits the project’s [`.nearhostrc`](/docs/reference/nearhostrc/).
 * **`nearhost`.** Something you do in Nearhost, such as adding a port in the edit form. The agent passes it on, or offers to write the port or host into `.nearhostrc` instead.
@@ -509,7 +590,11 @@ After editing `.nearhostrc`, and for `nearhostrc.pending` and `nearhostrc.not-ap
 
 Then it runs the doctor again, and stops when nothing is left that it can fix. It never edits Nearhost’s `config.yaml` itself; Nearhost saves a change there when it applies one. Approving a change needs the full-screen interface: under `nearhost up`, the agent tells you to open `nearhost`.
 
-## How the agent reaches Nearhost
+# How agents reach Nearhost
+
+> The socket a coding agent reaches Nearhost on, how Nearhost forwards it to each server, and the agent API.
+
+This page explains the socket an agent talks to Nearhost on, and the calls it makes.
 
 Nearhost listens on `~/.nearhost/<id>.sock` on your laptop, where `<id>` is six letters and digits made when Nearhost first runs and kept in `~/.config/nearhost/id`. A config directory copied to another machine gets a new id there, so two laptops never share a socket. On each server it is connected to, it forwards a socket of the same name over its own SSH connection:
 
@@ -528,84 +613,6 @@ A socket path can be at most 103 bytes on macOS and 107 on Linux. With a home di
 
 To use one socket explicitly, set `NEARHOST_SOCKET` to its path where the agent runs.
 
-## Browser previews from a server
-
-An agent on a server can start a dev server, but you cannot see it in your browser until its port is forwarded to your laptop. With a passthrough, the agent asks Nearhost to forward that one port for the rest of the session, and you approve it first. The preview then opens on your laptop. It works for any HTTP dev server, whatever it is built with. Needs Nearhost 0.10.0 or later; an older Nearhost answers without passthrough, and the agent tells you to update it.
-
-1. The agent asks for a port, and Nearhost opens a prompt over the interface: `Claude Code on mini wants to open port 5173 on this laptop (browser preview).` If that port is in use on the laptop, the prompt says so and that it will open on another port; the agent reports the laptop URL once it opens. The prompt queues with proposals, and Home shows the same hint.
-2. Press `y` to allow it, `n` to refuse, or `a` for Always allow. `esc` counts as No. A prompt that waits 10 minutes expires. If you allow it and the port cannot be opened, the prompt shows why, and the agent is told it failed rather than that you refused, so it passes the reason on. If the port opens but Always allow cannot be saved, the passthrough stays open and the log says Always allow was not saved. If the request has ended by then, because it expired or the agent’s session ended, pressing `y` or `a` tells you so; `n` or `esc` closes the prompt.
-3. Once you allow it, Nearhost forwards the port and the agent gives you the laptop URL. Asking again for a port that is already open, from the same agent session, returns the same passthrough without a second prompt. A port that a running project already forwards is answered at once, with no prompt.
-
-Always allow covers one tool on one server: Claude Code on `mini`, say, but not Claude Code on another server, and not another tool on `mini`. Only Claude Code is offered it. Codex documents no variable that identifies it, so Codex and every other agent are shown as `An agent`, are always prompted and are never offered Always allow.
-
-On a server’s panel, press `tab` to move to the server’s open passthroughs and Always allowed rows, which are shown only when there are any. When there are more than fit, they scroll with the selection, and a `+N more` line says how many are hidden above or below. Use `j` and `k` or the arrow keys to move, and `tab` or `esc` to leave. Press `x` on a passthrough to close it at once. Press `x` on an Always allowed row to revoke it; Nearhost asks you to confirm first. Home shows a `passthroughs` count while any are open.
-
-### What the token protects
-
-When you choose Always allow, Nearhost makes a token for that tool on that server. The skill keeps the token on the server, in `${XDG_STATE_HOME:-~/.local/state}/nearhost/tokens/<laptop id>/<requester>`, readable by your account only. The skill sends it with later requests, so Nearhost does not ask again. The laptop keeps only a SHA-256 hash of the token, in `grants.json` beside the install id in `~/.config/nearhost` (or under `XDG_CONFIG_HOME`).
-
-The token stops a different tool from borrowing an approval, and it stops anything from using one after you revoke it. It does not protect against anything else running as your account on the server: such a process can read the token file and use the approval. Treat Always allow as trust in everything that runs as you on that server. A wrong or revoked token gets a `401`; the skill drops it and asks again, so you are prompted.
-
-Removing a server from Nearhost, or renaming it, revokes its Always allow grants, so a server added later under the same name starts with none. Nearhost does this when it next applies the config or starts, and the log says how many it removed. It does this only for its default config file, not one given with `--config`, and never while that file is missing, so a config file that disappears for a moment does not cost you your grants.
-
-If `grants.json` cannot be read, Nearhost still serves coding agents but turns passthrough off, and says which file it could not read. Fix or remove the file, then restart Nearhost.
-
-### When a passthrough ends
-
-A passthrough ends when any of these happens:
-
-* the session ends, which Claude Code’s `SessionEnd` hook reports;
-* you disconnect the server in Nearhost, remove it, or its connection fails (for example, authentication);
-* the server has been away for 10 minutes in a row;
-* the forwarded port stops answering for 5 minutes, checked every 30 seconds while the server is connected;
-* you close it, or Nearhost quits.
-
-The `SessionEnd` hook ships with the Claude Code plugin, so it runs only for plugin installs. With the skill installed through the skills CLI, or in another agent, the other conditions apply. If the laptop port was taken by something else while the server was away, that passthrough closes when the server comes back. If closing a passthrough’s forward fails, Nearhost keeps its laptop port and tries again on each check until it closes.
-
-### Without Nearhost connected
-
-When Nearhost is not connected to the server, the agent cannot ask for a passthrough. It tells you to select the server in Nearhost and press `c`, then ask again, or to forward the port yourself from the laptop. Adding `-o ExitOnForwardFailure=yes` to the command it gives makes `ssh` stop with an error when the laptop port is already taken, rather than stay connected without the forward:
-
-```sh
-ssh -N -o ExitOnForwardFailure=yes -L <port>:localhost:<port> <server>
-```
-
-## Documents from coding agents
-
-When an agent writes a plan, spec, report or HTML mockup for you to read, it can ask Nearhost to show it. Nearhost serves the document at an address on your laptop and opens it in your browser. This works for an agent on the laptop and for one on a server Nearhost is connected to, so you no longer need a second terminal to read a path on a server. Markdown is shown as a page; HTML is served as written. Agents offer this only for documents they wrote for you, never for code or config files. You can also ask directly with `/nearhost open <path>`. It needs a Nearhost version that ships documents; an older one answers without them, and the agent tells you to update it.
-
-1. The agent asks, and Nearhost opens a prompt over the interface: `Claude Code on mini wants to show plans/2026-10-28-x.md`, with a line saying which folder Nearhost will serve. The prompt queues with proposals and passthroughs, and Home shows the same hint.
-2. Press `y` to allow it, `n` to refuse, or `a` for Always allow. `esc` counts as No. A prompt that waits 10 minutes expires. If you refuse, the agent does not offer that folder again in the session and only gives you the path.
-3. Once you allow it, your browser opens the document and the agent gives you the address. It looks like `https://localhost:<web port>/d/<random>/plans/2026-10-28-x.md`, where `<web port>` is Nearhost’s web port, and `<random>` is a long random string that other pages cannot guess.
-
-### What is served
-
-Nearhost serves the document’s git repository, so its images, stylesheets and linked documents work. A document that is not in a repository serves its own folder. A document directly in your home folder, or in `/`, is refused with `save the document in a project or a folder of its own`. Nearhost never serves dotfiles or the contents of dot folders inside that folder, and never follows a link out of it. A second document in the same folder reuses the address without a prompt for the agent you approved, and prompts any other.
-
-Nearhost keeps no copies. Each time the page loads, it reads the file again, from the laptop or over the server’s SSH connection, so reloading shows the current file. A file that has moved or gone shows as missing, never as an old version. A server that is not connected shows a page saying so; select it in Nearhost and press `c`.
-
-### Documents cannot reach your other pages
-
-Every file Nearhost serves from a document’s folder is sandboxed by the browser. Its scripts run, but they cannot read other pages on `localhost`, your projects’ cookies or storage, or other documents. Rendered markdown runs no scripts at all. Pages also send no referrer, so the address does not leak to sites a document links to.
-
-### Always allow
-
-Always allow covers one tool on one server, as for previews: Claude Code on `mini`, say, and not another tool or server. Only Claude Code is offered it; other agents are shown as `An agent` and are always prompted. It is kept separately from the preview approval, so revoking one leaves the other working. The skill keeps the token on the server in a file ending in `.documents`, beside the preview token, and Nearhost keeps a hash in `grants.json`. The note under [What the token protects](#what-the-token-protects) applies: anything that runs as you on that server can use the approval.
-
-With Always allow, the document opens in your browser at once, and Nearhost shows `Claude Code on mini opened plans/2026-10-28-x.md` in the status line. On a server’s panel, press `tab` to reach its `documents` and `always allowed` sections. Press `x` on an always allowed row to revoke it, after a confirm. Revoking leaves open documents in place.
-
-### When a served folder goes away
-
-Nearhost lists served folders on each server’s panel, and Home shows a count in its `agents` line. A folder stays served until:
-
-* Nearhost quits, as nothing is saved across restarts;
-* you press `x` on it in the server’s panel and confirm;
-* you remove the server from Nearhost, or rename it.
-
-Disconnecting a server does not remove its folders. Their pages say the server is not connected until it reconnects. The agent’s session ending does not remove them either, so you can read yesterday’s plan again while Nearhost runs. Home’s web page also lists the folders served since Nearhost started, with links to each document.
-
-If a project holds `localhost` and you started Nearhost with `--web-port 0`, there is no page to serve from, and the agent is told so.
-
 ## Agent API
 
 The skill’s script talks to Nearhost over that socket, with `curl --unix-socket`. Nearhost answers JSON for the machine the socket belongs to. These calls are the ones the doctor uses:
@@ -614,7 +621,47 @@ The skill’s script talks to Nearhost over that socket, with `curl --unix-socke
 * `GET /v1/doctor?path=…` returns `project` and `findings` for the project holding the absolute path, in the shape that [`nearhost doctor --json`](/docs/reference/cli/#json-output) gives its findings. For a project already in Nearhost, it first reads the project’s `.nearhostrc` again, as a reload does: a change that needs no approval is applied, restarting the project if it runs under `nearhost up`, and one that needs approval waits in Nearhost. For a directory that is not in Nearhost yet, `project` is `null`, each finding’s `project` is empty, and the findings are for the project as it would be added.
 * `POST /v1/projects/reload`, with `{"path": "/abs/dir"}`, asks Nearhost to read the `.nearhostrc` of the project holding the path again. The project must be added first. It answers `applied` when nothing needs approval, or `pending` with an `id` the agent waits on, as it does for a proposal, while you decide. A change you declined stays declined until the file changes or Nearhost restarts.
 
-## When agents cannot reach Nearhost
+# Prompts and Always allow
+
+> How Nearhost asks before an agent opens a preview or a document, what Always allow covers, and how to revoke it.
+
+Browser previews and documents ask you first, in the same way. This page covers the prompt, what Always allow does, and how to take it back.
+
+## The prompt
+
+Press `y` to allow it, `n` to refuse, or `a` for Always allow. `esc` counts as No. A prompt that waits 10 minutes expires. The prompt queues with proposals and passthroughs, and Home shows the same hint.
+
+## Always allow
+
+Always allow covers one tool on one server: Claude Code on `mini`, say, but not Claude Code on another server, and not another tool on `mini`. Only Claude Code is offered it. Codex documents no variable that identifies it, so Codex and every other agent are shown as `An agent`, are always prompted and are never offered Always allow.
+
+Previews and documents are approved separately, so revoking one leaves the other working.
+
+To revoke one, press `tab` on the server’s panel to reach its `always allowed` section, which also lists the Always allowed rows, and `x` on a row. Nearhost asks you to confirm first. Revoking leaves open passthroughs and documents in place.
+
+## What the token protects
+
+When you choose Always allow, Nearhost makes a token for that tool on that server. The skill keeps the token on the server, in `${XDG_STATE_HOME:-~/.local/state}/nearhost/tokens/<laptop id>/<requester>`, readable by your account only. For documents, the file ends in `.documents`, beside the preview token. The skill sends it with later requests, so Nearhost does not ask again. The laptop keeps only a SHA-256 hash of the token, in `grants.json` beside the install id in `~/.config/nearhost` (or under `XDG_CONFIG_HOME`).
+
+The token stops a different tool from borrowing an approval, and it stops anything from using one after you revoke it. It does not protect against anything else running as your account on the server: such a process can read the token file and use the approval. Treat Always allow as trust in everything that runs as you on that server. A wrong or revoked token gets a `401`; the skill drops it and asks again, so you are prompted.
+
+Removing a server from Nearhost, or renaming it, revokes its Always allow grants, so a server added later under the same name starts with none. Nearhost does this when it next applies the config or starts, and the log says how many it removed. It does this only for its default config file, not one given with `--config`, and never while that file is missing, so a config file that disappears for a moment does not cost you your grants.
+
+If `grants.json` cannot be read, Nearhost still serves coding agents but turns passthrough off, and says which file it could not read. Fix or remove the file, then restart Nearhost.
+
+## Turn notifications off
+
+Add this to the [config](/docs/reference/config/):
+
+```yaml
+notifications: false
+```
+
+# When agents cannot reach Nearhost
+
+> Fix an sshd that refuses Nearhost's socket forward, or an agent sandbox that blocks the socket.
+
+Two things can stop an agent reaching Nearhost: the server’s sshd, or the agent’s own sandbox.
 
 **The server refuses the forward.** Its sshd has `AllowStreamLocalForwarding no`. The server’s panel shows `agents unavailable` with sshd’s message, and so does `nearhost doctor`. Set `AllowStreamLocalForwarding yes` in the server’s `sshd_config` and press `r` on the server to reconnect. Projects serve either way, and `r` on Home leaves such a server connected.
 
@@ -634,14 +681,6 @@ Two settings also work, but open far more than Nearhost:
 * **Codex’s** `network_access = true` under `[sandbox_workspace_write]` gives its sandbox the network and every socket.
 
 Every socket includes ones like Docker’s `/var/run/docker.sock`, and a command that reaches Docker’s socket can take over the machine. Use these settings only if that is acceptable where the agent runs; otherwise approve the command when the agent asks.
-
-## Turn notifications off
-
-Add this to the [config](/docs/reference/config/):
-
-```yaml
-notifications: false
-```
 
 # Dev servers and hot reload
 
@@ -832,7 +871,7 @@ Inferred hosts are fixed when the project is added or edited. Changing `APP_URL`
 
 ## Where the URLs show
 
-The project view in the interface lists every URL under the project’s name. A pattern is shown dim, since a browser cannot open it. For a coding agent, `/nearhost status` reports the main URL as `url`, and every URL the project serves, the main one first, as `urls`. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+The project view in the interface lists every URL under the project’s name. A pattern is shown dim, since a browser cannot open it. For a coding agent, `/nearhost status` reports the main URL as `url`, and every URL the project serves, the main one first, as `urls`. See [Add a project](/docs/coding-agents/add-a-project/).
 
 ## An example
 
@@ -1048,7 +1087,7 @@ Nearhost keeps the list of forwards each server should have. After a reconnect i
 
 ## The agent socket
 
-Each master also forwards a Unix socket back to the laptop, at `~/.nearhost/<id>.sock` on the server, so that a coding agent there reaches Nearhost. It is added after the master connects and again after each reconnect, and a server that refuses it only loses that: its projects serve as usual. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+Each master also forwards a Unix socket back to the laptop, at `~/.nearhost/<id>.sock` on the server, so that a coding agent there reaches Nearhost. It is added after the master connects and again after each reconnect, and a server that refuses it only loses that: its projects serve as usual. See [How agents reach Nearhost](/docs/coding-agents/how-it-works/).
 
 ## Reconnection and backoff
 
@@ -1283,7 +1322,7 @@ When Nearhost quits, the forwards and the connection close. `~/.nearhost` stays,
 
 ## What coding agents can do
 
-A coding agent reaches Nearhost through a socket that only your user can open, and sees only the projects of the machine it runs on. Without asking you, it can list those projects, run `nearhost doctor` on a folder, and ask Nearhost to reload a project’s `.nearhostrc`. Nearhost applies changes such as ports and new `.test` hosts straight away and saves them to `config.yaml`; the agent never edits that file itself. Anything else, including other domains, wildcards, `localhost` and `docker_clients`, waits for you to approve it. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+A coding agent reaches Nearhost through a socket that only your user can open, and sees only the projects of the machine it runs on. Without asking you, it can list those projects, run `nearhost doctor` on a folder, and ask Nearhost to reload a project’s `.nearhostrc`. Nearhost applies changes such as ports and new `.test` hosts straight away and saves them to `config.yaml`; the agent never edits that file itself. Anything else, including other domains, wildcards, `localhost` and `docker_clients`, waits for you to approve it. See [How agents reach Nearhost](/docs/coding-agents/how-it-works/).
 
 ## Undo everything
 
@@ -1635,7 +1674,7 @@ For a project whose `.nearhostrc` has a mistyped key, with a route that also ser
 }
 ```
 
-`api.local.example.com` and `shop.test` do not resolve to this machine either, but the `hosts block` check already names them, so no `hosts.unresolved` finding repeats them. The exit status is 1. Coding agents run the same checks on one project through the [agent API](/docs/getting-started/use-a-coding-agent/#agent-api).
+`api.local.example.com` and `shop.test` do not resolve to this machine either, but the `hosts block` check already names them, so no `hosts.unresolved` finding repeats them. The exit status is 1. Coding agents run the same checks on one project through the [agent API](/docs/coding-agents/how-it-works/#agent-api).
 
 ## nearhost preset
 
@@ -2154,7 +2193,7 @@ Run it in a terminal and handle the host key, passphrase or `ssh-add` prompt. Th
 
 ## Agents unavailable on a server
 
-The server’s sshd refuses the socket coding agents reach Nearhost on, usually because `sshd_config` sets `AllowStreamLocalForwarding no`. Set it to `yes`, reload sshd and press `r` on the server. `nearhost doctor` shows the same check. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+The server’s sshd refuses the socket coding agents reach Nearhost on, usually because `sshd_config` sets `AllowStreamLocalForwarding no`. Set it to `yes`, reload sshd and press `r` on the server. `nearhost doctor` shows the same check. See [When agents cannot reach Nearhost](/docs/coding-agents/troubleshooting/).
 
 ## A server shows dropped
 
