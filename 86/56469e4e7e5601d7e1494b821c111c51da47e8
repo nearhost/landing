@@ -1,0 +1,21 @@
+src/content/docs/docs/coding-agents/documents.md
+  s_f4e5f254be91ba::t_b25156b79881c0 18,36
+src/components/landing/agents/scenes.ts
+  s_f4e5f254be91ba::t_b25156b79881c0 35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8656469e4e7e5601d7e1494b821c111c51da47e8",
+  "prompts": {},
+  "sessions": {
+    "s_f4e5f254be91ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a44b06e0-2635-49c9-9f5c-26fe1b6ff124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
