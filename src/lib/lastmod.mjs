@@ -11,8 +11,8 @@ const landingSources = [
 ];
 
 /**
- * The source files behind a page, from its path below the site base, or none for a page
- * that does not come from a file of its own.
+ * The source files behind a page, from its path below the site base: its Markdown file, or
+ * the index file of its folder, or none for a page that does not come from a file of its own.
  * @param {string} path such as "" or "docs/guides/workos-sign-in/"
  * @returns {string[]}
  */
@@ -20,7 +20,7 @@ export function sourcesFor(path) {
   if (path === '') return landingSources;
   const slug = path.replace(/\/$/, '');
   if (!slug.startsWith('docs/')) return [];
-  return ['.md', '.mdx']
+  return ['.md', '.mdx', '/index.md', '/index.mdx']
     .map((ext) => `src/content/docs/${slug}${ext}`)
     .filter((file) => existsSync(file));
 }

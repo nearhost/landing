@@ -44,3 +44,9 @@ test('dates a directory git does not know by the newest file in it', () => {
   assert.equal(lastModified([dir]), new Date(statSync(file).mtimeMs).toISOString());
   rmSync(dir, { recursive: true });
 });
+
+test('an index page is dated by its index.md', () => {
+  assert.deepEqual(sourcesFor('docs/coding-agents/'), [
+    'src/content/docs/docs/coding-agents/index.md',
+  ]);
+});

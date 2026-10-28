@@ -266,7 +266,7 @@ For a project whose `.nearhostrc` has a mistyped key, with a route that also ser
 }
 ```
 
-`api.local.example.com` and `shop.test` do not resolve to this machine either, but the `hosts block` check already names them, so no `hosts.unresolved` finding repeats them. The exit status is 1. Coding agents run the same checks on one project through the [agent API](/docs/getting-started/use-a-coding-agent/#agent-api).
+`api.local.example.com` and `shop.test` do not resolve to this machine either, but the `hosts block` check already names them, so no `hosts.unresolved` finding repeats them. The exit status is 1. Coding agents run the same checks on one project through the [agent API](/docs/coding-agents/how-it-works/#agent-api).
 
 ## nearhost preset
 

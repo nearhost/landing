@@ -42,7 +42,7 @@ Nearhost keeps the list of forwards each server should have. After a reconnect i
 
 ## The agent socket
 
-Each master also forwards a Unix socket back to the laptop, at `~/.nearhost/<id>.sock` on the server, so that a coding agent there reaches Nearhost. It is added after the master connects and again after each reconnect, and a server that refuses it only loses that: its projects serve as usual. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+Each master also forwards a Unix socket back to the laptop, at `~/.nearhost/<id>.sock` on the server, so that a coding agent there reaches Nearhost. It is added after the master connects and again after each reconnect, and a server that refuses it only loses that: its projects serve as usual. See [How agents reach Nearhost](/docs/coding-agents/how-it-works/).
 
 ## Reconnection and backoff
 

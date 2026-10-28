@@ -85,7 +85,7 @@ Run it in a terminal and handle the host key, passphrase or `ssh-add` prompt. Th
 
 ## Agents unavailable on a server
 
-The server's sshd refuses the socket coding agents reach Nearhost on, usually because `sshd_config` sets `AllowStreamLocalForwarding no`. Set it to `yes`, reload sshd and press `r` on the server. `nearhost doctor` shows the same check. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+The server's sshd refuses the socket coding agents reach Nearhost on, usually because `sshd_config` sets `AllowStreamLocalForwarding no`. Set it to `yes`, reload sshd and press `r` on the server. `nearhost doctor` shows the same check. See [When agents cannot reach Nearhost](/docs/coding-agents/troubleshooting/).
 
 ## A server shows dropped
 
