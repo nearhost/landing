@@ -1,0 +1,19 @@
+scripts/verify-dist.mjs
+  s_f4e5f254be91ba::t_1e2dbf979e71f3 164-165,167,199-226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "969cd99ee9c353cbfaaa577ad990839c54c528be",
+  "prompts": {},
+  "sessions": {
+    "s_f4e5f254be91ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a44b06e0-2635-49c9-9f5c-26fe1b6ff124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
