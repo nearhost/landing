@@ -5,7 +5,7 @@ sidebar:
   order: 2
 ---
 
-Ask your coding agent to serve the project it is working in, and Nearhost opens the add form for you to review.
+With the [`nearhost` skill installed](/docs/coding-agents/#install-the-skill), ask your coding agent to serve the project it is working in, and Nearhost opens the add form for you to review.
 
 In the project's directory, run `/nearhost add` in Claude Code, or `$nearhost add` in Codex. Asking in your own words, such as "serve this with Nearhost", works too.
 
