@@ -1,0 +1,64 @@
+scripts/verify-dist.mjs
+  s_f4e5f254be91ba::t_8bc2a0ed56b622 164-175
+  s_f4e5f254be91ba::t_fe98c1183f15a8 150,176-196
+  s_f4e5f254be91ba::t_7fc926edd88125 197-203
+src/components/landing/Nav.astro
+  s_f4e5f254be91ba::t_c494590183be41 9
+src/pages/index.astro
+  s_f4e5f254be91ba::t_65b81b8d95bb1b 26
+src/components/landing/Hero.astro
+  s_f4e5f254be91ba::t_e010bdeb415e7a 19-21
+package.json
+  s_f4e5f254be91ba::t_2c5d0cbcf9181b 23
+src/lib/agent-tour.test.mjs
+  s_f4e5f254be91ba::t_2c5d0cbcf9181b 1-47,55-112
+  s_f4e5f254be91ba::t_8a2d4976cd7ce4 48-54
+src/lib/agent-tour.mjs
+  s_f4e5f254be91ba::t_8a2d4976cd7ce4 1-96
+src/components/landing/agents/Terminal.astro
+  s_f4e5f254be91ba::t_884e850b0fe0d1 12-16
+  s_f4e5f254be91ba::t_f310cc316e7903 1-11,17-111
+src/components/landing/agents/NearhostWindow.astro
+  s_f4e5f254be91ba::t_884e850b0fe0d1 8-12
+  s_f4e5f254be91ba::t_f310cc316e7903 1-7,13-77
+src/components/landing/agents/ClaudeScene.astro
+  s_f4e5f254be91ba::t_4e1a13ba664deb 1-4,6-27,30-78,80-91,94-102,104-201
+  s_f4e5f254be91ba::t_e1b32fb0823bc7 92-93
+  s_f4e5f254be91ba::t_702199fa2e58ac 5,28-29,79,103
+src/components/landing/Agents.astro
+  s_f4e5f254be91ba::t_98b62579ef0fdd 10,15,20-22,31-33,40-41,60-63,85-87,89,93-95,104-106,116-132,136,138-139,143,148,156,159-161,183-186,188-194,196-203,219-220,222-227,229-252,255,259-296,299,321,327,344,346-348,352,354-363,367-368,370-374,376-382,384-385,387-391,393-395,397-398,403-406,409-415,418-419,421,424-425,427-428,430-431,433,435,437-439,453-454,457-460,462-468,470-473,475,477-478,482-483,485-495,497-498,500-502,504-509,567-575
+  s_f4e5f254be91ba::t_884e850b0fe0d1 43-59,64-71,90-92,96-103,107-115,133-134,162-163,434
+  s_f4e5f254be91ba::t_f9afddbcfc586b 16,72-84,206-209
+  s_f4e5f254be91ba::t_ecb1950ab95d13 2-7,12,17,19,42,88,204-205,228,297-298,480-481
+  s_f4e5f254be91ba::t_63df13b70bc66a 11,18
+  s_f4e5f254be91ba::t_81c7433e7d059a 210-218,401-402
+  s_f4e5f254be91ba::t_fe9682c70080f9 441-451
+src/components/landing/agents/scenes.ts
+  s_f4e5f254be91ba::t_738e692c0f5a34 1-4,16-25,27-34,36-38,52
+  s_f4e5f254be91ba::t_f9afddbcfc586b 5-15
+  s_f4e5f254be91ba::t_63df13b70bc66a 39-41,43,45-46,48-51
+  s_f4e5f254be91ba::t_5017923f27fd09 42,44
+src/components/landing/agents/Scene.astro
+  s_f4e5f254be91ba::t_702199fa2e58ac 1-47
+src/components/landing/agents/BrowserWindow.astro
+  s_f4e5f254be91ba::t_63df13b70bc66a 1-76
+src/components/landing/agents/CodexScene.astro
+  s_f4e5f254be91ba::t_63df13b70bc66a 1-28,30-39,41-164,166-225
+  s_f4e5f254be91ba::t_ebd98e7e44d901 29,40,165
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "42887e6979d00ac0175f6c5955bc1aa2b881b502",
+  "prompts": {},
+  "sessions": {
+    "s_f4e5f254be91ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a44b06e0-2635-49c9-9f5c-26fe1b6ff124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
