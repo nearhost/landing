@@ -185,11 +185,15 @@ if (existsSync(index)) {
     `agent tabs ${tabs} must match panels ${panels}`,
   );
   check(
-    !/Claude Code|Codex|Qwen/.test(agents.match(/role="tablist"[\s\S]*?<\/div>/)?.[0] ?? ''),
+    !/Claude|Codex|Qwen|Cursor|Gemini|Copilot/.test(
+      agents.match(/role="tablist"[\s\S]*?<\/div>/)?.[0] ?? '',
+    ),
     'scene selectors must not name an agent',
   );
   check(
-    decode(agents).includes('Nothing is added, forwarded or opened until you say yes in Nearhost.'),
+    decode(agents).includes(
+      'Nothing is added, forwarded or opened until you say yes in Nearhost, or have chosen Always allow for it.',
+    ),
     'agents facts copy changed',
   );
   check(
@@ -215,7 +219,13 @@ if (existsSync(index)) {
     const url = new URL(href, new URL(base + 'index.html', 'https://nearhost.dev'));
     const path = decodeURIComponent(url.pathname.slice(base.length));
     const target = join(dist, path, path === '' || path.endsWith('/') ? 'index.html' : '');
-    if (!url.pathname.startsWith(base) || !existsSync(target) || statSync(target).isDirectory()) {
+    if (
+      url.origin !== 'https://nearhost.dev' ||
+      !url.pathname.startsWith(base) ||
+      !target.startsWith(dist) ||
+      !existsSync(target) ||
+      statSync(target).isDirectory()
+    ) {
       failures.push(`the ${scene.id} scene links to ${href}, which is not in dist/`);
       continue;
     }
