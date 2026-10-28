@@ -23,10 +23,10 @@ describe('tourTimeline', () => {
   });
 
   it('types an emoji as one character', () => {
-    const { typed } = tourTimeline('a🙂b', 10);
+    const { typed } = tourTimeline('a🙂👨‍👩‍👧b', 10);
     assert.deepEqual(
       typed.map(([, text]) => text),
-      ['a', 'a🙂', 'a🙂b'],
+      ['a', 'a🙂', 'a🙂👨‍👩‍👧', 'a🙂👨‍👩‍👧b'],
     );
   });
 });
