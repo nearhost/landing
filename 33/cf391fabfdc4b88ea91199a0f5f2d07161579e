@@ -1,0 +1,21 @@
+src/content/docs/docs/coding-agents/documents.md
+  s_f4e5f254be91ba::t_edec972e6d8ba8 28
+src/content/docs/docs/coding-agents/prompts-and-always-allow.md
+  s_f4e5f254be91ba::t_1487c931cf57f7 12,20
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "33cf391fabfdc4b88ea91199a0f5f2d07161579e",
+  "prompts": {},
+  "sessions": {
+    "s_f4e5f254be91ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a44b06e0-2635-49c9-9f5c-26fe1b6ff124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
