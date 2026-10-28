@@ -250,6 +250,10 @@ for (const name of ['llms.txt', 'llms-full.txt', 'llms-small.txt']) {
   const text = readFileSync(file, 'utf8');
   check(/^(<SYSTEM>.*<\/SYSTEM>\s*)?# /.test(text), `dist/${name} must start with a heading`);
   check(!text.includes('Section titled'), `dist/${name} contains heading anchor text`);
+  check(
+    !text.includes('use-a-coding-agent'),
+    `dist/${name} mentions the old coding agent page, which only redirects`,
+  );
 }
 
 // 8. Every sitemap entry carries the date its page last changed.

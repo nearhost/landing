@@ -1,7 +1,8 @@
 ---
-title: Add a project
+title: Add a project from an agent
 description: Ask a coding agent to add the project it is working in, then save or dismiss the add form Nearhost fills in.
 sidebar:
+  label: Add a project
   order: 2
 ---
 

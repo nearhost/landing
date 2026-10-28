@@ -21,9 +21,15 @@ const canonical = new URL(overview, Astro.site).href;
       <meta http-equiv="refresh" content={`0; url=${overview}`} />
     </noscript>
     <script is:inline define:vars={{ moves, base }}>
-      // Same lookup as newPath() in src/lib/coding-agents-redirect.mjs.
+      // Same lookup as newPath() in src/lib/coding-agents-redirect.mjs. The query string, such as
+      // utm_ tags, comes along.
       const key = location.hash.replace(/^#/, '');
-      location.replace(base + (Object.hasOwn(moves, key) ? moves[key] : moves['']));
+      const to = new URL(
+        base + (Object.hasOwn(moves, key) ? moves[key] : moves['']),
+        location.href,
+      );
+      to.search = location.search;
+      location.replace(to);
     </script>
   </head>
   <body>
