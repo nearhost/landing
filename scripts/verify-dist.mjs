@@ -278,7 +278,14 @@ for (const file of pages) {
     [...html.matchAll(/<a\s[^>]*?href=(?:"([^"]*)"|'([^']*)')/gi)].map((m) => m[1] ?? m[2]),
   );
   for (const href of hrefs) {
-    if (href.startsWith('#')) continue;
+    if (href.startsWith('#')) {
+      // A link within the page: its anchor must be on the page.
+      const fragment = decodeURIComponent(href.slice(1));
+      if (fragment && !html.includes(`id="${fragment}"`)) {
+        failures.push(`${file} links to ${href}, but the page has no #${fragment}`);
+      }
+      continue;
+    }
     const absolute = /^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith('//');
     const prefix = absolute ? '/' : base;
     if (!absolute && base !== '/' && href.startsWith('/') && !href.startsWith(base)) {
@@ -347,13 +354,23 @@ if (!existsSync(oldPage)) {
     html.includes(`href="${base}docs/coding-agents/"`),
     'the old coding agent page does not link to the overview',
   );
+  // The redirect script, inline or bundled, carries the base as a string.
+  const scripts = [...html.matchAll(/<script\b([^>]*)>([^<]*)<\/script>/gi)]
+    .map(([, attrs, body]) => {
+      const src = attrs.match(/\ssrc="([^"]+)"/)?.[1];
+      const file = src && join(dist, src.slice(base.length));
+      return src ? (file && existsSync(file) ? readFileSync(file, 'utf8') : '') : body;
+    })
+    .filter((script) => script.includes('location.replace'));
   check(
-    html.includes(`const base = ${JSON.stringify(base)};`),
+    scripts.some((script) =>
+      new RegExp(`[\`'"]${base.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}[\`'"]`).test(script),
+    ),
     'the old coding agent page does not redirect through the site base',
   );
 }
+// Section 8 fails when the sitemap is missing.
 const sitemap = join(dist, 'sitemap-0.xml');
-check(existsSync(sitemap), 'dist/sitemap-0.xml does not exist');
 if (existsSync(sitemap)) {
   check(
     !readFileSync(sitemap, 'utf8').includes('use-a-coding-agent'),

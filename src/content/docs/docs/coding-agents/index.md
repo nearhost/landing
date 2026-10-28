@@ -13,7 +13,7 @@ A coding agent can ask Nearhost to add the project it is working in, can read wh
 - [Browser previews from a server](/docs/coding-agents/browser-previews/): the agent asks to forward its dev server's port, and the preview opens in your laptop's browser.
 - [Documents from coding agents](/docs/coding-agents/documents/): the agent asks to show a plan, spec or mockup it wrote, and Nearhost opens it in your browser.
 
-Nothing happens until you say yes in Nearhost. See [Prompts and Always allow](/docs/coding-agents/prompts-and-always-allow/).
+An add, a browser preview and a document each wait for your yes in Nearhost. See [Prompts and Always allow](/docs/coding-agents/prompts-and-always-allow/).
 
 ## Install the skill
 
@@ -31,4 +31,4 @@ In Claude Code you can install it as a plugin instead:
 /plugin install nearhost --marketplace nearhost/nearhost
 ```
 
-The skill needs `sh` and `curl`, and nothing else. Nothing is installed with it.
+The skill needs `sh` and `curl`, and nothing else. Nothing is installed with it. The plugin also brings a `SessionEnd` hook, which closes browser previews when the session ends.

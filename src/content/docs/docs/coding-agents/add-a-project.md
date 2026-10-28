@@ -16,7 +16,7 @@ In the project's directory, run `/nearhost add` in Claude Code, or `$nearhost ad
 4. Save it, and the agent reports `https://myapp.test`. Press `esc` on the path, and the agent is told you declined.
 5. The agent waits up to 30 seconds for the project to start, then runs the doctor on it and offers to work through any errors or warnings it finds. See [Fix a project](/docs/coding-agents/fix-a-project/).
 
-If a form is already open, the proposal waits, and Home shows `1 proposal waiting · p to review`. It opens when the form closes, or when you press `p`. An agent waits 10 minutes for an answer.
+If a form is already open, the proposal waits, and Home shows `1 request waiting · p to review`. It opens when the form closes, or when you press `p`. An agent waits 10 minutes for an answer.
 
 `/nearhost status` reports the project holding the current directory: its address, every address it serves in `urls`, its state and any error. A project with several web routes or hosts has one URL for each, so you can see where each service lives. `/nearhost status --all` reports every project on the machine the agent runs on.
 

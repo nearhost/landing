@@ -36,6 +36,7 @@ Copies made with a key or the mouse, adds, saves, removals and failures are conf
 | `l`      | Full-screen log of the selected row, or of everything from Home.        |
 | `n`      | Add a project, on the selected server or the selected project's server. |
 | `s`      | Add a server.                                                           |
+| `p`      | Review the next request a coding agent is waiting on.                   |
 | `?`      | Show or hide every key.                                                 |
 | `q`      | Quit. This stops every project.                                         |
 
