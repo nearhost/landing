@@ -30,7 +30,7 @@ const tour = JSON.stringify(
       <p>
         Coding agents on a server can add the project to Nearhost, open the preview they just
         started, and show you the plan they wrote, in the browser on your laptop. Nearhost asks you
-        first, every time, and the agent gets the address once you say yes.
+        first, and the agent gets the address once you say yes.
       </p>
       <a class="more" href={url('/docs/coding-agents/')}>
         Coding agents
@@ -153,7 +153,10 @@ const tour = JSON.stringify(
 
     <div class="after">
       <ul class="facts">
-        <li>Nothing is added, forwarded or opened until you say yes in Nearhost.</li>
+        <li>
+          Nothing is added, forwarded or opened until you say yes in Nearhost. Claude Code can also
+          be given Always allow for previews and documents.
+        </li>
         <li>
           On a server, the agent reaches Nearhost through the SSH connection Nearhost already has.
           No port is opened on the server.
@@ -180,9 +183,10 @@ const tour = JSON.stringify(
 </section>
 
 <script>
-  // Plays the gallery once the section is half in view: each scene types its prompt, steps
-  // through the exchange, pauses on the finished frame and hands over to the next. Clicking a
-  // selector or an arrow stops it on that scene, finished. With reduced motion it waits for play.
+  // Plays the gallery once the stage is in view: each scene types its prompt, steps through the
+  // exchange, pauses on the finished frame and hands over to the next. Clicking a selector or an
+  // arrow, or moving focus into the section, stops it on that scene, finished. With reduced motion
+  // it waits for play.
   import { createTour } from '../../lib/agent-tour.mjs';
 
   interface TourScene {
@@ -207,9 +211,18 @@ const tour = JSON.stringify(
       tablist,
       ...section.querySelectorAll<HTMLElement>('[data-controls], [data-caption-block]'),
     ];
-    const showPanel = (id: string) => panels.forEach((p) => (p.hidden = p.dataset.panel !== id));
+    // The panels share one grid cell, so the stage keeps the tallest one's height; the others
+    // stay laid out but invisible and out of reach.
+    const showPanel = (id: string) =>
+      panels.forEach((p) => {
+        const off = p.dataset.panel !== id;
+        p.inert = off;
+        if (off) p.setAttribute('aria-hidden', 'true');
+        else p.removeAttribute('aria-hidden');
+      });
     const toggle = section.querySelector<HTMLButtonElement>('[data-toggle]')!;
     let current = 0;
+    let isPlaying = false;
 
     const tour = createTour({
       scenes,
@@ -220,6 +233,7 @@ const tour = JSON.stringify(
         showPanel(id);
         stage.dataset.step = String(step);
         stage.classList.toggle('playing', playing);
+        isPlaying = playing;
         const box = stage.querySelector<HTMLElement>(`[data-panel="${id}"] [data-typed]`);
         if (box) box.textContent = typed;
         caption.textContent = scenes[scene].caption;
@@ -241,25 +255,58 @@ const tour = JSON.stringify(
       },
     });
 
+    // The tour starts once enough of the stage is in view: half of it, or half the viewport when
+    // the stage is taller than that. While it is out of view or the page is hidden the tour is
+    // suspended, and it restarts the scene it was on when it comes back.
     let started = false;
-    const seen = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) begin();
-      },
-      { threshold: 0.5 },
-    );
-    const begin = () => {
-      if (started) return;
-      started = true;
-      seen.disconnect();
-      tour.start({ still: window.matchMedia('(prefers-reduced-motion: reduce)').matches });
+    let chosen = false;
+    let suspended = false;
+    let inView = false;
+    const update = () => {
+      if (chosen) return;
+      if (inView && !document.hidden) {
+        if (!started) {
+          started = true;
+          tour.start({ still: window.matchMedia('(prefers-reduced-motion: reduce)').matches });
+        } else if (suspended) {
+          suspended = false;
+          tour.play(current);
+        }
+      } else if (isPlaying) {
+        suspended = true;
+        tour.destroy();
+      }
     };
-    // Any choice the reader makes stands: the tour no longer starts by itself.
+    const seen = new IntersectionObserver(
+      ([entry]) => {
+        const viewport = entry.rootBounds?.height ?? window.innerHeight;
+        const needed = Math.min(entry.boundingClientRect.height, viewport) * 0.5;
+        inView = entry.isIntersecting && entry.intersectionRect.height >= needed - 1;
+        update();
+      },
+      { threshold: Array.from({ length: 101 }, (_, i) => i / 100) },
+    );
+    document.addEventListener('visibilitychange', update);
+    // Any choice the reader makes stands: the tour no longer starts, stops or restarts by itself.
     const choose = (fn: () => void) => {
       started = true;
+      chosen = true;
+      suspended = false;
       seen.disconnect();
+      document.removeEventListener('visibilitychange', update);
       fn();
     };
+    // Focus moving into the section stops the tour on the current scene, finished, so keyboard
+    // and screen reader users are never moved on. A press is left to its click handler, which
+    // runs after the focus it causes (after the touch ends, on a touch screen).
+    let pressed = false;
+    section.addEventListener('pointerdown', () => (pressed = true));
+    for (const type of ['click', 'pointercancel']) {
+      window.addEventListener(type, () => (pressed = false));
+    }
+    section.addEventListener('focusin', () => {
+      if (!chosen && !pressed) choose(() => tour.show(current));
+    });
 
     tabs.forEach((tab, i) => tab.addEventListener('click', () => choose(() => tour.show(i))));
     tablist.addEventListener('keydown', (event) => {
@@ -333,10 +380,12 @@ const tour = JSON.stringify(
     font-size: 18px;
   }
 
-  /* The selectors: a title, what it is, and a top edge that fills as the scene plays. */
+  /* The selectors, one column per scene: a title, what it is, and a top edge that fills as the
+     scene plays. */
   .tabs {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
     gap: 12px;
   }
   .tab {
@@ -390,11 +439,23 @@ const tour = JSON.stringify(
     color: var(--nh-accent);
   }
 
-  /* One panel per scene: the script shows the current one, and without it they stack. */
+  /* One panel per scene. Without the script they stack; with it they share one cell, so the
+     stage keeps the tallest panel's height, and only the current one is visible. */
   .stage {
     display: flex;
     flex-direction: column;
     gap: 20px;
+  }
+  .stage.live {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .stage.live > [data-panel] {
+    grid-area: 1 / 1;
+    min-width: 0;
+  }
+  .stage.live > [data-panel][inert] {
+    visibility: hidden;
   }
 
   /* Each part of the exchange waits for its step. Without the script the step is 4: finished. */
@@ -552,6 +613,7 @@ const tour = JSON.stringify(
   }
   @media (max-width: 900px) {
     .tabs {
+      grid-auto-flow: row;
       grid-template-columns: minmax(0, 1fr);
     }
   }
