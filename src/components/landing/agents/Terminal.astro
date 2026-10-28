@@ -1,0 +1,111 @@
+---
+// A terminal window on the server: three lights, the title, then the pane the agent draws in.
+// It keeps its own colours in both themes, as a terminal does.
+interface Props {
+  title: string;
+}
+const { title } = Astro.props;
+---
+
+<div class="terminal">
+  <div class="bar">
+    <span class="lights" aria-hidden="true">
+      <i></i>
+      <i></i>
+      <i></i>
+    </span>
+    <span class="title">{title}</span>
+  </div>
+  <div class="pane">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .terminal {
+    background: #0f1210;
+    border: 1px solid var(--nh-line);
+    border-radius: var(--nh-radius-l);
+    overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.5);
+  }
+  .bar {
+    height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 12px;
+    background: #121513;
+    border-bottom: 1px solid #1e231f;
+    font-family: var(--nh-font-mono);
+    font-size: 12px;
+    color: #7c8479;
+  }
+  .lights {
+    display: flex;
+    gap: 7px;
+  }
+  .lights i {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2a312b;
+  }
+  .title {
+    color: #ecefe8;
+    white-space: nowrap;
+  }
+  .pane {
+    box-sizing: content-box;
+    min-height: calc(34 * 1.5em);
+    padding: 10px 1ch 12px;
+    font-family: var(--nh-font-mono);
+    font-size: 12.5px;
+    line-height: 1.5em;
+    font-variant-ligatures: none;
+    color: #d6d6d6;
+  }
+  .pane :global(b) {
+    font-weight: 600;
+  }
+  /* A line as the terminal prints it: cut at the edge, or wrapped with a hanging indent. */
+  .pane :global(.r) {
+    min-height: 1.5em;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pane :global(.w) {
+    min-height: 1.5em;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .pane :global(.h2) {
+    padding-left: 2ch;
+    text-indent: -2ch;
+  }
+  .pane :global(.caret) {
+    display: inline-block;
+    width: 1ch;
+    height: 1.15em;
+    vertical-align: text-bottom;
+    background: #d6d6d6;
+    animation: blink 1.06s steps(1) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pane :global(.caret) {
+      animation: none;
+    }
+  }
+  @media (max-width: 900px) {
+    .pane {
+      font-size: 10.5px;
+    }
+  }
+</style>

@@ -1,0 +1,77 @@
+---
+// Nearhost's window on the laptop: its title bar, with the dot that shows when it asks, then
+// what it shows. It keeps its own colours in both themes, as the interface demo does.
+---
+
+<div class="nearhost">
+  <div class="bar">
+    <span class="lights" aria-hidden="true">
+      <i></i>
+      <i></i>
+      <i></i>
+    </span>
+    <span class="title">nearhost</span>
+    <span class="badge" aria-label="notification"></span>
+  </div>
+  <slot />
+</div>
+
+<style>
+  .nearhost {
+    background: #0f1210;
+    border: 1px solid var(--nh-line);
+    border-radius: var(--nh-radius-l);
+    overflow: hidden;
+    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.5);
+    color: #ecefe8;
+    font-family: var(--nh-font-mono);
+    font-size: 12px;
+    line-height: 1.55em;
+    font-variant-ligatures: none;
+  }
+  .nearhost :global(b) {
+    font-weight: 600;
+  }
+  .nearhost :global(.r) {
+    min-height: 1.55em;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .nearhost :global(.w) {
+    min-height: 1.55em;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .bar {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 12px;
+    background: #121513;
+    border-bottom: 1px solid #1e231f;
+    color: #7c8479;
+  }
+  .lights {
+    display: flex;
+    gap: 7px;
+  }
+  .lights i {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2a312b;
+  }
+  .title {
+    color: #ecefe8;
+  }
+  .badge {
+    display: none;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d6f26b;
+  }
+</style>
