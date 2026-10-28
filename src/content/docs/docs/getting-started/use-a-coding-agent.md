@@ -72,11 +72,53 @@ A socket path can be at most 103 bytes on macOS and 107 on Linux. With a home di
 
 To use one socket explicitly, set `NEARHOST_SOCKET` to its path where the agent runs.
 
+## Browser previews from a server
+
+An agent on a server can start a dev server, but you cannot see it in your browser until its port is forwarded to your laptop. With a passthrough, the agent asks Nearhost to forward that one port for the rest of the session, and you approve it first. The preview then opens on your laptop. It works for any HTTP dev server, whatever it is built with. Needs Nearhost 0.10.0 or later; an older Nearhost answers without passthrough, and the agent tells you to update it.
+
+1. The agent asks for a port, and Nearhost opens a prompt over the interface: `Claude Code on mini wants to open port 5173 on this laptop (browser preview).` If that port is in use on the laptop, the prompt says so and that it will open on another port; the agent reports the laptop URL once it opens. The prompt queues with proposals, and Home shows the same hint.
+2. Press `y` to allow it, `n` to refuse, or `a` for Always allow. `esc` counts as No. A prompt that waits 10 minutes expires. If you allow it and the port cannot be opened, the prompt shows why, and the agent is told it failed rather than that you refused, so it passes the reason on. If the port opens but Always allow cannot be saved, the passthrough stays open and the log says Always allow was not saved. If the request has ended by then, because it expired or the agent's session ended, pressing `y` or `a` tells you so; `n` or `esc` closes the prompt.
+3. Once you allow it, Nearhost forwards the port and the agent gives you the laptop URL. Asking again for a port that is already open, from the same agent session, returns the same passthrough without a second prompt. A port that a running project already forwards is answered at once, with no prompt.
+
+Always allow covers one tool on one server: Claude Code on `mini`, say, but not Claude Code on another server, and not another tool on `mini`. Only Claude Code is offered it. Codex documents no variable that identifies it, so Codex and every other agent are shown as `An agent`, are always prompted and are never offered Always allow.
+
+On a server's panel, press `tab` to move to the server's open passthroughs and Always allowed rows, which are shown only when there are any. When there are more than fit, they scroll with the selection, and a `+N more` line says how many are hidden above or below. Use `j` and `k` or the arrow keys to move, and `tab` or `esc` to leave. Press `x` on a passthrough to close it at once. Press `x` on an Always allowed row to revoke it; Nearhost asks you to confirm first. Home shows a `passthroughs` count while any are open.
+
+### What the token protects
+
+When you choose Always allow, Nearhost makes a token for that tool on that server. The skill keeps the token on the server, in `${XDG_STATE_HOME:-~/.local/state}/nearhost/tokens/<laptop id>/<requester>`, readable by your account only. The skill sends it with later requests, so Nearhost does not ask again. The laptop keeps only a SHA-256 hash of the token, in `grants.json` beside the install id in `~/.config/nearhost` (or under `XDG_CONFIG_HOME`).
+
+The token stops a different tool from borrowing an approval, and it stops anything from using one after you revoke it. It does not protect against anything else running as your account on the server: such a process can read the token file and use the approval. Treat Always allow as trust in everything that runs as you on that server. A wrong or revoked token gets a `401`; the skill drops it and asks again, so you are prompted.
+
+Removing a server from Nearhost, or renaming it, revokes its Always allow grants, so a server added later under the same name starts with none. Nearhost does this when it next applies the config or starts, and the log says how many it removed. It does this only for its default config file, not one given with `--config`, and never while that file is missing, so a config file that disappears for a moment does not cost you your grants.
+
+If `grants.json` cannot be read, Nearhost still serves coding agents but turns passthrough off, and says which file it could not read. Fix or remove the file, then restart Nearhost.
+
+### When a passthrough ends
+
+A passthrough ends when any of these happens:
+
+- the session ends, which Claude Code's `SessionEnd` hook reports;
+- you disconnect the server in Nearhost, remove it, or its connection fails (for example, authentication);
+- the server has been away for 10 minutes in a row;
+- the forwarded port stops answering for 5 minutes, checked every 30 seconds while the server is connected;
+- you close it, or Nearhost quits.
+
+The `SessionEnd` hook ships with the Claude Code plugin, so it runs only for plugin installs. With the skill installed through the skills CLI, or in another agent, the other conditions apply. If the laptop port was taken by something else while the server was away, that passthrough closes when the server comes back. If closing a passthrough's forward fails, Nearhost keeps its laptop port and tries again on each check until it closes.
+
+### Without Nearhost connected
+
+When Nearhost is not connected to the server, the agent cannot ask for a passthrough. It tells you to select the server in Nearhost and press `c`, then ask again, or to forward the port yourself from the laptop. Adding `-o ExitOnForwardFailure=yes` to the command it gives makes `ssh` stop with an error when the laptop port is already taken, rather than stay connected without the forward:
+
+```sh
+ssh -N -o ExitOnForwardFailure=yes -L <port>:localhost:<port> <server>
+```
+
 ## Agent API
 
 The skill's script talks to Nearhost over that socket, with `curl --unix-socket`. Nearhost answers JSON for the machine the socket belongs to. These calls are the ones the doctor uses:
 
-- `GET /v1` says which API this is. Its `capabilities` list names the calls added since the first release of API 1: `doctor` and `reload`. An older Nearhost leaves them out, and the skill tells you to update it.
+- `GET /v1` says which API this is. Its `capabilities` list names the calls added since the first release of API 1: `doctor`, `reload` and `passthrough`. An older Nearhost leaves them out, and the skill tells you to update it. When passthroughs are available it also gives `id`, the laptop's install id, which the skill uses to keep a token per laptop.
 - `GET /v1/doctor?path=…` returns `project` and `findings` for the project holding the absolute path, in the shape that [`nearhost doctor --json`](/docs/reference/cli/#json-output) gives its findings. For a project already in Nearhost, it first reads the project's `.nearhostrc` again, as a reload does: a change that needs no approval is applied, restarting the project if it runs under `nearhost up`, and one that needs approval waits in Nearhost. For a directory that is not in Nearhost yet, `project` is `null`, each finding's `project` is empty, and the findings are for the project as it would be added.
 - `POST /v1/projects/reload`, with `{"path": "/abs/dir"}`, asks Nearhost to read the `.nearhostrc` of the project holding the path again. The project must be added first. It answers `applied` when nothing needs approval, or `pending` with an `id` the agent waits on, as it does for a proposal, while you decide. A change you declined stays declined until the file changes or Nearhost restarts.
 
