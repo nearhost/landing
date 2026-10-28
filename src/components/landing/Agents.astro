@@ -180,9 +180,10 @@ const tour = JSON.stringify(
 </section>
 
 <script>
-  // Plays the gallery once the section is half in view: each scene types its prompt, steps
-  // through the exchange, pauses on the finished frame and hands over to the next. Clicking a
-  // selector or an arrow stops it on that scene, finished. With reduced motion it waits for play.
+  // Plays the gallery once the stage is in view: each scene types its prompt, steps through the
+  // exchange, pauses on the finished frame and hands over to the next. Clicking a selector or an
+  // arrow, or moving focus into the section, stops it on that scene, finished. With reduced motion
+  // it waits for play.
   import { createTour } from '../../lib/agent-tour.mjs';
 
   interface TourScene {
@@ -218,6 +219,7 @@ const tour = JSON.stringify(
       });
     const toggle = section.querySelector<HTMLButtonElement>('[data-toggle]')!;
     let current = 0;
+    let isPlaying = false;
 
     const tour = createTour({
       scenes,
@@ -228,6 +230,7 @@ const tour = JSON.stringify(
         showPanel(id);
         stage.dataset.step = String(step);
         stage.classList.toggle('playing', playing);
+        isPlaying = playing;
         const box = stage.querySelector<HTMLElement>(`[data-panel="${id}"] [data-typed]`);
         if (box) box.textContent = typed;
         caption.textContent = scenes[scene].caption;
@@ -249,25 +252,58 @@ const tour = JSON.stringify(
       },
     });
 
+    // The tour starts once enough of the stage is in view: half of it, or half the viewport when
+    // the stage is taller than that. While it is out of view or the page is hidden the tour is
+    // suspended, and it restarts the scene it was on when it comes back.
     let started = false;
-    const seen = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) begin();
-      },
-      { threshold: 0.5 },
-    );
-    const begin = () => {
-      if (started) return;
-      started = true;
-      seen.disconnect();
-      tour.start({ still: window.matchMedia('(prefers-reduced-motion: reduce)').matches });
+    let chosen = false;
+    let suspended = false;
+    let inView = false;
+    const update = () => {
+      if (chosen) return;
+      if (inView && !document.hidden) {
+        if (!started) {
+          started = true;
+          tour.start({ still: window.matchMedia('(prefers-reduced-motion: reduce)').matches });
+        } else if (suspended) {
+          suspended = false;
+          tour.play(current);
+        }
+      } else if (isPlaying) {
+        suspended = true;
+        tour.destroy();
+      }
     };
-    // Any choice the reader makes stands: the tour no longer starts by itself.
+    const seen = new IntersectionObserver(
+      ([entry]) => {
+        const viewport = entry.rootBounds?.height ?? window.innerHeight;
+        const needed = Math.min(entry.boundingClientRect.height, viewport) * 0.5;
+        inView = entry.isIntersecting && entry.intersectionRect.height >= needed - 1;
+        update();
+      },
+      { threshold: Array.from({ length: 101 }, (_, i) => i / 100) },
+    );
+    document.addEventListener('visibilitychange', update);
+    // Any choice the reader makes stands: the tour no longer starts, stops or restarts by itself.
     const choose = (fn: () => void) => {
       started = true;
+      chosen = true;
+      suspended = false;
       seen.disconnect();
+      document.removeEventListener('visibilitychange', update);
       fn();
     };
+    // Focus moving into the section stops the tour on the current scene, finished, so keyboard
+    // and screen reader users are never moved on. A press is left to its click handler, which
+    // runs after the focus it causes (after the touch ends, on a touch screen).
+    let pressed = false;
+    section.addEventListener('pointerdown', () => (pressed = true));
+    for (const type of ['click', 'pointercancel']) {
+      window.addEventListener(type, () => (pressed = false));
+    }
+    section.addEventListener('focusin', () => {
+      if (!chosen && !pressed) choose(() => tour.show(current));
+    });
 
     tabs.forEach((tab, i) => tab.addEventListener('click', () => choose(() => tour.show(i))));
     tablist.addEventListener('keydown', (event) => {
@@ -405,6 +441,17 @@ const tour = JSON.stringify(
     flex-direction: column;
     gap: 20px;
   }
+  .stage.live {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .stage.live > [data-panel] {
+    grid-area: 1 / 1;
+    min-width: 0;
+  }
+  .stage.live > [data-panel][inert] {
+    visibility: hidden;
+  }
 
   /* Each part of the exchange waits for its step. Without the script the step is 4: finished. */
   .stage[data-step='0'] :global(.from-1),
@@ -437,17 +484,6 @@ const tour = JSON.stringify(
   .stage[data-step='3'] :global(.key) {
     background: #d6f26b;
     color: #0f1210;
-  }
-  .stage.live {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .stage.live > [data-panel] {
-    grid-area: 1 / 1;
-    min-width: 0;
-  }
-  .stage.live > [data-panel][inert] {
-    visibility: hidden;
   }
 
   /* The caption for the current scene, and the tour's controls. */
