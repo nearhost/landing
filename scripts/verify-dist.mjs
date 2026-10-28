@@ -146,7 +146,7 @@ if (existsSync(index)) {
   // Both demos hold sample data that must not be quoted as real.
   check(
     /<div class="(?:[^"]*\s)?frame(?:\s[^"]*)?"[^>]*\sdata-nosnippet[\s=>]/.test(html) &&
-      /<div class="(?:[^"]*\s)?window(?:\s[^"]*)?"[^>]*\sdata-nosnippet[\s=>]/.test(html),
+      /<div class="(?:[^"]*\s)?stage(?:\s[^"]*)?"[^>]*\sdata-nosnippet[\s=>]/.test(html),
     'the interface demo and the agent demo must carry data-nosnippet',
   );
   // The nav menu, the copy button and the interface demo.
@@ -171,6 +171,27 @@ if (existsSync(index)) {
       'A coding agent on that machine can use it too: it asks to add the project, open a preview or show you a plan, and you say yes.',
     ),
     'the hero must mention coding agents',
+  );
+  const agents = html.match(/<section id="agents"[\s\S]*?<\/section>/)?.[0] ?? '';
+  const tabs = [...agents.matchAll(/role="tab"[^>]*aria-controls="agents-(\w+)"/g)].map(
+    (m) => m[1],
+  );
+  const panels = [...agents.matchAll(/role="tabpanel"[^>]*id="agents-(\w+)"/g)].map((m) => m[1]);
+  check(
+    tabs.length >= 1 && tabs.join() === panels.join(),
+    `agent tabs ${tabs} must match panels ${panels}`,
+  );
+  check(
+    !/Claude Code|Codex|Qwen/.test(agents.match(/role="tablist"[\s\S]*?<\/div>/)?.[0] ?? ''),
+    'scene selectors must not name an agent',
+  );
+  check(
+    decode(agents).includes('Nothing is added, forwarded or opened until you say yes in Nearhost.'),
+    'agents facts copy changed',
+  );
+  check(
+    agents.includes('npx skills add nearhost/nearhost -g'),
+    'the skill install command is missing',
   );
 }
 

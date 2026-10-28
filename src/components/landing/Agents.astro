@@ -1,26 +1,14 @@
 ---
 import { url } from '../../lib/url';
 import CopyButton from '../CopyButton.svelte';
+import ClaudeScene from './agents/ClaudeScene.astro';
+import { scenes } from './agents/scenes';
 
 const install = 'npx skills add nearhost/nearhost -g';
-
-// Claude Code's logo as it prints it: block characters in three rows, each
-// cell split into quadrants (top left, top right, bottom left, bottom right).
-// Drawn as an SVG, so the rows meet whatever the line height.
-const quadrants: Record<string, number[]> = {
-  ' ': [],
-  '▐': [1, 3],
-  '▛': [0, 1, 2],
-  '█': [0, 1, 2, 3],
-  '▝': [1],
-  '▜': [0, 1, 3],
-  '▀': [0, 1],
-};
-const logoRows = [' ▐▛███▛█ ', '▝▜██████▀', ' ▝▝   ▝▝ '];
-const logo = logoRows.flatMap((row, y) =>
-  [...row].flatMap((ch, x) =>
-    quadrants[ch].map((q) => ({ x: x * 2 + (q % 2), y: y * 2 + Math.floor(q / 2) })),
-  ),
+const first = scenes[0];
+// What the script needs to play the tour; the copy itself is rendered below.
+const tour = JSON.stringify(
+  scenes.map(({ id, caption, link, prompt, perChar }) => ({ id, caption, link, prompt, perChar })),
 );
 ---
 
@@ -29,136 +17,136 @@ const logo = logoRows.flatMap((row, y) =>
     <div class="intro">
       <h2>Your agent asks. You say yes.</h2>
       <p>
-        Ask the coding agent in your project to add it to Nearhost. Nearhost opens the add form on
-        your laptop, already filled in, and the agent gets the address once you save it. It works
-        the same when the agent runs on a server you reach over SSH.
+        Coding agents on a server can add the project to Nearhost, open the preview they just
+        started, and show you the plan they wrote, in the browser on your laptop. Nearhost asks you
+        first, every time, and the agent gets the address once you say yes.
       </p>
       <a class="more" href={url('/docs/getting-started/use-a-coding-agent/')}>
         Use a coding agent
       </a>
     </div>
 
-    <!-- A scripted transcript, kept out of search snippets and AI answers. -->
-    <div class="window" data-agents data-tab="claude" data-step="9" data-nosnippet>
-      <div class="titlebar">
-        <span class="lights" aria-hidden="true">
-          <i></i>
-          <i></i>
-          <i></i>
-        </span>
-        <div class="tabs" role="tablist" aria-label="Terminal tabs">
-          <button type="button" role="tab" class="tab" data-for="claude" aria-selected="true">
-            claude on mini
-          </button>
-          <button type="button" role="tab" class="tab" data-for="nearhost" aria-selected="false">
-            nearhost
-            <span class="badge" aria-label="notification"></span>
-          </button>
-        </div>
-        <button type="button" class="replay" hidden>
+    <!-- The selectors name what the agent asks for, never the agent: a name there would suggest
+         the feature works only in that one. -->
+    <div class="tabs" role="tablist" aria-label="What an agent can ask for">
+      {scenes.map((scene, i) => (
+        <button
+          type="button"
+          role="tab"
+          class="tab"
+          id={`agents-tab-${scene.id}`}
+          aria-controls={`agents-${scene.id}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          tabindex={i === 0 ? 0 : -1}
+        >
+          <span class="edge" aria-hidden="true">
+            <span class="fill" />
+          </span>
+          <span class="title">{scene.title}</span>
+          <span class="tag">{scene.tag}</span>
+        </button>
+      ))}
+    </div>
+
+    <!-- Scripted transcripts, kept out of search snippets and AI answers. Without the script
+         every scene shows finished, one under another. -->
+    <div
+      class="stage"
+      data-agents
+      data-nosnippet
+      data-scene={first.id}
+      data-step="4"
+      data-tour={tour}
+    >
+      <div
+        role="tabpanel"
+        id="agents-claude"
+        data-panel="claude"
+        aria-labelledby="agents-tab-claude"
+        class="scene"
+      >
+        <ClaudeScene />
+      </div>
+    </div>
+
+    <div class="below">
+      <div class="caption">
+        <p data-caption>{first.caption}</p>
+        <a class="more" data-link href={first.link.href}>
+          {first.link.text}
+        </a>
+      </div>
+      <div class="controls" data-controls hidden>
+        <button type="button" class="control" data-toggle aria-label="Play the tour">
           <svg
-            width="13"
-            height="13"
+            class="i-pause"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <rect x="6" y="5" width="4" height="14" rx="1"></rect>
+            <rect x="14" y="5" width="4" height="14" rx="1"></rect>
+          </svg>
+          <svg
+            class="i-play"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"></path>
+          </svg>
+        </button>
+        <button type="button" class="control" data-prev aria-label="Previous">
+          <svg
+            width="18"
+            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="2.2"
+            stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
             aria-hidden="true"
           >
-            <path d="M3 12a9 9 0 1 0 3-6.7" />
-            <path d="M3 4v5h5" />
+            <path d="M15 18l-6-6 6-6"></path>
           </svg>
-          Replay
         </button>
-      </div>
-
-      <!-- prettier-ignore -->
-      <div class="pane claude" role="tabpanel" data-pane="claude" aria-label="claude on mini">
-        <div class="cc-head">
-          <svg class="logo" viewBox="0 0 18 6" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true">{logo.map((p) => <rect x={p.x} y={p.y} width="1" height="1" />)}</svg>
-          <div>
-            <div class="l"><b>Claude Code</b> <span class="grey">v2.1.301</span></div>
-            <div class="l grey">Opus 5.5 · Claude Max</div>
-            <div class="l grey">~/code/myapp</div>
-          </div>
-        </div>
-        <div class="transcript">
-          <div class="g g-user"><div class="l you"><span class="grey">❯</span> <span class="white">/nearhost:nearhost add</span></div></div>
-          <div class="g g-run1">
-            <div class="l">  Proposing this project to Nearhost</div>
-            <div class="l grey">  ⎿  $ sh ~/.claude/skills/nearhost/scripts/nearhost.sh propose .</div>
-          </div>
-          <div class="g g-ran1"><div class="l grey">  Ran <b>1</b> shell command</div></div>
-          <div class="g g-msg1"><div class="l"><span class="white">⏺</span> I've proposed myapp to Nearhost. Review it in Nearhost on ecs@macbook.</div></div>
-          <div class="g g-run2">
-            <div class="l">  Waiting for your answer in Nearhost</div>
-            <div class="l grey">  ⎿  $ sh ~/.claude/skills/nearhost/scripts/nearhost.sh wait 7c1f04a2e9b3d851</div>
-          </div>
-          <div class="g g-ran2"><div class="l grey">  Ran <b>1</b> shell command</div></div>
-          <div class="g g-final"><div class="l wrap"><span class="white">⏺</span> Added. myapp is running at <span class="lav">https://myapp.test</span>, served from port 5173 on mini.</div></div>
-          <div class="g spin spin1"><div class="l"><span class="spinc">✢ Combobulating…</span> <span class="grey">(2s · esc to interrupt)</span></div></div>
-          <div class="g spin spin2"><div class="l"><span class="spinc">✻ Percolating…</span> <span class="grey">(14s · esc to interrupt)</span></div></div>
-          <div class="g g-done"><div class="l grey">✻ Brewed for 21s</div></div>
-        </div>
-        <div class="promptbox">
-          <div class="hr"></div>
-          <div class="l"><span class="grey">❯</span> <span class="typed lav" data-text="/nearhost add"></span><span class="caret"></span></div>
-          <div class="hr"></div>
-          <div class="l grey">  ? for shortcuts</div>
-        </div>
-      </div>
-
-      <!-- prettier-ignore -->
-      <div class="pane nearhost" role="tabpanel" data-pane="nearhost" aria-label="nearhost">
-        <div class="l status"><span><span class="beacon">∩</span> nearhost</span><span class="dim">proxy <span class="ok">●</span> · CA trusted · hosts ok</span></div>
-        <div class="rule"></div>
-        <div class="body">
-          <div class="side">
-            <div class="l"><span class="beacon">▌</span><span>home</span></div>
-            <div class="l"></div>
-            <div class="l">▾ local</div>
-            <div class="l">  <span class="ok">●</span> website</div>
-            <div class="l"></div>
-            <div class="l">▾ mini</div>
-            <div class="l">  <span class="dim">○</span> blog</div>
-            <div class="l s7">  <span class="ok">●</span> myapp</div>
-          </div>
-          <div class="main">
-            <div class="l"><b>Nearhost</b></div>
-            <div class="l"></div>
-            <div class="l"><span class="dim">running  </span>1 of 2 projects</div>
-            <div class="l"></div>
-            <div class="l s3 dim">Agent on mini wants to add /home/dev/code/myapp.</div>
-            <div class="l s7">Added myapp, as an agent on mini proposed.</div>
-          </div>
-          <div class="box" aria-label="Add project">
-            <div class="l head"><span><b>Add project</b><span class="dim"> · routes</span></span><span class="dim">5 of 7</span></div>
-            <div class="l progress"><span></span></div>
-            <div class="l amber">Proposed by an agent on mini</div>
-            <div class="l"></div>
-            <div class="l"><span class="dim">server    </span><span>mini</span></div>
-            <div class="l"><span class="dim">path      </span><span>/home/dev/code/myapp</span></div>
-            <div class="l"></div>
-            <div class="l dim">      port    role        label</div>
-            <div class="l sel"><span class="beacon">▌</span> [x] 5173    <span class="beacon">‹ web ›</span>     vite (VITE_PORT)</div>
-            <div class="l">  [ ] 5432    ignore      db (DB_PORT)</div>
-            <div class="l"></div>
-            <div class="l keys"><span class="key">enter</span><span class="dim"> next · esc back</span></div>
-          </div>
-        </div>
+        <span class="pos">
+          <span data-pos>1</span> of {scenes.length}
+        </span>
+        <button type="button" class="control" data-next aria-label="Next">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M9 18l6-6-6-6"></path>
+          </svg>
+        </button>
       </div>
     </div>
 
     <div class="after">
       <ul class="facts">
-        <li>Nothing is added until you save it in Nearhost.</li>
+        <li>Nothing is added, forwarded or opened until you say yes in Nearhost.</li>
         <li>
           On a server, the agent reaches Nearhost through the SSH connection Nearhost already has.
-          No port is opened.
+          No port is opened on the server.
         </li>
-        <li>Works in Claude Code, Codex, Cursor, Gemini CLI and any agent that reads skills.</li>
+        <li>
+          Works in Claude Code, Codex, Qwen Code, Cursor, Gemini CLI and any agent that reads
+          skills.
+        </li>
       </ul>
       <div class="get">
         <span class="label">Give your agent the skill</span>
@@ -177,76 +165,107 @@ const logo = logoRows.flatMap((row, y) =>
 </section>
 
 <script>
-  // Plays the exchange once, when the window comes into view: the agent
-  // proposes, the Nearhost tab gets a notification, the view flips to it, the
-  // form is saved, and the view flips back for the answer. Without this
-  // script, or with reduced motion, every line is shown and the tabs flip
-  // only when clicked.
-  for (const win of document.querySelectorAll<HTMLElement>('[data-agents]')) {
-    const tabs = [...win.querySelectorAll<HTMLButtonElement>('.tab')];
-    const replay = win.querySelector<HTMLButtonElement>('.replay')!;
-    const typed = win.querySelector<HTMLElement>('.typed')!;
-    const text = typed.dataset.text ?? '';
-    const still = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let timers: number[] = [];
+  // Plays the gallery once the section is half in view: each scene types its prompt, steps
+  // through the exchange, pauses on the finished frame and hands over to the next. Clicking a
+  // selector or an arrow stops it on that scene, finished. With reduced motion it waits for play.
+  import { createTour } from '../../lib/agent-tour.mjs';
 
-    const show = (tab: string) => {
-      win.dataset.tab = tab;
-      for (const t of tabs) t.setAttribute('aria-selected', String(t.dataset.for === tab));
-      if (tab === 'nearhost') win.classList.remove('notified');
-    };
-    win.classList.add('live');
-    for (const t of tabs) t.addEventListener('click', () => show(t.dataset.for!));
+  interface TourScene {
+    id: string;
+    caption: string;
+    link: { text: string; href: string };
+    prompt: string;
+    perChar: number;
+  }
 
-    const at = (ms: number, fn: () => void) => timers.push(window.setTimeout(fn, ms));
-    const play = () => {
-      timers.forEach(clearTimeout);
-      timers = [];
-      replay.hidden = true;
-      win.classList.remove('notified');
-      win.dataset.step = '0';
-      show('claude');
-      typed.textContent = '';
-      [...text].forEach((c, i) => at(600 + i * 70, () => (typed.textContent += c)));
-      const done = 600 + text.length * 70;
-      // Enter: the prompt joins the transcript and the skill starts.
-      at(done + 400, () => {
-        typed.textContent = '';
-        win.dataset.step = '1';
-      });
-      at(done + 1800, () => (win.dataset.step = '3'));
-      at(done + 2800, () => win.classList.add('notified'));
-      at(done + 3800, () => show('nearhost'));
-      at(done + 5600, () => win.classList.add('pressed'));
-      at(done + 6000, () => {
-        win.classList.remove('pressed');
-        win.dataset.step = '7';
-      });
-      at(done + 7400, () => {
-        win.dataset.step = '8';
-        show('claude');
-      });
-      at(done + 7900, () => {
-        win.dataset.step = '9';
-        replay.hidden = false;
-      });
-    };
-    replay.addEventListener('click', play);
+  for (const stage of document.querySelectorAll<HTMLElement>('[data-agents]')) {
+    const section = stage.closest('section')!;
+    const scenes: TourScene[] = JSON.parse(stage.dataset.tour ?? '[]');
+    const tablist = section.querySelector<HTMLElement>('[role="tablist"]')!;
+    const tabs = [...tablist.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const caption = section.querySelector<HTMLElement>('[data-caption]')!;
+    const link = section.querySelector<HTMLAnchorElement>('[data-link]')!;
+    const pos = section.querySelector<HTMLElement>('[data-pos]')!;
+    const controls = section.querySelector<HTMLElement>('[data-controls]')!;
+    const toggle = section.querySelector<HTMLButtonElement>('[data-toggle]')!;
+    let current = 0;
 
-    if (still.matches) {
-      replay.hidden = false; // it plays only when asked
-      continue;
-    }
+    const tour = createTour({
+      scenes,
+      render({ scene, step, typed, playing, runMs }) {
+        const { id } = scenes[scene];
+        current = scene;
+        stage.dataset.scene = id;
+        stage.dataset.step = String(step);
+        stage.classList.toggle('playing', playing);
+        const box = stage.querySelector<HTMLElement>(`[data-panel="${id}"] [data-typed]`);
+        if (box) box.textContent = typed;
+        caption.textContent = scenes[scene].caption;
+        link.href = scenes[scene].link.href;
+        link.textContent = scenes[scene].link.text;
+        pos.textContent = String(scene + 1);
+        toggle.toggleAttribute('data-playing', playing);
+        toggle.setAttribute('aria-label', playing ? 'Pause the tour' : 'Play the tour');
+        tabs.forEach((tab, i) => {
+          const selected = i === scene;
+          tab.setAttribute('aria-selected', String(selected));
+          tab.tabIndex = selected ? 0 : -1;
+          // The selected edge fills over the scene's run, from the first typed character.
+          const full = selected && (!playing || step > 0 || typed !== '');
+          const fill = tab.querySelector<HTMLElement>('.fill')!;
+          fill.style.transitionDuration = full && playing ? `${Math.max(runMs - 600, 0)}ms` : '0s';
+          fill.style.width = full ? '100%' : '0%';
+        });
+      },
+    });
+
+    let started = false;
     const seen = new IntersectionObserver(
       (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          seen.disconnect();
-          play();
-        }
+        if (entries.some((e) => e.isIntersecting)) begin();
       },
       { threshold: 0.5 },
     );
-    seen.observe(win);
+    const begin = () => {
+      if (started) return;
+      started = true;
+      seen.disconnect();
+      tour.start({ still: window.matchMedia('(prefers-reduced-motion: reduce)').matches });
+    };
+    // Any choice the reader makes stands: the tour no longer starts by itself.
+    const choose = (fn: () => void) => {
+      started = true;
+      seen.disconnect();
+      fn();
+    };
+
+    tabs.forEach((tab, i) => tab.addEventListener('click', () => choose(() => tour.show(i))));
+    tablist.addEventListener('keydown', (event) => {
+      const at = tabs.indexOf(document.activeElement as HTMLButtonElement);
+      if (at < 0) return;
+      const to = {
+        ArrowLeft: at - 1,
+        ArrowRight: at + 1,
+        Home: 0,
+        End: tabs.length - 1,
+      }[event.key];
+      if (to === undefined) return;
+      event.preventDefault();
+      const i = (to + tabs.length) % tabs.length;
+      tabs[i].focus();
+      choose(() => tour.show(i));
+    });
+    toggle.addEventListener('click', () => choose(() => tour.toggle()));
+    section
+      .querySelector('[data-prev]')!
+      .addEventListener('click', () => choose(() => tour.show(current - 1)));
+    section
+      .querySelector('[data-next]')!
+      .addEventListener('click', () => choose(() => tour.show(current + 1)));
+
+    stage.classList.add('live');
+    controls.hidden = false;
+    seen.observe(stage);
   }
 </script>
 
@@ -268,13 +287,13 @@ const logo = logoRows.flatMap((row, y) =>
     padding-block: 112px;
     display: flex;
     flex-direction: column;
-    gap: 48px;
+    gap: 40px;
   }
   .intro {
     display: flex;
     flex-direction: column;
     gap: 28px;
-    max-width: 720px;
+    max-width: 760px;
   }
   .intro h2 {
     margin: 0;
@@ -291,334 +310,188 @@ const logo = logoRows.flatMap((row, y) =>
     font-size: 18px;
   }
 
-  /* The terminal keeps its own colours, as the interface mock-up does. */
-  .window {
-    --ground: #0f1210;
-    --beacon: #d6f26b;
-    --text: #ecefe8;
-    --dim: #7c8479;
-    --amber: #f2b84b;
-    --ok: #7fdb8a;
-    --edge: #4a5449;
-    --cell: 1.6em;
-    container-type: inline-size;
-    background: var(--ground);
-    color: var(--text);
-    border: 1px solid var(--nh-line);
-    border-radius: var(--nh-radius-l);
-    overflow: hidden;
-    box-shadow: 0 40px 120px rgba(0, 0, 0, 0.5);
-    font-family: var(--nh-font-mono);
-    font-size: clamp(10.5px, 1.45vw, 13.5px);
-    line-height: var(--cell);
-    font-variant-ligatures: none;
-  }
-  .titlebar {
-    display: flex;
-    align-items: stretch;
-    gap: 14px;
-    height: 34px;
-    padding: 0 12px;
-    background: #121513;
-    border-bottom: 1px solid #1e231f;
-    font-size: 12px;
-  }
-  .lights {
-    display: flex;
-    gap: 7px;
-    align-items: center;
-  }
-  .lights i {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #2a312b;
-  }
+  /* The selectors: a title, what it is, and a top edge that fills as the scene plays. */
   .tabs {
-    display: flex;
-    gap: 2px;
-    align-items: flex-end;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
   }
   .tab {
     position: relative;
+    overflow: hidden;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    height: 27px;
-    padding: 0 16px;
-    border: 1px solid transparent;
-    border-bottom: 0;
-    border-radius: 7px 7px 0 0;
-    background: none;
-    color: var(--dim);
-    font: inherit;
-    white-space: nowrap;
+    flex-direction: column;
+    gap: 4px;
+    min-height: 44px;
+    padding: 16px 18px 18px;
+    text-align: left;
+    background: transparent;
+    border: 1px solid var(--nh-line);
+    border-radius: var(--nh-radius-m);
+    color: var(--nh-muted);
+    font-family: var(--nh-font-body);
     cursor: pointer;
   }
   .tab[aria-selected='true'] {
-    background: var(--ground);
-    border-color: #1e231f;
-    color: var(--text);
+    background: var(--nh-surface);
+    color: var(--nh-text);
   }
-  .tab:focus-visible {
-    outline: 2px solid var(--beacon);
-    outline-offset: -2px;
+  .edge {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: var(--nh-line);
   }
-  .badge {
-    display: none;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--beacon);
+  .fill {
+    display: block;
+    width: 0;
+    height: 100%;
+    background: var(--nh-accent);
+    transition-property: width;
+    transition-timing-function: linear;
   }
-  .live.notified .badge {
-    display: inline-block;
+  .tab[aria-selected='true'] .fill {
+    width: 100%;
   }
-  .replay {
-    margin-left: auto;
-    margin-right: 4px;
-    /* On the tabs' line: they sit at the bottom of the bar, 27px high. */
-    align-self: flex-end;
-    margin-bottom: 2.5px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    height: 22px;
-    padding: 0 8px;
-    background: none;
-    border: 0;
-    border-radius: var(--nh-radius-s);
-    color: var(--dim);
-    font: inherit;
-    font-size: 11.5px;
-    cursor: pointer;
-  }
-  .replay[hidden] {
-    display: none;
-  }
-  .replay:hover {
-    color: var(--text);
-    background: #1d221e;
-  }
-  .replay:focus-visible {
-    color: var(--text);
-    outline: 2px solid var(--beacon);
-    outline-offset: 1px;
-  }
-
-  .pane {
-    height: calc(21 * var(--cell));
-    padding: 12px 2ch;
-    overflow: hidden;
-  }
-  .l {
-    min-height: var(--cell);
-    white-space: pre;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .dim {
-    color: var(--dim);
-  }
-  .beacon,
-  .url {
-    color: var(--beacon);
-  }
-  .ok {
-    color: var(--ok);
-  }
-  .amber {
-    color: var(--amber);
-  }
-  b {
+  .title {
+    font-family: var(--nh-font-display);
+    font-size: 20px;
     font-weight: 600;
+    letter-spacing: -0.02em;
   }
-  .caret {
-    display: inline-block;
-    width: 1ch;
-    height: 1.15em;
-    vertical-align: text-bottom;
-    background: var(--text);
-    opacity: 0;
+  .tag {
+    font-size: 14px;
+    color: var(--nh-faint);
   }
-
-  /* Without the script both tabs show, one under the other. */
-  .window:not(.live) .nearhost {
-    border-top: 1px solid #1e231f;
-  }
-  .live .pane {
-    display: none;
-  }
-  .live[data-tab='claude'] .claude {
-    display: flex;
-  }
-  .live[data-tab='nearhost'] .nearhost {
-    display: block;
+  .tab[aria-selected='true'] .tag {
+    color: var(--nh-accent);
   }
 
-  /* Each part of the exchange waits for its step. Without the script the
-     finished session shows: no spinner, nothing still running. */
-  .g-run1,
-  .g-run2,
-  .spin {
-    display: none;
-  }
-  .live[data-step='0'] :is(.g-user, .g-ran1, .g-msg1, .g-ran2, .g-final, .g-done),
-  .live[data-step='1'] :is(.g-ran1, .g-msg1, .g-ran2, .g-final, .g-done),
-  .live:is([data-step='3'], [data-step='7']) :is(.g-ran2, .g-final, .g-done) {
-    display: none;
-  }
-  .live[data-step='1'] :is(.g-run1, .spin1),
-  .live:is([data-step='3'], [data-step='7']) :is(.g-run2, .spin2) {
-    display: block;
-  }
-  /* On the Nearhost tab, the proposal arrives at 3 and is saved at 7. */
-  .live:is([data-step='0'], [data-step='1']) :is(.s3, .s7),
-  .live[data-step='3'] .s7 {
-    visibility: hidden;
-  }
-  .caret {
-    opacity: 1;
-    animation: blink 1.06s steps(1) infinite;
-  }
-  .live:is([data-step='1'], [data-step='3'], [data-step='7']) .caret {
-    opacity: 0;
-    animation: none;
-  }
-  @keyframes blink {
-    50% {
-      opacity: 0;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .caret {
-      animation: none;
-    }
-  }
-
-  /* Claude Code's own colours, as its terminal session draws them. */
-  .claude {
+  /* The stage: the server's terminal in 8 of 12 columns, the laptop in the other 4. */
+  .stage {
     display: flex;
     flex-direction: column;
-    color: #d6d6d6;
+    gap: 20px;
   }
-  .cc-head {
+  .scene {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 24px;
+    row-gap: 16px;
+  }
+  .scene :global(:is(.term, .laptop)) {
+    min-width: 0;
     display: flex;
-    gap: 3ch;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
   }
-  .cc-head .l {
-    min-height: 1.3em;
-    line-height: 1.3em;
+  .scene :global(.term) {
+    grid-column: 1 / 9;
   }
-  .logo {
-    width: 9ch;
-    height: 3.9em;
-    fill: #d77757;
+  .scene :global(.laptop) {
+    grid-column: 9 / 13;
   }
-  .grey {
-    color: #999;
-  }
-  .white {
-    color: #fff;
-  }
-  .lav {
-    color: #b1b9f9;
-  }
-  .spinc {
-    color: #c75b4e;
-  }
-  .transcript {
-    padding-top: var(--cell);
-  }
-  .g + .g {
-    margin-top: var(--cell);
-  }
-  .you {
-    background: #373737;
-    margin-inline: -2ch;
-    padding-inline: 2ch;
-  }
-  .promptbox {
-    margin-top: var(--cell);
-  }
-  .l.wrap {
-    white-space: pre-wrap;
-  }
-  .hr {
-    margin-inline: -2ch;
-    height: var(--cell);
-    background: linear-gradient(#888, #888) 0 50% / 100% 1px no-repeat;
+  .scene :global(.where) {
+    font-size: 14px;
+    color: var(--nh-faint);
   }
 
-  /* The Nearhost tab: the interface with the proposal open over it. */
-  .nearhost {
-    position: relative;
-    padding: 8px 1ch 0;
-  }
-  .status {
-    display: flex;
-    justify-content: space-between;
-  }
-  .rule {
-    height: 1px;
-    margin: 2px 0 6px;
-    background: #1e231f;
-  }
-  .body {
-    position: relative;
-    display: grid;
-    grid-template-columns: 18ch 1fr;
-    gap: 2ch;
-  }
-  .side {
-    border-right: 1px solid #1e231f;
-  }
-  .box {
-    position: absolute;
-    left: 50%;
-    top: 0;
-    transform: translateX(-50%);
-    width: min(56ch, calc(100% - 2ch));
-    padding: 4px 2.5ch 6px;
-    background: #121613;
-    border: 1px solid var(--edge);
-    border-radius: 6px;
-  }
-  /* What the form is open over waits behind it, faint. */
-  .body > :not(.box) {
-    opacity: 0.4;
-  }
-  .live:is([data-step='7'], [data-step='8'], [data-step='9']) .body > * {
-    opacity: 1;
-  }
-  .live:is([data-step='7'], [data-step='8'], [data-step='9']) .box {
+  /* With the script, only the current scene shows. */
+  .live [data-panel] {
     display: none;
   }
-  .head {
+  .live[data-scene='claude'] [data-panel='claude'] {
+    display: grid;
+  }
+
+  /* Each part of the exchange waits for its step. Without the script the step is 4: finished. */
+  .stage[data-step='0'] :global(.from-1),
+  .stage:is([data-step='0'], [data-step='1']) :global(.from-2),
+  .stage:not([data-step='4']) :global(.from-4),
+  .stage:not([data-step='1']) :global(.at-1),
+  .stage:not([data-step='2'], [data-step='3']) :global(.at-2-3),
+  .stage:is([data-step='0'], [data-step='4']) :global(.busy) {
+    display: none;
+  }
+  .stage :global(:is(.prompt, .browser)) {
+    transition: opacity 0.3s;
+  }
+  .stage:is([data-step='0'], [data-step='1']) :global(.prompt) {
+    opacity: 0;
+  }
+  .stage[data-step='4'] :global(.prompt) {
+    opacity: 0.45;
+  }
+  .stage:not([data-step='4']) :global(.browser) {
+    opacity: 0;
+  }
+  .stage[data-step='2'] :global(.badge) {
+    display: inline-block;
+  }
+  .stage :global(.key) {
+    color: #d6f26b;
+    border-radius: 3px;
+  }
+  .stage[data-step='3'] :global(.key) {
+    background: #d6f26b;
+    color: #0f1210;
+  }
+
+  /* The caption for the current scene, and the tour's controls. */
+  .below {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding-top: 8px;
   }
-  .progress {
-    background: linear-gradient(#3a413b, #3a413b) 0 50% / 100% 3px no-repeat;
+  .caption {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 680px;
+    flex: 1 1 420px;
+    min-width: 0;
   }
-  .progress span {
-    display: block;
-    height: var(--cell);
-    width: 71%;
-    background: linear-gradient(var(--beacon), var(--beacon)) 0 50% / 100% 3px no-repeat;
+  .caption p {
+    margin: 0;
+    color: var(--nh-body);
+    font-size: 16px;
   }
-  .sel {
-    background: #1f261f;
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  .key {
-    color: var(--beacon);
-    border-radius: 3px;
-    transition: background 0.12s;
+  .controls[hidden] {
+    display: none;
   }
-  .pressed .key {
-    background: var(--beacon);
-    color: var(--ground);
+  .control {
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: 1px solid var(--nh-line);
+    border-radius: var(--nh-radius-m);
+    color: var(--nh-text);
+    cursor: pointer;
+  }
+  .control:hover {
+    background: var(--nh-surface);
+  }
+  [data-toggle]:not([data-playing]) .i-pause,
+  [data-toggle][data-playing] .i-play {
+    display: none;
+  }
+  .pos {
+    min-width: 52px;
+    text-align: center;
+    font-family: var(--nh-font-mono);
+    font-size: 13px;
+    color: var(--nh-faint);
   }
 
   .after {
@@ -676,12 +549,18 @@ const logo = logoRows.flatMap((row, y) =>
     flex: 1;
   }
 
-  @container (max-width: 640px) {
-    .body {
-      grid-template-columns: 1fr;
+  @media (prefers-reduced-motion: reduce) {
+    .stage :global(:is(.prompt, .browser)),
+    .fill {
+      transition: none !important;
     }
-    .side {
-      display: none;
+  }
+  @media (max-width: 900px) {
+    .tabs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .scene :global(:is(.term, .laptop)) {
+      grid-column: 1 / -1;
     }
   }
   @media (max-width: 719px) {
@@ -690,25 +569,6 @@ const logo = logoRows.flatMap((row, y) =>
     }
     .after {
       grid-template-columns: 1fr;
-    }
-    /* Lines wrap here, so the panes grow to what they hold, and the
-       script's raw output, which says least, is left out. */
-    .pane {
-      height: auto;
-      min-height: calc(21 * var(--cell));
-    }
-    .claude .l {
-      white-space: pre-wrap;
-    }
-    .lights {
-      display: none;
-    }
-    .titlebar {
-      gap: 8px;
-      padding: 0 8px;
-    }
-    .tab {
-      padding: 0 10px;
     }
   }
 </style>
