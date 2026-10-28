@@ -1,0 +1,25 @@
+src/lib/agent-tour.mjs
+  s_f4e5f254be91ba::t_409e0a2dd86b55 18-22
+src/lib/agent-tour.test.mjs
+  s_f4e5f254be91ba::t_409e0a2dd86b55 26,29
+src/components/landing/Agents.astro
+  s_f4e5f254be91ba::t_409e0a2dd86b55 157-158
+scripts/verify-dist.mjs
+  s_f4e5f254be91ba::t_409e0a2dd86b55 193
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "36a09599862687270a5c7eef6e218dc8859ebc50",
+  "prompts": {},
+  "sessions": {
+    "s_f4e5f254be91ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a44b06e0-2635-49c9-9f5c-26fe1b6ff124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
