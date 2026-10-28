@@ -191,9 +191,7 @@ if (existsSync(index)) {
     'scene selectors must not name an agent',
   );
   check(
-    decode(agents).includes(
-      'Nothing is added, forwarded or opened until you say yes in Nearhost, or have chosen Always allow for it.',
-    ),
+    decode(agents).includes('Nothing is added, forwarded or opened until you say yes in Nearhost.'),
     'agents facts copy changed',
   );
   check(

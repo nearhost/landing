@@ -15,8 +15,11 @@ const LEAD_MS = 600;
  * @returns {{ typed: Array<[number, string]>, steps: Array<[number, 1|2|3|4]>, next: number }}
  */
 export function tourTimeline(prompt, perChar) {
-  // By code point, so an emoji types as one character.
-  const chars = [...prompt];
+  // By grapheme, so an emoji, even one joined from several, types as one character.
+  const chars = Array.from(
+    new Intl.Segmenter('en', { granularity: 'grapheme' }).segment(prompt),
+    (s) => s.segment,
+  );
   const typed = /** @type {Array<[number, string]>} */ (
     chars.map((_, k) => [LEAD_MS + k * perChar, chars.slice(0, k + 1).join('')])
   );
