@@ -1,11 +1,20 @@
 ---
+// The agent gallery. To add a scene:
+//   1. add its entry to `scenes` in ./agents/scenes.ts (the order there is the tour's order);
+//   2. write its component in ./agents/, built from Scene, Terminal and NearhostWindow and marked
+//      with the step classes described in ./agents/scenes.ts;
+//   3. add one line for it to `components` below.
+// Nothing else here changes: the selectors, panels, styles and script read `scenes`.
 import { url } from '../../lib/url';
 import CopyButton from '../CopyButton.svelte';
 import ClaudeScene from './agents/ClaudeScene.astro';
-import { scenes } from './agents/scenes';
+import { scenes, type Scene } from './agents/scenes';
 
 const install = 'npx skills add nearhost/nearhost -g';
 const first = scenes[0];
+const components: Partial<Record<Scene['id'], typeof ClaudeScene>> = {
+  claude: ClaudeScene,
+};
 // What the script needs to play the tour; the copy itself is rendered below.
 const tour = JSON.stringify(
   scenes.map(({ id, caption, link, prompt, perChar }) => ({ id, caption, link, prompt, perChar })),
@@ -28,7 +37,7 @@ const tour = JSON.stringify(
 
     <!-- The selectors name what the agent asks for, never the agent: a name there would suggest
          the feature works only in that one. -->
-    <div class="tabs" role="tablist" aria-label="What an agent can ask for">
+    <div class="tabs" role="tablist" aria-label="What an agent can ask for" hidden>
       {scenes.map((scene, i) => (
         <button
           type="button"
@@ -58,19 +67,23 @@ const tour = JSON.stringify(
       data-step="4"
       data-tour={tour}
     >
-      <div
-        role="tabpanel"
-        id="agents-claude"
-        data-panel="claude"
-        aria-labelledby="agents-tab-claude"
-        class="scene"
-      >
-        <ClaudeScene />
-      </div>
+      {scenes.map(({ id }) => {
+        const Component = components[id]!;
+        return (
+          <div
+            role="tabpanel"
+            id={`agents-${id}`}
+            data-panel={id}
+            aria-labelledby={`agents-tab-${id}`}
+          >
+            <Component />
+          </div>
+        );
+      })}
     </div>
 
     <div class="below">
-      <div class="caption">
+      <div class="caption" data-caption-block hidden>
         <p data-caption>{first.caption}</p>
         <a class="more" data-link href={first.link.href}>
           {first.link.text}
@@ -186,7 +199,13 @@ const tour = JSON.stringify(
     const caption = section.querySelector<HTMLElement>('[data-caption]')!;
     const link = section.querySelector<HTMLAnchorElement>('[data-link]')!;
     const pos = section.querySelector<HTMLElement>('[data-pos]')!;
-    const controls = section.querySelector<HTMLElement>('[data-controls]')!;
+    const panels = [...stage.querySelectorAll<HTMLElement>('[data-panel]')];
+    // Hidden until the script runs: without it, every scene shows finished and nothing to pick.
+    const chrome = [
+      tablist,
+      ...section.querySelectorAll<HTMLElement>('[data-controls], [data-caption-block]'),
+    ];
+    const showPanel = (id: string) => panels.forEach((p) => (p.hidden = p.dataset.panel !== id));
     const toggle = section.querySelector<HTMLButtonElement>('[data-toggle]')!;
     let current = 0;
 
@@ -196,6 +215,7 @@ const tour = JSON.stringify(
         const { id } = scenes[scene];
         current = scene;
         stage.dataset.scene = id;
+        showPanel(id);
         stage.dataset.step = String(step);
         stage.classList.toggle('playing', playing);
         const box = stage.querySelector<HTMLElement>(`[data-panel="${id}"] [data-typed]`);
@@ -264,7 +284,8 @@ const tour = JSON.stringify(
       .addEventListener('click', () => choose(() => tour.show(current + 1)));
 
     stage.classList.add('live');
-    controls.hidden = false;
+    showPanel(stage.dataset.scene ?? scenes[0].id);
+    chrome.forEach((el) => (el.hidden = false));
     seen.observe(stage);
   }
 </script>
@@ -367,41 +388,11 @@ const tour = JSON.stringify(
     color: var(--nh-accent);
   }
 
-  /* The stage: the server's terminal in 8 of 12 columns, the laptop in the other 4. */
+  /* One panel per scene: the script shows the current one, and without it they stack. */
   .stage {
     display: flex;
     flex-direction: column;
     gap: 20px;
-  }
-  .scene {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: 24px;
-    row-gap: 16px;
-  }
-  .scene :global(:is(.term, .laptop)) {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  .scene :global(.term) {
-    grid-column: 1 / 9;
-  }
-  .scene :global(.laptop) {
-    grid-column: 9 / 13;
-  }
-  .scene :global(.where) {
-    font-size: 14px;
-    color: var(--nh-faint);
-  }
-
-  /* With the script, only the current scene shows. */
-  .live [data-panel] {
-    display: none;
-  }
-  .live[data-scene='claude'] [data-panel='claude'] {
-    display: grid;
   }
 
   /* Each part of the exchange waits for its step. Without the script the step is 4: finished. */
@@ -464,6 +455,8 @@ const tour = JSON.stringify(
     align-items: center;
     gap: 8px;
   }
+  .tabs[hidden],
+  .caption[hidden],
   .controls[hidden] {
     display: none;
   }
@@ -558,9 +551,6 @@ const tour = JSON.stringify(
   @media (max-width: 900px) {
     .tabs {
       grid-template-columns: minmax(0, 1fr);
-    }
-    .scene :global(:is(.term, .laptop)) {
-      grid-column: 1 / -1;
     }
   }
   @media (max-width: 719px) {

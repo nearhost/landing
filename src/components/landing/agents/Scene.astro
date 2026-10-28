@@ -1,0 +1,47 @@
+---
+// One scene of the agent gallery: the agent's terminal on the server in 8 of 12 columns, and
+// what the laptop shows in the other 4. The columns stack below 900px.
+---
+
+<div class="scene">
+  <div class="term">
+    <div class="where">On mini, over SSH</div>
+    <slot name="terminal" />
+  </div>
+  <div class="laptop">
+    <div class="where">On your laptop</div>
+    <slot name="laptop" />
+  </div>
+</div>
+
+<style>
+  .scene {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 24px;
+    row-gap: 16px;
+  }
+  .term,
+  .laptop {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .term {
+    grid-column: 1 / 9;
+  }
+  .laptop {
+    grid-column: 9 / 13;
+  }
+  .where {
+    font-size: 14px;
+    color: var(--nh-faint);
+  }
+  @media (max-width: 900px) {
+    .term,
+    .laptop {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

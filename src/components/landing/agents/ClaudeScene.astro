@@ -2,6 +2,7 @@
 // Scene 1: Claude Code on the server asks Nearhost to add the project, and the add form opens on
 // the laptop. The step classes (from-1, at-1, …) are shown or hidden by the gallery's data-step.
 import NearhostWindow from './NearhostWindow.astro';
+import Scene from './Scene.astro';
 import Terminal from './Terminal.astro';
 
 // Claude Code's logo as it prints it: block characters in three rows, each
@@ -24,9 +25,8 @@ const logo = logoRows.flatMap((row, y) =>
 );
 ---
 
-<div class="term">
-  <div class="where">On mini, over SSH</div>
-  <Terminal title="claude on mini">
+<Scene>
+  <Terminal slot="terminal" title="claude on mini">
     <!-- prettier-ignore -->
     <div class="cc">
       <div class="head">
@@ -76,11 +76,7 @@ const logo = logoRows.flatMap((row, y) =>
       <div class="r grey">  ? for shortcuts</div>
     </div>
   </Terminal>
-</div>
-
-<div class="laptop">
-  <div class="where">On your laptop</div>
-  <NearhostWindow>
+  <NearhostWindow slot="laptop">
     <!-- prettier-ignore -->
     <div class="nh">
       <div class="r status"><span><span class="accent">∩</span> nearhost</span><span class="dim">proxy <span class="ok">●</span></span></div>
@@ -104,7 +100,7 @@ const logo = logoRows.flatMap((row, y) =>
       </div>
     </div>
   </NearhostWindow>
-</div>
+</Scene>
 
 <style>
   /* Claude Code's own colours, as its terminal session draws them. */
