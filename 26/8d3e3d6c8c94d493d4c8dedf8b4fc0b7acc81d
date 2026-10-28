@@ -1,0 +1,27 @@
+src/content/docs/docs/coding-agents/browser-previews.md
+  s_f4e5f254be91ba::t_ee616ace27c677 8
+src/content/docs/docs/coding-agents/fix-a-project.md
+  s_f4e5f254be91ba::t_ee616ace27c677 8
+src/content/docs/docs/coding-agents/prompts-and-always-allow.md
+  s_f4e5f254be91ba::t_ee616ace27c677 12,20
+src/content/docs/docs/coding-agents/add-a-project.md
+  s_f4e5f254be91ba::t_ee616ace27c677 8
+src/content/docs/docs/coding-agents/documents.md
+  s_f4e5f254be91ba::t_ee616ace27c677 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "268d3e3d6c8c94d493d4c8dedf8b4fc0b7acc81d",
+  "prompts": {},
+  "sessions": {
+    "s_f4e5f254be91ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a44b06e0-2635-49c9-9f5c-26fe1b6ff124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
