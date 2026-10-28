@@ -49,4 +49,14 @@ export const scenes: Scene[] = [
     prompt: 'Brainstorm three layouts for the pricing page and show them to me in the browser',
     perChar: 30,
   },
+  {
+    id: 'qwen',
+    title: 'Show a plan in your browser',
+    tag: 'New in 0.11',
+    caption:
+      'When an agent writes a plan or a spec on a server, it asks Nearhost to show it. Nearhost renders the markdown and opens it in your laptop’s browser, always as the file is now.',
+    link: { text: 'Documents from coding agents', href: url(guide + 'documents/') },
+    prompt: 'Write a plan for the checkout refactor and open it for me to review',
+    perChar: 30,
+  },
 ];

@@ -9,6 +9,7 @@ import { url } from '../../lib/url';
 import CopyButton from '../CopyButton.svelte';
 import ClaudeScene from './agents/ClaudeScene.astro';
 import CodexScene from './agents/CodexScene.astro';
+import QwenScene from './agents/QwenScene.astro';
 import { scenes, type Scene } from './agents/scenes';
 
 const install = 'npx skills add nearhost/nearhost -g';
@@ -16,6 +17,7 @@ const first = scenes[0];
 const components: Partial<Record<Scene['id'], typeof ClaudeScene>> = {
   claude: ClaudeScene,
   codex: CodexScene,
+  qwen: QwenScene,
 };
 // What the script needs to play the tour; the copy itself is rendered below.
 const tour = JSON.stringify(
@@ -615,6 +617,12 @@ const tour = JSON.stringify(
     .tabs {
       grid-auto-flow: row;
       grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* The controls wrap under the caption on a phone; ahead of it they stay put as captions differ. */
+  @media (max-width: 639px) {
+    .controls {
+      order: -1;
     }
   }
   @media (max-width: 719px) {

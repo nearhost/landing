@@ -199,6 +199,11 @@ if (existsSync(index)) {
     'the skill install command is missing',
   );
   check(tabs.includes('codex'), 'the Codex scene is missing');
+  check(tabs.includes('qwen'), 'the Qwen Code scene is missing');
+  check(
+    decode(agents).includes('An agent on mini wants to show docs/plans/2026-10-28-checkout.md'),
+    'the documents prompt text changed',
+  );
   // Every scene's caption link reaches a page, and the heading it names, as section 9 resolves
   // links.
   const tourJson = agents.match(/data-tour="([^"]*)"/)?.[1];
