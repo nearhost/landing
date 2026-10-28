@@ -30,7 +30,7 @@ const tour = JSON.stringify(
       <p>
         Coding agents on a server can add the project to Nearhost, open the preview they just
         started, and show you the plan they wrote, in the browser on your laptop. Nearhost asks you
-        first, every time, and the agent gets the address once you say yes.
+        first, and the agent gets the address once you say yes.
       </p>
       <a class="more" href={url('/docs/getting-started/use-a-coding-agent/')}>
         Use a coding agent
@@ -153,7 +153,10 @@ const tour = JSON.stringify(
 
     <div class="after">
       <ul class="facts">
-        <li>Nothing is added, forwarded or opened until you say yes in Nearhost.</li>
+        <li>
+          Nothing is added, forwarded or opened until you say yes in Nearhost, or have chosen Always
+          allow for it.
+        </li>
         <li>
           On a server, the agent reaches Nearhost through the SSH connection Nearhost already has.
           No port is opened on the server.

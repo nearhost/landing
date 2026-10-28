@@ -21,6 +21,14 @@ describe('tourTimeline', () => {
     assert.equal(steps[0][0], 600 + 80 * 30 + 400);
     assert.equal(next, 600 + 80 * 30 + 10300);
   });
+
+  it('types an emoji as one character', () => {
+    const { typed } = tourTimeline('a🙂b', 10);
+    assert.deepEqual(
+      typed.map(([, text]) => text),
+      ['a', 'a🙂', 'a🙂b'],
+    );
+  });
 });
 
 describe('createTour', () => {
@@ -37,6 +45,19 @@ describe('createTour', () => {
     mock.timers.enable({ apis: ['setTimeout'] });
   });
   afterEach(() => mock.timers.reset());
+
+  it('refuses an empty scene list', () => {
+    assert.throws(() => createTour({ scenes: [], render }), /at least one scene/);
+  });
+
+  it('destroy stops the tour', () => {
+    const tour = createTour({ scenes, render });
+    tour.start({ still: false });
+    tour.destroy();
+    const count = states.length;
+    mock.timers.tick(60000);
+    assert.equal(states.length, count);
+  });
 
   it('does nothing until start', () => {
     createTour({ scenes, render });

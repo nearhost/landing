@@ -15,10 +15,12 @@ const LEAD_MS = 600;
  * @returns {{ typed: Array<[number, string]>, steps: Array<[number, 1|2|3|4]>, next: number }}
  */
 export function tourTimeline(prompt, perChar) {
+  // By code point, so an emoji types as one character.
+  const chars = [...prompt];
   const typed = /** @type {Array<[number, string]>} */ (
-    Array.from(prompt, (_, k) => [LEAD_MS + k * perChar, prompt.slice(0, k + 1)])
+    chars.map((_, k) => [LEAD_MS + k * perChar, chars.slice(0, k + 1).join('')])
   );
-  const t = LEAD_MS + prompt.length * perChar;
+  const t = LEAD_MS + chars.length * perChar;
   return {
     typed,
     steps: [
@@ -44,6 +46,7 @@ export function createTour({
   setTimer = (fn, ms) => setTimeout(fn, ms),
   clearTimer = (id) => clearTimeout(/** @type {any} */ (id)),
 }) {
+  if (scenes.length === 0) throw new Error('createTour needs at least one scene');
   /** @type {unknown[]} */
   let timers = [];
   let current = 0;

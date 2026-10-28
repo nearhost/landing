@@ -31,7 +31,7 @@ export const scenes: Scene[] = [
     title: 'Add this project',
     tag: '/nearhost add',
     caption:
-      'Ask for /nearhost add. Nearhost opens the add form on your laptop, already filled in from the project’s .env, Compose and Vite config, and the agent gets the address once you save it.',
+      'Ask for /nearhost add. Nearhost opens the add form on your laptop, already filled in from the project’s .env and, with presets, its Compose and Vite config, and the agent gets the address once you save it.',
     link: { text: 'Use a coding agent', href: url(guide) },
     prompt: '/nearhost add',
     perChar: 70,
