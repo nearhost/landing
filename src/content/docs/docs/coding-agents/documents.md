@@ -25,7 +25,7 @@ Every file Nearhost serves from a document's folder is sandboxed by the browser.
 
 ## When a served folder goes away
 
-Nearhost lists served folders on each server's panel, and Home shows a count in its `agents` line. A folder stays served until:
+Nearhost lists served folders on each server's panel; press `tab` to reach its `documents` section. Home shows a count in its `agents` line. A folder stays served until:
 
 - Nearhost quits, as nothing is saved across restarts;
 - you press `x` on it in the server's panel and confirm;
