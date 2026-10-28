@@ -1,0 +1,90 @@
+src/content/docs/docs/coding-agents/index.md
+  s_f4e5f254be91ba::t_9c420f2b12b6a9 1-34
+src/content/docs/docs/concepts/multi-host-projects.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 73
+src/content/docs/docs/coding-agents/add-a-project.md
+  s_f4e5f254be91ba::t_9c420f2b12b6a9 1-7,9-22
+  s_f4e5f254be91ba::t_ee616ace27c677 8
+src/content/docs/docs/concepts/ssh-transport.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 45
+src/content/docs/docs/troubleshooting/troubleshooting.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 88
+src/components/landing/Agents.astro
+  s_f4e5f254be91ba::t_0f9035c5868fbb 35
+src/lib/lastmod.mjs
+  s_f4e5f254be91ba::t_0f9035c5868fbb 14-15,23
+src/content/docs/docs/getting-started/add-a-server.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 64
+astro.config.mjs
+  s_f4e5f254be91ba::t_0f9035c5868fbb 68,103
+  s_f4e5f254be91ba::t_c8a1420ffda8b4 116-117
+src/content/docs/docs/coding-agents/fix-a-project.md
+  s_f4e5f254be91ba::t_9c420f2b12b6a9 1-7,9-18
+  s_f4e5f254be91ba::t_ee616ace27c677 8
+src/content/docs/docs/coding-agents/prompts-and-always-allow.md
+  s_f4e5f254be91ba::t_563d7de0830a18 1-11,13-19,21-38
+  s_f4e5f254be91ba::t_ee616ace27c677 12,20
+src/content/docs/docs/reference/cli.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 269
+src/content/docs/docs/coding-agents/troubleshooting.md
+  s_f4e5f254be91ba::t_9c420f2b12b6a9 1-26
+src/content/docs/docs/coding-agents/browser-previews.md
+  s_f4e5f254be91ba::t_563d7de0830a18 1-7,9-34
+  s_f4e5f254be91ba::t_ee616ace27c677 8
+src/lib/lastmod.test.mjs
+  s_f4e5f254be91ba::t_b874c261d31baf 47-52
+src/content/docs/docs/coding-agents/documents.md
+  s_f4e5f254be91ba::t_563d7de0830a18 1-7,9-27,29-36
+  s_f4e5f254be91ba::t_edec972e6d8ba8 28
+  s_f4e5f254be91ba::t_ee616ace27c677 8
+src/content/docs/docs/concepts/what-nearhost-changes.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 79
+src/content/docs/docs/coding-agents/how-it-works.md
+  s_f4e5f254be91ba::t_9c420f2b12b6a9 1-33
+src/lib/coding-agents-redirect.mjs
+  s_f4e5f254be91ba::t_4ac72800daf918 1-30
+src/lib/coding-agents-redirect.test.mjs
+  s_f4e5f254be91ba::t_4ac72800daf918 1-18,20-28
+  s_f4e5f254be91ba::t_c8a1420ffda8b4 19
+scripts/verify-dist.mjs
+  s_f4e5f254be91ba::t_ad845f3375944d 339
+  s_f4e5f254be91ba::t_c8a1420ffda8b4 5,310-338,340-358
+  s_f4e5f254be91ba::t_4ee3d56e0a4ee8 359
+package.json
+  s_f4e5f254be91ba::t_c8a1420ffda8b4 22
+src/pages/docs/getting-started/use-a-coding-agent.astro
+  s_f4e5f254be91ba::t_c8a1420ffda8b4 1-22,24-32
+  s_f4e5f254be91ba::t_ad845f3375944d 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "10b7c975f6626c55d4227cf02079f8568507edff",
+  "prompts": {},
+  "sessions": {
+    "s_811983e1e3a15f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5cb337d7-6b02-4dbb-b067-e3ede185a42d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    },
+    "s_81ad364fe15b72": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "047f1bbe-a859-4471-ae3c-0288f1e01a7a",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    },
+    "s_f4e5f254be91ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a44b06e0-2635-49c9-9f5c-26fe1b6ff124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
