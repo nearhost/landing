@@ -114,6 +114,42 @@ When Nearhost is not connected to the server, the agent cannot ask for a passthr
 ssh -N -o ExitOnForwardFailure=yes -L <port>:localhost:<port> <server>
 ```
 
+## Documents from coding agents
+
+When an agent writes a plan, spec, report or HTML mockup for you to read, it can ask Nearhost to show it. Nearhost serves the document at an address on your laptop and opens it in your browser. This works for an agent on the laptop and for one on a server Nearhost is connected to, so you no longer need a second terminal to read a path on a server. Markdown is shown as a page; HTML is served as written. Agents offer this only for documents they wrote for you, never for code or config files. You can also ask directly with `/nearhost open <path>`. It needs a Nearhost version that ships documents; an older one answers without them, and the agent tells you to update it.
+
+1. The agent asks, and Nearhost opens a prompt over the interface: `Claude Code on mini wants to show plans/2026-10-28-x.md`, with a line saying which folder Nearhost will serve. The prompt queues with proposals and passthroughs, and Home shows the same hint.
+2. Press `y` to allow it, `n` to refuse, or `a` for Always allow. `esc` counts as No. A prompt that waits 10 minutes expires. If you refuse, the agent does not offer that folder again in the session and only gives you the path.
+3. Once you allow it, your browser opens the document and the agent gives you the address. It looks like `https://localhost:<web port>/d/<random>/plans/2026-10-28-x.md`, where `<web port>` is Nearhost's web port, and `<random>` is a long random string that other pages cannot guess.
+
+### What is served
+
+Nearhost serves the document's git repository, so its images, stylesheets and linked documents work. A document that is not in a repository serves its own folder. A document directly in your home folder, or in `/`, is refused with `save the document in a project or a folder of its own`. Nearhost never serves dotfiles or the contents of dot folders inside that folder, and never follows a link out of it. A second document in the same folder reuses the address without a prompt for the agent you approved, and prompts any other.
+
+Nearhost keeps no copies. Each time the page loads, it reads the file again, from the laptop or over the server's SSH connection, so reloading shows the current file. A file that has moved or gone shows as missing, never as an old version. A server that is not connected shows a page saying so; select it in Nearhost and press `c`.
+
+### Documents cannot reach your other pages
+
+Every file Nearhost serves from a document's folder is sandboxed by the browser. Its scripts run, but they cannot read other pages on `localhost`, your projects' cookies or storage, or other documents. Rendered markdown runs no scripts at all. Pages also send no referrer, so the address does not leak to sites a document links to.
+
+### Always allow
+
+Always allow covers one tool on one server, as for previews: Claude Code on `mini`, say, and not another tool or server. Only Claude Code is offered it; other agents are shown as `An agent` and are always prompted. It is kept separately from the preview approval, so revoking one leaves the other working. The skill keeps the token on the server in a file ending in `.documents`, beside the preview token, and Nearhost keeps a hash in `grants.json`. The note under [What the token protects](#what-the-token-protects) applies: anything that runs as you on that server can use the approval.
+
+With Always allow, the document opens in your browser at once, and Nearhost shows `Claude Code on mini opened plans/2026-10-28-x.md` in the status line. On a server's panel, press `tab` to reach its `documents` and `always allowed` sections. Press `x` on an always allowed row to revoke it, after a confirm. Revoking leaves open documents in place.
+
+### When a served folder goes away
+
+Nearhost lists served folders on each server's panel, and Home shows a count in its `agents` line. A folder stays served until:
+
+- Nearhost quits, as nothing is saved across restarts;
+- you press `x` on it in the server's panel and confirm;
+- you remove the server from Nearhost, or rename it.
+
+Disconnecting a server does not remove its folders. Their pages say the server is not connected until it reconnects. The agent's session ending does not remove them either, so you can read yesterday's plan again while Nearhost runs. Home's web page also lists the folders served since Nearhost started, with links to each document.
+
+If a project holds `localhost` and you started Nearhost with `--web-port 0`, there is no page to serve from, and the agent is told so.
+
 ## Agent API
 
 The skill's script talks to Nearhost over that socket, with `curl --unix-socket`. Nearhost answers JSON for the machine the socket belongs to. These calls are the ones the doctor uses:
