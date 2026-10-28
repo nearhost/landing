@@ -161,8 +161,10 @@ if (existsSync(index)) {
     'landing copy has words glued to an inline element',
   );
   const at = (re) => html.search(re);
+  // Each anchor must be found, so a missing one fails rather than passing as -1.
+  const order = [/Your browser is on this one\./, /id="agents"/, /id="how"/].map(at);
   check(
-    at(/Your browser is on this one\./) < at(/id="agents"/) && at(/id="agents"/) < at(/id="how"/),
+    order[0] >= 0 && order[0] < order[1] && order[1] < order[2],
     'the agents section must sit between the problem and the steps',
   );
   check(/<nav[\s\S]*?href="#agents"[\s\S]*?<\/nav>/.test(html), 'the nav must link to #agents');
@@ -194,6 +196,34 @@ if (existsSync(index)) {
     'the skill install command is missing',
   );
   check(tabs.includes('codex'), 'the Codex scene is missing');
+  // Every scene's caption link reaches a page, and the heading it names, as section 9 resolves
+  // links.
+  const tourJson = agents.match(/data-tour="([^"]*)"/)?.[1];
+  let tour = [];
+  try {
+    tour = JSON.parse(decode(tourJson ?? ''));
+  } catch {
+    failures.push('the agent gallery has no parseable data-tour scene list');
+  }
+  check(
+    tour.length === tabs.length,
+    `data-tour lists ${tour.length} scenes for ${tabs.length} tabs`,
+  );
+  for (const scene of tour) {
+    const href = scene.link?.href ?? '';
+    const url = new URL(href, new URL(base + 'index.html', 'https://nearhost.dev'));
+    const path = decodeURIComponent(url.pathname.slice(base.length));
+    const target = join(dist, path, path === '' || path.endsWith('/') ? 'index.html' : '');
+    if (!url.pathname.startsWith(base) || !existsSync(target) || statSync(target).isDirectory()) {
+      failures.push(`the ${scene.id} scene links to ${href}, which is not in dist/`);
+      continue;
+    }
+    const fragment = decodeURIComponent(url.hash.slice(1));
+    check(
+      !fragment || readFileSync(target, 'utf8').includes(`id="${fragment}"`),
+      `the ${scene.id} scene links to ${href}, but ${relative(dist, target)} has no id="${fragment}"`,
+    );
+  }
   check(
     decode(agents).includes(
       'An agent on mini wants to open port 5173 on this laptop (browser preview).',
