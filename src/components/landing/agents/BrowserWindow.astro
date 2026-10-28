@@ -1,0 +1,76 @@
+---
+// A browser window on the laptop, showing a page the agent serves. It is light in both themes,
+// as a page is, and the gallery fades it in (class `browser`) once Nearhost has forwarded the port.
+interface Props {
+  url: string;
+}
+const { url } = Astro.props;
+---
+
+<div class="browser">
+  <div class="bar">
+    <span class="lights" aria-hidden="true">
+      <i></i>
+      <i></i>
+      <i></i>
+    </span>
+    <span class="address">{url}</span>
+  </div>
+  <div class="page">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .browser {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background: #f4f5f1;
+    border: 1px solid #2a312b;
+    border-radius: var(--nh-radius-l);
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+    color: #1b1f1c;
+  }
+  .bar {
+    flex: none;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    background: #e6e9e0;
+    border-bottom: 1px solid #dde0d9;
+  }
+  .lights {
+    display: flex;
+    gap: 7px;
+  }
+  .lights i {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #c3c8bd;
+  }
+  .address {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    background: #fff;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-family: var(--nh-font-mono);
+    font-size: 12px;
+    color: #3e463f;
+  }
+  .page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+  }
+</style>

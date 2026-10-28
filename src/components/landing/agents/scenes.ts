@@ -36,4 +36,17 @@ export const scenes: Scene[] = [
     prompt: '/nearhost add',
     perChar: 70,
   },
+  {
+    id: 'codex',
+    title: 'Open a browser preview',
+    tag: 'localhost:5173',
+    caption:
+      'Ask for a page to look at. Nearhost asks first, then forwards the preview’s port to your laptop, so localhost:5173 opens the page the agent is serving on the server.',
+    link: {
+      text: 'Browser previews from a server',
+      href: url(guide + '#browser-previews-from-a-server'),
+    },
+    prompt: 'Brainstorm three layouts for the pricing page and show them to me in the browser',
+    perChar: 30,
+  },
 ];

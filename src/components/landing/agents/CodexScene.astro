@@ -1,0 +1,225 @@
+---
+// Scene 2: Codex on the server asks Nearhost to forward a browser preview, and the laptop opens
+// it. The step classes (from-1, at-1, …) are shown or hidden by the gallery's data-step.
+import BrowserWindow from './BrowserWindow.astro';
+import NearhostWindow from './NearhostWindow.astro';
+import Scene from './Scene.astro';
+import Terminal from './Terminal.astro';
+---
+
+<Scene>
+  <Terminal slot="terminal" title="codex on mini">
+    <!-- prettier-ignore -->
+    <div class="cx">
+      <div class="r"></div>
+      <div class="r">  <span class="blue">&gt;_</span> <b>OpenAI Codex</b> <span class="grey">(v0.165.0)</span></div>
+      <div class="r grey">     ~/code/myapp</div>
+      <div class="r"></div>
+      <div class="from-1">
+        <div class="you">
+          <div class="w h2"><b class="grey">›</b> Brainstorm three layouts for the pricing page and show them to me in the browser</div>
+        </div>
+        <div class="r"></div>
+        <div class="w h2"><span class="grey">•</span> I'll sketch three layouts and serve them from a preview on port 5173.</div>
+        <div class="r"></div>
+      </div>
+      <div class="from-2">
+        <div class="r"><b class="green">•</b> <b>Ran</b> <span class="sh">sh</span> <span class="cmd">~/.codex/skills/nearhost/scripts/nearhost.sh passthrough 5173</span> <span class="flag">--label</span></div>
+        <div class="r"><span class="grey">  │ </span><span class="str">"browser preview"</span></div>
+        <div class="r grey">  └ {'{"id":"3f9a61c0d2e7b845"}'}</div>
+        <div class="r"></div>
+        <div class="w h2"><span class="grey">•</span> Approve it in Nearhost on ecs@macbook.</div>
+        <div class="r"></div>
+      </div>
+      <div class="at-2-3">
+        <div class="r"><span class="grey">◦</span> <b>Running</b> <span class="sh">sh</span> <span class="cmd">~/.codex/skills/nearhost/scripts/nearhost.sh passthrough-wait 3f9a61c0d2e7b845</span></div>
+        <div class="r"></div>
+      </div>
+      <div class="from-4">
+        <div class="r"><b class="green">•</b> <b>Ran</b> <span class="sh">sh</span> <span class="cmd">~/.codex/skills/nearhost/scripts/nearhost.sh passthrough-wait 3f9a61c0d2e7b845</span></div>
+        <div class="r grey">  └ {'{"state":"open","url":"http://localhost:5173"}'}</div>
+        <div class="r"></div>
+        <div class="w h2"><span class="grey">•</span> The three layouts are open at <span class="sh link">http://localhost:5173/pricing</span> on your laptop. Pick one and I'll build it.</div>
+        <div class="r"></div>
+        <div class="r grey">  Worked for 48s • 10:42 AM</div>
+        <div class="r"></div>
+      </div>
+      <div class="busy">
+        <div class="r"><span class="dimmer">•</span> <span class="dimmer">Working</span><span class="grey"> (<span class="at-1">2s</span><span class="from-2">9s</span> • </span><b>esc</b><span class="grey"> to interrupt)</span></div>
+      </div>
+      <div class="composer">
+        <div class="w h2"><b>›</b> <span data-typed></span><span class="caret"></span><span class="placeholder grey">Ask Codex to do anything</span></div>
+      </div>
+      <div class="r">  <span class="model">GPT-6.1-Sol low</span><span class="dot"> · </span><span class="path">~/code/myapp</span></div>
+      <div class="r">  <b>?</b><span class="dot"> for shortcuts</span></div>
+    </div>
+  </Terminal>
+  <NearhostWindow slot="laptop">
+    <!-- prettier-ignore -->
+    <div class="nh">
+      <div class="prompt box">
+        <div class="r"><b>Browser preview</b></div>
+        <div class="w ask">An agent on mini wants to open port 5173 on this laptop (browser preview).</div>
+        <div class="r"></div>
+        <div class="r"><span class="key">y</span><span class="dim"> yes · </span><span class="accent">n</span><span class="dim"> no · </span><span class="accent">esc</span><span class="dim"> no</span></div>
+      </div>
+    </div>
+  </NearhostWindow>
+  <BrowserWindow slot="laptop" url="localhost:5173/pricing">
+    <!-- prettier-ignore -->
+    <div class="site">
+      <div class="heading">Pricing page: three layouts</div>
+      <div class="options">
+        <div class="opt chosen"><span>A · Three tiers</span><div class="tiers"><i></i><i class="mid"></i><i></i></div></div>
+        <div class="opt"><span>B · Usage slider</span><i class="track"></i><i class="thumb"></i></div>
+        <div class="opt rows"><span>C · Comparison</span><i></i><i class="alt"></i><i></i></div>
+      </div>
+    </div>
+  </BrowserWindow>
+</Scene>
+
+<style>
+  /* Codex's own colours, as its terminal session draws them. */
+  .cx {
+    padding: 0 1ch;
+  }
+  .grey {
+    color: #7d7f7e;
+  }
+  .blue {
+    color: #63a8f8;
+  }
+  .green {
+    color: #8cc265;
+  }
+  .sh {
+    color: #89b4fa;
+  }
+  .cmd {
+    color: #cdd6f4;
+  }
+  .flag {
+    color: #eba0ac;
+  }
+  .str {
+    color: #a6e3a1;
+  }
+  .link {
+    text-decoration: underline;
+  }
+  .dimmer {
+    color: #727473;
+  }
+  .model {
+    color: #f6e2b7;
+  }
+  .path {
+    color: #abdfa7;
+  }
+  .dot {
+    color: #868886;
+  }
+  .you,
+  .composer {
+    margin-inline: -1ch;
+    padding: 1.5em 1ch;
+  }
+  .you {
+    background: #353836;
+  }
+  .composer {
+    background: #2c2e2d;
+  }
+  [data-typed]:not(:empty) ~ .placeholder {
+    display: none;
+  }
+
+  /* Nearhost, asking to forward the port. */
+  .nh {
+    padding: 12px 1ch 14px;
+  }
+  .box {
+    padding: 6px 1.5ch 8px;
+    background: #121613;
+    border: 1px solid #f2b84b;
+    border-radius: 6px;
+  }
+  .ask {
+    margin-top: 4px;
+  }
+  .dim {
+    color: #7c8479;
+  }
+  .accent {
+    color: #d6f26b;
+  }
+
+  /* The page the agent serves: three layout sketches. */
+  .site {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .heading {
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .options {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .opt {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #dde0d9;
+    border-radius: 8px;
+  }
+  .opt.chosen {
+    border: 2px solid #4a6200;
+  }
+  .opt span {
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .opt i {
+    display: block;
+    background: #e6e9e0;
+    border-radius: 3px;
+  }
+  .tiers {
+    flex: 1;
+    min-height: 40px;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .tiers i.mid {
+    background: #cfd6c1;
+  }
+  .track {
+    height: 6px;
+    margin-top: 4px;
+  }
+  .thumb {
+    width: 40%;
+    height: 18px;
+  }
+  .rows {
+    gap: 5px;
+  }
+  .rows i {
+    height: 7px;
+    border-radius: 2px;
+  }
+  .rows i.alt {
+    background: #f4f5f1;
+  }
+</style>

@@ -193,6 +193,13 @@ if (existsSync(index)) {
     agents.includes('npx skills add nearhost/nearhost -g'),
     'the skill install command is missing',
   );
+  check(tabs.includes('codex'), 'the Codex scene is missing');
+  check(
+    decode(agents).includes(
+      'An agent on mini wants to open port 5173 on this laptop (browser preview).',
+    ),
+    'the passthrough prompt text changed',
+  );
 }
 
 // 5. The docs entry point exists, and every docs page is a dated technical article.
