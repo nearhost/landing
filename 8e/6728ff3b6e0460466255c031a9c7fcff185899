@@ -1,0 +1,53 @@
+src/content/docs/docs/coding-agents/index.md
+  s_f4e5f254be91ba::t_9c420f2b12b6a9 1-34
+src/content/docs/docs/concepts/multi-host-projects.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 73
+src/content/docs/docs/coding-agents/add-a-project.md
+  s_f4e5f254be91ba::t_9c420f2b12b6a9 1-22
+src/content/docs/docs/concepts/ssh-transport.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 45
+src/content/docs/docs/troubleshooting/troubleshooting.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 88
+src/components/landing/Agents.astro
+  s_f4e5f254be91ba::t_0f9035c5868fbb 36
+src/lib/lastmod.mjs
+  s_f4e5f254be91ba::t_0f9035c5868fbb 14-15,23
+src/content/docs/docs/getting-started/add-a-server.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 64
+astro.config.mjs
+  s_f4e5f254be91ba::t_0f9035c5868fbb 68,103
+src/content/docs/docs/coding-agents/fix-a-project.md
+  s_f4e5f254be91ba::t_9c420f2b12b6a9 1-18
+src/content/docs/docs/coding-agents/prompts-and-always-allow.md
+  s_f4e5f254be91ba::t_563d7de0830a18 1-38
+src/content/docs/docs/reference/cli.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 269
+src/content/docs/docs/coding-agents/troubleshooting.md
+  s_f4e5f254be91ba::t_9c420f2b12b6a9 1-26
+src/content/docs/docs/coding-agents/browser-previews.md
+  s_f4e5f254be91ba::t_563d7de0830a18 1-34
+src/lib/lastmod.test.mjs
+  s_f4e5f254be91ba::t_b874c261d31baf 47-52
+src/content/docs/docs/coding-agents/documents.md
+  s_f4e5f254be91ba::t_563d7de0830a18 1-36
+src/content/docs/docs/concepts/what-nearhost-changes.md
+  s_f4e5f254be91ba::t_0f9035c5868fbb 79
+src/content/docs/docs/coding-agents/how-it-works.md
+  s_f4e5f254be91ba::t_9c420f2b12b6a9 1-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8e6728ff3b6e0460466255c031a9c7fcff185899",
+  "prompts": {},
+  "sessions": {
+    "s_f4e5f254be91ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a44b06e0-2635-49c9-9f5c-26fe1b6ff124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
