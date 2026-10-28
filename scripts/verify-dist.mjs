@@ -160,6 +160,18 @@ if (existsSync(index)) {
     !/[A-Za-z.]<(code|span)[^>]*>\w/.test(main) && !/<\/(code|span)>[A-Za-z]/.test(main),
     'landing copy has words glued to an inline element',
   );
+  const at = (re) => html.search(re);
+  check(
+    at(/Your browser is on this one\./) < at(/id="agents"/) && at(/id="agents"/) < at(/id="how"/),
+    'the agents section must sit between the problem and the steps',
+  );
+  check(/<nav[\s\S]*?href="#agents"[\s\S]*?<\/nav>/.test(html), 'the nav must link to #agents');
+  check(
+    decode(html).includes(
+      'A coding agent on that machine can use it too: it asks to add the project, open a preview or show you a plan, and you say yes.',
+    ),
+    'the hero must mention coding agents',
+  );
 }
 
 // 5. The docs entry point exists, and every docs page is a dated technical article.
