@@ -113,6 +113,8 @@ export default defineConfig({
     svelte(),
     // Starlight adds a plain sitemap unless one is configured here; this one adds lastmod.
     sitemap({
+      // The old coding agent page only redirects.
+      filter: (page) => !page.includes('/docs/getting-started/use-a-coding-agent/'),
       serialize(item) {
         const path = new URL(item.url).pathname.slice(base.length);
         const lastmod = lastModified(sourcesFor(path));

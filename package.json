@@ -19,8 +19,9 @@
     "test:stats": "node --test scripts/collect-stats.test.mjs",
     "test:og": "node --test src/lib/og.test.mjs",
     "test:lastmod": "node --test src/lib/lastmod.test.mjs",
+    "test:redirect": "node --test src/lib/coding-agents-redirect.test.mjs",
     "test:tour": "node --test src/lib/agent-tour.test.mjs",
-    "verify": "npm run format:check && npm run lint && npm run check && npm run test:install && npm run test:stats && npm run test:og && npm run test:lastmod && npm run test:tour && npm run build && node scripts/verify-dist.mjs",
+    "verify": "npm run format:check && npm run lint && npm run check && npm run test:install && npm run test:stats && npm run test:og && npm run test:lastmod && npm run test:redirect && npm run test:tour && npm run build && node scripts/verify-dist.mjs",
     "prepare": "simple-git-hooks",
     "logo": "node scripts/logo.mjs"
   },

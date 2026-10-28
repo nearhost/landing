@@ -1,0 +1,32 @@
+---
+// The old coding agent page, split into src/content/docs/docs/coding-agents/. This page keeps
+// the old URL and its anchors working. It is not a docs page: no Starlight layout, noindex, and
+// left out of the sitemap (astro.config.mjs) and llms.txt.
+import { moves } from '../../../lib/coding-agents-redirect.mjs';
+
+const base = import.meta.env.BASE_URL.replace(/\/?$/, '/');
+const overview = base + moves[''];
+const canonical = new URL(overview, Astro.site).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Coding agents | Nearhost</title>
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={canonical} />
+    <meta http-equiv="refresh" content={`0; url=${overview}`} />
+    <script is:inline define:vars={{ moves, base }}>
+      // Same lookup as newPath() in src/lib/coding-agents-redirect.mjs.
+      const key = location.hash.replace(/^#/, '');
+      location.replace(base + (Object.hasOwn(moves, key) ? moves[key] : moves['']));
+    </script>
+  </head>
+  <body>
+    <p>
+      This page has moved. Read <a href={overview}>Coding agents</a>.
+    </p>
+  </body>
+</html>
