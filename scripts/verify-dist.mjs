@@ -282,6 +282,7 @@ for (const file of pages) {
       continue;
     }
     let path;
+    let fragment;
     try {
       const url = new URL(href, page);
       // Other schemes and other hosts.
@@ -291,6 +292,7 @@ for (const file of pages) {
         continue;
       }
       path = decodeURIComponent(url.pathname.slice(prefix.length));
+      fragment = decodeURIComponent(url.hash.slice(1));
     } catch {
       failures.push(`${file} links to ${href}, which is not a valid URL path`);
       continue;
@@ -303,6 +305,12 @@ for (const file of pages) {
       failures.push(`${file} links to ${href}, which is not in dist/`);
     } else if (statSync(target).isDirectory()) {
       failures.push(`${file} links to ${href}, a directory; end the link with a slash`);
+    } else if (
+      fragment &&
+      target.endsWith('.html') &&
+      !readFileSync(target, 'utf8').includes(`id="${fragment}"`)
+    ) {
+      failures.push(`${file} links to ${href}, but the page has no #${fragment}`);
     }
   }
 }
