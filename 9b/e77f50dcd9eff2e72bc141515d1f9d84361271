@@ -1,0 +1,27 @@
+src/components/landing/agents/QwenScene.astro
+  s_f4e5f254be91ba::t_824c2d33869bcd 176,194-201
+src/components/landing/Agents.astro
+  s_f4e5f254be91ba::t_048ef20d63b9ec 91-104
+  s_f4e5f254be91ba::t_824c2d33869bcd 516-526,532-534
+scripts/verify-dist.mjs
+  s_f4e5f254be91ba::t_b8f5319160cc66 212-215,217-219
+  s_f4e5f254be91ba::t_824c2d33869bcd 204-209,216
+src/components/landing/agents/BrowserWindow.astro
+  s_f4e5f254be91ba::t_824c2d33869bcd 3,35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "9be77f50dcd9eff2e72bc141515d1f9d84361271",
+  "prompts": {},
+  "sessions": {
+    "s_f4e5f254be91ba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a44b06e0-2635-49c9-9f5c-26fe1b6ff124",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
