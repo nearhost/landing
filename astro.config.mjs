@@ -65,7 +65,7 @@ export default defineConfig({
             'docs/getting-started/first-run',
             'docs/getting-started/add-a-server',
             'docs/getting-started/add-a-project',
-            'docs/getting-started/use-a-coding-agent',
+            'docs/coding-agents/**',
             'docs/concepts/**',
             'docs/reference/**',
             'docs/troubleshooting/**',
@@ -100,6 +100,7 @@ export default defineConfig({
           label: 'Getting started',
           items: [{ autogenerate: { directory: 'docs/getting-started' } }],
         },
+        { label: 'Coding agents', items: [{ autogenerate: { directory: 'docs/coding-agents' } }] },
         { label: 'Concepts', items: [{ autogenerate: { directory: 'docs/concepts' } }] },
         { label: 'Reference', items: [{ autogenerate: { directory: 'docs/reference' } }] },
         {

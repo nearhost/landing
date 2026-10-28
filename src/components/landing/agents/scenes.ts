@@ -23,7 +23,7 @@ export interface Scene {
   perChar: number;
 }
 
-const guide = '/docs/getting-started/use-a-coding-agent/';
+const guide = '/docs/coding-agents/';
 
 export const scenes: Scene[] = [
   {
@@ -32,7 +32,7 @@ export const scenes: Scene[] = [
     tag: '/nearhost add',
     caption:
       'Ask for /nearhost add. Nearhost opens the add form on your laptop, already filled in from the project’s .env, Compose and Vite config, and the agent gets the address once you save it.',
-    link: { text: 'Use a coding agent', href: url(guide) },
+    link: { text: 'Add a project', href: url(guide + 'add-a-project/') },
     prompt: '/nearhost add',
     perChar: 70,
   },
@@ -44,7 +44,7 @@ export const scenes: Scene[] = [
       'When an agent on a server starts a preview, such as a brainstorming page, it asks Nearhost to forward that one port. Press y and the preview opens in your laptop’s browser until the session ends.',
     link: {
       text: 'Browser previews from a server',
-      href: url(guide + '#browser-previews-from-a-server'),
+      href: url(guide + 'browser-previews/'),
     },
     prompt: 'Brainstorm three layouts for the pricing page and show them to me in the browser',
     perChar: 30,

@@ -70,7 +70,7 @@ Inferred hosts are fixed when the project is added or edited. Changing `APP_URL`
 
 ## Where the URLs show
 
-The project view in the interface lists every URL under the project's name. A pattern is shown dim, since a browser cannot open it. For a coding agent, `/nearhost status` reports the main URL as `url`, and every URL the project serves, the main one first, as `urls`. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+The project view in the interface lists every URL under the project's name. A pattern is shown dim, since a browser cannot open it. For a coding agent, `/nearhost status` reports the main URL as `url`, and every URL the project serves, the main one first, as `urls`. See [Add a project](/docs/coding-agents/add-a-project/).
 
 ## An example
 

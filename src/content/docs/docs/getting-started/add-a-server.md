@@ -61,4 +61,4 @@ Select the server in the sidebar to see its host, its projects and its log.
 
 From the command line, `nearhost add --server <name>` run at a terminal offers to add a server it does not know yet.
 
-Nothing is installed on the remote machine. Nearhost makes a private `~/.nearhost` folder there and keeps a socket in it, so a coding agent on the server can reach Nearhost. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/). The only file it ever writes to a project is a `.nearhostrc`, and only when you run [`nearhost export`](/docs/reference/cli/#nearhost-export).
+Nothing is installed on the remote machine. Nearhost makes a private `~/.nearhost` folder there and keeps a socket in it, so a coding agent on the server can reach Nearhost. See [How agents reach Nearhost](/docs/coding-agents/how-it-works/). The only file it ever writes to a project is a `.nearhostrc`, and only when you run [`nearhost export`](/docs/reference/cli/#nearhost-export).

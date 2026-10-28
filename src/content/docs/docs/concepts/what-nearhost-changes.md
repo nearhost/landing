@@ -76,7 +76,7 @@ When Nearhost quits, the forwards and the connection close. `~/.nearhost` stays,
 
 ## What coding agents can do
 
-A coding agent reaches Nearhost through a socket that only your user can open, and sees only the projects of the machine it runs on. Without asking you, it can list those projects, run `nearhost doctor` on a folder, and ask Nearhost to reload a project's `.nearhostrc`. Nearhost applies changes such as ports and new `.test` hosts straight away and saves them to `config.yaml`; the agent never edits that file itself. Anything else, including other domains, wildcards, `localhost` and `docker_clients`, waits for you to approve it. See [Use a coding agent](/docs/getting-started/use-a-coding-agent/).
+A coding agent reaches Nearhost through a socket that only your user can open, and sees only the projects of the machine it runs on. Without asking you, it can list those projects, run `nearhost doctor` on a folder, and ask Nearhost to reload a project's `.nearhostrc`. Nearhost applies changes such as ports and new `.test` hosts straight away and saves them to `config.yaml`; the agent never edits that file itself. Anything else, including other domains, wildcards, `localhost` and `docker_clients`, waits for you to approve it. See [How agents reach Nearhost](/docs/coding-agents/how-it-works/).
 
 ## Undo everything
 
