@@ -8,12 +8,14 @@
 import { url } from '../../lib/url';
 import CopyButton from '../CopyButton.svelte';
 import ClaudeScene from './agents/ClaudeScene.astro';
+import CodexScene from './agents/CodexScene.astro';
 import { scenes, type Scene } from './agents/scenes';
 
 const install = 'npx skills add nearhost/nearhost -g';
 const first = scenes[0];
 const components: Partial<Record<Scene['id'], typeof ClaudeScene>> = {
   claude: ClaudeScene,
+  codex: CodexScene,
 };
 // What the script needs to play the tour; the copy itself is rendered below.
 const tour = JSON.stringify(
