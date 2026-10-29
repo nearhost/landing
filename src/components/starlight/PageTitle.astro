@@ -1,0 +1,16 @@
+---
+import Default from '@astrojs/starlight/components/PageTitle.astro';
+import { agentNote, siteUrl } from '../../lib/markdown-twin.mjs';
+
+// Only docs pages carry the note; the 404 page renders through this component too.
+const isDocsPage = Astro.locals.starlightRoute.entry.id.startsWith('docs/');
+---
+
+<Default>
+  <slot />
+</Default>
+{isDocsPage && (
+  <p class="sr-only" aria-hidden="true" data-agent-note>
+    {agentNote(siteUrl(import.meta.env.BASE_URL))}
+  </p>
+)}
