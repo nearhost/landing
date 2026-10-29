@@ -1,0 +1,28 @@
+src/pages/docs/[...slug].md.ts
+  s_518ab5453c65a1::t_e0a34f259f25c2 1-2
+src/route-data.ts
+  s_518ab5453c65a1::t_e0a34f259f25c2 6,23-30
+scripts/verify-dist.mjs
+  s_518ab5453c65a1::t_ccb1d42fb1ac19 451-484
+  s_518ab5453c65a1::t_ced4ddb039f9e3 485-486
+src/lib/twin-endpoint.ts
+  s_518ab5453c65a1::t_e0a34f259f25c2 1-22
+src/pages/docs/[...slug]/index.md.ts
+  s_518ab5453c65a1::t_e0a34f259f25c2 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1c3b638a77ebaa5d963852bdc970d9515bd62edb",
+  "prompts": {},
+  "sessions": {
+    "s_518ab5453c65a1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "286741ca-1109-4366-9186-4591cc780258",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
