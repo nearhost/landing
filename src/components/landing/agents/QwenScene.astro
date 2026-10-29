@@ -1,0 +1,269 @@
+---
+// Scene 3: Qwen Code on the server asks Nearhost to show a plan, and the laptop opens it. The
+// step classes (from-1, at-1, …) are shown or hidden by the gallery's data-step.
+import BrowserWindow from './BrowserWindow.astro';
+import NearhostWindow from './NearhostWindow.astro';
+import Scene from './Scene.astro';
+import Terminal from './Terminal.astro';
+---
+
+<Scene>
+  <Terminal slot="terminal" title="qwen on mini">
+    <!-- prettier-ignore -->
+    <div class="qw">
+      <div class="head">
+        <div class="logo" aria-hidden="true">
+          <div class="r"></div>
+          <div class="r"><span class="grad"> ▄▄▄▄▄▄  ▄▄     ▄▄ ▄▄▄▄▄▄▄ ▄▄▄    ▄▄</span></div>
+          <div class="r"><span class="grad">██╔═══██╗██║    ██║██╔════╝████╗  ██║</span></div>
+          <div class="r"><span class="grad">██║   ██║██║ █╗ ██║█████╗  ██╔██╗ ██║</span></div>
+          <div class="r"><span class="grad">██║▄▄ ██║██║███╗██║██╔══╝  ██║╚██╗██║</span></div>
+          <div class="r"><span class="grad">╚██████╔╝╚███╔███╔╝███████╗██║ ╚████║</span></div>
+          <div class="r"><span class="grad"> ╚══▀▀═╝  ╚══╝╚══╝ ╚══════╝╚═╝  ╚═══╝</span></div>
+          <div class="r"></div>
+        </div>
+        <div class="info">
+          <div class="r"><b class="purple">&gt;_ Qwen Code</b><span class="grey"> (v0.26.2)</span></div>
+          <div class="r"></div>
+          <div class="r grey">Qwen OAuth | coder-model (/model to change)</div>
+          <div class="r grey">~/code/myapp</div>
+        </div>
+      </div>
+      <div class="w tips grey">Tips: Type / to open the command popup; Tab autocompletes slash commands and saved prompts.</div>
+      <div class="from-1">
+        <div class="r"></div>
+        <div class="w qh purple">&gt; Write a plan for the checkout refactor and open it for me to review</div>
+        <div class="r"></div>
+        <div class="w qh"><span class="purple">◆︎</span> I'll write the plan to docs/plans/2026-10-28-checkout.md, then open it in your browser.</div>
+        <div class="w qh"><span class="green">✓</span> <b>WriteFile</b> <span class="grey">Writing to docs/plans/2026-10-28-checkout.md</span></div>
+        <div class="qo file">
+          <div class="r"><span class="num">1</span> <span class="gold"># Checkout refactor</span></div>
+          <div class="r"><span class="num">2</span></div>
+          <div class="r"><span class="num">3</span> Move tax and shipping into one Quote service.</div>
+          <div class="r"><span class="num">4</span></div>
+          <div class="r"><span class="num">5</span> <span class="gold">-</span> [ ] Add the Quote service and its tests</div>
+        </div>
+      </div>
+      <div class="from-2">
+        <div class="w qh"><span class="green">✓</span> <b>Shell</b> <span class="grey">sh ~/.qwen/skills/nearhost/scripts/nearhost.sh open docs/plans/2026-10-28-checkout.md --label plan</span></div>
+        <div class="r qo">{'{"id":"9b2e44d1a07c3f68","expires_at":"2026-10-28T09:52:00Z"}'}</div>
+        <div class="r"></div>
+        <div class="w qh"><span class="purple">◆︎</span> Approve it in Nearhost on ecs@macbook.</div>
+      </div>
+      <div class="at-2-3">
+        <div class="w qh split"><span>⊷ <b>Shell</b> <span class="grey">sh ~/.qwen/skills/nearhost/scripts/nearhost.sh open-wait 9b2e44d1a07c3f68</span></span><span class="grey fixed">(9s · timeout 2m)</span></div>
+      </div>
+      <div class="from-4">
+        <div class="w qh"><span class="green">✓</span> <b>Shell</b> <span class="grey">sh ~/.qwen/skills/nearhost/scripts/nearhost.sh open-wait 9b2e44d1a07c3f68</span></div>
+        <div class="r qo">{'{"state":"open","url":"https://localhost:6327/d/Qm7xK2v9pLr4Tn8wZc3hJA/docs/plans/2026-10-28-checkout.md"}'}</div>
+        <div class="r"></div>
+        <div class="w qh"><span class="purple">◆︎</span> The plan is open in your browser. It always shows the file as it is now, so reload it after I make changes.</div>
+      </div>
+      <div class="r"></div>
+      <div class="busy">
+        <div class="r">  ⠋ <span class="purple">Brewing fresh bytes...</span><span class="grey"> (<span class="at-1">2s</span><span class="from-2">9s</span> · esc to cancel)</span></div>
+        <div class="r"></div>
+      </div>
+      <div class="rule"></div>
+      <div class="w"><span class="purple">&gt;</span> <span data-typed></span><span class="caret"></span><span class="placeholder grey"> Type your message or @path/to/file</span></div>
+      <div class="rule"></div>
+      <div class="r foot grey"><span><span class="busy">Enter to steer · Ctrl+Q to queue · </span>⏸ Ask permissions (shift + tab to cycle)</span><span class="from-1">2.1% context used</span></div>
+    </div>
+  </Terminal>
+  <NearhostWindow slot="laptop">
+    <!-- prettier-ignore -->
+    <div class="nh">
+      <div class="prompt box">
+        <div class="r"><b>Show a document</b></div>
+        <div class="w ask">An agent on mini wants to show docs/plans/2026-10-28-checkout.md (plan)</div>
+        <div class="w ask">Nearhost will serve files in /home/ecs/code/myapp, except dotfiles.</div>
+        <div class="r"></div>
+        <div class="r"><span class="key">y</span><span class="dim"> yes · </span><span class="accent">n</span><span class="dim"> no</span></div>
+      </div>
+    </div>
+  </NearhostWindow>
+  <BrowserWindow
+    slot="laptop"
+    url="localhost:6327/d/Qm7xK2v9pLr4Tn8wZc3hJA/docs/plans/2026-10-28-checkout.md"
+  >
+    <!-- prettier-ignore -->
+    <div class="doc">
+      <div class="heading">Checkout refactor</div>
+      <p>Move tax and shipping into one <code>Quote</code> service, so the cart and the payment step agree on the total.</p>
+      <div class="sub">Tasks</div>
+      <div class="tasks">
+        <label><input type="checkbox" disabled /> Add the Quote service and its tests</label>
+        <label><input type="checkbox" disabled /> Use it from the cart page</label>
+        <label><input type="checkbox" disabled /> Use it from the payment step</label>
+      </div>
+    </div>
+  </BrowserWindow>
+</Scene>
+
+<style>
+  /* Qwen Code's own colours, as its terminal session draws them. */
+  .qw {
+    padding: 0 1ch;
+  }
+  .grey {
+    color: #6c7086;
+  }
+  .purple {
+    color: #cba6f7;
+  }
+  .green {
+    color: #a6e3a1;
+  }
+  .gold {
+    color: #ffd700;
+  }
+  .num {
+    color: #3d4149;
+  }
+  .head {
+    display: flex;
+    align-items: center;
+    gap: 2ch;
+    margin-inline: 1ch;
+  }
+  .logo {
+    flex: none;
+  }
+  .grad {
+    display: inline-block;
+    white-space: pre;
+    background: linear-gradient(90deg, #4796e4, #847ace, #c3677f);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .info {
+    flex: 1;
+    max-width: 60ch;
+    min-width: 0;
+    padding: 0 1ch;
+    border: 1px solid #6c7086;
+  }
+  .tips {
+    margin-left: 2ch;
+  }
+  .qh {
+    margin-left: 2ch;
+    padding-left: 2ch;
+    text-indent: -2ch;
+  }
+  .qo {
+    margin-left: 4ch;
+  }
+  .file {
+    color: #bfbdb6;
+  }
+  .split {
+    display: flex;
+    justify-content: space-between;
+    gap: 2ch;
+    text-indent: 0;
+  }
+  .split > :first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .fixed {
+    flex: none;
+  }
+  .rule {
+    margin-inline: -2ch;
+    height: 1.5em;
+    background: linear-gradient(#89b4fa, #89b4fa) 0 50% / 100% 1px no-repeat;
+  }
+  .foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 2ch;
+    padding-inline: 2ch;
+  }
+  .foot > :first-child {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  [data-typed]:not(:empty) ~ .placeholder {
+    display: none;
+  }
+  /* The real TUI drops its logo below 87 columns; here that is below 1200px. */
+  @media (max-width: 1199px) {
+    .logo {
+      display: none;
+    }
+  }
+  /* Without the tips line the scene is no taller than Codex's, so the stage keeps one height. */
+  @media (max-width: 959px) {
+    .tips {
+      display: none;
+    }
+  }
+
+  /* Nearhost, asking to show the document. */
+  .nh {
+    padding: 12px 1ch 14px;
+  }
+  .box {
+    padding: 6px 1.5ch 8px;
+    background: #121613;
+    border: 1px solid #f2b84b;
+    border-radius: 6px;
+  }
+  .ask {
+    margin-top: 4px;
+  }
+  .dim {
+    color: #7c8479;
+  }
+  .accent {
+    color: #d6f26b;
+  }
+
+  /* The page Nearhost renders from the plan. */
+  .doc {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 2px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .heading {
+    font-family: var(--nh-font-display);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+  }
+  .doc p {
+    margin: 0;
+    color: #3e463f;
+  }
+  .doc code {
+    background: #e6e9e0;
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+  .sub {
+    margin-top: 4px;
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: #3e463f;
+  }
+  .tasks label {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+</style>

@@ -9,6 +9,7 @@ import { url } from '../../lib/url';
 import CopyButton from '../CopyButton.svelte';
 import ClaudeScene from './agents/ClaudeScene.astro';
 import CodexScene from './agents/CodexScene.astro';
+import QwenScene from './agents/QwenScene.astro';
 import { scenes, type Scene } from './agents/scenes';
 
 const install = 'npx skills add nearhost/nearhost -g';
@@ -16,6 +17,7 @@ const first = scenes[0];
 const components: Partial<Record<Scene['id'], typeof ClaudeScene>> = {
   claude: ClaudeScene,
   codex: CodexScene,
+  qwen: QwenScene,
 };
 // What the script needs to play the tour; the copy itself is rendered below.
 const tour = JSON.stringify(
@@ -86,10 +88,20 @@ const tour = JSON.stringify(
 
     <div class="below">
       <div class="caption" data-caption-block hidden>
-        <p data-caption>{first.caption}</p>
-        <a class="more" data-link href={first.link.href}>
-          {first.link.text}
-        </a>
+        <div class="captions">
+          {scenes.map((scene) => (
+            <div class="sizer" aria-hidden="true" data-nosnippet>
+              <p>{scene.caption}</p>
+              <span class="more">{scene.link.text}</span>
+            </div>
+          ))}
+          <div class="live">
+            <p data-caption>{first.caption}</p>
+            <a class="more" data-link href={first.link.href}>
+              {first.link.text}
+            </a>
+          </div>
+        </div>
       </div>
       <div class="controls" data-controls hidden>
         <button type="button" class="control" data-toggle aria-label="Play the tour">
@@ -501,12 +513,24 @@ const tour = JSON.stringify(
     padding-top: 8px;
   }
   .caption {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
     max-width: 680px;
     flex: 1 1 420px;
     min-width: 0;
+  }
+  /* Every scene's caption shares one cell, hidden but for the live one, so the block keeps the
+     tallest caption's height and the controls and facts below stay put. */
+  .captions {
+    display: grid;
+  }
+  .captions > * {
+    grid-area: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .sizer {
+    visibility: hidden;
   }
   .caption p {
     margin: 0;

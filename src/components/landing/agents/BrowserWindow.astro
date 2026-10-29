@@ -1,6 +1,6 @@
 ---
 // A browser window on the laptop, showing a page the agent serves. It is light in both themes,
-// as a page is, and the gallery fades it in (class `browser`) once Nearhost has forwarded the port.
+// as a page is, and the gallery fades it in (class `browser`) once Nearhost has opened it.
 interface Props {
   url: string;
 }
@@ -32,6 +32,7 @@ const { url } = Astro.props;
     overflow: hidden;
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
     color: #1b1f1c;
+    color-scheme: light;
   }
   .bar {
     flex: none;
