@@ -1,14 +1,18 @@
-import { test } from 'node:test';
+import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { docsIndex, sidebarGroups } from './docs-index.mjs';
 import { siteUrl } from './markdown-twin.mjs';
 
+const fixtures = [];
+after(() => fixtures.forEach((dir) => rmSync(dir, { recursive: true, force: true })));
+
 function contentWith(pages) {
   const dir = mkdtempSync(join(tmpdir(), 'docs-index-'));
+  fixtures.push(dir);
   for (const group of sidebarGroups) mkdirSync(join(dir, group.directory), { recursive: true });
   for (const [path, frontmatter] of Object.entries(pages)) {
     writeFileSync(join(dir, path), `---\n${frontmatter}\n---\n\nBody.\n`);

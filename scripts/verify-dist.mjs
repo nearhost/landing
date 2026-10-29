@@ -330,7 +330,12 @@ for (const name of ['llms.txt', 'llms-full.txt', 'llms-small.txt']) {
   for (const path of docsPaths) {
     check(text.includes(`](${siteRoot}${path}.md)`), `dist/llms.txt does not link ${path}.md`);
   }
-  check(!/\]\([^)]*\/docs\/[^)]*\/\)/.test(text), 'dist/llms.txt links a docs HTML page');
+  // Any link to a docs page on this site, other than its .md twin, is an HTML link.
+  const htmlDocsLink = [...text.matchAll(/\]\(([^)\s]*)/g)].some(([, href]) => {
+    const url = new URL(href, siteRoot);
+    return url.href.startsWith(`${siteRoot}docs/`) && !url.pathname.endsWith('.md');
+  });
+  check(!htmlDocsLink, 'dist/llms.txt links a docs HTML page');
   // The index has to follow the sidebar, so an agent reads the pages in the order a person would.
   const sidebarHtml = readFileSync(
     join(dist, 'docs', 'getting-started', 'install', 'index.html'),
@@ -363,7 +368,8 @@ if (existsSync(sitemapFile)) {
 
 // 9. Every internal link in every page resolves to a file in dist/.
 // Links are resolved the way a browser would, against the page's own URL on the site's origin.
-// Absolute links to the site point at production, which has no base.
+// Absolute links to the site point at production, which has no base, unless they carry this
+// build's base, as the links to a page's own Markdown twin do on a PR preview.
 const origin = 'https://nearhost.dev';
 for (const file of pages) {
   const html = readFileSync(file, 'utf8');
@@ -387,7 +393,7 @@ for (const file of pages) {
       continue;
     }
     const absolute = /^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith('//');
-    const prefix = absolute ? '/' : base;
+    const prefix = absolute && !href.startsWith(origin + base) ? '/' : base;
     if (!absolute && base !== '/' && href.startsWith('/') && !href.startsWith(base)) {
       failures.push(`${file} links to ${href}, which skips the site base ${base}`);
       continue;
@@ -542,8 +548,8 @@ for (const path of docsPaths) {
   const tag = element.slice(0, element.indexOf('>') + 1);
   check(/class="[^"]*\bsr-only\b/.test(tag), `${path}: the agent note is not hidden with sr-only`);
   check(
-    !/(?<![-\w])hidden(?![-\w])|display:\s*none/i.test(tag),
-    `${path}: the agent note must not use hidden or display:none`,
+    !/(?<![-\w])hidden(?![-\w])|display:\s*none|visibility:\s*hidden/i.test(tag),
+    `${path}: the agent note must not use hidden, display:none or visibility:hidden`,
   );
   check(
     decodeEntities(inner).trim() === agentNote(siteRoot),
@@ -551,7 +557,7 @@ for (const path of docsPaths) {
   );
   const content = html.indexOf('<div class="sl-markdown-content');
   check(content !== -1, `${path}/index.html has no sl-markdown-content to place the note against`);
-  check(index < content, `${path}: the agent note comes after the page content`);
+  check(content === -1 || index < content, `${path}: the agent note comes after the page content`);
   // The Copy as Markdown menu server-renders a plain link to the twin, for readers without JS.
   const twin = escapeRegExp(`${siteRoot}${path}.md`);
   check(

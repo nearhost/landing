@@ -121,3 +121,41 @@ test('puts a note label on its own line before a block', () => {
 test('leaves out an empty body', () => {
   assert.equal(toMarkdown(entry('\n'), site), `# X\n\n> ${agentNote(site)}\n`);
 });
+
+test('keeps a query string on a docs link', () => {
+  const md = toMarkdown(entry('[CLI](/docs/reference/cli/?v=1#flags)\n'), site);
+  assert.equal(bodyOf(md), '[CLI](https://nearhost.dev/docs/reference/cli.md?v=1#flags)\n');
+});
+
+test('fails on a nested note', () => {
+  assert.throws(() => toMarkdown(entry(':::note\nA\n:::note\nB\n:::\n:::\n'), site), {
+    message: 'docs/x: nested :::note',
+  });
+});
+
+test('rewrites links with any title form', () => {
+  const md = toMarkdown(entry("[a](/docs/a/ 'T') [b](/docs/b/ (T))\n"), site);
+  assert.equal(
+    bodyOf(md),
+    "[a](https://nearhost.dev/docs/a.md 'T') [b](https://nearhost.dev/docs/b.md (T))\n",
+  );
+});
+
+test('leaves a code span holding shorter backtick runs alone', () => {
+  const body = '``a `[x](/docs/a/)` b`` then [y](/docs/b/)\n';
+  assert.equal(
+    bodyOf(toMarkdown(entry(body), site)),
+    '``a `[x](/docs/a/)` b`` then [y](https://nearhost.dev/docs/b.md)\n',
+  );
+});
+
+test('treats an indented heading as a block but not a hashtag', () => {
+  assert.equal(
+    bodyOf(toMarkdown(entry(':::note\n  ## Steps\n:::\n'), site)),
+    '> **Note:**\n>\n>   ## Steps\n',
+  );
+  assert.equal(
+    bodyOf(toMarkdown(entry(':::note\n#nearhost\n:::\n'), site)),
+    '> **Note:** #nearhost\n',
+  );
+});

@@ -41,7 +41,10 @@
     else location.href = url;
   }
 
+  // Only the latest copy is shown and announced, so a second copy is never masked by the first.
   function showCopied() {
+    linkCopied = false;
+    clearTimeout(linkTimer);
     copied = true;
     clearTimeout(timer);
     timer = setTimeout(() => (copied = false), 2000);
@@ -114,6 +117,8 @@
   async function copyLlms() {
     try {
       await navigator.clipboard.writeText(llms);
+      copied = false;
+      clearTimeout(timer);
       linkCopied = true;
       clearTimeout(linkTimer);
       linkTimer = setTimeout(() => (linkCopied = false), 2000);
@@ -158,16 +163,21 @@
         bind:this={arrow}
         onclick={() => (open ? closeMenu() : openMenu())}
       >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          aria-hidden="true"
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
+        {#if linkCopied}
+          <!-- The menu has closed by now, so the arrow shows the tick for the copied link. -->
+          <CopyIcon copied size={14} />
+        {:else}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        {/if}
       </button>
     </div>
     {#if open}

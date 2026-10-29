@@ -29,19 +29,21 @@ export function agentNote(site) {
 }
 
 // A code span, left as written, or a root-relative link target with an optional title, as in
-// "](/docs/a/)" or '](/docs/a/ "Title")'. Matching code spans first keeps their text intact.
-const rootLink = /(`+)[^`]*?\1|\]\((\/[^)\s]*)((?:\s+"[^"]*")?)\)/g;
+// "](/docs/a/)" or '](/docs/a/ "Title")'. Matching code spans first keeps their text intact; a
+// span closes only on a backtick run of its own length, so it can hold shorter runs.
+const rootLink =
+  /(?<!`)(`+)(?!`)[\s\S]*?(?<!`)\1(?!`)|\]\((\/[^)\s]*)((?:\s+(?:"[^"]*"|'[^']*'|\([^)]*\)))?)\)/g;
 
 // A code fence opener or closer: up to any indent, then three or more backticks or tildes.
 const fenceLine = /^\s*(`{3,}|~{3,})(.*)$/;
 
 // A line that starts a block of its own, so a note's label can't share it.
-const blockStart = /^(\s*([-*+]|\d+[.)])\s|#|>|\||\s*(`{3,}|~{3,}))/;
+const blockStart = /^\s*(?:([-*+]|\d+[.)])\s|#{1,6}(?:\s|$)|>|\||`{3,}|~{3,})/;
 
 function absoluteLink(path, site) {
-  const [pathname, hash] = path.split(/#(.*)/s);
+  const [, pathname, suffix] = path.match(/^([^?#]*)(.*)$/s);
   const twin = pathname.startsWith('/docs/') ? `${pathname.replace(/\/$/, '')}.md` : pathname;
-  return `${site}${twin.slice(1)}${hash === undefined ? '' : `#${hash}`}`;
+  return `${site}${twin.slice(1)}${suffix}`;
 }
 
 /**
@@ -76,6 +78,8 @@ export function toMarkdown(entry, site) {
     const open = line.match(/^:::(\w+)(?:\[(.*)\])?\s*$/);
     if (open) {
       if (open[1] !== 'note') throw new Error(`${entry.id}: unsupported directive :::${open[1]}`);
+      // A note inside a note would lose the outer one's lines, and Starlight doesn't nest them.
+      if (note) throw new Error(`${entry.id}: nested :::note`);
       note = { title: open[2] ?? 'Note', lines: [] };
     } else if (note && line.trim() === ':::') {
       const quote = (l) => (l === '' ? '>' : `> ${l}`);
