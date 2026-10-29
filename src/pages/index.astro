@@ -13,6 +13,7 @@ import Trust from '../components/landing/Trust.astro';
 import Faq from '../components/landing/Faq.astro';
 import Install from '../components/landing/Install.astro';
 import Footer from '../components/landing/Footer.astro';
+import { agentNote, siteUrl } from '../lib/markdown-twin.mjs';
 ---
 
 <Landing
@@ -20,6 +21,9 @@ import Footer from '../components/landing/Footer.astro';
   description="Open the dev server on your other machine at a trusted https://name.test address on your laptop, over the SSH you already have. Any stack, no server install."
 >
   <Nav slot="header" />
+  <p class="sr-only" aria-hidden="true" data-agent-note>
+    {agentNote(siteUrl(import.meta.env.BASE_URL))}
+  </p>
   <Hero />
   <TuiMock />
   <Problem />
