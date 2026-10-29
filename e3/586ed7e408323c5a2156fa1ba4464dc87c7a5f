@@ -1,0 +1,24 @@
+src/components/starlight/MarkdownMenu.svelte
+  s_518ab5453c65a1::t_4fa500d45a785c 37,39-41,129-135
+  s_518ab5453c65a1::t_f53a84fc23d90c 3,29-32,35-36,38,42-43,56-57,68,121,148
+src/components/CopyButton.svelte
+  s_518ab5453c65a1::t_f53a84fc23d90c 2-3,32
+src/components/CopyIcon.svelte
+  s_518ab5453c65a1::t_768dbec1ae6f1b 1-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e3586ed7e408323c5a2156fa1ba4464dc87c7a5f",
+  "prompts": {},
+  "sessions": {
+    "s_518ab5453c65a1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "286741ca-1109-4366-9186-4591cc780258",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
