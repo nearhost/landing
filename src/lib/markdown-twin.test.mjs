@@ -77,6 +77,12 @@ test('fails on other directives', () => {
   });
 });
 
+test('fails on an unterminated note', () => {
+  assert.throws(() => toMarkdown(entry(':::note\nHi.\n'), site), {
+    message: 'docs/x: unterminated :::note',
+  });
+});
+
 test('quotes fenced code inside a note without rewriting it', () => {
   const body = ':::note\nRun:\n```sh\n:::tip\n[x](/docs/a/)\n```\n:::\n';
   assert.equal(

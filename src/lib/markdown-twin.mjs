@@ -67,6 +67,7 @@ export function toMarkdown(entry, site) {
       (note?.lines ?? out).push(text);
     }
   }
+  if (note) throw new Error(`${entry.id}: unterminated :::note`);
   const parts = [`# ${entry.title}`, `> ${agentNote(site)}`];
   if (entry.description) parts.push(entry.description);
   parts.push(out.join('\n').trim());

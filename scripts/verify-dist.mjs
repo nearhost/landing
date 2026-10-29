@@ -495,7 +495,10 @@ for (const path of docsPaths) {
   const twin = readFileSync(flat, 'utf8');
   check(twin === readFileSync(nested, 'utf8'), `${path}: the twin differs between its two paths`);
   check(twin.startsWith('# '), `${path}.md must start with a heading`);
-  check(twin.includes('> For AI agents:'), `${path}.md lacks the agent note`);
+  check(
+    twin.split('\n').includes(`> ${agentNote(siteRoot)}`),
+    `${path}.md lacks the exact agent note line`,
+  );
   check(!/^:::/m.test(twin), `${path}.md contains a Starlight directive`);
   check(!twin.includes('](/'), `${path}.md contains a root-relative link`);
   check(
