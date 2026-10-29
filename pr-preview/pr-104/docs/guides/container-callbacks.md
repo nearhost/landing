@@ -1,0 +1,135 @@
+# Callbacks from Docker containers to a local HTTPS domain
+
+> For AI agents: the full Nearhost documentation index is at https://nearhost.dev/pr-preview/pr-104/llms.txt. Every docs page is also available as Markdown: replace the trailing slash with `.md`, so https://nearhost.dev/pr-preview/pr-104/docs/getting-started/install/ becomes https://nearhost.dev/pr-preview/pr-104/docs/getting-started/install.md.
+
+Let a Docker Compose service, such as a queue worker or a LocalStack job, call your app at its Nearhost HTTPS name on this machine.
+
+> **Note:** Needs Nearhost 0.6.0 or later, which can serve a project to Docker containers. Run `nearhost update` to get it. See [CLI](https://nearhost.dev/pr-preview/pr-104/docs/reference/cli.md#nearhost-update).
+
+A service in your Compose file often calls the app back: a queue worker reports a finished job, or a LocalStack job delivers an event to a webhook. Point it at the app's Nearhost name, such as `https://api.local.example.com/webhooks/jobs`, and the call fails, even though the same URL works in your browser.
+
+Three things stand between the container and Nearhost. The container cannot find the host, it does not trust the local certificate authority, and on Linux Nearhost does not let it in. The fixes go in the project's files, which you commit. Each developer then sets one variable, for the certificate's path, and approves the opt-in on their own machine.
+
+This works only for a project on this machine. A container on an SSH server cannot reach the proxy on your laptop.
+
+## The example
+
+The project is named `shop`, and its worker is a Node service. Its app listens on port 8000 and is served at `api.local.example.com`. Its `.nearhostrc`:
+
+```yaml
+version: 1
+routes:
+  - port: ${APP_PORT:-8000}
+    label: app
+    hosts: [api.local.example.com]
+docker_clients: true
+```
+
+`hosts` serves the route at a name of your own, besides the project's main name. See [Multi-host projects](https://nearhost.dev/pr-preview/pr-104/docs/concepts/multi-host-projects.md). `docker_clients` is explained in [Being let in](#being-let-in). Its Compose file runs the app and a worker that calls it:
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - '${APP_PORT:-8000}:8000'
+  worker:
+    build: .
+    command: ['./worker']
+    environment:
+      WEBHOOK_URL: https://api.local.example.com/webhooks/jobs
+```
+
+Nothing here depends on the stack. Any service that reads a URL naming a host Nearhost serves, from its `environment`, its `env_file` files, or the project's `.env` or `.env.local` when it mounts the project directory, has the same three problems.
+
+## Reaching the host
+
+Nearhost puts `api.local.example.com` in your machine's [hosts file](https://nearhost.dev/pr-preview/pr-104/docs/concepts/the-hosts-file.md), pointing at loopback. A container does not read that file, and inside it loopback is the container itself. So the name resolves to nothing, to the public internet, or, where DNS points it at 127.0.0.1, back to the container.
+
+Map the name to the host with `extra_hosts`. `host-gateway` is Docker's name for the host's address as seen from a container:
+
+```yaml
+services:
+  worker:
+    extra_hosts:
+      - 'api.local.example.com:host-gateway'
+```
+
+List every name the service calls. `nearhost doctor` reports a service that calls a name without this mapping, as `docker.host-gateway`, and its fix is this snippet for the names it found.
+
+## Trusting the local CA
+
+Nearhost's certificates are signed by its own local certificate authority. Your system trusts it, but a container has its own trust store, so the call fails with a certificate error.
+
+Mount the root certificate into the container and point the service at it. The certificate is at `pki/authorities/local/root.crt` under Nearhost's `caddy` folder, which is `~/Library/Application Support/nearhost/caddy` on macOS and `~/.local/share/nearhost/caddy` on Linux, or `$XDG_DATA_HOME/nearhost/caddy` on either when that is set to an absolute path. `nearhost doctor` prints the path on your machine. Earlier versions kept it under `~/.config/nearhost/caddy`, or `$XDG_CONFIG_HOME/nearhost/caddy` when that variable was set. Nearhost 0.8.0 moves that folder the first time it runs while no other Nearhost is running. After that, a `NEARHOST_CA_CERT` set for an earlier version points at a file that is gone, so set it to the new path, which `nearhost doctor` prints. Mount only `root.crt`, never the folder: the key is beside it. The doctor's snippet, for a Node service:
+
+```yaml
+services:
+  worker:
+    environment:
+      NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/nearhost.crt
+    volumes:
+      - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
+```
+
+Each developer sets `NEARHOST_CA_CERT` to the certificate's path in their shell profile, or in `.env` when the project does not commit `.env`, so the Compose file holds no one's path. Compose reads only `.env` and the shell, not `.env.local`. Until the variable is set, every `docker compose` command that reads this Compose file stops with `set NEARHOST_CA_CERT to Nearhost's root certificate`, so nobody runs the service without the certificate by mistake.
+
+`NODE_EXTRA_CA_CERTS` adds the certificate to Node's own. `SSL_CERT_FILE`, `AWS_CA_BUNDLE` and `REQUESTS_CA_BUNDLE` replace the default bundle instead, so point them at a bundle that includes the certificate, or have the image run `update-ca-certificates`.
+
+`nearhost doctor` reports a service that calls a name Nearhost serves and does not trust the certificate, as `docker.ca`. A service that sets `SSL_CERT_FILE`, `NODE_EXTRA_CA_CERTS`, `AWS_CA_BUNDLE`, `REQUESTS_CA_BUNDLE` or `CURL_CA_BUNDLE`, or mounts the certificate's path, counts as set up. The doctor checks only that the setting is there, not that the runtime trusts the certificate, so a worker in another language needs the setting its runtime reads.
+
+## Being let in
+
+Nearhost serves its projects only to this machine. A request from anywhere else is dropped without an answer. On Linux, a container's request comes from its address on a Docker network, not from loopback, so Nearhost drops it.
+
+`docker_clients: true` in the project's [`.nearhostrc`](https://nearhost.dev/pr-preview/pr-104/docs/reference/nearhostrc.md#docker-clients) serves the project to the networks the Docker daemon has on this machine as well. Nearhost asks Docker for them when the project starts, and again every 30 seconds while it runs, so a network Compose creates later is let in too. It finds Docker through `DOCKER_HOST` or the current docker context, then the usual sockets of Docker Desktop, OrbStack, Rancher Desktop, Colima and Podman. From Nearhost 0.8.0. Until Docker first answers, it accepts requests from `172.16.0.0/12`, the private block most of Docker's default networks come from, which can also take in other machines on that block your machine can reach. The project's log says which networks it accepts requests from.
+
+- It works only for a project on this machine. On a project on a server, the file is an error.
+- It always needs your approval, as a real domain does. See [Approval](https://nearhost.dev/pr-preview/pr-104/docs/reference/nearhostrc.md#approval).
+- Other projects stay loopback-only. Only the project that opts in is served to Docker's networks.
+
+With no `.nearhostrc` yet, `nearhost export` writes one from the project's current setup, and you add the line to it.
+
+Docker Desktop on macOS already delivers container requests from 127.0.0.1, so this matters on Linux. On a Mac, the project is reached without it. Keep it in a committed `.nearhostrc` if anyone on the team uses Linux.
+
+`nearhost doctor` reports a project whose containers call a name it serves without the opt-in, as `docker.clients`. It is a warning on Linux, and only a note on macOS.
+
+## The finished Compose file
+
+```yaml
+services:
+  app:
+    build: .
+    ports:
+      - '${APP_PORT:-8000}:8000'
+  worker:
+    build: .
+    command: ['./worker']
+    environment:
+      WEBHOOK_URL: https://api.local.example.com/webhooks/jobs
+      NODE_EXTRA_CA_CERTS: /usr/local/share/ca-certificates/nearhost.crt
+    extra_hosts:
+      - 'api.local.example.com:host-gateway'
+    volumes:
+      - "${NEARHOST_CA_CERT:?set NEARHOST_CA_CERT to Nearhost's root certificate}:/usr/local/share/ca-certificates/nearhost.crt:ro"
+```
+
+Approve `api.local.example.com` and `docker_clients` when you add the project, or when Nearhost asks after the file changes. See [Approval](https://nearhost.dev/pr-preview/pr-104/docs/reference/nearhostrc.md#approval). Then restart the worker with `docker compose up -d worker`.
+
+## Check it works
+
+Run `nearhost doctor`. After the machine checks, it lists what it finds in each enabled project. For the example before any of the fixes, with `docker_clients` not yet in its `.nearhostrc`, on a Mac, these are the first lines of its three findings, without their fixes:
+
+```text
+warn  shop             worker calls a name Nearhost serves, and does not trust Nearhost's root certificate
+warn  shop             worker uses api.local.example.com, which a container resolves to itself or to the public internet, not to Nearhost
+info  shop             a container calls a name Nearhost serves, and Nearhost does not accept requests from Docker's network
+```
+
+Under each, a `fix:` line says what to do, followed by the snippet to paste. These are `docker.ca`, `docker.host-gateway` and `docker.clients`, and `nearhost doctor --json` gives each finding's `id`. On Linux the last one is a warning too. When the project is fixed, none of them is shown. See [nearhost doctor](https://nearhost.dev/pr-preview/pr-104/docs/reference/cli.md#nearhost-doctor).
+
+The doctor only reads the files. To see the call work, run the worker and watch the request arrive in Nearhost.
+
+## When a public tunnel is still the right tool
+
+This is for services you run yourself, on this machine. A webhook from a real provider, such as a payment or source control service, comes from its servers, which cannot reach your laptop. Use a public tunnel, such as ngrok, for that. See [ngrok loads the page, but assets point at localhost](https://nearhost.dev/pr-preview/pr-104/docs/guides/ngrok-assets-on-localhost.md).
