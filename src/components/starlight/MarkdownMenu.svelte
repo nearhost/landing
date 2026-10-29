@@ -33,9 +33,17 @@
 
   async function copyPage() {
     try {
-      const res = await fetch(localTwin);
-      if (!res.ok) throw new Error(`${res.status}`);
-      await navigator.clipboard.writeText(await res.text());
+      const text = fetch(localTwin).then(async (res) => {
+        if (!res.ok) throw new Error(`${res.status}`);
+        return new Blob([await res.text()], { type: 'text/plain' });
+      });
+      // Safari only lets the click write to the clipboard before anything is awaited, so
+      // hand it the pending fetch as a promised item rather than waiting for it first.
+      if (typeof ClipboardItem !== 'undefined' && navigator.clipboard.write) {
+        await navigator.clipboard.write([new ClipboardItem({ 'text/plain': text })]);
+      } else {
+        await navigator.clipboard.writeText(await (await text).text());
+      }
       showCopied();
     } catch {
       // No twin or no clipboard: show the Markdown instead, so the reader can still take it.
