@@ -3,6 +3,7 @@
 import { defineRouteMiddleware } from '@astrojs/starlight/route-data';
 import { url } from './lib/url';
 import { height, ogPath, width } from './lib/og.mjs';
+import { siteUrl, twinPath } from './lib/markdown-twin.mjs';
 import { jsonLd, techArticle } from './lib/structured-data.mjs';
 
 export const onRequest = defineRouteMiddleware((context) => {
@@ -19,6 +20,14 @@ export const onRequest = defineRouteMiddleware((context) => {
     { tag: 'meta', attrs: { property: 'og:image:alt', content: alt } },
     { tag: 'meta', attrs: { name: 'twitter:image', content: image } },
     { tag: 'meta', attrs: { name: 'twitter:image:alt', content: alt } },
+    {
+      tag: 'link',
+      attrs: {
+        rel: 'alternate',
+        type: 'text/markdown',
+        href: siteUrl(import.meta.env.BASE_URL) + twinPath(route.entry.id),
+      },
+    },
     {
       tag: 'script',
       attrs: { type: 'application/ld+json' },

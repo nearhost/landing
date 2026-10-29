@@ -448,6 +448,42 @@ for (const file of pages) {
   }
 }
 
+// 11. Every docs page has a Markdown twin, at both paths, with the agent note and no Starlight syntax.
+const siteRoot = `https://nearhost.dev${base}`;
+const docsPaths = existsSync(sitemapFile)
+  ? [...readFileSync(sitemapFile, 'utf8').matchAll(/<loc>([^<]*)<\/loc>/g)]
+      .map((m) => new URL(m[1]).pathname.slice(base.length))
+      .filter((path) => path.startsWith('docs/') && path !== 'docs/')
+      .map((path) => path.replace(/\/$/, ''))
+  : [];
+check(docsPaths.length > 0, 'the sitemap lists no docs pages to check for twins');
+for (const path of docsPaths) {
+  const flat = join(dist, `${path}.md`);
+  const nested = join(dist, path, 'index.md');
+  if (!existsSync(flat) || !existsSync(nested)) {
+    failures.push(`missing twin for ${path}: needs ${path}.md and ${path}/index.md`);
+    continue;
+  }
+  const twin = readFileSync(flat, 'utf8');
+  check(twin === readFileSync(nested, 'utf8'), `${path}: the twin differs between its two paths`);
+  check(twin.startsWith('# '), `${path}.md must start with a heading`);
+  check(twin.includes('> For AI agents:'), `${path}.md lacks the agent note`);
+  check(!/^:::/m.test(twin), `${path}.md contains a Starlight directive`);
+  check(!twin.includes('](/'), `${path}.md contains a root-relative link`);
+  check(
+    !twin.includes('<nav') && !twin.includes('Skip to content'),
+    `${path}.md contains page chrome`,
+  );
+  const htmlFile = join(dist, path, 'index.html');
+  const html = existsSync(htmlFile) ? readFileSync(htmlFile, 'utf8') : '';
+  check(
+    new RegExp(
+      `<link\\b(?=[^>]*rel="alternate")(?=[^>]*type="text/markdown")[^>]*href="${`${siteRoot}${path}.md`.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}"`,
+    ).test(html),
+    `${path}/index.html lacks the alternate link to ${siteRoot}${path}.md`,
+  );
+}
+
 if (failures.length) {
   console.error(
     `verify-dist: ${failures.length} failure(s)\n` + failures.map((f) => `  - ${f}`).join('\n'),
