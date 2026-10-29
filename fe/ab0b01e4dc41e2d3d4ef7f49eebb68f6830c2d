@@ -1,0 +1,26 @@
+src/lib/markdown-twin.mjs
+  s_518ab5453c65a1::t_6a0c7605023cc1 70
+scripts/verify-dist.mjs
+  s_518ab5453c65a1::t_6a0c7605023cc1 498-501
+src/components/starlight/MarkdownMenu.svelte
+  s_518ab5453c65a1::t_6a0c7605023cc1 19-20,101-103,160
+  s_518ab5453c65a1::t_8a76f9a4456170 196-198
+src/lib/markdown-twin.test.mjs
+  s_518ab5453c65a1::t_6a0c7605023cc1 80-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "feab0b01e4dc41e2d3d4ef7f49eebb68f6830c2d",
+  "prompts": {},
+  "sessions": {
+    "s_518ab5453c65a1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "286741ca-1109-4366-9186-4591cc780258",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
