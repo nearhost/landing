@@ -1,0 +1,21 @@
+src/pages/index.astro
+  s_518ab5453c65a1::t_2647ecee6c217c 16,24-26
+scripts/verify-dist.mjs
+  s_518ab5453c65a1::t_2647ecee6c217c 525,537-538,541-542,546,549,553,555-561,574-587
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ead2073ecd6d3462e756bd20b5bfbb1591e9ab62",
+  "prompts": {},
+  "sessions": {
+    "s_518ab5453c65a1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "286741ca-1109-4366-9186-4591cc780258",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
