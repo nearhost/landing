@@ -572,9 +572,11 @@ for (const path of docsPaths) {
   );
 }
 // The home page carries the note too, ahead of the hero, but has no twin and so no menu.
-const home = readFileSync(join(dist, 'index.html'), 'utf8');
+const homeFile = join(dist, 'index.html');
+const home = existsSync(homeFile) ? readFileSync(homeFile, 'utf8') : '';
 const homeNote = checkNote('index.html', home);
 const hero = home.indexOf('<h1');
+check(hero !== -1, 'index.html has no <h1> to place the note against');
 check(
   homeNote === -1 || hero === -1 || homeNote < hero,
   'index.html: the agent note comes after the hero',
