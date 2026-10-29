@@ -393,7 +393,6 @@ for (const file of pages) {
       continue;
     }
     const absolute = /^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith('//');
-    const prefix = absolute && !href.startsWith(origin + base) ? '/' : base;
     if (!absolute && base !== '/' && href.startsWith('/') && !href.startsWith(base)) {
       failures.push(`${file} links to ${href}, which skips the site base ${base}`);
       continue;
@@ -404,6 +403,7 @@ for (const file of pages) {
       const url = new URL(href, page);
       // Other schemes and other hosts.
       if (url.origin !== origin) continue;
+      const prefix = absolute && !url.pathname.startsWith(base) ? '/' : base;
       if (!url.pathname.startsWith(prefix)) {
         failures.push(`${file} links to ${href}, which is outside the site base ${base}`);
         continue;

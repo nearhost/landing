@@ -41,6 +41,10 @@
     else location.href = url;
   }
 
+  // Each copy takes a number; one that finishes after a newer copy has started is stale, and
+  // must not replace the newer one's tick or announcement.
+  let latest = 0;
+
   // Only the latest copy is shown and announced, so a second copy is never masked by the first.
   function showCopied() {
     linkCopied = false;
@@ -51,6 +55,7 @@
   }
 
   async function copyPage() {
+    const copy = ++latest;
     try {
       const text = fetch(localTwin).then(async (res) => {
         if (!res.ok) throw new Error(`${res.status}`);
@@ -65,8 +70,9 @@
       } else {
         await navigator.clipboard.writeText(await (await text).text());
       }
-      showCopied();
+      if (copy === latest) showCopied();
     } catch {
+      if (copy !== latest) return;
       // No twin or no clipboard: show the Markdown instead, so the reader can still take it.
       show(localTwin);
     }
@@ -115,15 +121,17 @@
   }
 
   async function copyLlms() {
+    const copy = ++latest;
     try {
       await navigator.clipboard.writeText(llms);
+      if (copy !== latest) return;
       copied = false;
       clearTimeout(timer);
       linkCopied = true;
       clearTimeout(linkTimer);
       linkTimer = setTimeout(() => (linkCopied = false), 2000);
     } catch {
-      show(llms);
+      if (copy === latest) show(llms);
     }
     closeMenu();
   }
