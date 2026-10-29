@@ -1,4 +1,5 @@
 // @ts-check
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightLlmsTxt from 'starlight-llms-txt';
@@ -7,12 +8,17 @@ import sitemap from '@astrojs/sitemap';
 import { satteri } from '@astrojs/markdown-satteri';
 import baseLinks from './src/lib/base-links.mjs';
 import { lastModified, sourcesFor } from './src/lib/lastmod.mjs';
+import { docsIndex, sidebarGroups } from './src/lib/docs-index.mjs';
+import { siteUrl, twinPath } from './src/lib/markdown-twin.mjs';
 import { plausibleInit, plausibleSrc, tracked } from './src/lib/plausible.mjs';
 
 // Pull request previews are built under /pr-preview/pr-<number>/; the live site sits at /.
 const base = process.env.SITE_BASE ?? '/';
 /** @param {string} path */
 const atBase = (path) => base.replace(/\/$/, '') + path;
+const site = siteUrl(base);
+/** @param {string} id a docs page id */
+const twin = (id) => site + twinPath(id);
 const analytics = tracked(base, process.argv.includes('build'))
   ? [
       { tag: /** @type {const} */ ('script'), attrs: { async: true, src: plausibleSrc } },
@@ -47,16 +53,18 @@ export default defineConfig({
             '- It works with any HTTP dev server. It reads ports from `.env`, and presets add Docker Compose, Vite and Laravel Sail.',
             '- It is for your own machines and your own browser, not for sharing a page publicly; use a tunnel service such as ngrok for that.',
             '',
-            'Start with [Introduction](https://nearhost.dev/docs/getting-started/introduction/) and [Install](https://nearhost.dev/docs/getting-started/install/). The guides cover:',
+            `Start with [Introduction](${twin('docs/getting-started/introduction')}) and [Install](${twin('docs/getting-started/install')}). The guides cover:`,
             '',
-            '- [SSO callback fails on a remote dev server](https://nearhost.dev/docs/guides/sso-callback-on-a-remote-dev-server/)',
-            '- [HTTPS on a local dev domain](https://nearhost.dev/docs/guides/https-on-a-local-dev-domain/)',
-            '- [ngrok loads the page, but assets point at localhost](https://nearhost.dev/docs/guides/ngrok-assets-on-localhost/)',
-            '- [Vite hot reload fails over SSH port forwarding](https://nearhost.dev/docs/guides/vite-hot-reload-over-ssh/)',
-            '- [Forward several ports over SSH without retyping -L](https://nearhost.dev/docs/guides/forward-ports-over-ssh/)',
-            '- [WorkOS sign-in on a remote dev server](https://nearhost.dev/docs/guides/workos-sign-in/)',
-            '- [Clerk sign-in on a remote dev server](https://nearhost.dev/docs/guides/clerk-sign-in/)',
-            '- [Cognito sign-in on a remote dev server](https://nearhost.dev/docs/guides/cognito-sign-in/)',
+            `- [SSO callback fails on a remote dev server](${twin('docs/guides/sso-callback-on-a-remote-dev-server')})`,
+            `- [HTTPS on a local dev domain](${twin('docs/guides/https-on-a-local-dev-domain')})`,
+            `- [ngrok loads the page, but assets point at localhost](${twin('docs/guides/ngrok-assets-on-localhost')})`,
+            `- [Vite hot reload fails over SSH port forwarding](${twin('docs/guides/vite-hot-reload-over-ssh')})`,
+            `- [Forward several ports over SSH without retyping -L](${twin('docs/guides/forward-ports-over-ssh')})`,
+            `- [WorkOS sign-in on a remote dev server](${twin('docs/guides/workos-sign-in')})`,
+            `- [Clerk sign-in on a remote dev server](${twin('docs/guides/clerk-sign-in')})`,
+            `- [Cognito sign-in on a remote dev server](${twin('docs/guides/cognito-sign-in')})`,
+            '',
+            docsIndex(fileURLToPath(new URL('./src/content/docs/', import.meta.url)), site),
           ].join('\n'),
           // The docs in reading order, as the sidebar has them; the guides come last.
           promote: [
@@ -95,20 +103,10 @@ export default defineConfig({
         Header: './src/components/starlight/Header.astro',
         Footer: './src/components/starlight/Footer.astro',
       },
-      sidebar: [
-        {
-          label: 'Getting started',
-          items: [{ autogenerate: { directory: 'docs/getting-started' } }],
-        },
-        { label: 'Coding agents', items: [{ autogenerate: { directory: 'docs/coding-agents' } }] },
-        { label: 'Concepts', items: [{ autogenerate: { directory: 'docs/concepts' } }] },
-        { label: 'Reference', items: [{ autogenerate: { directory: 'docs/reference' } }] },
-        {
-          label: 'Troubleshooting',
-          items: [{ autogenerate: { directory: 'docs/troubleshooting' } }],
-        },
-        { label: 'Guides', items: [{ autogenerate: { directory: 'docs/guides' } }] },
-      ],
+      sidebar: sidebarGroups.map(({ label, directory }) => ({
+        label,
+        items: [{ autogenerate: { directory } }],
+      })),
     }),
     svelte(),
     // Starlight adds a plain sitemap unless one is configured here; this one adds lastmod.

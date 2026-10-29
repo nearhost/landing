@@ -22,7 +22,8 @@
     "test:redirect": "node --test src/lib/coding-agents-redirect.test.mjs",
     "test:tour": "node --test src/lib/agent-tour.test.mjs",
     "test:twin": "node --test src/lib/markdown-twin.test.mjs",
-    "verify": "npm run format:check && npm run lint && npm run check && npm run test:install && npm run test:stats && npm run test:og && npm run test:lastmod && npm run test:redirect && npm run test:tour && npm run test:twin && npm run build && node scripts/verify-dist.mjs",
+    "test:docs-index": "node --test src/lib/docs-index.test.mjs",
+    "verify": "npm run format:check && npm run lint && npm run check && npm run test:install && npm run test:stats && npm run test:og && npm run test:lastmod && npm run test:redirect && npm run test:tour && npm run test:twin && npm run test:docs-index && npm run build && node scripts/verify-dist.mjs",
     "prepare": "simple-git-hooks",
     "logo": "node scripts/logo.mjs"
   },
@@ -41,7 +42,8 @@
     "satori": "0.33.5",
     "sharp": "^0.35.3",
     "starlight-llms-txt": "^0.12.0",
-    "svelte": "^5.57.2"
+    "svelte": "^5.57.2",
+    "yaml": "^2.9.1"
   },
   "engines": {
     "node": ">=22.13"

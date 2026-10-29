@@ -298,6 +298,16 @@ for (const file of guides) {
   );
 }
 
+// The sitemap's docs pages, which sections 7 and 11 check against.
+const sitemapFile = join(dist, 'sitemap-0.xml');
+const siteRoot = `https://nearhost.dev${base}`;
+const docsPaths = existsSync(sitemapFile)
+  ? [...readFileSync(sitemapFile, 'utf8').matchAll(/<loc>([^<]*)<\/loc>/g)]
+      .map((m) => new URL(m[1]).pathname.slice(base.length))
+      .filter((path) => path.startsWith('docs/') && path !== 'docs/')
+      .map((path) => path.replace(/\/$/, ''))
+  : [];
+
 // 7. The llms.txt files for AI assistants exist and carry no page chrome.
 for (const name of ['llms.txt', 'llms-full.txt', 'llms-small.txt']) {
   const file = join(dist, name);
@@ -310,10 +320,34 @@ for (const name of ['llms.txt', 'llms-full.txt', 'llms-small.txt']) {
     !text.includes('use-a-coding-agent'),
     `dist/${name} mentions the old coding agent page, which only redirects`,
   );
+  if (name !== 'llms.txt') continue;
+  // Agents read llms.txt whole, so it has to stay small, list every page and link the Markdown.
+  check(text.length < 50_000, `dist/llms.txt is ${text.length} characters; keep it under 50,000`);
+  for (const path of docsPaths) {
+    check(text.includes(`](${siteRoot}${path}.md)`), `dist/llms.txt does not link ${path}.md`);
+  }
+  check(!/\]\([^)]*\/docs\/[^)]*\/\)/.test(text), 'dist/llms.txt links a docs HTML page');
+  // The index has to follow the sidebar, so an agent reads the pages in the order a person would.
+  const sidebarHtml = readFileSync(
+    join(dist, 'docs', 'getting-started', 'install', 'index.html'),
+    'utf8',
+  );
+  const nav = sidebarHtml.match(/<nav[^>]*aria-label="Main"[^>]*>[\s\S]*?<\/nav>/)?.[0] ?? '';
+  const sidebarOrder = [...nav.matchAll(/href="([^"]*\/docs\/[^"]*)"/g)].map((m) =>
+    m[1].slice(base.length).replace(/\/$/, ''),
+  );
+  const docsSection = text.slice(text.indexOf('\n## '));
+  const twinOrder = [...docsSection.matchAll(/\]\(([^)]*?)\.md\)/g)]
+    .map((m) => m[1].slice(siteRoot.length))
+    .filter((path) => path.startsWith('docs/'));
+  check(sidebarOrder.length > 0, 'the built sidebar has no docs links to compare with llms.txt');
+  check(
+    twinOrder.join('\n') === sidebarOrder.join('\n'),
+    `dist/llms.txt lists pages in a different order from the sidebar:\n  llms.txt: ${twinOrder.join(', ')}\n  sidebar:  ${sidebarOrder.join(', ')}`,
+  );
 }
 
 // 8. Every sitemap entry carries the date its page last changed.
-const sitemapFile = join(dist, 'sitemap-0.xml');
 check(existsSync(sitemapFile), 'dist/sitemap-0.xml is missing');
 if (existsSync(sitemapFile)) {
   const xml = readFileSync(sitemapFile, 'utf8');
@@ -449,13 +483,6 @@ for (const file of pages) {
 }
 
 // 11. Every docs page has a Markdown twin, at both paths, with the agent note and no Starlight syntax.
-const siteRoot = `https://nearhost.dev${base}`;
-const docsPaths = existsSync(sitemapFile)
-  ? [...readFileSync(sitemapFile, 'utf8').matchAll(/<loc>([^<]*)<\/loc>/g)]
-      .map((m) => new URL(m[1]).pathname.slice(base.length))
-      .filter((path) => path.startsWith('docs/') && path !== 'docs/')
-      .map((path) => path.replace(/\/$/, ''))
-  : [];
 check(docsPaths.length > 0, 'the sitemap lists no docs pages to check for twins');
 for (const path of docsPaths) {
   const flat = join(dist, `${path}.md`);
