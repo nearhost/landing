@@ -522,7 +522,7 @@ for (const path of docsPaths) {
   );
 }
 
-// 12. Every docs page tells agents where the index is, without showing it to people.
+// 12. Every docs page and the home page tell agents where the index is, without showing it to people.
 const decodeEntities = (text) =>
   text
     .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
@@ -534,27 +534,31 @@ const decodeEntities = (text) =>
 const noteElements = (html) => [
   ...html.matchAll(/<p\b[^>]*\bdata-agent-note\b[^>]*>([\s\S]*?)<\/p>/g),
 ];
-for (const path of docsPaths) {
-  const htmlFile = join(dist, path, 'index.html');
-  const html = existsSync(htmlFile) ? readFileSync(htmlFile, 'utf8') : '';
+// The index of the note in the page, or -1 after recording why it is missing or wrong.
+const checkNote = (name, html) => {
   const notes = noteElements(html);
   if (notes.length !== 1) {
-    failures.push(
-      `${path}/index.html needs exactly one data-agent-note paragraph, has ${notes.length}`,
-    );
-    continue;
+    failures.push(`${name} needs exactly one data-agent-note paragraph, has ${notes.length}`);
+    return -1;
   }
   const [{ 0: element, 1: inner, index }] = notes;
   const tag = element.slice(0, element.indexOf('>') + 1);
-  check(/class="[^"]*\bsr-only\b/.test(tag), `${path}: the agent note is not hidden with sr-only`);
+  check(/class="[^"]*\bsr-only\b/.test(tag), `${name}: the agent note is not hidden with sr-only`);
   check(
     !/(?<![-\w])hidden(?![-\w])|display:\s*none|visibility:\s*hidden/i.test(tag),
-    `${path}: the agent note must not use hidden, display:none or visibility:hidden`,
+    `${name}: the agent note must not use hidden, display:none or visibility:hidden`,
   );
   check(
     decodeEntities(inner).trim() === agentNote(siteRoot),
-    `${path}: the agent note text differs from agentNote(${siteRoot})`,
+    `${name}: the agent note text differs from agentNote(${siteRoot})`,
   );
+  return index;
+};
+for (const path of docsPaths) {
+  const htmlFile = join(dist, path, 'index.html');
+  const html = existsSync(htmlFile) ? readFileSync(htmlFile, 'utf8') : '';
+  const index = checkNote(`${path}/index.html`, html);
+  if (index === -1) continue;
   const content = html.indexOf('<div class="sl-markdown-content');
   check(content !== -1, `${path}/index.html has no sl-markdown-content to place the note against`);
   check(content === -1 || index < content, `${path}: the agent note comes after the page content`);
@@ -567,18 +571,22 @@ for (const path of docsPaths) {
     `${path}/index.html lacks the data-markdown-menu fallback link to ${siteRoot}${path}.md`,
   );
 }
-for (const file of ['index.html', '404.html']) {
-  const page = join(dist, file);
-  if (existsSync(page)) {
-    check(
-      !readFileSync(page, 'utf8').includes('data-agent-note'),
-      `${file} must not carry the agent note`,
-    );
-    check(
-      !readFileSync(page, 'utf8').includes('data-markdown-menu'),
-      `${file} must not carry the Markdown menu`,
-    );
-  }
+// The home page carries the note too, ahead of the hero, but has no twin and so no menu.
+const homeFile = join(dist, 'index.html');
+const home = existsSync(homeFile) ? readFileSync(homeFile, 'utf8') : '';
+const homeNote = checkNote('index.html', home);
+const hero = home.indexOf('<h1');
+check(hero !== -1, 'index.html has no <h1> to place the note against');
+check(
+  homeNote === -1 || hero === -1 || homeNote < hero,
+  'index.html: the agent note comes after the hero',
+);
+check(!home.includes('data-markdown-menu'), 'index.html must not carry the Markdown menu');
+const notFound = join(dist, '404.html');
+if (existsSync(notFound)) {
+  const html = readFileSync(notFound, 'utf8');
+  check(!html.includes('data-agent-note'), '404.html must not carry the agent note');
+  check(!html.includes('data-markdown-menu'), '404.html must not carry the Markdown menu');
 }
 
 if (failures.length) {
