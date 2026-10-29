@@ -28,8 +28,15 @@ export function agentNote(site) {
   return `For AI agents: the full Nearhost documentation index is at ${site}llms.txt. Every docs page is also available as Markdown: replace the trailing slash with \`.md\`, so ${site}docs/getting-started/install/ becomes ${site}docs/getting-started/install.md.`;
 }
 
-// A root-relative link target, as in "](/docs/a/)".
-const rootLink = /\]\((\/[^)\s]*)\)/g;
+// A code span, left as written, or a root-relative link target with an optional title, as in
+// "](/docs/a/)" or '](/docs/a/ "Title")'. Matching code spans first keeps their text intact.
+const rootLink = /(`+)[^`]*?\1|\]\((\/[^)\s]*)((?:\s+"[^"]*")?)\)/g;
+
+// A code fence opener or closer: up to any indent, then three or more backticks or tildes.
+const fenceLine = /^\s*(`{3,}|~{3,})(.*)$/;
+
+// A line that starts a block of its own, so a note's label can't share it.
+const blockStart = /^(\s*([-*+]|\d+[.)])\s|#|>|\||\s*(`{3,}|~{3,}))/;
 
 function absoluteLink(path, site) {
   const [pathname, hash] = path.split(/#(.*)/s);
@@ -45,23 +52,39 @@ function absoluteLink(path, site) {
  */
 export function toMarkdown(entry, site) {
   const out = [];
-  let fence = null; // the marker that opened the code fence we are in
+  let fence = null; // the marker that opened the code fence we are in, such as "```"
   let note = null; // the lines of the note directive we are in
   for (const line of entry.body.split('\n')) {
-    const marker = line.match(/^(```|~~~)/)?.[1];
-    if (marker && (fence === null || fence === marker)) fence = fence === null ? marker : null;
+    const [, marker, rest] = line.match(fenceLine) ?? [];
+    if (fence === null && marker) {
+      fence = marker;
+    } else if (
+      fence !== null &&
+      marker?.[0] === fence[0] &&
+      marker.length >= fence.length &&
+      !rest.trim()
+    ) {
+      fence = null;
+    }
     if (fence !== null || marker) {
       (note?.lines ?? out).push(line);
       continue;
     }
-    const text = line.replace(rootLink, (_, path) => `](${absoluteLink(path, site)})`);
+    const text = line.replace(rootLink, (match, code, path, title) =>
+      code ? match : `](${absoluteLink(path, site)}${title})`,
+    );
     const open = line.match(/^:::(\w+)(?:\[(.*)\])?\s*$/);
     if (open) {
       if (open[1] !== 'note') throw new Error(`${entry.id}: unsupported directive :::${open[1]}`);
       note = { title: open[2] ?? 'Note', lines: [] };
     } else if (note && line.trim() === ':::') {
+      const quote = (l) => (l === '' ? '>' : `> ${l}`);
       const [first = '', ...rest] = note.lines;
-      out.push(`> **${note.title}:** ${first}`, ...rest.map((l) => (l === '' ? '>' : `> ${l}`)));
+      if (blockStart.test(first)) {
+        out.push(`> **${note.title}:**`, '>', ...note.lines.map(quote));
+      } else {
+        out.push(`> **${note.title}:** ${first}`, ...rest.map(quote));
+      }
       note = null;
     } else {
       (note?.lines ?? out).push(text);
@@ -70,6 +93,7 @@ export function toMarkdown(entry, site) {
   if (note) throw new Error(`${entry.id}: unterminated :::note`);
   const parts = [`# ${entry.title}`, `> ${agentNote(site)}`];
   if (entry.description) parts.push(entry.description);
-  parts.push(out.join('\n').trim());
+  const body = out.join('\n').trim();
+  if (body) parts.push(body);
   return `${parts.join('\n\n')}\n`;
 }

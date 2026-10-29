@@ -14,6 +14,9 @@ function check(condition, message) {
   if (!condition) failures.push(message);
 }
 
+/** Text escaped for use inside a RegExp. */
+const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+
 function filesMatching(dir, extensions) {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
@@ -460,9 +463,7 @@ if (!existsSync(oldPage)) {
     })
     .filter((script) => script.includes('location.replace'));
   check(
-    scripts.some((script) =>
-      new RegExp(`[\`'"]${base.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}[\`'"]`).test(script),
-    ),
+    scripts.some((script) => new RegExp(`[\`'"]${escapeRegExp(base)}[\`'"]`).test(script)),
     'the old coding agent page does not redirect through the site base',
   );
 }
@@ -509,14 +510,14 @@ for (const path of docsPaths) {
   const html = existsSync(htmlFile) ? readFileSync(htmlFile, 'utf8') : '';
   check(
     new RegExp(
-      `<link\\b(?=[^>]*rel="alternate")(?=[^>]*type="text/markdown")[^>]*href="${`${siteRoot}${path}.md`.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}"`,
+      `<link\\b(?=[^>]*rel="alternate")(?=[^>]*type="text/markdown")[^>]*href="${escapeRegExp(`${siteRoot}${path}.md`)}"`,
     ).test(html),
     `${path}/index.html lacks the alternate link to ${siteRoot}${path}.md`,
   );
 }
 
 // 12. Every docs page tells agents where the index is, without showing it to people.
-const unescape = (text) =>
+const decodeEntities = (text) =>
   text
     .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
     .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
@@ -545,13 +546,14 @@ for (const path of docsPaths) {
     `${path}: the agent note must not use hidden or display:none`,
   );
   check(
-    unescape(inner).trim() === agentNote(siteRoot),
+    decodeEntities(inner).trim() === agentNote(siteRoot),
     `${path}: the agent note text differs from agentNote(${siteRoot})`,
   );
   const content = html.indexOf('<div class="sl-markdown-content');
-  check(content === -1 || index < content, `${path}: the agent note comes after the page content`);
+  check(content !== -1, `${path}/index.html has no sl-markdown-content to place the note against`);
+  check(index < content, `${path}: the agent note comes after the page content`);
   // The Copy as Markdown menu server-renders a plain link to the twin, for readers without JS.
-  const twin = `${siteRoot}${path}.md`.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+  const twin = escapeRegExp(`${siteRoot}${path}.md`);
   check(
     new RegExp(
       `<[a-z]+\\b[^>]*\\bdata-markdown-menu\\b[^>]*>(?:\\s|<!--[^>]*-->)*<a\\b[^>]*\\bhref="${twin}"[^>]*>(?:\\s|<!--[^>]*-->)*View Markdown(?:\\s|<!--[^>]*-->)*</a>`,
