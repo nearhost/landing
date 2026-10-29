@@ -76,3 +76,11 @@ test('fails on other directives', () => {
     message: 'docs/x: unsupported directive :::tip',
   });
 });
+
+test('quotes fenced code inside a note without rewriting it', () => {
+  const body = ':::note\nRun:\n```sh\n:::tip\n[x](/docs/a/)\n```\n:::\n';
+  assert.equal(
+    bodyOf(toMarkdown(entry(body), site)),
+    '> **Note:** Run:\n> ```sh\n> :::tip\n> [x](/docs/a/)\n> ```\n',
+  );
+});

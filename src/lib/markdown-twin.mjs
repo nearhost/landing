@@ -51,7 +51,7 @@ export function toMarkdown(entry, site) {
     const marker = line.match(/^(```|~~~)/)?.[1];
     if (marker && (fence === null || fence === marker)) fence = fence === null ? marker : null;
     if (fence !== null || marker) {
-      (note ?? out).push(line);
+      (note?.lines ?? out).push(line);
       continue;
     }
     const text = line.replace(rootLink, (_, path) => `](${absoluteLink(path, site)})`);
