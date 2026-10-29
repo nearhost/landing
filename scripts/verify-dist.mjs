@@ -547,6 +547,14 @@ for (const path of docsPaths) {
   );
   const content = html.indexOf('<div class="sl-markdown-content');
   check(content === -1 || index < content, `${path}: the agent note comes after the page content`);
+  // The Copy as Markdown menu server-renders a plain link to the twin, for readers without JS.
+  const twin = `${siteRoot}${path}.md`.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+  check(
+    new RegExp(
+      `<[a-z]+\\b[^>]*\\bdata-markdown-menu\\b[^>]*>(?:\\s|<!--[^>]*-->)*<a\\b[^>]*\\bhref="${twin}"[^>]*>(?:\\s|<!--[^>]*-->)*View Markdown(?:\\s|<!--[^>]*-->)*</a>`,
+    ).test(html),
+    `${path}/index.html lacks the data-markdown-menu fallback link to ${siteRoot}${path}.md`,
+  );
 }
 for (const file of ['index.html', '404.html']) {
   const page = join(dist, file);
@@ -554,6 +562,10 @@ for (const file of ['index.html', '404.html']) {
     check(
       !readFileSync(page, 'utf8').includes('data-agent-note'),
       `${file} must not carry the agent note`,
+    );
+    check(
+      !readFileSync(page, 'utf8').includes('data-markdown-menu'),
+      `${file} must not carry the Markdown menu`,
     );
   }
 }
