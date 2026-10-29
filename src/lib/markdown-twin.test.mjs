@@ -90,3 +90,72 @@ test('quotes fenced code inside a note without rewriting it', () => {
     '> **Note:** Run:\n> ```sh\n> :::tip\n> [x](/docs/a/)\n> ```\n',
   );
 });
+
+test('pins the agent note', () => {
+  assert.equal(
+    agentNote(site),
+    'For AI agents: the full Nearhost documentation index is at https://nearhost.dev/llms.txt. Every docs page is also available as Markdown: replace the trailing slash with `.md`, so https://nearhost.dev/docs/getting-started/install/ becomes https://nearhost.dev/docs/getting-started/install.md.',
+  );
+});
+
+test('tracks indented and longer fences', () => {
+  const fenced = '- Step:\n\n  ```sh\n  [x](/docs/a/)\n  ```\n\n````md\n```\n[x](/docs/a/)\n````\n';
+  assert.equal(bodyOf(toMarkdown(entry(fenced), site)), fenced);
+});
+
+test('rewrites a link with a title and leaves code spans alone', () => {
+  const md = toMarkdown(entry('[CLI](/docs/reference/cli/ "The CLI") and `[x](/docs/a/)`\n'), site);
+  assert.equal(
+    bodyOf(md),
+    '[CLI](https://nearhost.dev/docs/reference/cli.md "The CLI") and `[x](/docs/a/)`\n',
+  );
+});
+
+test('puts a note label on its own line before a block', () => {
+  assert.equal(
+    bodyOf(toMarkdown(entry(':::note\n- One\n- Two\n:::\n'), site)),
+    '> **Note:**\n>\n> - One\n> - Two\n',
+  );
+});
+
+test('leaves out an empty body', () => {
+  assert.equal(toMarkdown(entry('\n'), site), `# X\n\n> ${agentNote(site)}\n`);
+});
+
+test('keeps a query string on a docs link', () => {
+  const md = toMarkdown(entry('[CLI](/docs/reference/cli/?v=1#flags)\n'), site);
+  assert.equal(bodyOf(md), '[CLI](https://nearhost.dev/docs/reference/cli.md?v=1#flags)\n');
+});
+
+test('fails on a nested note', () => {
+  assert.throws(() => toMarkdown(entry(':::note\nA\n:::note\nB\n:::\n:::\n'), site), {
+    message: 'docs/x: nested :::note',
+  });
+});
+
+test('rewrites links with any title form', () => {
+  const md = toMarkdown(entry("[a](/docs/a/ 'T') [b](/docs/b/ (T))\n"), site);
+  assert.equal(
+    bodyOf(md),
+    "[a](https://nearhost.dev/docs/a.md 'T') [b](https://nearhost.dev/docs/b.md (T))\n",
+  );
+});
+
+test('leaves a code span holding shorter backtick runs alone', () => {
+  const body = '``a `[x](/docs/a/)` b`` then [y](/docs/b/)\n';
+  assert.equal(
+    bodyOf(toMarkdown(entry(body), site)),
+    '``a `[x](/docs/a/)` b`` then [y](https://nearhost.dev/docs/b.md)\n',
+  );
+});
+
+test('treats an indented heading as a block but not a hashtag', () => {
+  assert.equal(
+    bodyOf(toMarkdown(entry(':::note\n  ## Steps\n:::\n'), site)),
+    '> **Note:**\n>\n>   ## Steps\n',
+  );
+  assert.equal(
+    bodyOf(toMarkdown(entry(':::note\n#nearhost\n:::\n'), site)),
+    '> **Note:** #nearhost\n',
+  );
+});

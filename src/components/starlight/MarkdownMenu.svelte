@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, tick } from 'svelte';
+  import CopyIcon from '../CopyIcon.svelte';
 
   interface Props {
     /** The absolute URL of this page's Markdown twin. */
@@ -25,20 +26,43 @@
 
   onMount(() => {
     mounted = true;
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(linkTimer);
+    };
   });
 
+  // Opens a URL in a new tab, or here when the browser blocks the tab: a failed copy has
+  // awaited by then, so the click may no longer count as one.
+  // (With "noopener" window.open always returns null, so drop the opener by hand instead.)
+  function show(url: string) {
+    const tab = window.open(url, '_blank');
+    if (tab) tab.opener = null;
+    else location.href = url;
+  }
+
+  // Each copy takes a number; one that finishes after a newer copy has started is stale, and
+  // must not replace the newer one's tick or announcement.
+  let latest = 0;
+
+  // Only the latest copy is shown and announced, so a second copy is never masked by the first.
   function showCopied() {
+    linkCopied = false;
+    clearTimeout(linkTimer);
     copied = true;
     clearTimeout(timer);
     timer = setTimeout(() => (copied = false), 2000);
   }
 
   async function copyPage() {
+    const copy = ++latest;
     try {
       const text = fetch(localTwin).then(async (res) => {
         if (!res.ok) throw new Error(`${res.status}`);
         return new Blob([await res.text()], { type: 'text/plain' });
       });
+      // The catch below reports a failed fetch; this stops it also surfacing as unhandled.
+      text.catch(() => {});
       // Safari only lets the click write to the clipboard before anything is awaited, so
       // hand it the pending fetch as a promised item rather than waiting for it first.
       if (typeof ClipboardItem !== 'undefined' && navigator.clipboard.write) {
@@ -46,10 +70,11 @@
       } else {
         await navigator.clipboard.writeText(await (await text).text());
       }
-      showCopied();
+      if (copy === latest) showCopied();
     } catch {
+      if (copy !== latest) return;
       // No twin or no clipboard: show the Markdown instead, so the reader can still take it.
-      window.open(localTwin, '_blank', 'noopener');
+      show(localTwin);
     }
   }
 
@@ -96,13 +121,17 @@
   }
 
   async function copyLlms() {
+    const copy = ++latest;
     try {
       await navigator.clipboard.writeText(llms);
+      if (copy !== latest) return;
+      copied = false;
+      clearTimeout(timer);
       linkCopied = true;
       clearTimeout(linkTimer);
       linkTimer = setTimeout(() => (linkCopied = false), 2000);
     } catch {
-      window.open(llms, '_blank', 'noopener');
+      if (copy === latest) show(llms);
     }
     closeMenu();
   }
@@ -110,7 +139,13 @@
   $effect(() => {
     if (!open) return;
     const onPointerDown = (event: PointerEvent) => {
-      if (root && !root.contains(event.target as Node)) closeMenu();
+      if (!root || root.contains(event.target as Node)) return;
+      open = false;
+      // Let the click move focus where it lands; only when it lands nowhere (plain text, the
+      // page background) does focus go back to the arrow, so keyboard users keep their place.
+      setTimeout(() => {
+        if (document.activeElement === document.body) arrow?.focus();
+      });
     };
     document.addEventListener('pointerdown', onPointerDown);
     return () => document.removeEventListener('pointerdown', onPointerDown);
@@ -123,32 +158,7 @@
   {:else}
     <div class="split">
       <button type="button" class="btn main" onclick={copyPage}>
-        {#if copied}
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M20 6 9 17l-5-5" />
-          </svg>
-        {:else}
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <rect x="9" y="9" width="12" height="12" rx="2" />
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-          </svg>
-        {/if}
+        <CopyIcon {copied} size={14} />
         Copy as Markdown
       </button>
       <button
@@ -161,16 +171,21 @@
         bind:this={arrow}
         onclick={() => (open ? closeMenu() : openMenu())}
       >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          aria-hidden="true"
-        >
-          <path d="m6 9 6 6 6-6" />
-        </svg>
+        {#if linkCopied}
+          <!-- The menu has closed by now, so the arrow shows the tick for the copied link. -->
+          <CopyIcon copied size={14} />
+        {:else}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        {/if}
       </button>
     </div>
     {#if open}

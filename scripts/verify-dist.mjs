@@ -14,6 +14,9 @@ function check(condition, message) {
   if (!condition) failures.push(message);
 }
 
+/** Text escaped for use inside a RegExp. */
+const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+
 function filesMatching(dir, extensions) {
   return readdirSync(dir).flatMap((name) => {
     const path = join(dir, name);
@@ -327,7 +330,12 @@ for (const name of ['llms.txt', 'llms-full.txt', 'llms-small.txt']) {
   for (const path of docsPaths) {
     check(text.includes(`](${siteRoot}${path}.md)`), `dist/llms.txt does not link ${path}.md`);
   }
-  check(!/\]\([^)]*\/docs\/[^)]*\/\)/.test(text), 'dist/llms.txt links a docs HTML page');
+  // Any link to a docs page on this site, other than its .md twin, is an HTML link.
+  const htmlDocsLink = [...text.matchAll(/\]\(([^)\s]*)/g)].some(([, href]) => {
+    const url = new URL(href, siteRoot);
+    return url.href.startsWith(`${siteRoot}docs/`) && !url.pathname.endsWith('.md');
+  });
+  check(!htmlDocsLink, 'dist/llms.txt links a docs HTML page');
   // The index has to follow the sidebar, so an agent reads the pages in the order a person would.
   const sidebarHtml = readFileSync(
     join(dist, 'docs', 'getting-started', 'install', 'index.html'),
@@ -360,7 +368,8 @@ if (existsSync(sitemapFile)) {
 
 // 9. Every internal link in every page resolves to a file in dist/.
 // Links are resolved the way a browser would, against the page's own URL on the site's origin.
-// Absolute links to the site point at production, which has no base.
+// Absolute links to the site point at production, which has no base, unless they carry this
+// build's base, as the links to a page's own Markdown twin do on a PR preview.
 const origin = 'https://nearhost.dev';
 for (const file of pages) {
   const html = readFileSync(file, 'utf8');
@@ -384,7 +393,6 @@ for (const file of pages) {
       continue;
     }
     const absolute = /^[a-z][a-z\d+.-]*:/i.test(href) || href.startsWith('//');
-    const prefix = absolute ? '/' : base;
     if (!absolute && base !== '/' && href.startsWith('/') && !href.startsWith(base)) {
       failures.push(`${file} links to ${href}, which skips the site base ${base}`);
       continue;
@@ -395,6 +403,7 @@ for (const file of pages) {
       const url = new URL(href, page);
       // Other schemes and other hosts.
       if (url.origin !== origin) continue;
+      const prefix = absolute && !url.pathname.startsWith(base) ? '/' : base;
       if (!url.pathname.startsWith(prefix)) {
         failures.push(`${file} links to ${href}, which is outside the site base ${base}`);
         continue;
@@ -460,9 +469,7 @@ if (!existsSync(oldPage)) {
     })
     .filter((script) => script.includes('location.replace'));
   check(
-    scripts.some((script) =>
-      new RegExp(`[\`'"]${base.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}[\`'"]`).test(script),
-    ),
+    scripts.some((script) => new RegExp(`[\`'"]${escapeRegExp(base)}[\`'"]`).test(script)),
     'the old coding agent page does not redirect through the site base',
   );
 }
@@ -509,14 +516,14 @@ for (const path of docsPaths) {
   const html = existsSync(htmlFile) ? readFileSync(htmlFile, 'utf8') : '';
   check(
     new RegExp(
-      `<link\\b(?=[^>]*rel="alternate")(?=[^>]*type="text/markdown")[^>]*href="${`${siteRoot}${path}.md`.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}"`,
+      `<link\\b(?=[^>]*rel="alternate")(?=[^>]*type="text/markdown")[^>]*href="${escapeRegExp(`${siteRoot}${path}.md`)}"`,
     ).test(html),
     `${path}/index.html lacks the alternate link to ${siteRoot}${path}.md`,
   );
 }
 
 // 12. Every docs page tells agents where the index is, without showing it to people.
-const unescape = (text) =>
+const decodeEntities = (text) =>
   text
     .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
     .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
@@ -541,17 +548,18 @@ for (const path of docsPaths) {
   const tag = element.slice(0, element.indexOf('>') + 1);
   check(/class="[^"]*\bsr-only\b/.test(tag), `${path}: the agent note is not hidden with sr-only`);
   check(
-    !/(?<![-\w])hidden(?![-\w])|display:\s*none/i.test(tag),
-    `${path}: the agent note must not use hidden or display:none`,
+    !/(?<![-\w])hidden(?![-\w])|display:\s*none|visibility:\s*hidden/i.test(tag),
+    `${path}: the agent note must not use hidden, display:none or visibility:hidden`,
   );
   check(
-    unescape(inner).trim() === agentNote(siteRoot),
+    decodeEntities(inner).trim() === agentNote(siteRoot),
     `${path}: the agent note text differs from agentNote(${siteRoot})`,
   );
   const content = html.indexOf('<div class="sl-markdown-content');
+  check(content !== -1, `${path}/index.html has no sl-markdown-content to place the note against`);
   check(content === -1 || index < content, `${path}: the agent note comes after the page content`);
   // The Copy as Markdown menu server-renders a plain link to the twin, for readers without JS.
-  const twin = `${siteRoot}${path}.md`.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+  const twin = escapeRegExp(`${siteRoot}${path}.md`);
   check(
     new RegExp(
       `<[a-z]+\\b[^>]*\\bdata-markdown-menu\\b[^>]*>(?:\\s|<!--[^>]*-->)*<a\\b[^>]*\\bhref="${twin}"[^>]*>(?:\\s|<!--[^>]*-->)*View Markdown(?:\\s|<!--[^>]*-->)*</a>`,
