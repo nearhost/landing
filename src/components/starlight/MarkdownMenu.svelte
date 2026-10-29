@@ -16,6 +16,8 @@
   let open = $state(false);
   let alignStart = $state(false);
   let copied = $state(false);
+  let linkCopied = $state(false);
+  let linkTimer: ReturnType<typeof setTimeout> | undefined;
   let timer: ReturnType<typeof setTimeout> | undefined;
   let root: HTMLElement | undefined = $state();
   let arrow: HTMLButtonElement | undefined = $state();
@@ -96,7 +98,9 @@
   async function copyLlms() {
     try {
       await navigator.clipboard.writeText(llms);
-      showCopied();
+      linkCopied = true;
+      clearTimeout(linkTimer);
+      linkTimer = setTimeout(() => (linkCopied = false), 2000);
     } catch {
       window.open(llms, '_blank', 'noopener');
     }
@@ -153,7 +157,7 @@
         aria-label="More Markdown options"
         aria-haspopup="menu"
         aria-expanded={open}
-        aria-controls="markdown-menu-items"
+        aria-controls={open ? 'markdown-menu-items' : undefined}
         bind:this={arrow}
         onclick={() => (open ? closeMenu() : openMenu())}
       >
@@ -189,7 +193,9 @@
       </div>
     {/if}
   {/if}
-  <span class="sr-only" aria-live="polite">{copied ? 'Copied' : ''}</span>
+  <span class="sr-only" aria-live="polite"
+    >{linkCopied ? 'Link copied' : copied ? 'Copied' : ''}</span
+  >
 </div>
 
 <style>
