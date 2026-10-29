@@ -102,6 +102,7 @@ export default defineConfig({
         SiteTitle: './src/components/starlight/SiteTitle.astro',
         Header: './src/components/starlight/Header.astro',
         Footer: './src/components/starlight/Footer.astro',
+        PageTitle: './src/components/starlight/PageTitle.astro',
       },
       sidebar: sidebarGroups.map(({ label, directory }) => ({
         label,

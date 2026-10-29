@@ -2,6 +2,7 @@
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { agentNote } from '../src/lib/markdown-twin.mjs';
 import { moves } from '../src/lib/coding-agents-redirect.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -509,6 +510,52 @@ for (const path of docsPaths) {
     ).test(html),
     `${path}/index.html lacks the alternate link to ${siteRoot}${path}.md`,
   );
+}
+
+// 12. Every docs page tells agents where the index is, without showing it to people.
+const unescape = (text) =>
+  text
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&amp;/g, '&');
+const noteElements = (html) => [
+  ...html.matchAll(/<p\b[^>]*\bdata-agent-note\b[^>]*>([\s\S]*?)<\/p>/g),
+];
+for (const path of docsPaths) {
+  const htmlFile = join(dist, path, 'index.html');
+  const html = existsSync(htmlFile) ? readFileSync(htmlFile, 'utf8') : '';
+  const notes = noteElements(html);
+  if (notes.length !== 1) {
+    failures.push(
+      `${path}/index.html needs exactly one data-agent-note paragraph, has ${notes.length}`,
+    );
+    continue;
+  }
+  const [{ 0: element, 1: inner, index }] = notes;
+  const tag = element.slice(0, element.indexOf('>') + 1);
+  check(/class="[^"]*\bsr-only\b/.test(tag), `${path}: the agent note is not hidden with sr-only`);
+  check(
+    !/(?<![-\w])hidden(?![-\w])|display:\s*none/i.test(tag),
+    `${path}: the agent note must not use hidden or display:none`,
+  );
+  check(
+    unescape(inner).trim() === agentNote(siteRoot),
+    `${path}: the agent note text differs from agentNote(${siteRoot})`,
+  );
+  const content = html.indexOf('<div class="sl-markdown-content');
+  check(content === -1 || index < content, `${path}: the agent note comes after the page content`);
+}
+for (const file of ['index.html', '404.html']) {
+  const page = join(dist, file);
+  if (existsSync(page)) {
+    check(
+      !readFileSync(page, 'utf8').includes('data-agent-note'),
+      `${file} must not carry the agent note`,
+    );
+  }
 }
 
 if (failures.length) {
