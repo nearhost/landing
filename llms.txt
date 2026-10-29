@@ -6,16 +6,72 @@
 - It works with any HTTP dev server. It reads ports from `.env`, and presets add Docker Compose, Vite and Laravel Sail.
 - It is for your own machines and your own browser, not for sharing a page publicly; use a tunnel service such as ngrok for that.
 
-Start with [Introduction](https://nearhost.dev/docs/getting-started/introduction/) and [Install](https://nearhost.dev/docs/getting-started/install/). The guides cover:
+Start with [Introduction](https://nearhost.dev/docs/getting-started/introduction.md) and [Install](https://nearhost.dev/docs/getting-started/install.md). The guides cover:
 
-- [SSO callback fails on a remote dev server](https://nearhost.dev/docs/guides/sso-callback-on-a-remote-dev-server/)
-- [HTTPS on a local dev domain](https://nearhost.dev/docs/guides/https-on-a-local-dev-domain/)
-- [ngrok loads the page, but assets point at localhost](https://nearhost.dev/docs/guides/ngrok-assets-on-localhost/)
-- [Vite hot reload fails over SSH port forwarding](https://nearhost.dev/docs/guides/vite-hot-reload-over-ssh/)
-- [Forward several ports over SSH without retyping -L](https://nearhost.dev/docs/guides/forward-ports-over-ssh/)
-- [WorkOS sign-in on a remote dev server](https://nearhost.dev/docs/guides/workos-sign-in/)
-- [Clerk sign-in on a remote dev server](https://nearhost.dev/docs/guides/clerk-sign-in/)
-- [Cognito sign-in on a remote dev server](https://nearhost.dev/docs/guides/cognito-sign-in/)
+- [SSO callback fails on a remote dev server](https://nearhost.dev/docs/guides/sso-callback-on-a-remote-dev-server.md)
+- [HTTPS on a local dev domain](https://nearhost.dev/docs/guides/https-on-a-local-dev-domain.md)
+- [ngrok loads the page, but assets point at localhost](https://nearhost.dev/docs/guides/ngrok-assets-on-localhost.md)
+- [Vite hot reload fails over SSH port forwarding](https://nearhost.dev/docs/guides/vite-hot-reload-over-ssh.md)
+- [Forward several ports over SSH without retyping -L](https://nearhost.dev/docs/guides/forward-ports-over-ssh.md)
+- [WorkOS sign-in on a remote dev server](https://nearhost.dev/docs/guides/workos-sign-in.md)
+- [Clerk sign-in on a remote dev server](https://nearhost.dev/docs/guides/clerk-sign-in.md)
+- [Cognito sign-in on a remote dev server](https://nearhost.dev/docs/guides/cognito-sign-in.md)
+
+## Getting started
+
+- [Introduction](https://nearhost.dev/docs/getting-started/introduction.md): What Nearhost does, who it is for, and how to get a remote project open in your browser.
+- [Install](https://nearhost.dev/docs/getting-started/install.md): Install the Nearhost binary on macOS or Linux, including the extra steps Linux needs.
+- [First run](https://nearhost.dev/docs/getting-started/first-run.md): What Nearhost shows the first time you start it, and when it asks for your password.
+- [Add a server](https://nearhost.dev/docs/getting-started/add-a-server.md): Register a remote machine that Nearhost reaches through your existing SSH setup.
+- [Add a project](https://nearhost.dev/docs/getting-started/add-a-project.md): Register a directory on this machine or a server and serve it at an alias.
+
+## Coding agents
+
+- [Coding agents](https://nearhost.dev/docs/coding-agents.md): Let Claude Code, Codex or another coding agent add projects, open browser previews and show documents through Nearhost, on this machine or on a server, with your approval.
+- [Add a project from an agent](https://nearhost.dev/docs/coding-agents/add-a-project.md): Ask a coding agent to add the project it is working in, then save or dismiss the add form Nearhost fills in.
+- [Fix a project](https://nearhost.dev/docs/coding-agents/fix-a-project.md): Let a coding agent run Nearhost's project checks and fix what stops the project being served.
+- [Browser previews from a server](https://nearhost.dev/docs/coding-agents/browser-previews.md): Let a coding agent on a server open its dev server's preview in your laptop's browser, after you allow it in Nearhost.
+- [Documents from coding agents](https://nearhost.dev/docs/coding-agents/documents.md): Let a coding agent show a plan, spec or mockup it wrote in your laptop's browser, after you allow it in Nearhost.
+- [Prompts and Always allow](https://nearhost.dev/docs/coding-agents/prompts-and-always-allow.md): How Nearhost asks before an agent opens a preview or a document, what Always allow covers, and how to revoke it.
+- [How agents reach Nearhost](https://nearhost.dev/docs/coding-agents/how-it-works.md): The socket a coding agent reaches Nearhost on, how Nearhost forwards it to each server, and the agent API.
+- [When agents cannot reach Nearhost](https://nearhost.dev/docs/coding-agents/troubleshooting.md): Fix an sshd that refuses Nearhost's socket forward, or an agent sandbox that blocks the socket.
+
+## Concepts
+
+- [Routes and roles](https://nearhost.dev/docs/concepts/routes-and-roles.md): How each discovered port becomes a web, loopback or ignored route.
+- [Multi-host projects](https://nearhost.dev/docs/concepts/multi-host-projects.md): How one project serves several web routes, each at hosts of its own, and where those hosts come from.
+- [Discovery](https://nearhost.dev/docs/concepts/discovery.md): How Nearhost reads a project's files to propose routes without running anything.
+- [Presets and registries](https://nearhost.dev/docs/concepts/presets-and-registries.md): How Nearhost learns what a framework's ports mean, and where that knowledge comes from.
+- [SSH transport](https://nearhost.dev/docs/concepts/ssh-transport.md): How Nearhost drives OpenSSH with one supervised control master per server.
+- [TLS and the proxy](https://nearhost.dev/docs/concepts/tls-and-the-proxy.md): How the embedded Caddy proxy and the local certificate authority serve each alias over HTTPS.
+- [The hosts file](https://nearhost.dev/docs/concepts/the-hosts-file.md): How Nearhost keeps one delimited block in /etc/hosts to resolve project names.
+- [Dev servers and hot reload](https://nearhost.dev/docs/concepts/dev-servers-and-hot-reload.md): How assets and live reload reach your browser, and when a project needs a loopback forward.
+- [The request log](https://nearhost.dev/docs/concepts/the-request-log.md): How Nearhost keeps each request and response in memory, and how to look at them and send them again.
+- [What Nearhost changes on your machine](https://nearhost.dev/docs/concepts/what-nearhost-changes.md): Every file, privilege, port and network request Nearhost uses on your laptop and your servers, and how to undo each one.
+
+## Reference
+
+- [CLI](https://nearhost.dev/docs/reference/cli.md): Every nearhost command, its flags, and what nearhost doctor checks.
+- [config.yaml](https://nearhost.dev/docs/reference/config.md): Every key in the Nearhost configuration file.
+- [.nearhostrc](https://nearhost.dev/docs/reference/nearhostrc.md): Every key in a project's .nearhostrc, how its variables are filled, and what it asks you to approve.
+- [Keyboard shortcuts](https://nearhost.dev/docs/reference/keyboard-shortcuts.md): Every key in the Nearhost interface, by screen.
+- [Advisories](https://nearhost.dev/docs/reference/advisories.md): The advice Nearhost gives about a project, when each appears and how to fix it.
+
+## Troubleshooting
+
+- [Troubleshooting](https://nearhost.dev/docs/troubleshooting/troubleshooting.md): Symptoms Nearhost reports and the fix for each.
+
+## Guides
+
+- [ngrok loads the page, but assets point at localhost](https://nearhost.dev/docs/guides/ngrok-assets-on-localhost.md): Why a dev site behind ngrok still loads its scripts, redirects or hot reload from localhost or http://, how to patch each one, and how to skip the tunnel when the dev server runs on another machine.
+- [SSO callback fails on a remote dev server](https://nearhost.dev/docs/guides/sso-callback-on-a-remote-dev-server.md): Why an SSO or OAuth sign-in callback fails, or lands on localhost or the wrong origin, when your dev server runs on a server or VM, and how to give it one HTTPS address that works.
+- [Vite hot reload fails over SSH port forwarding](https://nearhost.dev/docs/guides/vite-hot-reload-over-ssh.md): Why Vite's scripts or hot reload fail when the dev server runs on another machine and you reach it through ssh -L, which port each setup has to forward, and how to keep it working without retyping forwards.
+- [Forward several ports over SSH without retyping -L](https://nearhost.dev/docs/guides/forward-ports-over-ssh.md): Ways to reach a remote app, its asset server and its other ports from your laptop over SSH, from stacked -L flags to forwards added to a running connection, and what each leaves for you to do.
+- [HTTPS on a local dev domain](https://nearhost.dev/docs/guides/https-on-a-local-dev-domain.md): Serve local development at a trusted HTTPS name, such as myapp.test or local.myapp.com, so secure-context browser APIs and Secure cookies work, and choose which kind of name to use.
+- [WorkOS sign-in on a remote dev server](https://nearhost.dev/docs/guides/workos-sign-in.md): Give a WorkOS AuthKit app an HTTPS redirect URI in local dev, such as https://local.myapp.com/authenticate, when the dev server runs on another machine.
+- [Clerk sign-in on a remote dev server](https://nearhost.dev/docs/guides/clerk-sign-in.md): Run a Clerk and Next.js app at a local HTTPS domain, such as https://local.myapp.com, with hot reload working, when the dev server runs on another machine.
+- [Callbacks from Docker containers to a local HTTPS domain](https://nearhost.dev/docs/guides/container-callbacks.md): Let a Docker Compose service, such as a queue worker or a LocalStack job, call your app at its Nearhost HTTPS name on this machine.
+- [Cognito sign-in on a remote dev server](https://nearhost.dev/docs/guides/cognito-sign-in.md): Give an Amazon Cognito app client an HTTPS callback URL in local dev, such as https://local.myapp.com/auth/cognito/callback, when the dev server runs on another machine.
 
 ## Documentation Sets
 
