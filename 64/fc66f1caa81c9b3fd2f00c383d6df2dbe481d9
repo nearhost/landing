@@ -1,0 +1,21 @@
+src/components/starlight/MarkdownMenu.svelte
+  s_518ab5453c65a1::t_572b9654e2fa58 44-47,58,73,75,124,127,134
+scripts/verify-dist.mjs
+  s_518ab5453c65a1::t_572b9654e2fa58 406
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "64fc66f1caa81c9b3fd2f00c383d6df2dbe481d9",
+  "prompts": {},
+  "sessions": {
+    "s_518ab5453c65a1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "286741ca-1109-4366-9186-4591cc780258",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Edward Coleridge Smith <edcoleridgesmith@gmail.com>"
+    }
+  }
+}
