@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /pr-preview/
+Sitemap: https://nearhost.dev/sitemap-index.xml
