@@ -32,7 +32,7 @@ Adding a project can add a server on the way: choose **New server…** on its fi
 
 ## What Nearhost stores
 
-Only the name and the host, in `~/.config/nearhost/config.yaml`. No keys, passwords or sockets are stored.
+Only the name and the host, in `~/.config/nearhost/config.yaml`, or `%APPDATA%\nearhost\config.yaml` on Windows. No keys, passwords or sockets are stored.
 
 ```yaml
 servers:

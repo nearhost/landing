@@ -4,7 +4,7 @@
 
 How Nearhost keeps one delimited block in the hosts file, /etc/hosts or its Windows equivalent, to resolve project names.
 
-`.test` is a reserved top-level domain that is never public, so Nearhost resolves aliases through the hosts file and not through DNS. The hosts file is `/etc/hosts` on macOS and Linux, and `C:\Windows\System32\drivers\etc\hosts` on Windows. This page says `/etc/hosts` for both.
+`.test` is a reserved top-level domain that is never public, so Nearhost resolves aliases through the hosts file and not through DNS. The hosts file is `/etc/hosts` on macOS and Linux, and `C:\Windows\System32\drivers\etc\hosts` on Windows. This page says `/etc/hosts` for either file.
 
 ## The owned block
 

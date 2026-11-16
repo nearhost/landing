@@ -99,7 +99,7 @@ irm https://nearhost.dev/install.ps1 | iex
 
 The script detects your CPU, downloads the matching release from GitHub, verifies its checksum and installs `nearhost.exe` to `%LOCALAPPDATA%\Programs\nearhost`. It adds that folder to your user `PATH`, so open a new terminal before you run `nearhost`: a terminal that is already open keeps its old `PATH`. It runs in Windows PowerShell 5.1 and PowerShell 7, and if anything fails it stops with the reason and leaves an existing install as it was.
 
-These environment variables change what it does. Set them before the command:
+These environment variables change what it does. Set them before the command; a variable stays set for the rest of that PowerShell window:
 
 ```powershell
 $env:NEARHOST_VERSION='v<version>'; irm https://nearhost.dev/install.ps1 | iex
@@ -167,7 +167,7 @@ The Windows binaries are not signed. See [SmartScreen](#smartscreen) below.
 nearhost update
 ```
 
-updates Nearhost the way you installed it, after asking. On Windows, an install from the PowerShell installer or the zip is updated by running the PowerShell installer again into the same folder. See [`nearhost update`](/pr-preview/pr-111/docs/reference/cli/#nearhost-update).
+updates Nearhost the way you installed it, after asking. On Windows, for a copy from the PowerShell installer or a zip, `nearhost update` runs the PowerShell installer again into the same folder. See [`nearhost update`](/pr-preview/pr-111/docs/reference/cli/#nearhost-update).
 
 ## Linux setup
 
@@ -229,6 +229,8 @@ Nearhost needs Windows 11, and Windows Terminal is the terminal it supports. `ne
 ### SmartScreen
 
 The Windows binaries are not code signed, so the first time you run `nearhost.exe`, Microsoft Defender SmartScreen may stop it and say it prevented an unrecognised app from starting. Choose More info, check that the file is the `nearhost.exe` you installed, then choose Run anyway.
+
+If Smart App Control is on, Windows can block `nearhost.exe` outright, with no Run anyway, because the binary is not code signed. Nearhost cannot run on that machine until its Windows binaries are signed.
 
 ### OpenSSH
 
@@ -304,7 +306,7 @@ Press `enter` to trust it now, or `s` to skip. Skipping lasts until you next sta
 
 Trusting installs the authority’s root certificate into your system trust store: the System keychain on macOS, your distribution’s certificate store on Linux, your user’s certificate store on Windows. It is what lets your browser open `https://<alias>` without a warning.
 
-Firefox, and Chromium-based browsers on Linux, keep their own stores. Nearhost updates those too when `certutil` is installed. See [Install](/pr-preview/pr-111/docs/getting-started/install/) for the one-line setup. On Windows, every browser uses the Windows store, Firefox from version 120, so there is nothing more to set up.
+Firefox, and Chromium-based browsers on Linux, keep their own stores. Nearhost updates those too when `certutil` is installed. See [Install](/pr-preview/pr-111/docs/getting-started/install/) for the one-line setup. On Windows, every browser uses the Windows store, Firefox from version 120, so there is usually nothing more to set up. Firefox can be set not to read it, and `nearhost doctor` warns when it is.
 
 If you skip, the proxy still runs and Home shows `local CA ● not trusted. Run nearhost trust`. You can trust it from a terminal at any time, and `nearhost untrust` reverses it:
 
@@ -407,7 +409,7 @@ Adding a project can add a server on the way: choose **New server…** on its fi
 
 ## What Nearhost stores
 
-Only the name and the host, in `~/.config/nearhost/config.yaml`. No keys, passwords or sockets are stored.
+Only the name and the host, in `~/.config/nearhost/config.yaml`, or `%APPDATA%\nearhost\config.yaml` on Windows. No keys, passwords or sockets are stored.
 
 ```yaml
 servers:
@@ -531,7 +533,7 @@ Advisories are shown, never applied. See [Advisories](/pr-preview/pr-111/docs/re
 
 ## What gets written
 
-Every project lives in `~/.config/nearhost/config.yaml`. You can edit it by hand too.
+Every project lives in `~/.config/nearhost/config.yaml`, or `%APPDATA%\nearhost\config.yaml` on Windows. You can edit it by hand too.
 
 ```yaml
 projects:
@@ -687,7 +689,7 @@ Then it runs the doctor again, and stops when nothing is left that it can fix. I
 
 This page explains the socket an agent talks to Nearhost on, and the calls it makes.
 
-Nearhost listens on `~/.nearhost/<id>.sock` on your laptop, where `<id>` is six letters and digits made when Nearhost first runs and kept in `~/.config/nearhost/id` with a fingerprint of the machine. A config directory copied to another machine gets a new id there, so two laptops never share a socket. On each server it is connected to, it forwards a socket of the same name over its own SSH connection:
+Nearhost listens on `~/.nearhost/<id>.sock` on your laptop, where `<id>` is six letters and digits made when Nearhost first runs and kept in `~/.config/nearhost/id` (`%APPDATA%\nearhost\id` on Windows) with a fingerprint of the machine. A config directory copied to another machine gets a new id there, so two laptops never share a socket. On each server it is connected to, it forwards a socket of the same name over its own SSH connection:
 
 ```sh
 ssh -S <sock> -O forward -R <home on the server>/.nearhost/<id>.sock:<socket on the laptop> -- <host>
@@ -715,7 +717,7 @@ ssh -N -R <home on the server>/.nearhost/<id>.sock:127.0.0.1:<port> -- <host>
 Any program on the laptop can connect to that port, so Nearhost answers there only requests that carry a token. It writes the token beside the socket on the server, as `~/.nearhost/<id>.token`, readable only by your account, and makes a new one each time Nearhost starts. The skill’s script sends it with curl, which reads it from that file, so it never appears on a command line. Two things follow on the server:
 
 * **curl 7.55 or later.** Older curl cannot read a header from a file, so an agent there cannot reach a Windows laptop.
-* **A current skill.** A skill installed before Windows support sends no token, and Nearhost answers `this request has no valid Nearhost token: update the Nearhost skill on this machine`. Install it again on the server, as in [Install the skill](/pr-preview/pr-111/docs/coding-agents/#install-the-skill).
+* **A current skill.** A skill installed before Windows support sends no token, and Nearhost answers `this request has no valid Nearhost token: update the Nearhost skill on this machine`. Run `npx skills add nearhost/nearhost -g` again on the server or, if you installed it as a Claude Code plugin, update the plugin from `/plugin`. See [Install the skill](/pr-preview/pr-111/docs/coding-agents/#install-the-skill).
 
 On the laptop itself, the skill runs its PowerShell script, which needs only Windows PowerShell 5.1 or PowerShell 7 and the `curl.exe` that Windows ships.
 
@@ -747,7 +749,7 @@ To revoke one, press `tab` on the server’s panel to reach its `always allowed`
 
 ## What the token protects
 
-When you choose Always allow, Nearhost makes a token for that tool on that server. The skill keeps the token on the server, in `${XDG_STATE_HOME:-~/.local/state}/nearhost/tokens/<laptop id>/<requester>`, readable by your account only. For documents, the file ends in `.documents`, beside the preview token. The skill sends it with later requests, so Nearhost does not ask again. The laptop keeps only a SHA-256 hash of the token, in `grants.json` beside the install id in `~/.config/nearhost` (or under `XDG_CONFIG_HOME`).
+When you choose Always allow, Nearhost makes a token for that tool on that server. The skill keeps the token on the server, in `${XDG_STATE_HOME:-~/.local/state}/nearhost/tokens/<laptop id>/<requester>`, readable by your account only. For documents, the file ends in `.documents`, beside the preview token. The skill sends it with later requests, so Nearhost does not ask again. The laptop keeps only a SHA-256 hash of the token, in `grants.json` beside the install id in `~/.config/nearhost` (`%APPDATA%\nearhost` on Windows, or under `XDG_CONFIG_HOME`).
 
 The token stops a different tool from borrowing an approval, and it stops anything from using one after you revoke it. It does not protect against anything else running as your account on the server: such a process can read the token file and use the approval. Treat Always allow as trust in everything that runs as you on that server. A wrong or revoked token gets a `401`; the skill drops it and asks again, so you are prompted.
 
@@ -1076,7 +1078,7 @@ Presets from a registry are named after it, as in `nearhost/vite`, so you can se
 
 ## Where they live
 
-Presets are files beside the config, under `presets/` in Nearhost’s config folder: `~/.config/nearhost/presets/`, or under `$XDG_CONFIG_HOME/nearhost` when that variable is an absolute path. Each registry’s cached index is beside them, at `registry/<alias>/index.yaml`. One from a registry is `presets/<alias>/<name>.yaml`. A local preset is `presets/<name>.yaml`, with a plain name, and is enabled with `nearhost preset enable <name>`.
+Presets are files beside the config, under `presets/` in Nearhost’s config folder: `~/.config/nearhost/presets/` (`%APPDATA%\nearhost\presets\` on Windows), or under `$XDG_CONFIG_HOME/nearhost` when that variable is an absolute path. Each registry’s cached index is beside them, at `registry/<alias>/index.yaml`. One from a registry is `presets/<alias>/<name>.yaml`. A local preset is `presets/<name>.yaml`, with a plain name, and is enabled with `nearhost preset enable <name>`.
 
 The config records what is trusted and enabled:
 
@@ -1197,7 +1199,7 @@ Each master also forwards a Unix socket back to the laptop, at `~/.nearhost/<id>
 
 ## On Windows
 
-The OpenSSH client in Windows, `ssh.exe`, has no connection sharing: no ControlMaster and no `-O` commands. So on Windows, Nearhost runs one long-lived `ssh.exe -N` per server for the connection and the agent socket, and one more `ssh.exe` for each forward, started when the project or browser preview needs it and stopped when it no longer does. Reading files over SFTP opens a short connection of its own. Starting or stopping one project never touches another project’s forwards. Each `ssh.exe` runs with `BatchMode=yes`, `ExitOnForwardFailure=yes` and the same keepalives as above, and your `~/.ssh/config` applies as it does on macOS and Linux. There is nothing to configure.
+The OpenSSH client in Windows, `ssh.exe`, has no connection sharing: no ControlMaster and no `-O` commands. So on Windows, Nearhost runs one long-lived `ssh.exe -N` per server for the connection and the agent socket, and one more `ssh.exe` for each forward, started when the project or browser preview needs it and stopped when it no longer does. Reading files over SFTP opens a short connection of its own. Starting or stopping one project never touches another project’s forwards. Each `ssh.exe` runs with `BatchMode=yes`, `ExitOnForwardFailure=yes` and the same keepalives as above, and your `~/.ssh/config` applies as it does on macOS and Linux, with one limit. Without a control master, Nearhost cannot keep your config’s own forwards out of its connections, so the `Host` entry it uses for a server must not set `LocalForward`, `RemoteForward`, `DynamicForward`, `ForkAfterAuthentication yes` or `ClearAllForwardings yes`. If it does, Nearhost stops connecting to that server and names the setting. Move those lines to a `Host` entry Nearhost does not use, such as another alias for the same machine.
 
 `ssh.exe` cannot forward a server’s socket to a Unix socket on the laptop, so the agent socket on the server leads to a port on the laptop’s loopback address instead. Nearhost answers there only requests that carry a token, which it writes beside the socket on the server, readable only by your account. See [Agents and Windows laptops](/pr-preview/pr-111/docs/coding-agents/how-it-works/#windows-laptops).
 
@@ -1228,7 +1230,7 @@ Nothing beyond the host string. No keys, passwords or sockets are kept in `confi
 
 > How Nearhost keeps one delimited block in the hosts file, /etc/hosts or its Windows equivalent, to resolve project names.
 
-`.test` is a reserved top-level domain that is never public, so Nearhost resolves aliases through the hosts file and not through DNS. The hosts file is `/etc/hosts` on macOS and Linux, and `C:\Windows\System32\drivers\etc\hosts` on Windows. This page says `/etc/hosts` for both.
+`.test` is a reserved top-level domain that is never public, so Nearhost resolves aliases through the hosts file and not through DNS. The hosts file is `/etc/hosts` on macOS and Linux, and `C:\Windows\System32\drivers\etc\hosts` on Windows. This page says `/etc/hosts` for either file.
 
 ## The owned block
 
@@ -1407,6 +1409,7 @@ While Nearhost runs, it listens on:
 * **80**, only to redirect to HTTPS
 * **6327** for [Nearhost’s page](/pr-preview/pr-111/docs/concepts/tls-and-the-proxy/)
 * one port on `127.0.0.1` per forwarded route, and for a `loopback` route the same port on `::1` too, when the machine has IPv6 loopback
+* on Windows, one more port on `127.0.0.1` per connected server, which coding agents on that server reach Nearhost through. It answers only requests that carry that server’s token.
 
 The first three listen on every interface, because macOS lets a program that is not root bind a low port only that way. On Windows they listen on loopback addresses only, so Windows Firewall does not ask about them. They answer only this machine: another computer’s connection is closed before it gets a certificate or a response. A project with `docker_clients` in its [`.nearhostrc`](/pr-preview/pr-111/docs/reference/nearhostrc/) is also answered for your Docker networks. Until Docker first reports them, Nearhost uses Docker’s default range, `172.16.0.0/12`, which some home and office networks share.
 
@@ -1435,6 +1438,7 @@ Nearhost installs nothing on a server and opens no ports there. It runs your `ss
 * forwards each route’s port to your laptop
 * reads files over SFTP: `.env`, `.env.local`, `.nearhostrc`, Compose files and any files an enabled preset names
 * creates `~/.nearhost`, readable only by you, with a socket for coding agents on the server
+* when the laptop runs Windows, writes the token for that socket beside it, as `~/.nearhost/<id>.token`, readable only by you
 
 When Nearhost quits, the forwards and the connection close. `~/.nearhost` stays, and may hold a stale socket that the next connection replaces. A `.nearhostrc` written by `nearhost export` stays in the project. See [SSH transport](/pr-preview/pr-111/docs/concepts/ssh-transport/).
 
@@ -1447,7 +1451,7 @@ A coding agent reaches Nearhost through a socket that only your user can open, a
 1. Run `nearhost untrust` to stop your system and browsers trusting the certificate authority.
 2. Run `nearhost hosts clean` to remove the block from `/etc/hosts`.
 3. On Linux, the port capability goes with the binary when you uninstall it. To drop it and keep Nearhost, run `sudo setcap -r` on the binary `nearhost doctor` names.
-4. Uninstall Nearhost the way you installed it, such as `brew uninstall nearhost` or `npm uninstall -g @nearhost/cli`.
+4. Uninstall Nearhost the way you installed it, such as `brew uninstall nearhost` or `npm uninstall -g @nearhost/cli`. For the PowerShell installer, delete `%LOCALAPPDATA%\Programs\nearhost` and remove it from your user `PATH`.
 5. Delete `~/.config/nearhost`, the data folder that holds `caddy`, `~/.cache/nearhost` and `~/.nearhost`. On Windows, delete `%APPDATA%\nearhost`, `%LOCALAPPDATA%\nearhost` and `~\.nearhost`.
 6. On each server, delete `~/.nearhost`, and any `.nearhostrc` you no longer want.
 
@@ -1669,7 +1673,7 @@ On Windows it adds the root to your user’s certificate store, which Windows co
 
 ## nearhost untrust
 
-Reverses `trust`: removes the local CA from the system and browser stores. It asks for your password, and runs `sudo` under the same rule as `trust`. The CA’s key stays in its folder, so `nearhost trust` can add the same CA again. See [The local CA](/pr-preview/pr-111/docs/concepts/tls-and-the-proxy/#the-local-ca).
+Reverses `trust`: removes the local CA from the system and browser stores. It asks for your password, and runs `sudo` under the same rule as `trust`. On Windows it removes the root from your user’s certificate store, with no password. The CA’s key stays in its folder, so `nearhost trust` can add the same CA again. See [The local CA](/pr-preview/pr-111/docs/concepts/tls-and-the-proxy/#the-local-ca).
 
 ## nearhost hosts
 
@@ -1835,9 +1839,9 @@ Checks GitHub for the latest release and updates Nearhost the way it was install
 | The shell installer                           | The installer again, with `NEARHOST_INSTALL_DIR` set to the binary’s folder            |
 | The PowerShell installer, or a zip on Windows | The PowerShell installer again, with `NEARHOST_INSTALL_DIR` set to the binary’s folder |
 
-Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. When the binary’s folder is not writable, it prints the installer command with `sudo` rather than running anything. On Linux, after a Homebrew or `go install` update, it prints the `setcap` command to run again.
+Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. On macOS and Linux, when the binary’s folder is not writable, it prints the installer command with `sudo` rather than running anything. On Linux, after a Homebrew or `go install` update, it prints the `setcap` command to run again.
 
-Windows will not replace a program while it runs, so Nearhost first moves the running `nearhost.exe` aside, and puts it back if the update fails, so you always have a working `nearhost`. When you cannot write to the binary’s folder, it prints the installer command to run in Windows Terminal opened as administrator.
+On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. If the update fails, you keep the copy you had, and the error says so. When you cannot write to the binary’s folder, it prints the installer command to run in Windows Terminal opened as administrator, rather than running anything.
 
 | Flag      | Effect                                                         |
 | --------- | -------------------------------------------------------------- |
@@ -2340,13 +2344,17 @@ Run it in a terminal and handle the host key, passphrase or `ssh-add` prompt. Th
 
 On Windows, a key with a passphrase needs the ssh-agent service running, and Windows installs it disabled. `nearhost doctor` shows its state. See [OpenSSH](/pr-preview/pr-111/docs/getting-started/install/#openssh) to start it. If the server is reached through a `ProxyJump` host named by an alias, Windows 11’s OpenSSH 9.5 does not resolve the alias: give `ProxyJump` the jump host’s address instead.
 
+## A server’s ssh configuration sets a forward
+
+On Windows only, Nearhost stops trying to connect to the server, which shows `auth failed` with a message such as `mini's ssh configuration sets localforward, which Nearhost can't keep out of its own connections on this system`. The `Host` entry Nearhost uses for that server sets `LocalForward`, `RemoteForward`, `DynamicForward`, `ForkAfterAuthentication yes` or `ClearAllForwardings yes`. Move those lines to a `Host` entry Nearhost does not use, then press `r` on the server. See [SSH transport](/pr-preview/pr-111/docs/concepts/ssh-transport/#on-windows).
+
 ## Agents unavailable on a server
 
 The server’s sshd refuses the socket coding agents reach Nearhost on, usually because `sshd_config` sets `AllowStreamLocalForwarding no`. Set it to `yes`, reload sshd and press `r` on the server. `nearhost doctor` shows the same check. See [When agents cannot reach Nearhost](/pr-preview/pr-111/docs/coding-agents/troubleshooting/).
 
 ## Agents on a server cannot reach a Windows laptop
 
-The skill on the server says `this request has no valid Nearhost token: update the Nearhost skill on this machine`. A Windows laptop answers only requests that carry a token, which the skill sends with curl. The server needs curl 7.55 or later and a skill installed since Windows support. Install the skill again on the server. See [Windows laptops](/pr-preview/pr-111/docs/coding-agents/how-it-works/#windows-laptops).
+The skill on the server says `this request has no valid Nearhost token: update the Nearhost skill on this machine`. A Windows laptop answers only requests that carry a token, which the skill sends with curl. The server needs curl 7.55 or later and a skill installed since Windows support. Run `npx skills add nearhost/nearhost -g` again on the server or, if you installed it as a Claude Code plugin, update the plugin from `/plugin`. See [Windows laptops](/pr-preview/pr-111/docs/coding-agents/how-it-works/#windows-laptops).
 
 ## A server shows dropped
 
@@ -2362,7 +2370,9 @@ Nearhost exits naming the file and the problem, with the line for a YAML error. 
 
 ## Windows stops nearhost.exe from starting
 
-Microsoft Defender SmartScreen may stop it the first time it runs, because the binary is not code signed. Choose More info, then Run anyway. See [SmartScreen](/pr-preview/pr-111/docs/getting-started/install/#smartscreen).
+Microsoft Defender SmartScreen may stop it the first time it runs, because the binary is not code signed. Choose More info, then Run anyway.
+
+If Smart App Control is on, Windows can block `nearhost.exe` outright, with no Run anyway, because the binary is not code signed. Nearhost cannot run on that machine until its Windows binaries are signed. See [SmartScreen](/pr-preview/pr-111/docs/getting-started/install/#smartscreen).
 
 ## The nearhost command is not found on Windows
 

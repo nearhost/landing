@@ -142,7 +142,7 @@ On Windows it adds the root to your user's certificate store, which Windows conf
 
 ## nearhost untrust
 
-Reverses `trust`: removes the local CA from the system and browser stores. It asks for your password, and runs `sudo` under the same rule as `trust`. The CA's key stays in its folder, so `nearhost trust` can add the same CA again. See [The local CA](https://nearhost.dev/pr-preview/pr-111/docs/concepts/tls-and-the-proxy.md#the-local-ca).
+Reverses `trust`: removes the local CA from the system and browser stores. It asks for your password, and runs `sudo` under the same rule as `trust`. On Windows it removes the root from your user's certificate store, with no password. The CA's key stays in its folder, so `nearhost trust` can add the same CA again. See [The local CA](https://nearhost.dev/pr-preview/pr-111/docs/concepts/tls-and-the-proxy.md#the-local-ca).
 
 ## nearhost hosts
 
@@ -308,9 +308,9 @@ Checks GitHub for the latest release and updates Nearhost the way it was install
 | The shell installer                           | The installer again, with `NEARHOST_INSTALL_DIR` set to the binary's folder            |
 | The PowerShell installer, or a zip on Windows | The PowerShell installer again, with `NEARHOST_INSTALL_DIR` set to the binary's folder |
 
-Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. When the binary's folder is not writable, it prints the installer command with `sudo` rather than running anything. On Linux, after a Homebrew or `go install` update, it prints the `setcap` command to run again.
+Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. On macOS and Linux, when the binary's folder is not writable, it prints the installer command with `sudo` rather than running anything. On Linux, after a Homebrew or `go install` update, it prints the `setcap` command to run again.
 
-Windows will not replace a program while it runs, so Nearhost first moves the running `nearhost.exe` aside, and puts it back if the update fails, so you always have a working `nearhost`. When you cannot write to the binary's folder, it prints the installer command to run in Windows Terminal opened as administrator.
+On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. If the update fails, you keep the copy you had, and the error says so. When you cannot write to the binary's folder, it prints the installer command to run in Windows Terminal opened as administrator, rather than running anything.
 
 | Flag      | Effect                                                         |
 | --------- | -------------------------------------------------------------- |

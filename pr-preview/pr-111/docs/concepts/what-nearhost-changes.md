@@ -44,6 +44,7 @@ While Nearhost runs, it listens on:
 - **80**, only to redirect to HTTPS
 - **6327** for [Nearhost's page](https://nearhost.dev/pr-preview/pr-111/docs/concepts/tls-and-the-proxy.md)
 - one port on `127.0.0.1` per forwarded route, and for a `loopback` route the same port on `::1` too, when the machine has IPv6 loopback
+- on Windows, one more port on `127.0.0.1` per connected server, which coding agents on that server reach Nearhost through. It answers only requests that carry that server's token.
 
 The first three listen on every interface, because macOS lets a program that is not root bind a low port only that way. On Windows they listen on loopback addresses only, so Windows Firewall does not ask about them. They answer only this machine: another computer's connection is closed before it gets a certificate or a response. A project with `docker_clients` in its [`.nearhostrc`](https://nearhost.dev/pr-preview/pr-111/docs/reference/nearhostrc.md) is also answered for your Docker networks. Until Docker first reports them, Nearhost uses Docker's default range, `172.16.0.0/12`, which some home and office networks share.
 
@@ -72,6 +73,7 @@ Nearhost installs nothing on a server and opens no ports there. It runs your `ss
 - forwards each route's port to your laptop
 - reads files over SFTP: `.env`, `.env.local`, `.nearhostrc`, Compose files and any files an enabled preset names
 - creates `~/.nearhost`, readable only by you, with a socket for coding agents on the server
+- when the laptop runs Windows, writes the token for that socket beside it, as `~/.nearhost/<id>.token`, readable only by you
 
 When Nearhost quits, the forwards and the connection close. `~/.nearhost` stays, and may hold a stale socket that the next connection replaces. A `.nearhostrc` written by `nearhost export` stays in the project. See [SSH transport](https://nearhost.dev/pr-preview/pr-111/docs/concepts/ssh-transport.md).
 
@@ -84,7 +86,7 @@ A coding agent reaches Nearhost through a socket that only your user can open, a
 1. Run `nearhost untrust` to stop your system and browsers trusting the certificate authority.
 2. Run `nearhost hosts clean` to remove the block from `/etc/hosts`.
 3. On Linux, the port capability goes with the binary when you uninstall it. To drop it and keep Nearhost, run `sudo setcap -r` on the binary `nearhost doctor` names.
-4. Uninstall Nearhost the way you installed it, such as `brew uninstall nearhost` or `npm uninstall -g @nearhost/cli`.
+4. Uninstall Nearhost the way you installed it, such as `brew uninstall nearhost` or `npm uninstall -g @nearhost/cli`. For the PowerShell installer, delete `%LOCALAPPDATA%\Programs\nearhost` and remove it from your user `PATH`.
 5. Delete `~/.config/nearhost`, the data folder that holds `caddy`, `~/.cache/nearhost` and `~/.nearhost`. On Windows, delete `%APPDATA%\nearhost`, `%LOCALAPPDATA%\nearhost` and `~\.nearhost`.
 6. On each server, delete `~/.nearhost`, and any `.nearhostrc` you no longer want.
 
