@@ -64,6 +64,13 @@ if (existsSync(join(dist, 'install.sh'))) {
     'install.sh must start with #!/bin/sh',
   );
 }
+check(existsSync(join(dist, 'install.ps1')), 'dist/install.ps1 is missing');
+if (existsSync(join(dist, 'install.ps1'))) {
+  const ps1 = readFileSync(join(dist, 'install.ps1'), 'utf8');
+  check(ps1.startsWith('# Nearhost installer for Windows.'), 'install.ps1 lost its header');
+  // Windows PowerShell 5.1 reads a script without a BOM as ANSI, so it has to stay ASCII.
+  check(!/[^\t\n\r -~]/.test(ps1), 'install.ps1 must be plain ASCII');
+}
 
 // 2. Every page has its own social card, present and the right size.
 const pngSignature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);

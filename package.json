@@ -16,6 +16,7 @@
     "lint": "eslint .",
     "check": "astro check && svelte-check --tsconfig ./tsconfig.json",
     "test:install": "sh scripts/test-install.sh",
+    "test:install:ps": "pwsh -NoProfile -File scripts/test-install.ps1",
     "test:stats": "node --test scripts/collect-stats.test.mjs",
     "test:og": "node --test src/lib/og.test.mjs",
     "test:lastmod": "node --test src/lib/lastmod.test.mjs",

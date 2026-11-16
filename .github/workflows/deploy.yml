@@ -60,6 +60,30 @@ jobs:
           include-hidden-files: true
           retention-days: 1
 
+  # The PowerShell installer, under Windows PowerShell 5.1 and PowerShell 7. It gates the deploy as
+  # the build does.
+  install-windows:
+    if: github.event.action != 'closed'
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test under Windows PowerShell 5.1
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File scripts/test-install.ps1
+      # Each check runs even when one before it failed, so one run shows every failure.
+      - name: Test under PowerShell 7
+        if: success() || failure()
+        shell: pwsh
+        run: npm run test:install:ps
+      - name: PSScriptAnalyzer
+        if: success() || failure()
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -RequiredVersion 1.24.0 -Force -Scope CurrentUser
+          $found = 'public/install.ps1', 'scripts/test-install.ps1' | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Severity Error, Warning }
+          $found | Format-Table -AutoSize -Wrap | Out-String -Width 200
+          if ($found) { exit 1 }
+
   lighthouse:
     if: github.event_name == 'pull_request' && github.event.action != 'closed'
     runs-on: ubuntu-latest
@@ -77,12 +101,12 @@ jobs:
           uploadArtifacts: true
 
   deploy:
-    needs: build
-    # Runs after a green build, or alone when a pull request closes to remove its preview. A
-    # fork's token cannot push to gh-pages, so fork pull requests get no preview.
+    needs: [build, install-windows]
+    # Runs after a green build and installer check, or alone when a pull request closes to remove
+    # its preview. A fork's token cannot push to gh-pages, so fork pull requests get no preview.
     if: >-
       always() &&
-      (needs.build.result == 'success' || github.event.action == 'closed') &&
+      ((needs.build.result == 'success' && needs.install-windows.result == 'success') || github.event.action == 'closed') &&
       (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) &&
       (github.event_name == 'pull_request' || github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
