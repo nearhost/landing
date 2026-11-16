@@ -103,13 +103,17 @@ Run it in a terminal and handle the host key, passphrase or `ssh-add` prompt. Th
 
 On Windows, a key with a passphrase needs the ssh-agent service running, and Windows installs it disabled. `nearhost doctor` shows its state. See [OpenSSH](/docs/getting-started/install/#openssh) to start it. If the server is reached through a `ProxyJump` host named by an alias, Windows 11's OpenSSH 9.5 does not resolve the alias: give `ProxyJump` the jump host's address instead.
 
+## A server's ssh configuration sets a forward
+
+On Windows only, Nearhost stops trying to connect to the server, which shows `auth failed` with a message such as `mini's ssh configuration sets localforward, which Nearhost can't keep out of its own connections on this system`. The `Host` entry Nearhost uses for that server sets `LocalForward`, `RemoteForward`, `DynamicForward`, `ForkAfterAuthentication yes` or `ClearAllForwardings yes`. Move those lines to a `Host` entry Nearhost does not use, then press `r` on the server. See [SSH transport](/docs/concepts/ssh-transport/#on-windows).
+
 ## Agents unavailable on a server
 
 The server's sshd refuses the socket coding agents reach Nearhost on, usually because `sshd_config` sets `AllowStreamLocalForwarding no`. Set it to `yes`, reload sshd and press `r` on the server. `nearhost doctor` shows the same check. See [When agents cannot reach Nearhost](/docs/coding-agents/troubleshooting/).
 
 ## Agents on a server cannot reach a Windows laptop
 
-The skill on the server says `this request has no valid Nearhost token: update the Nearhost skill on this machine`. A Windows laptop answers only requests that carry a token, which the skill sends with curl. The server needs curl 7.55 or later and a skill installed since Windows support. Install the skill again on the server. See [Windows laptops](/docs/coding-agents/how-it-works/#windows-laptops).
+The skill on the server says `this request has no valid Nearhost token: update the Nearhost skill on this machine`. A Windows laptop answers only requests that carry a token, which the skill sends with curl. The server needs curl 7.55 or later and a skill installed since Windows support. Run `npx skills add nearhost/nearhost -g` again on the server or, if you installed it as a Claude Code plugin, update the plugin from `/plugin`. See [Windows laptops](/docs/coding-agents/how-it-works/#windows-laptops).
 
 ## A server shows dropped
 
@@ -125,7 +129,9 @@ Nearhost exits naming the file and the problem, with the line for a YAML error. 
 
 ## Windows stops nearhost.exe from starting
 
-Microsoft Defender SmartScreen may stop it the first time it runs, because the binary is not code signed. Choose More info, then Run anyway. See [SmartScreen](/docs/getting-started/install/#smartscreen).
+Microsoft Defender SmartScreen may stop it the first time it runs, because the binary is not code signed. Choose More info, then Run anyway.
+
+If Smart App Control is on, Windows can block `nearhost.exe` outright, with no Run anyway, because the binary is not code signed. Nearhost cannot run on that machine until its Windows binaries are signed. See [SmartScreen](/docs/getting-started/install/#smartscreen).
 
 ## The nearhost command is not found on Windows
 

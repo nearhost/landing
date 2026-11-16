@@ -37,7 +37,7 @@ Press `enter` to trust it now, or `s` to skip. Skipping lasts until you next sta
 
 Trusting installs the authority's root certificate into your system trust store: the System keychain on macOS, your distribution's certificate store on Linux, your user's certificate store on Windows. It is what lets your browser open `https://<alias>` without a warning.
 
-Firefox, and Chromium-based browsers on Linux, keep their own stores. Nearhost updates those too when `certutil` is installed. See [Install](/docs/getting-started/install/) for the one-line setup. On Windows, every browser uses the Windows store, Firefox from version 120, so there is nothing more to set up.
+Firefox, and Chromium-based browsers on Linux, keep their own stores. Nearhost updates those too when `certutil` is installed. See [Install](/docs/getting-started/install/) for the one-line setup. On Windows, every browser uses the Windows store, Firefox from version 120, so there is usually nothing more to set up. Firefox can be set not to read it, and `nearhost doctor` warns when it is.
 
 If you skip, the proxy still runs and Home shows `local CA ● not trusted. Run nearhost trust`. You can trust it from a terminal at any time, and `nearhost untrust` reverses it:
 

@@ -7,7 +7,7 @@ sidebar:
 
 This page explains the socket an agent talks to Nearhost on, and the calls it makes.
 
-Nearhost listens on `~/.nearhost/<id>.sock` on your laptop, where `<id>` is six letters and digits made when Nearhost first runs and kept in `~/.config/nearhost/id` with a fingerprint of the machine. A config directory copied to another machine gets a new id there, so two laptops never share a socket. On each server it is connected to, it forwards a socket of the same name over its own SSH connection:
+Nearhost listens on `~/.nearhost/<id>.sock` on your laptop, where `<id>` is six letters and digits made when Nearhost first runs and kept in `~/.config/nearhost/id` (`%APPDATA%\nearhost\id` on Windows) with a fingerprint of the machine. A config directory copied to another machine gets a new id there, so two laptops never share a socket. On each server it is connected to, it forwards a socket of the same name over its own SSH connection:
 
 ```sh
 ssh -S <sock> -O forward -R <home on the server>/.nearhost/<id>.sock:<socket on the laptop> -- <host>
@@ -35,7 +35,7 @@ ssh -N -R <home on the server>/.nearhost/<id>.sock:127.0.0.1:<port> -- <host>
 Any program on the laptop can connect to that port, so Nearhost answers there only requests that carry a token. It writes the token beside the socket on the server, as `~/.nearhost/<id>.token`, readable only by your account, and makes a new one each time Nearhost starts. The skill's script sends it with curl, which reads it from that file, so it never appears on a command line. Two things follow on the server:
 
 - **curl 7.55 or later.** Older curl cannot read a header from a file, so an agent there cannot reach a Windows laptop.
-- **A current skill.** A skill installed before Windows support sends no token, and Nearhost answers `this request has no valid Nearhost token: update the Nearhost skill on this machine`. Install it again on the server, as in [Install the skill](/docs/coding-agents/#install-the-skill).
+- **A current skill.** A skill installed before Windows support sends no token, and Nearhost answers `this request has no valid Nearhost token: update the Nearhost skill on this machine`. Run `npx skills add nearhost/nearhost -g` again on the server or, if you installed it as a Claude Code plugin, update the plugin from `/plugin`. See [Install the skill](/docs/coding-agents/#install-the-skill).
 
 On the laptop itself, the skill runs its PowerShell script, which needs only Windows PowerShell 5.1 or PowerShell 7 and the `curl.exe` that Windows ships.
 

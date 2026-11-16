@@ -93,7 +93,7 @@ Advisories are shown, never applied. See [Advisories](/docs/reference/advisories
 
 ## What gets written
 
-Every project lives in `~/.config/nearhost/config.yaml`. You can edit it by hand too.
+Every project lives in `~/.config/nearhost/config.yaml`, or `%APPDATA%\nearhost\config.yaml` on Windows. You can edit it by hand too.
 
 ```yaml
 projects:

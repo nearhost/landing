@@ -43,7 +43,7 @@ irm https://nearhost.dev/install.ps1 | iex
 
 The script detects your CPU, downloads the matching release from GitHub, verifies its checksum and installs `nearhost.exe` to `%LOCALAPPDATA%\Programs\nearhost`. It adds that folder to your user `PATH`, so open a new terminal before you run `nearhost`: a terminal that is already open keeps its old `PATH`. It runs in Windows PowerShell 5.1 and PowerShell 7, and if anything fails it stops with the reason and leaves an existing install as it was.
 
-These environment variables change what it does. Set them before the command:
+These environment variables change what it does. Set them before the command; a variable stays set for the rest of that PowerShell window:
 
 ```powershell
 $env:NEARHOST_VERSION='v<version>'; irm https://nearhost.dev/install.ps1 | iex
@@ -111,7 +111,7 @@ The Windows binaries are not signed. See [SmartScreen](#smartscreen) below.
 nearhost update
 ```
 
-updates Nearhost the way you installed it, after asking. On Windows, an install from the PowerShell installer or the zip is updated by running the PowerShell installer again into the same folder. See [`nearhost update`](/docs/reference/cli/#nearhost-update).
+updates Nearhost the way you installed it, after asking. On Windows, for a copy from the PowerShell installer or a zip, `nearhost update` runs the PowerShell installer again into the same folder. See [`nearhost update`](/docs/reference/cli/#nearhost-update).
 
 ## Linux setup
 
@@ -173,6 +173,8 @@ Nearhost needs Windows 11, and Windows Terminal is the terminal it supports. `ne
 ### SmartScreen
 
 The Windows binaries are not code signed, so the first time you run `nearhost.exe`, Microsoft Defender SmartScreen may stop it and say it prevented an unrecognised app from starting. Choose More info, check that the file is the `nearhost.exe` you installed, then choose Run anyway.
+
+If Smart App Control is on, Windows can block `nearhost.exe` outright, with no Run anyway, because the binary is not code signed. Nearhost cannot run on that machine until its Windows binaries are signed.
 
 ### OpenSSH
 
