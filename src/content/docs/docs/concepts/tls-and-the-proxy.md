@@ -5,7 +5,7 @@ sidebar:
   order: 6
 ---
 
-Caddy runs inside the Nearhost process, with its storage in Nearhost's data folder, under `nearhost/caddy`: `~/Library/Application Support/nearhost/caddy` on macOS and `~/.local/share/nearhost/caddy` on Linux, or `$XDG_DATA_HOME/nearhost/caddy` on either when that variable is set to an absolute path. It listens on 443 for HTTPS, on 80 only to redirect to HTTPS, with a 308, and on 6327 for Nearhost's page. To use other ports, run Nearhost with `--https-port`, `--http-port` and `--web-port`.
+Caddy runs inside the Nearhost process, with its storage in Nearhost's data folder, under `nearhost/caddy`: `~/Library/Application Support/nearhost/caddy` on macOS, `~/.local/share/nearhost/caddy` on Linux and `%LOCALAPPDATA%\nearhost\caddy` on Windows, or `$XDG_DATA_HOME/nearhost/caddy` on any of them when that variable is set to an absolute path. It listens on 443 for HTTPS, on 80 only to redirect to HTTPS, with a 308, and on 6327 for Nearhost's page. To use other ports, run Nearhost with `--https-port`, `--http-port` and `--web-port`.
 
 It answers only this machine, and, for a project whose `.nearhostrc` sets `docker_clients`, containers on this machine's Docker networks. A request from another computer, or for a name Nearhost does not serve, has its connection closed with no answer.
 
@@ -15,15 +15,15 @@ While Nearhost runs, even with no projects, `https://localhost:6327` shows Nearh
 
 The internal certificate authority, "Nearhost Local CA", is created the first time Nearhost starts. Nearhost never ships a shared key or a wildcard certificate, and Caddy never installs the authority by itself.
 
-Trusting it puts its root into the system trust store, which asks for your password once: the System keychain on macOS, your distribution's certificate store on Linux. It also updates the separate stores that Firefox and Linux Chromium-based browsers use, when `certutil` is installed. If the system already trusts it, only the browser stores are updated, with no password.
+Trusting it puts its root into the system trust store, which asks for your password once: the System keychain on macOS, your distribution's certificate store on Linux. On Windows it goes into your user's certificate store, which Windows confirms in a dialog of its own, with no password, and every browser there uses that store. It also updates the separate stores that Firefox and Linux Chromium-based browsers use, when `certutil` is installed. If the system already trusts it, only the browser stores are updated, with no password.
 
 ### Where its key is kept
 
-The CA's private key is in the `caddy` folder named above, under `pki/authorities/local`. Anyone who has it can sign certificates that your browser trusts, so keep that folder out of dotfiles repositories and shared backups. Your config, `~/.config/nearhost/config.yaml` (or under `$XDG_CONFIG_HOME` when that is set), holds no keys and is safe to share.
+The CA's private key is in the `caddy` folder named above, under `pki/authorities/local`. Anyone who has it can sign certificates that your browser trusts, so keep that folder out of dotfiles repositories and shared backups. Your config, `~/.config/nearhost/config.yaml` (`%APPDATA%\nearhost\config.yaml` on Windows, or under `$XDG_CONFIG_HOME` when that is set), holds no keys and is safe to share.
 
 From Nearhost 0.8.0 the key is in the data folder. Earlier versions kept it in `~/.config/nearhost/caddy`, or `$XDG_CONFIG_HOME/nearhost/caddy` when that variable is set. The next time you run `nearhost`, `nearhost up`, `nearhost trust` or `nearhost untrust`, Nearhost moves an existing old folder there, so the CA you already trust stays the same. It does not move it while another Nearhost is running. If a copy of the old folder is left behind, `nearhost doctor` warns with `old CA copy` and says which folder to delete.
 
-Trust it from the welcome box the first time you start Nearhost, or at any time with `nearhost trust`. `nearhost untrust` removes the CA from the system and browser stores. It leaves the key's folder where it is. See [First run](/docs/getting-started/first-run/) and, for Linux and Firefox, [Install](/docs/getting-started/install/).
+Trust it from the welcome box the first time you start Nearhost, or at any time with `nearhost trust`. `nearhost untrust` removes the CA from the system and browser stores. It leaves the key's folder where it is. See [First run](/docs/getting-started/first-run/) and, for Linux, Windows and Firefox, [Install](/docs/getting-started/install/).
 
 Home shows whether it is trusted and when it expires. The date turns amber in the last 30 days.
 

@@ -1,6 +1,6 @@
 ---
 title: SSH transport
-description: How Nearhost drives OpenSSH with one supervised control master per server.
+description: How Nearhost drives OpenSSH with one supervised control master per server, or on Windows one ssh.exe per forward.
 sidebar:
   order: 5
 ---
@@ -44,6 +44,14 @@ Nearhost keeps the list of forwards each server should have. After a reconnect i
 
 Each master also forwards a Unix socket back to the laptop, at `~/.nearhost/<id>.sock` on the server, so that a coding agent there reaches Nearhost. It is added after the master connects and again after each reconnect, and a server that refuses it only loses that: its projects serve as usual. See [How agents reach Nearhost](/docs/coding-agents/how-it-works/).
 
+## On Windows
+
+The OpenSSH client in Windows, `ssh.exe`, has no connection sharing: no ControlMaster and no `-O` commands. So on Windows, Nearhost runs one long-lived `ssh.exe -N` per server for the connection and the agent socket, and one more `ssh.exe` for each forward, started when the project or browser preview needs it and stopped when it no longer does. Reading files over SFTP opens a short connection of its own. Starting or stopping one project never touches another project's forwards. Each `ssh.exe` runs with `BatchMode=yes`, `ExitOnForwardFailure=yes` and the same keepalives as above, and your `~/.ssh/config` applies as it does on macOS and Linux. There is nothing to configure.
+
+`ssh.exe` cannot forward a server's socket to a Unix socket on the laptop, so the agent socket on the server leads to a port on the laptop's loopback address instead. Nearhost answers there only requests that carry a token, which it writes beside the socket on the server, readable only by your account. See [Agents and Windows laptops](/docs/coding-agents/how-it-works/#windows-laptops).
+
+Reconnection and backoff below work the same way on every system.
+
 ## Reconnection and backoff
 
 If the master exits, Nearhost starts it again, waiting 1 second, then twice as long each time, up to 30 seconds. A master that does not connect within 20 seconds is stopped and tried again. While it waits, the server shows `reconnecting · attempt 3 · next in 8s`, and its projects show `degraded`.
@@ -59,7 +67,7 @@ On a server's row in the interface:
 
 ## Shutting down
 
-On exit, Nearhost stops every master with `-O exit`, and stops it outright if it has not gone after 3 seconds. A socket left by a crash is checked before each start, and cleared.
+On exit, Nearhost stops every master with `-O exit`, and stops it outright if it has not gone after 3 seconds. On Windows it stops each `ssh.exe`. A socket left by a crash is checked before each start, and cleared.
 
 ## What is stored
 

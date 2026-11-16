@@ -1,6 +1,6 @@
 ---
 title: First run
-description: What Nearhost shows the first time you start it, and when it asks for your password.
+description: What Nearhost shows the first time you start it, and when it asks for your password or, on Windows, your approval.
 sidebar:
   order: 2
 ---
@@ -31,11 +31,13 @@ While your system does not trust the certificate authority, a box titled "Welcom
 - now: trusting the local certificate authority, so browsers accept HTTPS from Nearhost's web server
 - later: adding names to `/etc/hosts`
 
+On Windows it says both ask for your approval, and names the hosts file as `C:\Windows\System32\drivers\etc\hosts`.
+
 Press `enter` to trust it now, or `s` to skip. Skipping lasts until you next start Nearhost, and the box comes back while the authority is still untrusted. Once it is trusted you see "The local CA is now trusted." and the box does not appear again.
 
-Trusting installs the authority's root certificate into your system trust store: the System keychain on macOS, your distribution's certificate store on Linux. It is what lets your browser open `https://<alias>` without a warning.
+Trusting installs the authority's root certificate into your system trust store: the System keychain on macOS, your distribution's certificate store on Linux, your user's certificate store on Windows. It is what lets your browser open `https://<alias>` without a warning.
 
-Firefox, and Chromium-based browsers on Linux, keep their own stores. Nearhost updates those too when `certutil` is installed. See [Install](/docs/getting-started/install/) for the one-line setup.
+Firefox, and Chromium-based browsers on Linux, keep their own stores. Nearhost updates those too when `certutil` is installed. See [Install](/docs/getting-started/install/) for the one-line setup. On Windows, every browser uses the Windows store, Firefox from version 120, so there is nothing more to set up.
 
 If you skip, the proxy still runs and Home shows `local CA ● not trusted. Run nearhost trust`. You can trust it from a terminal at any time, and `nearhost untrust` reverses it:
 
@@ -45,7 +47,7 @@ nearhost trust
 
 ## The password box
 
-Two things need root: trusting the certificate authority, and adding your projects' names to `/etc/hosts`. For both, Nearhost asks in a box titled "Password needed", which says why:
+On macOS and Linux, two things need root: trusting the certificate authority, and adding your projects' names to `/etc/hosts`. For both, Nearhost asks in a box titled "Password needed", which says why:
 
 ```text
 Nearhost needs your password to add myapp.test to /etc/hosts.
@@ -59,6 +61,15 @@ Type your password and press `enter`, or `esc` to cancel. The password goes stra
 - **If sudo asks every time**, because it is set up not to remember, Nearhost hands over to the terminal for the password, then comes back.
 
 `/etc/hosts` is only changed when a project starts and its names are missing, so most starts ask for nothing. See [The hosts file](/docs/concepts/the-hosts-file/).
+
+## On Windows
+
+On Windows, Nearhost shows no password box. Windows asks in its own dialogs instead:
+
+- **Trusting the certificate authority** opens a Windows security warning that asks whether to install the certificate. Choose Yes. It needs no administrator rights.
+- **Each change to the hosts file** opens a User Account Control prompt, because the file needs administrator rights. Windows does not remember the approval, so each change asks again, including one a coding agent asks for. If you choose No, the hosts file stays as it was and the project stays stopped.
+
+As on macOS and Linux, the hosts file is only changed when a project starts and its names are missing, so most starts ask for nothing.
 
 ## Touch ID on a Mac
 
@@ -89,7 +100,7 @@ Once a project exists, the screen has a sidebar on the left, with Home at the to
 - `proxy`: whether it is serving, and on which ports
 - `page`: a link to Nearhost's page at `https://localhost:6327`, or the port `--web-port` gives, once the proxy is serving. It is left out when that port was taken. Needs Nearhost 0.8.0 or later.
 - `local CA`: whether it is trusted, and when it expires
-- `hosts`: whether `/etc/hosts` has every project's name
+- `hosts`: whether the hosts file has every project's name
 - `config`: the path of the config file
 - `running`: how many projects are running, on how many servers
 

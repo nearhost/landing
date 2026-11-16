@@ -24,6 +24,21 @@ A socket path can be at most 103 bytes on macOS and 107 on Linux. With a home di
 
 To use one socket explicitly, set `NEARHOST_SOCKET` to its path where the agent runs.
 
+## Windows laptops
+
+On a Windows laptop, Nearhost listens on `~\.nearhost\<id>.sock` as on macOS and Linux. Windows' `ssh.exe` cannot forward a server's socket to a Unix socket on the laptop, so the socket on each server leads to a port on the laptop's `127.0.0.1` instead:
+
+```sh
+ssh -N -R <home on the server>/.nearhost/<id>.sock:127.0.0.1:<port> -- <host>
+```
+
+Any program on the laptop can connect to that port, so Nearhost answers there only requests that carry a token. It writes the token beside the socket on the server, as `~/.nearhost/<id>.token`, readable only by your account, and makes a new one each time Nearhost starts. The skill's script sends it with curl, which reads it from that file, so it never appears on a command line. Two things follow on the server:
+
+- **curl 7.55 or later.** Older curl cannot read a header from a file, so an agent there cannot reach a Windows laptop.
+- **A current skill.** A skill installed before Windows support sends no token, and Nearhost answers `this request has no valid Nearhost token: update the Nearhost skill on this machine`. Install it again on the server, as in [Install the skill](/docs/coding-agents/#install-the-skill).
+
+On the laptop itself, the skill runs its PowerShell script, which needs only Windows PowerShell 5.1 or PowerShell 7 and the `curl.exe` that Windows ships.
+
 ## Agent API
 
 The skill's script talks to Nearhost over that socket, with `curl --unix-socket`. Nearhost answers JSON for the machine the socket belongs to. These calls are the ones the doctor uses:

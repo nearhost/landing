@@ -1,11 +1,11 @@
 ---
 title: The hosts file
-description: How Nearhost keeps one delimited block in /etc/hosts to resolve project names.
+description: How Nearhost keeps one delimited block in the hosts file, /etc/hosts or its Windows equivalent, to resolve project names.
 sidebar:
   order: 7
 ---
 
-`.test` is a reserved top-level domain that is never public, so Nearhost resolves aliases through `/etc/hosts` and not through DNS.
+`.test` is a reserved top-level domain that is never public, so Nearhost resolves aliases through the hosts file and not through DNS. The hosts file is `/etc/hosts` on macOS and Linux, and `C:\Windows\System32\drivers\etc\hosts` on Windows. This page says `/etc/hosts` for both.
 
 ## The owned block
 
@@ -34,6 +34,8 @@ with the aliases on its standard input, one per line. The command is an internal
 
 In the interface, the password is asked for in a box, and `sudo` remembers it for a few minutes. Where `sudo` asks every time, Nearhost hands over to the terminal for it. See [First run](/docs/getting-started/first-run/#the-password-box). `nearhost up` asks in the terminal.
 
+On Windows, Nearhost runs itself as administrator through User Account Control instead, which shows Windows' own prompt. The aliases go to it in a temporary file rather than on its standard input, and it checks them as strictly as the `sudo` step does. Windows does not remember the approval, so every change asks. If you choose No, the file stays as it was. After each change Nearhost clears Windows' DNS cache, so the new names resolve at once. See [First run](/docs/getting-started/first-run/#on-windows).
+
 From Nearhost 0.8.0, Nearhost runs `sudo` from `/usr/bin`, `/bin`, `/usr/local/bin` or `/run/wrappers/bin`, and only a copy owned by root, never one found on your `PATH`.
 
 The rewrite changes only the content between the markers, and adds the block at the end of the file if it is absent. It writes a new file and renames it into place, keeping the file's permissions, and on Linux its SELinux label and access lists.
@@ -46,7 +48,7 @@ Run Nearhost with `--no-hosts` to leave `/etc/hosts` alone, for example when you
 
 ## Removing it
 
-Nothing is removed when Nearhost quits. To remove the block, which asks for your password through `sudo`:
+Nothing is removed when Nearhost quits. To remove the block, which asks for your password through `sudo`, or on Windows for your approval:
 
 ```sh
 nearhost hosts clean

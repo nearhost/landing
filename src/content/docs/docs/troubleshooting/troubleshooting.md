@@ -15,6 +15,14 @@ Quit that program, or run Nearhost with `--https-port` and `--http-port`. Anothe
 
 If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary, as in [Allow binding ports 80 and 443](/docs/getting-started/install/#allow-binding-ports-80-and-443); run it, then start Nearhost again. For an npm install, use the command `nearhost doctor` prints, which names the real binary. From Nearhost 0.8.0.
 
+On Windows, a port held by `System (pid 4)` is held by HTTP.sys on behalf of a Windows service, often IIS, so there is no program to quit. To see which service registered it, run this in a terminal opened as administrator:
+
+```powershell
+netsh http show servicestate
+```
+
+Stop that service, for IIS with `net stop w3svc`, or run Nearhost with `--http-port` and `--https-port`.
+
 ## Port 6327 already in use
 
 Nearhost starts, serves every project and leaves out Nearhost's page, and the log says `port 6327 is in use; serving without Nearhost's page`. `nearhost doctor` warns about it. Another Nearhost already running is the usual cause. Otherwise pass `--web-port` with a free port, or `--web-port 0` to turn off the page's own port, leaving it at `https://localhost`. From Nearhost 0.8.0.
@@ -31,11 +39,19 @@ From Nearhost 0.7.0, on a laptop with the IPv6 loopback, a loopback forward answ
 lsof -nP -iTCP:<port> -sTCP:LISTEN
 ```
 
+On Windows, in PowerShell:
+
+```powershell
+Get-NetTCPConnection -State Listen -LocalPort <port> | Select-Object LocalAddress, OwningProcess
+```
+
 On older versions, such a program could answer the browser in the forward's place, so the page loaded your laptop's scripts instead of the server's. Run `nearhost update` to get the check.
 
 ## The password was cancelled
 
 When the hosts block needs a project's alias, Nearhost asks for your password in a box. If you cancel it, or get it wrong three times, the project stays `stopped`, its alias is not added to `/etc/hosts`, and Home's `hosts` row shows it as missing.
+
+On Windows, choosing No in the User Account Control prompt does the same.
 
 Press `enter` on the project to try again. Or add the alias to `/etc/hosts` yourself and run Nearhost with `--no-hosts`. See [The hosts file](/docs/concepts/the-hosts-file/).
 
@@ -44,6 +60,8 @@ Press `enter` on the project to try again. Or add the alias to `/etc/hosts` your
 `sudo` remembers your password for a few minutes, so Nearhost usually asks once for several changes. If it asks in the terminal instead of the box, `sudo` is set to ask every time.
 
 On a Mac you can use Touch ID instead of typing it. See [First run](/docs/getting-started/first-run/#touch-id-on-a-mac).
+
+On Windows, every change to the hosts file shows a User Account Control prompt, because Windows does not remember the approval. Changes happen only when a project starts and its names are missing, so most starts ask for nothing.
 
 ## No root-owned sudo
 
@@ -83,9 +101,15 @@ ssh <host>
 
 Run it in a terminal and handle the host key, passphrase or `ssh-add` prompt. Then press `r`. On Home, `y` copies the command.
 
+On Windows, a key with a passphrase needs the ssh-agent service running, and Windows installs it disabled. `nearhost doctor` shows its state. See [OpenSSH](/docs/getting-started/install/#openssh) to start it. If the server is reached through a `ProxyJump` host named by an alias, Windows 11's OpenSSH 9.5 does not resolve the alias: give `ProxyJump` the jump host's address instead.
+
 ## Agents unavailable on a server
 
 The server's sshd refuses the socket coding agents reach Nearhost on, usually because `sshd_config` sets `AllowStreamLocalForwarding no`. Set it to `yes`, reload sshd and press `r` on the server. `nearhost doctor` shows the same check. See [When agents cannot reach Nearhost](/docs/coding-agents/troubleshooting/).
+
+## Agents on a server cannot reach a Windows laptop
+
+The skill on the server says `this request has no valid Nearhost token: update the Nearhost skill on this machine`. A Windows laptop answers only requests that carry a token, which the skill sends with curl. The server needs curl 7.55 or later and a skill installed since Windows support. Install the skill again on the server. See [Windows laptops](/docs/coding-agents/how-it-works/#windows-laptops).
 
 ## A server shows dropped
 
@@ -97,4 +121,12 @@ The routes step says no ports were found and asks for the web port. Enter it, or
 
 ## Config file invalid
 
-Nearhost exits naming the file and the problem, with the line for a YAML error. Fix it in `~/.config/nearhost/config.yaml`. `nearhost doctor` reports the same without exiting. See [config.yaml](/docs/reference/config/).
+Nearhost exits naming the file and the problem, with the line for a YAML error. Fix it in `~/.config/nearhost/config.yaml`, or `%APPDATA%\nearhost\config.yaml` on Windows. `nearhost doctor` reports the same without exiting. See [config.yaml](/docs/reference/config/).
+
+## Windows stops nearhost.exe from starting
+
+Microsoft Defender SmartScreen may stop it the first time it runs, because the binary is not code signed. Choose More info, then Run anyway. See [SmartScreen](/docs/getting-started/install/#smartscreen).
+
+## The nearhost command is not found on Windows
+
+The PowerShell installer adds its folder to your user `PATH`, and a terminal that was already open keeps its old `PATH`. Open a new terminal. If it is still not found, check that `%LOCALAPPDATA%\Programs\nearhost`, or the folder you installed into, is in your user `PATH`.

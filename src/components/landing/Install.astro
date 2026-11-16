@@ -4,6 +4,7 @@ import CopyButton from '../CopyButton.svelte';
 
 const commands = [
   { id: 'install-sh', label: 'Shell', text: 'curl -fsSL https://nearhost.dev/install.sh | sh' },
+  { id: 'install-ps', label: 'PowerShell', text: 'irm https://nearhost.dev/install.ps1 | iex' },
   { id: 'install-brew', label: 'Homebrew', text: 'brew install nearhost/tap/nearhost' },
   { id: 'install-npm', label: 'npm', text: 'npx @nearhost/cli' },
 ];
@@ -13,8 +14,8 @@ const commands = [
   <div class="intro">
     <h2 class="heading">Install Nearhost.</h2>
     <p class="lede">
-      One static binary for macOS and Linux, on Apple silicon, Intel and ARM. The first run offers
-      to trust its local CA, then helps you add your first project.
+      One static binary for macOS, Linux and Windows 11, on Apple silicon, Intel and ARM. The first
+      run offers to trust its local CA, then helps you add your first project.
     </p>
   </div>
   <div class="cards">
@@ -69,7 +70,7 @@ const commands = [
   }
   .cards {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
     width: 100%;
   }
