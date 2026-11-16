@@ -35,7 +35,7 @@ expect "unsupported arch" 1 "unsupported architecture" \
 
 # 2. Unsupported OS refuses.
 fake_uname FreeBSD amd64
-expect "unsupported os" 1 "unsupported OS" \
+expect "unsupported os" 1 "unsupported OS: freebsd. This installer supports macOS and Linux." \
   env PATH="$work/bin:$PATH" sh "$script"
 
 # 3. Dry run resolves the asset URL from version, os and arch.
@@ -66,6 +66,16 @@ printf '#!/bin/sh\necho "https://github.com/nearhost/nearhost/releases"\n' > "$w
 chmod +x "$work/bin/curl"
 expect "no release" 1 "could not determine the latest release" \
   env -u NEARHOST_VERSION -u NEARHOST_BASE_URL PATH="$work/bin:$PATH" sh "$script"
+
+# 7. Git Bash on Windows (MINGW) is pointed to the PowerShell installer.
+fake_uname MINGW64_NT-10.0-26100 x86_64
+expect "mingw" 1 "irm https://nearhost.dev/install.ps1 | iex" \
+  env PATH="$work/bin:$PATH" sh "$script"
+
+# 8. MSYS on Windows is pointed to the PowerShell installer too.
+fake_uname MSYS_NT-10.0-26100 x86_64
+expect "msys" 1 "irm https://nearhost.dev/install.ps1 | iex" \
+  env PATH="$work/bin:$PATH" sh "$script"
 
 [ "$fails" -eq 0 ] || exit 1
 echo "all install.sh checks passed"

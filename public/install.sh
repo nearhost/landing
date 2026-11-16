@@ -23,7 +23,8 @@ main() {
   os="$(uname -s | tr '[:upper:]' '[:lower:]')"
   case "$os" in
     darwin | linux) ;;
-    *) fail "unsupported OS: $os. Nearhost supports macOS and Linux." ;;
+    mingw* | msys* | cygwin*) fail "this installer is for macOS and Linux. On Windows, run this in PowerShell instead: irm https://nearhost.dev/install.ps1 | iex" ;;
+    *) fail "unsupported OS: $os. This installer supports macOS and Linux." ;;
   esac
 
   arch="$(uname -m)"
