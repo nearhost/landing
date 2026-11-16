@@ -135,6 +135,15 @@ try {
   $pattern = '^https://github\.com/nearhost/nearhost/releases/download/v(\d+\.\d+\.\d+[^/]*)/nearhost_\1_windows_' + $arch + '\.zip$'
   Write-Result 'dry run latest' (@($lines -match $pattern).Count -eq 1) ($lines -join "`n")
 
+  # nearhost update passes NEARHOST_VERSION empty on a normal build, which means latest. (Setting
+  # it empty here removes it, as Windows does; the script treats empty and unset alike.)
+  $lines = Invoke-Installer @{ NEARHOST_VERSION = ''; NEARHOST_INSTALL_DRY_RUN = '1' }
+  Write-Result 'dry run empty version' (@($lines -match $pattern).Count -eq 1) ($lines -join "`n")
+
+  # A version without its leading v names the same asset.
+  $lines = Invoke-Installer @{ NEARHOST_VERSION = '0.13.0-rc.1'; NEARHOST_INSTALL_DRY_RUN = '1' }
+  Write-Result 'dry run version without v' ($lines -contains $want) ($lines -join "`n")
+
   # 3. An unsupported architecture is refused.
   # Set in the child only: under PowerShell 7, changing PROCESSOR_ARCHITECTURE in this process
   # neither reached the child nor came back afterwards.
@@ -189,10 +198,20 @@ try {
     $ok = ($lines -contains "installed nearhost $version to $target") -and -not $proc.HasExited -and
       ([IO.File]::ReadAllText($target) -eq 'replaced nearhost') -and (Test-Alive $lines)
     Write-Result 'install over running' $ok ($lines -join "`n")
+    $lines = Invoke-Installer @{ NEARHOST_BASE_URL = $release; NEARHOST_INSTALL_DIR = $dest }
+    $ok = ($lines -contains "installed nearhost $version to $target") -and -not $proc.HasExited -and
+      ([IO.File]::ReadAllText($target) -eq 'replaced nearhost') -and (Test-Alive $lines)
+    Write-Result 'install over running again' $ok ($lines -join "`n")
   } finally {
     Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
     $proc.WaitForExit()
   }
+  # Once the old copy has stopped, the next install clears every old copy.
+  $lines = Invoke-Installer @{ NEARHOST_BASE_URL = $release; NEARHOST_INSTALL_DIR = $dest }
+  $left = @(Get-ChildItem -LiteralPath $dest -Name)
+  $ok = ($lines -contains "installed nearhost $version to $target") -and
+    ($left.Count -eq 1) -and ($left[0] -eq 'nearhost.exe') -and (Test-Alive $lines)
+  Write-Result 'old copies cleared' $ok (($lines -join "`n") + "`nleft: $($left -join ', ')")
 
   # 9. With NEARHOST_NO_PATH=1 the PATH is left alone.
   $seed = '%USERPROFILE%\tools;C:\Other'
@@ -218,6 +237,28 @@ try {
   $after = Get-TestPath
   $ok = ($after.Value -eq "$seed;$dest") -and -not (($lines -join "`n") -match 'new terminal')
   Write-Result 'path added once' $ok (($lines -join "`n") + "`nPATH: $($after.Value)")
+
+  # 11. A REG_SZ PATH stays REG_SZ.
+  $key = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey($pathKey)
+  $key.SetValue('Path', 'C:\Other', 'String')
+  $key.Close()
+  $dest = Join-Path $work 'string-bin'
+  $lines = Invoke-Installer @{ NEARHOST_BASE_URL = $release; NEARHOST_INSTALL_DIR = $dest; NEARHOST_NO_PATH = $null }
+  $after = Get-TestPath
+  $ok = ($after.Value -eq "C:\Other;$dest") -and ($after.Kind -eq 'String') -and (Test-Alive $lines)
+  Write-Result 'path kind kept' $ok (($lines -join "`n") + "`nPATH: $($after.Value) ($($after.Kind))")
+
+  # 12. A PATH that names the folder through a variable already has it.
+  $seed = '%NEARHOST_TEST_HOME%\var-bin;C:\Other'
+  $key = [Microsoft.Win32.Registry]::CurrentUser.CreateSubKey($pathKey)
+  $key.SetValue('Path', $seed, 'ExpandString')
+  $key.Close()
+  $dest = Join-Path $work 'var-bin'
+  $lines = Invoke-Installer @{ NEARHOST_BASE_URL = $release; NEARHOST_INSTALL_DIR = $dest; NEARHOST_NO_PATH = $null; NEARHOST_TEST_HOME = $work }
+  $after = Get-TestPath
+  $ok = ($lines -contains "installed nearhost $version to $(Join-Path $dest 'nearhost.exe')") -and
+    ($after.Value -eq $seed) -and -not (($lines -join "`n") -match 'new terminal')
+  Write-Result 'path through variable' $ok (($lines -join "`n") + "`nPATH: $($after.Value)")
 } finally {
   Remove-Item -LiteralPath $work -Recurse -Force -ErrorAction SilentlyContinue
   Remove-Item -LiteralPath ('HKCU:\' + (Split-Path -Parent $pathKey)) -Recurse -Force -ErrorAction SilentlyContinue

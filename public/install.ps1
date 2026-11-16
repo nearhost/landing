@@ -54,6 +54,7 @@ function Install-Nearhost {
     }
     $version = $tag
   }
+  if (-not $version.StartsWith('v')) { $version = 'v' + $version }
 
   $base = $env:NEARHOST_BASE_URL
   if (-not $base) { $base = "https://github.com/$repo/releases/download/$version" }
@@ -155,8 +156,10 @@ function Install-Nearhost {
       }
       throw "nearhost install: could not install $target ($reason). Nothing was installed."
     }
-    # A running copy cannot be deleted yet; the next update clears it.
-    if ($old) { Remove-Item -LiteralPath $old -Force -ErrorAction SilentlyContinue }
+    # Old copies from this and earlier runs go now. One still running cannot be deleted yet; a
+    # later run clears it.
+    Get-ChildItem -LiteralPath $dest -Filter 'nearhost.exe.old-*' -File |
+      Remove-Item -Force -ErrorAction SilentlyContinue
   } finally {
     Remove-Item -LiteralPath $tmp -Recurse -Force -ErrorAction SilentlyContinue
   }
