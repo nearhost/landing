@@ -57,9 +57,13 @@
   async function copyPage() {
     const copy = ++latest;
     try {
+      // A newer copy (such as the llms.txt link) may start while the fetch runs; this one then
+      // drops its pending clipboard item rather than writing over the newer text.
       const text = fetch(localTwin).then(async (res) => {
         if (!res.ok) throw new Error(`${res.status}`);
-        return new Blob([await res.text()], { type: 'text/plain' });
+        const markdown = await res.text();
+        if (copy !== latest) throw new Error('A newer copy replaced this one');
+        return new Blob([markdown], { type: 'text/plain' });
       });
       // The catch below reports a failed fetch; this stops it also surfacing as unhandled.
       text.catch(() => {});
