@@ -38,7 +38,7 @@ const structuredData = {
       url: canonical.href,
       image: image.href,
       applicationCategory: 'DeveloperApplication',
-      operatingSystem: 'macOS, Linux',
+      operatingSystem: 'macOS, Linux, Windows',
       ...(version === 'latest' ? {} : { softwareVersion: version.replace(/^v/, '') }),
       downloadUrl: new URL(url('/docs/getting-started/install/'), Astro.site).href,
       license: 'https://opensource.org/licenses/MIT',

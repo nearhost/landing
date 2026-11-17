@@ -21,7 +21,7 @@ To revoke one, press `tab` on the server's panel to reach its `always allowed` s
 
 ## What the token protects
 
-When you choose Always allow, Nearhost makes a token for that tool on that server. The skill keeps the token on the server, in `${XDG_STATE_HOME:-~/.local/state}/nearhost/tokens/<laptop id>/<requester>`, readable by your account only. For documents, the file ends in `.documents`, beside the preview token. The skill sends it with later requests, so Nearhost does not ask again. The laptop keeps only a SHA-256 hash of the token, in `grants.json` beside the install id in `~/.config/nearhost` (or under `XDG_CONFIG_HOME`).
+When you choose Always allow, Nearhost makes a token for that tool on that server. The skill keeps the token on the server, in `${XDG_STATE_HOME:-~/.local/state}/nearhost/tokens/<laptop id>/<requester>`, readable by your account only. For documents, the file ends in `.documents`, beside the preview token. The skill sends it with later requests, so Nearhost does not ask again. The laptop keeps only a SHA-256 hash of the token, in `grants.json` beside the install id in `~/.config/nearhost` (`%APPDATA%\nearhost` on Windows, or under `XDG_CONFIG_HOME`).
 
 The token stops a different tool from borrowing an approval, and it stops anything from using one after you revoke it. It does not protect against anything else running as your account on the server: such a process can read the token file and use the approval. Treat Always allow as trust in everything that runs as you on that server. A wrong or revoked token gets a `401`; the skill drops it and asks again, so you are prompted.
 
