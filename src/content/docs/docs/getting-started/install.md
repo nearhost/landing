@@ -111,7 +111,7 @@ The Windows binaries are not signed. See [SmartScreen](#smartscreen) below.
 nearhost update
 ```
 
-updates Nearhost the way you installed it, after asking. On Windows, for a copy from the PowerShell installer or a zip, `nearhost update` runs the PowerShell installer again into the same folder. See [`nearhost update`](/docs/reference/cli/#nearhost-update).
+updates Nearhost the way you installed it, after asking. On Windows, for a copy from the PowerShell installer or a zip, `nearhost update` downloads the release's zip itself, checks it against the release's `checksums.txt` and replaces `nearhost.exe` where it is. See [`nearhost update`](/docs/reference/cli/#nearhost-update).
 
 ## Linux setup
 
