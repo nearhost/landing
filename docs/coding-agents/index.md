@@ -29,4 +29,4 @@ In Claude Code you can install it as a plugin instead:
 /plugin install nearhost --marketplace nearhost/nearhost
 ```
 
-The skill needs `sh` and `curl`, and nothing else. Nothing is installed with it. The plugin also brings a `SessionEnd` hook, which closes browser previews when the session ends.
+The skill needs `sh` and `curl`, and nothing else. On a Windows laptop it uses PowerShell and the `curl.exe` that Windows ships instead. A server that reaches a Windows laptop needs curl 7.55 or later. See [Windows laptops](https://nearhost.dev/docs/coding-agents/how-it-works.md#windows-laptops). Nothing is installed with it. The plugin also brings a `SessionEnd` hook, which closes browser previews when the session ends.

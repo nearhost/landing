@@ -8,12 +8,12 @@ Nearhost asks for your password, trusts a certificate authority and edits `/etc/
 
 ## Files on your laptop
 
-| Path                                                                                                | What it holds                                                                                                                                       |
-| --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `~/.config/nearhost/`                                                                               | `config.yaml` with your servers and projects, a lock file, an install id, presets you enabled, cached registry indexes, and `run/` with SSH sockets |
-| `~/Library/Application Support/nearhost/caddy` (macOS)<br />`~/.local/share/nearhost/caddy` (Linux) | The local certificate authority, its private key and the certificates it signed, readable only by you                                               |
-| `~/.cache/nearhost/update.json`                                                                     | When Nearhost last checked for a new release                                                                                                        |
-| `~/.nearhost/`                                                                                      | The socket coding agents on this machine use, readable only by you                                                                                  |
+| Path                                                                                                                                               | What it holds                                                                                                                                       |
+| -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `~/.config/nearhost/` (macOS, Linux)<br />`%APPDATA%\nearhost\` (Windows)                                                                          | `config.yaml` with your servers and projects, a lock file, an install id, presets you enabled, cached registry indexes, and `run/` with SSH sockets |
+| `~/Library/Application Support/nearhost/caddy` (macOS)<br />`~/.local/share/nearhost/caddy` (Linux)<br />`%LOCALAPPDATA%\nearhost\caddy` (Windows) | The local certificate authority, its private key and the certificates it signed, readable only by you                                               |
+| `~/.cache/nearhost/update.json` (macOS, Linux)<br />`%LOCALAPPDATA%\nearhost\cache\update.json` (Windows)                                          | When Nearhost last checked for a new release                                                                                                        |
+| `~/.nearhost/`                                                                                                                                     | The socket coding agents on this machine use, readable only by you                                                                                  |
 
 An absolute `XDG_CONFIG_HOME`, `XDG_DATA_HOME` or `XDG_CACHE_HOME` moves the first three. The install id is six random characters plus a hash of the machine id. It never leaves your machine.
 
@@ -25,6 +25,8 @@ Nearhost never runs as root itself. It uses `sudo` for two things, and from Near
 
 - **The hosts file.** When a project starts and the [block Nearhost owns](https://nearhost.dev/docs/concepts/the-hosts-file.md) in `/etc/hosts` is not what it should be, Nearhost runs its own binary as root, `sudo nearhost hosts apply --file /etc/hosts`, which rewrites that block and nothing else. If `sudo` still holds your password from the last few minutes, this happens without asking again. `--no-hosts` turns it off.
 - **Trusting the certificate authority.** Only when you run `nearhost trust` or accept the welcome box. On macOS it adds the root certificate to the System keychain with `security add-trusted-cert`. On Linux it copies the certificate into your distribution's anchors folder and runs `update-ca-certificates`, `update-ca-trust` or `trust extract-compat`. When `certutil` is installed, it also updates the stores that Firefox and, on Linux, Chromium-based browsers keep for themselves, as you, with no password.
+
+On Windows, Nearhost uses User Account Control in place of `sudo`, and only for the hosts file: it runs its own binary as administrator to rewrite the block in `C:\Windows\System32\drivers\etc\hosts`, and Windows asks you to approve each time. Trusting the certificate authority needs no administrator rights there: it goes into your user's certificate store, and Windows asks you to confirm it.
 
 On Linux, binding ports 80 and 443 needs `cap_net_bind_service`. Nearhost itself never sets it. The install script offers to run `sudo setcap` when you run a downloaded copy from a terminal, and asks first. Through `curl | sh`, or `nearhost update`, it only prints the command, as `nearhost doctor` does.
 
@@ -42,8 +44,9 @@ While Nearhost runs, it listens on:
 - **80**, only to redirect to HTTPS
 - **6327** for [Nearhost's page](https://nearhost.dev/docs/concepts/tls-and-the-proxy.md)
 - one port on `127.0.0.1` per forwarded route, and for a `loopback` route the same port on `::1` too, when the machine has IPv6 loopback
+- on Windows, one more port on `127.0.0.1` per connected server, which coding agents on that server reach Nearhost through. It answers only requests that carry that server's token.
 
-The first three listen on every interface, because macOS lets a program that is not root bind a low port only that way. They answer only this machine: another computer's connection is closed before it gets a certificate or a response. A project with `docker_clients` in its [`.nearhostrc`](https://nearhost.dev/docs/reference/nearhostrc.md) is also answered for your Docker networks. Until Docker first reports them, Nearhost uses Docker's default range, `172.16.0.0/12`, which some home and office networks share.
+The first three listen on every interface, because macOS lets a program that is not root bind a low port only that way. On Windows they listen on loopback addresses only, so Windows Firewall does not ask about them. They answer only this machine: another computer's connection is closed before it gets a certificate or a response. A project with `docker_clients` in its [`.nearhostrc`](https://nearhost.dev/docs/reference/nearhostrc.md) is also answered for your Docker networks. Until Docker first reports them, Nearhost uses Docker's default range, `172.16.0.0/12`, which some home and office networks share.
 
 `--https-port`, `--http-port` and `--web-port` move the ports, and `--web-port 0` turns the page off. When Nearhost quits, all of them close.
 
@@ -70,8 +73,10 @@ Nearhost installs nothing on a server and opens no ports there. It runs your `ss
 - forwards each route's port to your laptop
 - reads files over SFTP: `.env`, `.env.local`, `.nearhostrc`, Compose files and any files an enabled preset names
 - creates `~/.nearhost`, readable only by you, with a socket for coding agents on the server
+- from Nearhost 0.12.0, on a server with a private runtime folder (`/run/user/<uid>`, as systemd makes), creates `nearhost` in it, readable only by you, keeps the socket there, and links to it from `~/.nearhost`. SELinux on Fedora and its relatives stops sshd making a socket in a home folder
+- when the laptop runs Windows, writes the token for that socket beside it, as `~/.nearhost/<id>.token`, readable only by you
 
-When Nearhost quits, the forwards and the connection close. `~/.nearhost` stays, and may hold a stale socket that the next connection replaces. A `.nearhostrc` written by `nearhost export` stays in the project. See [SSH transport](https://nearhost.dev/docs/concepts/ssh-transport.md).
+When Nearhost quits, the forwards and the connection close. `~/.nearhost` stays, and may hold a stale socket or link that the next connection replaces. The system clears the runtime folder when your last session on the server ends. A `.nearhostrc` written by `nearhost export` stays in the project. See [SSH transport](https://nearhost.dev/docs/concepts/ssh-transport.md).
 
 ## What coding agents can do
 
@@ -82,8 +87,8 @@ A coding agent reaches Nearhost through a socket that only your user can open, a
 1. Run `nearhost untrust` to stop your system and browsers trusting the certificate authority.
 2. Run `nearhost hosts clean` to remove the block from `/etc/hosts`.
 3. On Linux, the port capability goes with the binary when you uninstall it. To drop it and keep Nearhost, run `sudo setcap -r` on the binary `nearhost doctor` names.
-4. Uninstall Nearhost the way you installed it, such as `brew uninstall nearhost` or `npm uninstall -g @nearhost/cli`.
-5. Delete `~/.config/nearhost`, the data folder that holds `caddy`, `~/.cache/nearhost` and `~/.nearhost`.
+4. Uninstall Nearhost the way you installed it, such as `brew uninstall nearhost` or `npm uninstall -g @nearhost/cli`. For the PowerShell installer, delete `%LOCALAPPDATA%\Programs\nearhost` and remove it from your user `PATH`.
+5. Delete `~/.config/nearhost`, the data folder that holds `caddy`, `~/.cache/nearhost` and `~/.nearhost`. On Windows, delete `%APPDATA%\nearhost`, `%LOCALAPPDATA%\nearhost` and `~\.nearhost`.
 6. On each server, delete `~/.nearhost`, and any `.nearhostrc` you no longer want.
 
 Run steps 1 and 2 before step 4, while the `nearhost` command still exists.

@@ -47,7 +47,7 @@ nearhost up myapp
 
 ## Where to go next
 
-- [Install](https://nearhost.dev/docs/getting-started/install.md) covers the installer, Homebrew, npm and Linux setup.
+- [Install](https://nearhost.dev/docs/getting-started/install.md) covers the installers, Homebrew, npm, and Linux and Windows setup.
 - [Add a server](https://nearhost.dev/docs/getting-started/add-a-server.md) and [Add a project](https://nearhost.dev/docs/getting-started/add-a-project.md) walk through each screen.
 - [Presets and registries](https://nearhost.dev/docs/concepts/presets-and-registries.md) explains how Nearhost learns a framework's ports.
 - [Dev servers and hot reload](https://nearhost.dev/docs/concepts/dev-servers-and-hot-reload.md) explains how assets and live reload reach your browser.
