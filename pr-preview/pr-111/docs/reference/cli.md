@@ -298,19 +298,19 @@ See [Presets and registries](https://nearhost.dev/pr-preview/pr-111/docs/concept
 
 ## nearhost update
 
-Checks GitHub for the latest release and updates Nearhost the way it was installed. It shows the command it will run and asks first.
+Checks GitHub for the latest release and updates Nearhost the way it was installed. It shows what it will do and asks first.
 
-| Installed with                                | Command it runs                                                                        |
-| --------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Homebrew                                      | `brew upgrade --cask nearhost/tap/nearhost`                                            |
-| npm, pnpm, bun                                | `npm install -g @nearhost/cli@latest`, or the pnpm or bun equivalent                   |
-| `go install`                                  | `go install github.com/nearhost/nearhost/cmd/nearhost@latest`                          |
-| The shell installer                           | The installer again, with `NEARHOST_INSTALL_DIR` set to the binary's folder            |
-| The PowerShell installer, or a zip on Windows | The PowerShell installer again, with `NEARHOST_INSTALL_DIR` set to the binary's folder |
+| Installed with                                | What it does                                                                    |
+| --------------------------------------------- | ------------------------------------------------------------------------------- |
+| Homebrew                                      | `brew upgrade --cask nearhost/tap/nearhost`                                     |
+| npm, pnpm, bun                                | `npm install -g @nearhost/cli@latest`, or the pnpm or bun equivalent            |
+| `go install`                                  | `go install github.com/nearhost/nearhost/cmd/nearhost@latest`                   |
+| The shell installer                           | The installer again, with `NEARHOST_INSTALL_DIR` set to the binary's folder     |
+| The PowerShell installer, or a zip on Windows | Downloads the release's zip from GitHub and replaces `nearhost.exe` where it is |
 
 Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. On macOS and Linux, when the binary's folder is not writable, it prints the installer command with `sudo` rather than running anything. On Linux, after a Homebrew or `go install` update, it prints the `setcap` command to run again.
 
-On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. If the update fails, you keep the copy you had, and the error says so. When you cannot write to the binary's folder, it prints the installer command to run in Windows Terminal opened as administrator, rather than running anything.
+On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. For a copy from the PowerShell installer or a zip it runs no other program: it downloads the release's zip itself and installs it only if it matches the release's `checksums.txt`. If the update fails, you keep the copy you had, and the error says so. When you cannot write to the binary's folder, it prints the installer command to run in Windows Terminal opened as administrator, rather than running anything.
 
 | Flag      | Effect                                                         |
 | --------- | -------------------------------------------------------------- |
