@@ -21,6 +21,14 @@ n  add a project on this machine or a server
 s  add a server you reach over SSH
 ```
 
+From Nearhost 0.12.0, once you have added a server, a third line appears:
+
+```text
+c  connect a server, so its agents reach Nearhost
+```
+
+Press `c` to connect the server without adding a project first, so a coding agent working there can ask Nearhost to add one. With several servers, Nearhost asks which. See [Coding agents](https://nearhost.dev/pr-preview/pr-111/docs/coding-agents.md).
+
 Below them are the folder you started in, whether the certificate authority is trusted, the proxy's ports, and, from Nearhost 0.8.0, a link to Nearhost's page at `https://localhost:6327`, or on the port `--web-port` gives, unless that port was taken or `--web-port 0` turned it off. See [TLS and the proxy](https://nearhost.dev/pr-preview/pr-111/docs/concepts/tls-and-the-proxy.md). Press `n` to serve a project from this machine, or from a server you have added. Press `s` first if the project is on a machine you reach over SSH. See [Add a server](https://nearhost.dev/pr-preview/pr-111/docs/getting-started/add-a-server.md) and [Add a project](https://nearhost.dev/pr-preview/pr-111/docs/getting-started/add-a-project.md).
 
 ## Welcome to Nearhost

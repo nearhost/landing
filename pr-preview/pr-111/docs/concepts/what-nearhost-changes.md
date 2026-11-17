@@ -73,9 +73,10 @@ Nearhost installs nothing on a server and opens no ports there. It runs your `ss
 - forwards each route's port to your laptop
 - reads files over SFTP: `.env`, `.env.local`, `.nearhostrc`, Compose files and any files an enabled preset names
 - creates `~/.nearhost`, readable only by you, with a socket for coding agents on the server
+- from Nearhost 0.12.0, on a server with a private runtime folder (`/run/user/<uid>`, as systemd makes), creates `nearhost` in it, readable only by you, keeps the socket there, and links to it from `~/.nearhost`. SELinux on Fedora and its relatives stops sshd making a socket in a home folder
 - when the laptop runs Windows, writes the token for that socket beside it, as `~/.nearhost/<id>.token`, readable only by you
 
-When Nearhost quits, the forwards and the connection close. `~/.nearhost` stays, and may hold a stale socket that the next connection replaces. A `.nearhostrc` written by `nearhost export` stays in the project. See [SSH transport](https://nearhost.dev/pr-preview/pr-111/docs/concepts/ssh-transport.md).
+When Nearhost quits, the forwards and the connection close. `~/.nearhost` stays, and may hold a stale socket or link that the next connection replaces. The system clears the runtime folder when your last session on the server ends. A `.nearhostrc` written by `nearhost export` stays in the project. See [SSH transport](https://nearhost.dev/pr-preview/pr-111/docs/concepts/ssh-transport.md).
 
 ## What coding agents can do
 
