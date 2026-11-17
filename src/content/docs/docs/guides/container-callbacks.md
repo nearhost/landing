@@ -64,7 +64,7 @@ List every name the service calls. `nearhost doctor` reports a service that call
 
 Nearhost's certificates are signed by its own local certificate authority. Your system trusts it, but a container has its own trust store, so the call fails with a certificate error.
 
-Mount the root certificate into the container and point the service at it. The certificate is at `pki/authorities/local/root.crt` under Nearhost's `caddy` folder, which is `~/Library/Application Support/nearhost/caddy` on macOS and `~/.local/share/nearhost/caddy` on Linux, or `$XDG_DATA_HOME/nearhost/caddy` on either when that is set to an absolute path. `nearhost doctor` prints the path on your machine. Earlier versions kept it under `~/.config/nearhost/caddy`, or `$XDG_CONFIG_HOME/nearhost/caddy` when that variable was set. Nearhost 0.8.0 moves that folder the first time it runs while no other Nearhost is running. After that, a `NEARHOST_CA_CERT` set for an earlier version points at a file that is gone, so set it to the new path, which `nearhost doctor` prints. Mount only `root.crt`, never the folder: the key is beside it. The doctor's snippet, for a Node service:
+Mount the root certificate into the container and point the service at it. The certificate is at `pki/authorities/local/root.crt` under Nearhost's `caddy` folder, which is `~/Library/Application Support/nearhost/caddy` on macOS, `~/.local/share/nearhost/caddy` on Linux and `%LOCALAPPDATA%\nearhost\caddy` on Windows, or `$XDG_DATA_HOME/nearhost/caddy` on any of them when that is set to an absolute path. `nearhost doctor` prints the path on your machine. Earlier versions kept it under `~/.config/nearhost/caddy`, or `$XDG_CONFIG_HOME/nearhost/caddy` when that variable was set. Nearhost 0.8.0 moves that folder the first time it runs while no other Nearhost is running. After that, a `NEARHOST_CA_CERT` set for an earlier version points at a file that is gone, so set it to the new path, which `nearhost doctor` prints. Mount only `root.crt`, never the folder: the key is beside it. The doctor's snippet, for a Node service:
 
 ```yaml
 services:
@@ -93,9 +93,9 @@ Nearhost serves its projects only to this machine. A request from anywhere else 
 
 With no `.nearhostrc` yet, `nearhost export` writes one from the project's current setup, and you add the line to it.
 
-Docker Desktop on macOS already delivers container requests from 127.0.0.1, so this matters on Linux. On a Mac, the project is reached without it. Keep it in a committed `.nearhostrc` if anyone on the team uses Linux.
+Docker Desktop on macOS and on Windows already delivers container requests from 127.0.0.1, so this matters on Linux. On a Mac or a Windows PC, the project is reached without it. Keep it in a committed `.nearhostrc` if anyone on the team uses Linux.
 
-`nearhost doctor` reports a project whose containers call a name it serves without the opt-in, as `docker.clients`. It is a warning on Linux, and only a note on macOS.
+`nearhost doctor` reports a project whose containers call a name it serves without the opt-in, as `docker.clients`. It is a warning on Linux, and only a note on macOS and Windows.
 
 ## The finished Compose file
 
