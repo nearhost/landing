@@ -14,6 +14,18 @@ need() {
   command -v "$1" >/dev/null 2>&1 || fail "$1 is required"
 }
 
+# Downloads $1 to $2. A 404 on the newest release means it is still being published.
+fetch() {
+  status=0
+  # shellcheck disable=SC2086 # dl_opts is empty or a fixed flag list
+  code="$(curl $dl_opts -fsSL -o "$2" -w '%{http_code}' "$1")" || status=$?
+  [ "$status" -ne 0 ] || return 0
+  if [ "$code" = "404" ] && [ -z "$pinned" ]; then
+    fail "Nearhost $version is still being published. Try again in a few minutes, or set NEARHOST_VERSION to install an earlier release."
+  fi
+  fail "download failed: $1"
+}
+
 main() {
   curl_opts="--proto =https --tlsv1.2"
   need curl
@@ -35,6 +47,7 @@ main() {
   esac
 
   version="${NEARHOST_VERSION:-}"
+  pinned="$version"
   if [ -z "$version" ]; then
     # shellcheck disable=SC2086 # curl_opts is a fixed, space-separated flag list
     version="$(curl $curl_opts -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$REPO/releases/latest" | sed -n 's#.*/tag/##p')"
@@ -60,10 +73,8 @@ main() {
   trap 'rm -rf "$tmp"' EXIT
 
   echo "Downloading $asset"
-  # shellcheck disable=SC2086 # dl_opts is empty or a fixed flag list
-  curl $dl_opts -fsSL -o "$tmp/$asset" "$base/$asset" || fail "download failed: $base/$asset"
-  # shellcheck disable=SC2086
-  curl $dl_opts -fsSL -o "$tmp/checksums.txt" "$base/checksums.txt" || fail "download failed: $base/checksums.txt"
+  fetch "$base/$asset" "$tmp/$asset"
+  fetch "$base/checksums.txt" "$tmp/checksums.txt"
 
   expected="$(awk -v a="$asset" '$2 == a { print $1 }' "$tmp/checksums.txt")"
   [ -n "$expected" ] || fail "no checksum listed for $asset"

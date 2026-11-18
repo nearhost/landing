@@ -77,5 +77,21 @@ fake_uname MSYS_NT-10.0-26100 x86_64
 expect "msys" 1 "irm https://nearhost.dev/install.ps1 | iex" \
   env PATH="$work/bin:$PATH" sh "$script"
 
+# 9. A 404 on the newest release says it is still being published; a pinned version keeps the plain message.
+fake_uname Linux x86_64
+cat > "$work/bin/curl" <<'EOF'
+#!/bin/sh
+for a in "$@"; do
+  if [ "$a" = "-fsSLI" ]; then echo "https://github.com/nearhost/nearhost/releases/tag/v9.9.9"; exit 0; fi
+done
+printf '404'
+exit 22
+EOF
+chmod +x "$work/bin/curl"
+expect "still publishing" 1 "Nearhost v9.9.9 is still being published. Try again in a few minutes, or set NEARHOST_VERSION to install an earlier release." \
+  env -u NEARHOST_VERSION -u NEARHOST_BASE_URL PATH="$work/bin:$PATH" sh "$script"
+expect "pinned 404" 1 "download failed: https://github.com/nearhost/nearhost/releases/download/v9.9.9/nearhost_9.9.9_linux_amd64.tar.gz" \
+  env -u NEARHOST_BASE_URL PATH="$work/bin:$PATH" NEARHOST_VERSION=v9.9.9 sh "$script"
+
 [ "$fails" -eq 0 ] || exit 1
 echo "all install.sh checks passed"
