@@ -81,7 +81,9 @@ With Go:
 go install github.com/nearhost/nearhost/cmd/nearhost@latest
 ```
 
-Nearhost needs Go 1.27.3 or later, the version the release binaries are built with. Go 1.21 to 1.27.2 downloads it first, unless `GOTOOLCHAIN` forbids it (some distributions' Go packages set it to `local`). Then install Go 1.27.3 or later yourself.
+Nearhost needs Go 1.27.4 or later, the version the release binaries are built with. Go 1.21 to 1.27.3 downloads it first, unless `GOTOOLCHAIN` forbids it (some distributions' Go packages set it to `local`). Then install Go 1.27.4 or later yourself.
+
+A copy built this way reports its release version, rather than `dev`, so `nearhost update` can tell whether it updated.
 
 ## npm
 
@@ -111,7 +113,9 @@ The Windows binaries are not signed. See [SmartScreen](#smartscreen) below.
 nearhost update
 ```
 
-updates Nearhost the way you installed it, after asking. On Windows, for a copy from the PowerShell installer or a zip, `nearhost update` downloads the release's zip itself, checks it against the release's `checksums.txt` and replaces `nearhost.exe` where it is. See [`nearhost update`](/docs/reference/cli/#nearhost-update).
+updates Nearhost the way you installed it, after asking. Afterwards it checks the version of the copy your next command runs. If that copy is unchanged, it says so and exits 1. On Windows, for a copy from the PowerShell installer or a zip, `nearhost update` downloads the release's zip itself, checks it against the release's `checksums.txt` and only then replaces `nearhost.exe` where it is, so a failed or cancelled download leaves your copy as it was. See [`nearhost update`](/docs/reference/cli/#nearhost-update).
+
+`nearhost update --check` only reports, for scripts: it exits 0 when Nearhost is up to date, 1 when a newer release is out, and 2 when it could not check.
 
 ## Linux setup
 
@@ -125,7 +129,9 @@ Nearhost serves HTTPS on 443 and redirects 80. A normal user cannot bind those p
 sudo setcap cap_net_bind_service=+ep "$(command -v nearhost)"
 ```
 
-Run it again after each upgrade, because replacing the binary clears the capability. After a Homebrew or `go install` update, `nearhost update` prints the command. The shell installer prints it as it installs, also when `nearhost update` runs it. After an update from npm, pnpm or bun, use the command `nearhost doctor` gives. Run from a downloaded copy at a terminal, rather than through `curl | sh`, the installer asks whether to run it, and only uses `sudo` if you say yes.
+Run it again after each upgrade, because replacing the binary clears the capability. After any update, `nearhost update` prints the command, naming the real binary file, even for Homebrew, npm, pnpm and bun installs. It prints nothing when the binary still has the capability, or when the system lets any user bind port 80. The shell installer prints it as it installs, also when `nearhost update` runs it. Run from a downloaded copy at a terminal, rather than through `curl | sh`, the installer asks whether to run it, and only uses `sudo` if you say yes.
+
+`nearhost up` prints the same command when it cannot bind port 80 or 443 for want of the capability, with `Do not run nearhost with sudo.` Running Nearhost with `sudo` leaves files owned by root in your config and data folders.
 
 Installed from npm, `command -v nearhost` finds the Node launcher rather than the binary, so run the command `nearhost doctor` prints instead: it names the binary itself.
 
@@ -179,6 +185,10 @@ If Smart App Control is on, Windows can block `nearhost.exe` outright, with no R
 ### OpenSSH
 
 Nearhost uses the OpenSSH client that ships with Windows 11, `ssh.exe`, and your `~/.ssh/config`, as on macOS and Linux. If `ssh` is missing, add OpenSSH Client in Settings > System > Optional features. `nearhost doctor` reports the version, and warns about one older than the 9.5 that Windows 11 ships.
+
+Nearhost runs the first `ssh` on your `PATH`. Git for Windows puts its own ssh there, which reads another config and agent, so forwards can fail in ways that are hard to follow. `nearhost doctor` warns, under `ssh vendor`, when the `ssh` it finds is not in `%SystemRoot%\System32\OpenSSH` or `%ProgramFiles%\OpenSSH`, and gives its path. Put `%SystemRoot%\System32\OpenSSH` first on your `PATH`.
+
+Windows' `ssh.exe` cannot share one connection, so Nearhost logs in once for each forward, as well as once for the server. A key that needs a touch or an approval at each login asks once for each forward, and again for each forward every time the server reconnects. See [SSH transport](/docs/concepts/ssh-transport/#on-windows).
 
 A key with a passphrase needs the ssh-agent service, which Windows installs disabled. In PowerShell run as administrator, start it and have it start with Windows:
 

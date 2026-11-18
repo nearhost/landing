@@ -53,9 +53,8 @@ Run `nearhost add` without `--alias`, and it asks before using the name, since y
 
 ```text
 $ nearhost add --server mini '~/code/myapp'
-This project asks for these, which need your approval:
-  local.myapp.com on port 8080 (a real domain)
-Approve these? [y/N]
+Approving a name puts it in your hosts file on this machine, has Nearhost's local CA sign a certificate for it, and makes your browser send that site's cookies to this project.
+local.myapp.com on port 8080 (a real domain): approve? [y/N]
 ```
 
 See [Add a project](/docs/getting-started/add-a-project/) for the rest of the add flow, and [Main name](/docs/reference/config/#main-name) for how the name is approved and written to the hosts file.

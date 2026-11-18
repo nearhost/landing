@@ -13,7 +13,9 @@ The proxy does not start. Home shows `proxy down`, names the port and, where it 
 
 Quit that program, or run Nearhost with `--https-port` and `--http-port`. Another local proxy is the usual cause: nginx, Caddy, Herd or Valet. On Linux, also check that the binary may bind low ports. See [Install](/docs/getting-started/install/).
 
-If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary, as in [Allow binding ports 80 and 443](/docs/getting-started/install/#allow-binding-ports-80-and-443); run it, then start Nearhost again. For an npm install, use the command `nearhost doctor` prints, which names the real binary. From Nearhost 0.8.0.
+If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary, as in [Allow binding ports 80 and 443](/docs/getting-started/install/#allow-binding-ports-80-and-443); run it, then start Nearhost again. For an npm install, use the command `nearhost doctor` prints, which names the real binary. From Nearhost 0.8.0. `nearhost up` prints the same command under the error, followed by `Do not run nearhost with sudo.`
+
+`nearhost doctor` run while Nearhost serves shows the ports Nearhost holds as `in use by the running Nearhost`, which passes. If no tool can name what holds a port while Nearhost runs, the check warns and suggests a command to find it.
 
 On Windows, a port held by `System (pid 4)` is held by HTTP.sys on behalf of a Windows service, often IIS, so there is no program to quit. To see which service registered it, run this in a terminal opened as administrator:
 
@@ -22,6 +24,28 @@ netsh http show servicestate
 ```
 
 Stop that service, for IIS with `net stop w3svc`, or run Nearhost with `--http-port` and `--https-port`.
+
+## Another Nearhost is already running
+
+Nearhost stops at start with:
+
+```text
+Another Nearhost is already running (pid N). Stop it first. To run a second one beside it, give it its own XDG_CONFIG_HOME.
+```
+
+Two Nearhosts that share a config folder would end each other's ssh connections, so only one runs at a time. A different `--config` file is not enough: both still share one run directory. Stop the other one, which may be an interface in another terminal or a `nearhost up` under a service manager. To run a second one on purpose, start it with `XDG_CONFIG_HOME` set to another folder, and other ports.
+
+## nearhost up stops with nothing to serve
+
+`nearhost up` prints its summary, then `Nothing can be served, so nearhost up is stopping.`, and exits 1. Every project failed to start, and none is waiting on a server that is still connecting. The summary names each project's error. Fix those, then start `up` again. It stops the same way when every change to the hosts block is refused.
+
+## Nearhost without a terminal
+
+Bare `nearhost` prints `nearhost needs a terminal for its interface. Use nearhost up to serve without one.` and exits 1. It was started from a service, a cron job, a script or a pipe, where there is no terminal for the interface. Run `nearhost up` there instead. On Windows the message adds `In Git Bash, run it through winpty or use Windows Terminal.`
+
+`nearhost up` without a terminal cannot ask for your password. When the hosts block needs to change and `sudo` wants a password, it skips the change and says so once. Run `nearhost up` once at a terminal so it can update the block, or add the names to the hosts file yourself and run with `--no-hosts`.
+
+`nearhost add` without a terminal cannot ask you to approve anything, so it adds nothing when the project asks for approval. `nearhost untrust --delete-key` refuses without a terminal.
 
 ## Port 6327 already in use
 
@@ -47,6 +71,8 @@ Get-NetTCPConnection -State Listen -LocalPort <port> | Select-Object LocalAddres
 
 On older versions, such a program could answer the browser in the forward's place, so the page loaded your laptop's scripts instead of the server's. Run `nearhost update` to get the check.
 
+On Windows, a program can bind a port that another already holds. Before each forward, Nearhost checks the port with exclusive use, so a program that holds it on `127.0.0.1` puts the project into `error` as above, rather than sharing the port with the forward.
+
 ## The password was cancelled
 
 When the hosts block needs a project's alias, Nearhost asks for your password in a box. If you cancel it, or get it wrong three times, the project stays `stopped`, its alias is not added to `/etc/hosts`, and Home's `hosts` row shows it as missing.
@@ -54,6 +80,16 @@ When the hosts block needs a project's alias, Nearhost asks for your password in
 On Windows, choosing No in the User Account Control prompt does the same.
 
 Press `enter` on the project to try again. Or add the alias to `/etc/hosts` yourself and run Nearhost with `--no-hosts`. See [The hosts file](/docs/concepts/the-hosts-file/).
+
+## The hosts file is read-only
+
+On Windows, a hosts file with the read-only attribute stops the change after the User Account Control prompt, and nothing changes on disk:
+
+```text
+<path> is read-only. Clear it with: attrib -r "<path>" (in an administrator terminal), or run with --no-hosts.
+```
+
+Nearhost does not clear the attribute itself, since a read-only hosts file is often set on purpose. Run the `attrib` command in Windows Terminal opened as administrator, or add the names yourself and run Nearhost with `--no-hosts`. A read-only file whose block is already up to date needs no change, so it causes no error.
 
 ## Too many password prompts
 
@@ -103,6 +139,10 @@ Run it in a terminal and handle the host key, passphrase or `ssh-add` prompt. Th
 
 On Windows, a key with a passphrase needs the ssh-agent service running, and Windows installs it disabled. `nearhost doctor` shows its state. See [OpenSSH](/docs/getting-started/install/#openssh) to start it. If the server is reached through a `ProxyJump` host named by an alias, Windows 11's OpenSSH 9.5 does not resolve the alias: give `ProxyJump` the jump host's address instead.
 
+## Doctor warns about the ssh vendor
+
+On Windows only, `nearhost doctor` shows `ssh vendor` as `warn`, with the path of the `ssh` it found. That `ssh` is not Microsoft's OpenSSH in `%SystemRoot%\System32\OpenSSH` or `%ProgramFiles%\OpenSSH`. It is often Git for Windows' ssh, which reads another config and agent, so forwards can fail in confusing ways. Put `%SystemRoot%\System32\OpenSSH` first on your `PATH`, then open a new terminal. The warning does not change doctor's exit status.
+
 ## A server's ssh configuration sets a forward
 
 On Windows only, Nearhost stops trying to connect to the server, which shows `auth failed` with a message such as `mini's ssh configuration sets localforward, which Nearhost can't keep out of its own connections on this system`. The `Host` entry Nearhost uses for that server sets `LocalForward`, `RemoteForward`, `DynamicForward`, `ForkAfterAuthentication yes` or `ClearAllForwardings yes`. Move those lines to a `Host` entry Nearhost does not use, then press `r` on the server. See [SSH transport](/docs/concepts/ssh-transport/#on-windows).
@@ -132,6 +172,10 @@ Nearhost exits naming the file and the problem, with the line for a YAML error. 
 Microsoft Defender SmartScreen may stop it the first time it runs, because the binary is not code signed. Choose More info, then Run anyway.
 
 If Smart App Control is on, Windows can block `nearhost.exe` outright, with no Run anyway, because the binary is not code signed. Nearhost cannot run on that machine until its Windows binaries are signed. See [SmartScreen](/docs/getting-started/install/#smartscreen).
+
+## An update ran but the version did not change
+
+`nearhost update` prints `The update ran, but <path> is still <old>.` with the command to run by hand, and exits 1. The update command succeeded, but the copy your next command runs, at `<path>`, is still the old version. Run the command it prints, then check with `nearhost --version`.
 
 ## The nearhost command is not found on Windows
 

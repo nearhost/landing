@@ -9,13 +9,19 @@ Browser previews and documents ask you first, in the same way. This page covers 
 
 ## The prompt
 
-Press `y` to allow it, `n` to refuse, or `a` for Always allow. `esc` counts as No. A prompt that waits 10 minutes expires. The prompt queues with proposals and passthroughs, and Home shows the same hint as for a [proposal](/docs/coding-agents/add-a-project/).
+Press `y` to allow it, `n` to refuse, or `A` (shift-a) for Always allow. `esc` counts as No. A prompt that waits 10 minutes expires.
+
+For the first 750 ms after a prompt opens, it ignores every key but ctrl+c and hides its keys, then shows them. A key you meant for the screen behind it, pressed as the request arrived, does nothing. The add form an agent's proposal opens waits the same way, and each prompt in a queue waits again when it opens. Lowercase `a` does nothing in a prompt.
+
+When you refuse a preview or a document, that server's requests of the same kind are held back for 30 seconds: a new one is refused at once, with no prompt, and the agent is told when it may ask again. Its other waiting requests of that kind are dropped. A request that carries a valid Always allow token still goes through. The prompt queues with proposals and passthroughs, and Home shows the same hint as for a [proposal](/docs/coding-agents/add-a-project/).
 
 ## Always allow
 
 Always allow covers one tool on one server: Claude Code on `mini`, say, but not Claude Code on another server, and not another tool on `mini`. Only Claude Code is offered it. Codex documents no variable that identifies it, so Codex and every other agent are shown as `An agent`, are always prompted and are never offered Always allow.
 
 Previews and documents are approved separately, so revoking one leaves the other working.
+
+For documents, Always allow covers the folders you have approved, not every folder on the server. A document in a folder you approved opens without a prompt. One in any other folder prompts, and the prompt names the folder. Always allow there adds that folder to the same approval; Yes opens the document and adds nothing. Approvals saved by an earlier version name no folders, so after you update, each folder prompts once.
 
 To revoke one, press `tab` on the server's panel to reach its `always allowed` section, and `x` on a row. Nearhost asks you to confirm first. Revoking leaves open passthroughs and documents in place.
 
