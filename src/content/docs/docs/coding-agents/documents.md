@@ -27,7 +27,7 @@ Nearhost keeps no copies. Each time the page loads, it reads the file again, fro
 
 Every file Nearhost serves from a document's folder is sandboxed by the browser. Its scripts run, but they cannot read other pages on `localhost`, your projects' cookies or storage, or other documents. Rendered markdown runs no scripts at all. Pages also send no referrer, so the address does not leak to sites a document links to.
 
-A page's script can load the folder's scripts, stylesheets, fonts, images, audio, video and WebAssembly, but cannot read its other files, such as `config/secrets.json`. It can still read the folder's `.js`, `.mjs` and `.css` files, which modules and styles need. So an HTML report that fetches its own JSON data does not work; put the data in the page or in a script.
+A page's script can load the folder's scripts, stylesheets, fonts, images, audio, video and WebAssembly, but cannot read its other files, such as `config/secrets.json`. It can still read the files it may load, such as the folder's scripts, stylesheets, fonts and images, since modules and styles need that to load. So an HTML report that fetches its own JSON data does not work; put the data in the page or in a script.
 
 ## When a served folder goes away
 

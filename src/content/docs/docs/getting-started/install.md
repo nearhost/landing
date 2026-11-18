@@ -188,7 +188,7 @@ Nearhost uses the OpenSSH client that ships with Windows 11, `ssh.exe`, and your
 
 Nearhost runs the first `ssh` on your `PATH`. Git for Windows puts its own ssh there, which reads another config and agent, so forwards can fail in ways that are hard to follow. `nearhost doctor` warns, under `ssh vendor`, when the `ssh` it finds is not in `%SystemRoot%\System32\OpenSSH` or `%ProgramFiles%\OpenSSH`, and gives its path. Put `%SystemRoot%\System32\OpenSSH` first on your `PATH`.
 
-Windows' `ssh.exe` cannot share one connection, so Nearhost logs in once for each forward, as well as once for the server. A key that needs a touch or an approval at each login asks once for each forward, and again for each forward every time the server reconnects. See [SSH transport](/docs/concepts/ssh-transport/#on-windows).
+Windows' `ssh.exe` cannot share one connection, so Nearhost logs in once for the server, once for each forward and once for each file it reads over SFTP. A key that needs a touch or an approval at each login asks once for each forward, and again for each forward every time the server reconnects. See [SSH transport](/docs/concepts/ssh-transport/#on-windows).
 
 A key with a passphrase needs the ssh-agent service, which Windows installs disabled. In PowerShell run as administrator, start it and have it start with Windows:
 

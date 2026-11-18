@@ -11,7 +11,7 @@ Every failure attaches to the thing that failed, with why it happened and how to
 
 The proxy does not start. Home shows `proxy down`, names the port and, where it can, the program holding it.
 
-Quit that program, or run Nearhost with `--https-port` and `--http-port`. Another local proxy is the usual cause: nginx, Caddy, Herd or Valet. On Linux, also check that the binary may bind low ports. See [Install](/docs/getting-started/install/).
+Quit that program, or run Nearhost with `--https-port` and `--http-port`. If the holder is `nearhost`, another Nearhost is running: stop it rather than moving ports. Another local proxy is the usual cause: nginx, Caddy, Herd or Valet. On Linux, also check that the binary may bind low ports. See [Install](/docs/getting-started/install/).
 
 If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary, as in [Allow binding ports 80 and 443](/docs/getting-started/install/#allow-binding-ports-80-and-443); run it, then start Nearhost again. For an npm install, use the command `nearhost doctor` prints, which names the real binary. From Nearhost 0.8.0. `nearhost up` prints the same command under the error, followed by `Do not run nearhost with sudo.`
 
@@ -30,10 +30,10 @@ Stop that service, for IIS with `net stop w3svc`, or run Nearhost with `--http-p
 Nearhost stops at start with:
 
 ```text
-Another Nearhost is already running (pid N). Stop it first. To run a second one beside it, give it its own XDG_CONFIG_HOME.
+Another Nearhost is already running (pid N). Stop it first.
 ```
 
-Two Nearhosts that share a config folder would end each other's ssh connections, so only one runs at a time. A different `--config` file is not enough: both still share one run directory. Stop the other one, which may be an interface in another terminal or a `nearhost up` under a service manager. To run a second one on purpose, start it with `XDG_CONFIG_HOME` set to another folder, and other ports.
+Two Nearhosts would end each other's ssh connections, so only one runs at a time, whatever `--config` file each is given. The pid is left out when it is not known. Stop the other one, which may be an interface in another terminal or a `nearhost up` under a service manager, then start Nearhost again.
 
 ## nearhost up stops with nothing to serve
 
@@ -43,13 +43,19 @@ Two Nearhosts that share a config folder would end each other's ssh connections,
 
 Bare `nearhost` prints `nearhost needs a terminal for its interface. Use nearhost up to serve without one.` and exits 1. It was started from a service, a cron job, a script or a pipe, where there is no terminal for the interface. Run `nearhost up` there instead. On Windows the message adds `In Git Bash, run it through winpty or use Windows Terminal.`
 
-`nearhost up` without a terminal cannot ask for your password. When the hosts block needs to change and `sudo` wants a password, it skips the change and says so once. Run `nearhost up` once at a terminal so it can update the block, or add the names to the hosts file yourself and run with `--no-hosts`.
+`nearhost up` without a terminal cannot ask for your password. When the hosts block needs to change, it skips the change and prints, once:
 
-`nearhost add` without a terminal cannot ask you to approve anything, so it adds nothing when the project asks for approval. `nearhost untrust --delete-key` refuses without a terminal.
+```text
+The hosts file needs sudo, and there is no terminal to ask in. Run nearhost up in a terminal once, or pass --no-hosts.
+```
+
+Run `nearhost up` once at a terminal so it can update the block, or add the names to the hosts file yourself and run with `--no-hosts`. Do not give Nearhost a passwordless `sudo` rule instead: its binary is usually writable by you, so the rule would give your account root.
+
+`nearhost add` without a terminal cannot ask you to approve anything, so it adds nothing when the project asks for approval. `nearhost untrust --delete-key` refuses without a terminal unless you also pass `--yes`.
 
 ## Port 6327 already in use
 
-Nearhost starts, serves every project and leaves out Nearhost's page, and the log says `port 6327 is in use; serving without Nearhost's page`. `nearhost doctor` warns about it. Another Nearhost already running is the usual cause. Otherwise pass `--web-port` with a free port, or `--web-port 0` to turn off the page's own port, leaving it at `https://localhost`. From Nearhost 0.8.0.
+Nearhost starts, serves every project and leaves out Nearhost's page, and the log says `port 6327 is in use; serving without Nearhost's page`. `nearhost doctor` warns about it. Another program holding the port is the usual cause. If it is another Nearhost, see [Another Nearhost is already running](#another-nearhost-is-already-running) and stop it. Otherwise pass `--web-port` with a free port, or `--web-port 0` to turn off the page's own port, leaving it at `https://localhost`. From Nearhost 0.8.0.
 
 ## A loopback port is already bound
 
@@ -175,7 +181,7 @@ If Smart App Control is on, Windows can block `nearhost.exe` outright, with no R
 
 ## An update ran but the version did not change
 
-`nearhost update` prints `The update ran, but <path> is still <old>.` with the command to run by hand, and exits 1. The update command succeeded, but the copy your next command runs, at `<path>`, is still the old version. Run the command it prints, then check with `nearhost --version`.
+`nearhost update` prints `The update ran, but <path> is still <old>. Run it again, or install by hand: <command>.` and exits 1. The update command succeeded, but the copy your next command runs, at `<path>`, did not start, printed no version, or is still the old version. Run the command it prints, then check with `nearhost --version`.
 
 ## The nearhost command is not found on Windows
 

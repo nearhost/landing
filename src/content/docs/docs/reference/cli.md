@@ -23,24 +23,24 @@ nearhost version               print the version (also nearhost --version)
 
 Every command takes `--config <file>` to use another config file. A mistyped command gets a suggestion, as `Did you mean this?` with the closest command names. From Nearhost 0.8.0.
 
-A mistyped subcommand under `nearhost hosts`, `nearhost preset`, `nearhost preset registry` or `nearhost completion` is an error too. It prints `unknown command "<x>" for "nearhost <group>"` with the same suggestion, and exits 1, so `nearhost hosts clear` no longer looks like a clean that worked. With no subcommand, each of them prints its help and exits 0.
+A mistyped subcommand under `nearhost hosts`, `nearhost preset`, `nearhost preset registry` or `nearhost completion` is an error too. It prints `unknown command "<x>" for "nearhost <group>"`, suggests the closest command when there is one, and exits 1, so `nearhost hosts clear` no longer looks like a clean that worked. With no subcommand, each of them prints its help and exits 0.
 
 ## Exit status
 
 These are the exit statuses a script can rely on:
 
-| Command                     | Status | When                                                                                  |
-| --------------------------- | ------ | ------------------------------------------------------------------------------------- |
-| `nearhost`                  | 1      | There is no terminal. Use `nearhost up` instead.                                      |
-| `nearhost up`               | 1      | Nothing can be served once every project has tried to start.                          |
-| `nearhost add`              | 130    | Ctrl-C or another stop signal interrupted it, and nothing was added.                  |
-| `nearhost untrust`          | not 0  | A system or browser store still trusts the CA afterwards, or could not be reached.    |
-| `nearhost doctor`           | 1      | A check failed, or a project has an error. Warnings leave it at 0.                    |
-| `nearhost update --check`   | 0      | Nearhost is up to date, including when the newest release has no files for it yet.    |
-|                             | 1      | A newer release is out.                                                               |
-|                             | 2      | The check failed. The reason goes to stderr.                                          |
-| `nearhost update`           | 1      | The update command ran, but the copy that runs next is still the old version.         |
-| A mistyped command or group | 1      | The command, or a subcommand under `hosts`, `preset` or `completion`, does not exist. |
+| Command                     | Status | When                                                                                                                |
+| --------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
+| `nearhost`                  | 1      | There is no terminal. Use `nearhost up` instead.                                                                    |
+| `nearhost up`               | 1      | Nothing can be served once every project has tried to start.                                                        |
+| `nearhost add`              | 130    | Ctrl-C or another stop signal interrupted it, and nothing was added.                                                |
+| `nearhost untrust`          | not 0  | While trust remains: a system or browser store still trusts the CA, or could not be reached.                        |
+| `nearhost doctor`           | 1      | A check failed, or a project has an error. Warnings leave it at 0.                                                  |
+| `nearhost update --check`   | 0      | Nearhost is up to date, including when the newest release has no files for it yet.                                  |
+|                             | 1      | A newer release is out.                                                                                             |
+|                             | 2      | The check failed. The reason goes to stderr.                                                                        |
+| `nearhost update`           | 1      | The update command ran, but the copy that runs next did not start, printed no version, or is still the old version. |
+| A mistyped command or group | 1      | The command, or a subcommand under `hosts`, `preset` or `completion`, does not exist.                               |
 
 ## nearhost
 
@@ -62,7 +62,7 @@ On Windows the message adds `In Git Bash, run it through winpty or use Windows T
 | `--no-hosts`          | Leave `/etc/hosts` alone. Add the aliases yourself.                                                         |
 | `--no-capture`        | Keep no requests or responses in memory. See [The request log](/docs/concepts/the-request-log/).            |
 
-Only one Nearhost runs with a config folder at a time. A second one, the interface or `nearhost up`, stops with `Another Nearhost is already running (pid N). Stop it first. To run a second one beside it, give it its own XDG_CONFIG_HOME.` Two Nearhosts given different `--config` files still share one run directory, so the second one stops too. When the second one's ports are taken, it reports the ports first.
+Only one Nearhost runs at a time. A second one, the interface or `nearhost up`, stops with `Another Nearhost is already running (pid N). Stop it first.`, without the pid when it is not known. A different `--config` file does not change that. When the second one's ports are taken, it reports the ports first.
 
 ## nearhost up
 
@@ -78,7 +78,7 @@ Ctrl-C, a SIGTERM and closing the terminal all stop it the same way. It stops th
 
 Once every project has tried to start, `up` checks that at least one is running, or is starting or reconnecting while it waits on its server. If none is, it prints the summary and `Nothing can be served, so nearhost up is stopping.`, stops as Ctrl-C does and exits 1, so a service manager sees the failure. It does the same when every change to the hosts block is refused.
 
-When the hosts block needs to change, it asks for your password in the terminal. Without a terminal, as under a service manager, CI or `nohup`, it runs `sudo` without a prompt. That works where `sudo` needs no password; otherwise `up` skips the change and says so once. On Windows, the change goes through a User Account Control prompt, with no password.
+When the hosts block needs to change, it asks for your password in the terminal. Without a terminal, as under a service manager, CI or `nohup`, it cannot ask for your password, so it skips the hosts change and prints, once: `The hosts file needs sudo, and there is no terminal to ask in. Run nearhost up in a terminal once, or pass --no-hosts.` Do not give Nearhost a passwordless `sudo` rule to get around this: its binary is usually writable by you, so the rule would give your account root. On Windows, the change goes through a User Account Control prompt, with no password.
 
 On Linux, when this user may not bind port 80 or 443, `up` prints the `setcap` command for its binary under the error, then `Do not run nearhost with sudo.` It prints neither when the port is in use by another program, or when the system lets any user bind port 80.
 
@@ -88,7 +88,7 @@ Adds a project. It discovers the routes from the project's files, prints them an
 
 Approval asks about each item on its own, as `<item>: approve? [y/N]`. Before it asks about a host or a main name, it says what approving a name does. A no drops that host, loopback port or `docker_clients`, and the add goes on. A refused main name falls back to the `.test` one, and the summary names what was left out. Nearhost asks about a refused item from the `.nearhostrc` again when it next reviews the project. See [Approval](/docs/reference/nearhostrc/#approval).
 
-Its last line says whether the Nearhost already running picks the project up. With the interface open, it says `The running Nearhost picks it up in a moment.` Under `nearhost up`, it says to stop `up` and start it again. With nothing running, it says to start it with `nearhost up`.
+Its last line says whether the Nearhost already running picks the project up. With the interface open, it says `The running Nearhost picks it up in a moment.` Under `nearhost up`, it says to stop `up` and start it again. With nothing running, it says to start it with `nearhost up`. When it cannot tell which kind of Nearhost runs, it says to stop it and start it again if the project does not appear. A project added with `--disabled` is listed by the interface, not started, and the line says how to start it.
 
 Ctrl-C, or any other signal that `nearhost up` stops on, ends the add cleanly: it closes the ssh connection, removes its temporary folder, saves nothing, prints `Interrupted, so the project was not added.` and exits 130. A second Ctrl-C ends it at once.
 
@@ -196,7 +196,7 @@ When the system store does not hold the CA, it prints `Nearhost Local CA was not
 | `--delete-key` | After untrusting, delete the CA's folder with its private key, the site certificates it issued, and any copy Nearhost 0.7 left. It asks first. |
 | `-y`, `--yes`  | With `--delete-key`, delete without asking.                                                                                                    |
 
-`--delete-key` refuses while a Nearhost runs, without a terminal to ask in, and under `sudo` on another user's files. If untrusting fails in a way you can fix, it deletes nothing and says what to fix. If trust remains that Nearhost cannot remove, it deletes the key anyway, then fails, names the old root by fingerprint and serial number, and keeps a copy of its certificate in `old-roots`.
+`--delete-key` refuses while a Nearhost runs, without a terminal unless you also pass `--yes`, and under `sudo` on another user's files. If untrusting fails in a way you can fix, it deletes nothing and says what to fix. If trust remains that Nearhost cannot remove, it deletes the key anyway, then fails, names the old root by fingerprint and serial number, and keeps a copy of its certificate in `old-roots`.
 
 ## nearhost hosts
 
@@ -368,7 +368,7 @@ Checks GitHub for the latest release and updates Nearhost the way it was install
 
 Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. On macOS and Linux, when the binary's folder is not writable, it prints the installer command with `sudo` rather than running anything. For the shell installer, it downloads the script to a file and runs it only once the whole script has arrived, and installs the version it checked.
 
-After the update, it runs `nearhost version` on the copy your next command starts: the Homebrew link, the pnpm shim on your `PATH`, or the binary itself. If that copy is still the old version, it prints `The update ran, but <path> is still <old>.` with the command to run by hand, and exits 1. A copy built with `go install` reports its release version, so it is checked the same way.
+After the update, it runs `nearhost version` on the copy your next command starts: the Homebrew link, the pnpm shim on your `PATH`, or the binary itself. If that copy is still the old version, it prints `The update ran, but <path> is still <old>. Run it again, or install by hand: <command>.` and exits 1. It does the same when that copy does not start or prints no version. A copy built with `go install` reports its release version, so it is checked the same way.
 
 On Linux, replacing the binary drops its permission to bind ports 80 and 443. After any update, `nearhost update` prints the `setcap` command for the real binary file: the file behind Homebrew's link, or the platform package's binary behind pnpm's shim. It prints nothing when the binary keeps the capability, or when the system lets any user bind port 80. After a shell installer update, the installer prints the command as well.
 
@@ -381,7 +381,7 @@ On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. For a
 | `-y`, `--yes` | Update without asking.                                                                                                       |
 | `--check`     | Only report. Exits 0 when up to date, 1 when a newer release is out, and 2 when the check failed, with the reason on stderr. |
 
-At the `Update now?` prompt, end of input with no answer, or an input that cannot be read, counts as No: nothing runs and the exit is 0. Piped input is refused unless you pass `--yes`.
+At the `[Y/n]` question, an empty line is yes. End of input, or input that cannot be read, is No: nothing runs and the exit is 0. Without a terminal it asks nothing: it prints the command to run, or says to pass `--yes`, and exits 0.
 
 Nearhost also checks for a new release at most once a day, in the background, and prints a line after the command when one is out. The interface shows it in its log. When the day's check has to ask GitHub, a command that has finished waits up to 2 seconds for the answer. Later commands that day read the answer from a cache and don't wait. Set `NEARHOST_NO_UPDATE_CHECK=1` to turn the check off.
 
