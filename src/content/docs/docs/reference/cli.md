@@ -43,11 +43,11 @@ Starts the named projects, or every enabled project when none is named, and serv
 nearhost up myapp
 ```
 
-Ctrl-C, a SIGTERM and closing the terminal all stop it the same way. It stops the projects and their ssh connections, and waits at most 30 seconds for them. A second Ctrl-C stops at once. Started under `nohup`, it keeps running when the terminal closes. On Windows, closing the window gives it only the few seconds Windows allows before it ends the process.
+Ctrl-C, a SIGTERM and closing the terminal all stop it the same way. It stops the projects and their ssh connections, and waits at most 30 seconds for them. A second Ctrl-C stops at once. Started under `nohup`, it keeps running when the terminal closes. On Windows, closing the window gives it the few seconds Windows allows before it ends the process, and Ctrl-C there gives it the full shutdown.
 
 `up` reads the config once, when it starts. To serve a project you add with `nearhost add` while it runs, stop `up` and start it again.
 
-When the hosts block needs to change, it asks for your password in the terminal. On Windows it asks for no password: Windows shows a User Account Control prompt instead.
+When the hosts block needs to change, it asks for your password in the terminal. On Windows, the change goes through a User Account Control prompt, with no password.
 
 ## nearhost add
 
@@ -314,7 +314,7 @@ Checks GitHub for the latest release and updates Nearhost the way it was install
 | The shell installer                           | The installer again, with `NEARHOST_INSTALL_DIR` set to the binary's folder     |
 | The PowerShell installer, or a zip on Windows | Downloads the release's zip from GitHub and replaces `nearhost.exe` where it is |
 
-Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. On macOS and Linux, when the binary's folder is not writable, it prints the installer command with `sudo` rather than running anything. On Linux, after a Homebrew or `go install` update, it prints the `setcap` command to run again. After an update from npm, pnpm, bun or the shell installer, run the command that `nearhost doctor` prints.
+Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. On macOS and Linux, when the binary's folder is not writable, it prints the installer command with `sudo` rather than running anything. On Linux, after a Homebrew or `go install` update, it prints the `setcap` command to run again, and after a shell installer update the installer prints it. On Linux, after an update from npm, pnpm or bun, run the command that `nearhost doctor` prints.
 
 On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. For a copy from the PowerShell installer or a zip it runs no other program: it downloads the release's zip itself and installs it only if it matches the release's `checksums.txt`. If the update fails, you keep the copy you had, and the error says so. When you cannot write to the binary's folder, it prints the installer command to run in Windows Terminal opened as administrator, rather than running anything.
 
