@@ -17,6 +17,7 @@ nearhost doctor                check ports, the CA, the hosts block, servers and
 nearhost preset ...            presets, which say what a framework's ports mean
 nearhost preset registry ...   the preset registries you trust
 nearhost update                update to the latest release
+nearhost completion <shell>    print a shell completion script
 nearhost version               print the version (also nearhost --version)
 ```
 
@@ -24,7 +25,7 @@ Every command takes `--config <file>` to use another config file. A mistyped com
 
 ## nearhost
 
-Opens the interface, at a terminal. It starts the proxy and every enabled project, and `q` stops them all. See [First run](/docs/getting-started/first-run/).
+Opens the interface, at a terminal. It starts the proxy and every enabled project, and `q` stops them all. When stdin or stdout is not a terminal, as in a script or a pipe, it prints the help and starts nothing. See [First run](/docs/getting-started/first-run/).
 
 | Flag                  | Effect                                                                                                      |
 | --------------------- | ----------------------------------------------------------------------------------------------------------- |
@@ -36,13 +37,17 @@ Opens the interface, at a terminal. It starts the proxy and every enabled projec
 
 ## nearhost up
 
-Starts the named projects, or every enabled project when none is named, and serves them until Ctrl-C. A second Ctrl-C stops at once. It takes the same five flags as `nearhost`.
+Starts the named projects, or every enabled project when none is named, and serves them until Ctrl-C. It takes the same five flags as `nearhost`.
 
 ```sh
 nearhost up myapp
 ```
 
-When the hosts block needs to change, it asks for your password in the terminal.
+Ctrl-C, a SIGTERM and closing the terminal all stop it the same way. It stops the projects and their ssh connections, and waits at most 30 seconds for them. A second Ctrl-C stops at once. Started under `nohup`, it keeps running when the terminal closes. On Windows, closing the window gives it only the few seconds Windows allows before it ends the process.
+
+`up` reads the config once, when it starts. To serve a project you add with `nearhost add` while it runs, stop `up` and start it again.
+
+When the hosts block needs to change, it asks for your password in the terminal. On Windows it asks for no password: Windows shows a User Account Control prompt instead.
 
 ## nearhost add
 
@@ -156,7 +161,7 @@ On Windows, Nearhost runs `apply` as administrator through User Account Control,
 
 ## nearhost doctor
 
-Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit non-zero. After the machine checks, it checks each enabled project's files and setup and lists what it finds. See [Project checks](#project-checks). An error there also makes it exit non-zero. It takes `--https-port`, `--http-port`, `--web-port` and `--no-hosts`, and `--json` prints all of it as one JSON object. See [JSON output](#json-output).
+Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit 1. After the machine checks, it checks each enabled project's files and setup and lists what it finds. See [Project checks](#project-checks). An error there also makes it exit 1. It takes `--https-port`, `--http-port`, `--web-port` and `--no-hosts`, and `--json` prints all of it as one JSON object. See [JSON output](#json-output).
 
 | Check                              | What it looks at                                                                                                                                                                                                                                                                                                                    |
 | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -309,16 +314,20 @@ Checks GitHub for the latest release and updates Nearhost the way it was install
 | The shell installer                           | The installer again, with `NEARHOST_INSTALL_DIR` set to the binary's folder     |
 | The PowerShell installer, or a zip on Windows | Downloads the release's zip from GitHub and replaces `nearhost.exe` where it is |
 
-Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. On macOS and Linux, when the binary's folder is not writable, it prints the installer command with `sudo` rather than running anything. On Linux, after a Homebrew or `go install` update, it prints the `setcap` command to run again.
+Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. On macOS and Linux, when the binary's folder is not writable, it prints the installer command with `sudo` rather than running anything. On Linux, after a Homebrew or `go install` update, it prints the `setcap` command to run again. After an update from npm, pnpm, bun or the shell installer, run the command that `nearhost doctor` prints.
 
 On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. For a copy from the PowerShell installer or a zip it runs no other program: it downloads the release's zip itself and installs it only if it matches the release's `checksums.txt`. If the update fails, you keep the copy you had, and the error says so. When you cannot write to the binary's folder, it prints the installer command to run in Windows Terminal opened as administrator, rather than running anything.
 
-| Flag      | Effect                                                         |
-| --------- | -------------------------------------------------------------- |
-| `--yes`   | Update without asking.                                         |
-| `--check` | Only report. Exits 1 when a newer release is out, 0 otherwise. |
+| Flag          | Effect                                                                                    |
+| ------------- | ----------------------------------------------------------------------------------------- |
+| `-y`, `--yes` | Update without asking.                                                                    |
+| `--check`     | Only report. Exits 1 when a newer release is out or when it cannot find out, 0 otherwise. |
 
 Nearhost also checks for a new release at most once a day, in the background, and prints a line after the command when one is out. The interface shows it in its log. When the day's check has to ask GitHub, a command that has finished waits up to 2 seconds for the answer. Later commands that day read the answer from a cache and don't wait. Set `NEARHOST_NO_UPDATE_CHECK=1` to turn the check off.
+
+## nearhost completion
+
+Prints a completion script for `bash`, `zsh`, `fish` or `powershell`. `nearhost completion <shell> --help` says how to load it in that shell.
 
 ## nearhost version
 

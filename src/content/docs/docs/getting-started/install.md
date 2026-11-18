@@ -125,7 +125,7 @@ Nearhost serves HTTPS on 443 and redirects 80. A normal user cannot bind those p
 sudo setcap cap_net_bind_service=+ep "$(command -v nearhost)"
 ```
 
-Run it again after each upgrade, because replacing the binary clears the capability. `nearhost update` prints the command when it is needed. The shell installer prints this command for you. Run from a downloaded copy at a terminal, rather than through `curl | sh`, it asks whether to run it, and only uses `sudo` if you say yes.
+Run it again after each upgrade, because replacing the binary clears the capability. After a Homebrew or `go install` update, `nearhost update` prints the command. After an update from npm, pnpm, bun or the shell installer, run it again: `nearhost doctor` prints the command. The shell installer prints this command for you. Run from a downloaded copy at a terminal, rather than through `curl | sh`, it asks whether to run it, and only uses `sudo` if you say yes.
 
 Installed from npm, `command -v nearhost` finds the Node launcher rather than the binary, so run the command `nearhost doctor` prints instead: it names the binary itself.
 
