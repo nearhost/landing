@@ -4,11 +4,17 @@
 
 How the embedded Caddy proxy and the local certificate authority serve each alias over HTTPS.
 
-Caddy runs inside the Nearhost process, with its storage in Nearhost's data folder, under `nearhost/caddy`: `~/Library/Application Support/nearhost/caddy` on macOS, `~/.local/share/nearhost/caddy` on Linux and `%LOCALAPPDATA%\nearhost\caddy` on Windows, or `$XDG_DATA_HOME/nearhost/caddy` on any of them when that variable is set to an absolute path. It listens on 443 for HTTPS, on 80 only to redirect to HTTPS, with a 308, and on 6327 for Nearhost's page. To use other ports, run Nearhost with `--https-port`, `--http-port` and `--web-port`.
+Caddy runs inside the Nearhost process, with its storage in Nearhost's data folder, under `nearhost/caddy`: `~/Library/Application Support/nearhost/caddy` on macOS, `~/.local/share/nearhost/caddy` on Linux and `%LOCALAPPDATA%\nearhost\caddy` on Windows, or `$XDG_DATA_HOME/nearhost/caddy` on any of them when that variable is set to an absolute path. It listens on 443 for HTTPS, on 80 only to redirect to HTTPS, with a 307 that browsers do not keep, and on 6327 for Nearhost's page. To use other ports, run Nearhost with `--https-port`, `--http-port` and `--web-port`.
 
 It answers only this machine, and, for a project whose `.nearhostrc` sets `docker_clients`, containers on this machine's Docker networks. A request from another computer, or for a name Nearhost does not serve, has its connection closed with no answer.
 
-While Nearhost runs, even with no projects, `https://localhost:6327` shows Nearhost's own page. No project uses that port, so the page is there whatever the projects serve. `https://localhost` shows the same page too, unless a project serves `localhost` itself. `--web-port` moves the port, and `--web-port 0` turns it off, leaving only `https://localhost`. If the page's port is taken, Nearhost starts without the page and says so, and `nearhost doctor` warns. Pass `--web-port` to choose another port. A taken HTTPS or HTTP port is different: Nearhost does not start the proxy. The page needs Nearhost 0.8.0 or later.
+While Nearhost runs, even with no projects, `https://nearhost.localhost:6327` shows Nearhost's own page. No project uses that port, and no project may use the name `nearhost.localhost`, so the page is there whatever the projects serve. `https://localhost:6327` shows the page too, without the document list. `localhost` on the HTTPS port belongs to projects: when no project serves it, `https://localhost` gets its connection closed, like any name Nearhost does not serve. `--web-port` moves the port, and `--web-port 0` turns the page off. If the page's port is taken, Nearhost starts without the page and says so, and `nearhost doctor` warns. Pass `--web-port` to choose another port. A taken HTTPS or HTTP port is different: Nearhost does not start the proxy. The page needs Nearhost 0.8.0 or later.
+
+The page's port listens on the loopback addresses, `127.0.0.1` and `::1`, on every system, so another machine's connection to it is refused before anything is read. One exception: on macOS, a page port below 1024, given with `--web-port` while Nearhost is not root, listens on every address, because macOS lets such a program bind a low port only that way. The page still answers only this machine.
+
+Current macOS, Windows 11, Linux with systemd-resolved, Chrome and Firefox resolve `nearhost.localhost` to this machine themselves. For older systems and resolvers that do not, Nearhost adds `nearhost.localhost` to [its block](https://nearhost.dev/docs/concepts/the-hosts-file.md) each time it writes the block. It does not ask for your password for that line alone. If the name does not resolve, use `https://localhost:6327`. See [nearhost.localhost does not resolve](https://nearhost.dev/docs/troubleshooting/troubleshooting.md#nearhostlocalhost-does-not-resolve).
+
+The page lists the documents agents have shown only to a browser that holds its cookie, `__Host-nearhost`. The interface opens the page with a link that sets the cookie, and opening any document link sets it too, so the list appears in a browser that opened a document link, or opened the page from Nearhost's interface. Other browsers and programs see the page without the list. The cookie's value is a secret kept in `page-secret` in Nearhost's data folder, readable only by you. Nearhost sets and reads the cookie at `nearhost.localhost` only. At `https://localhost:6327` the page has no list, and a document link opened there sets no cookie. So a server or container you browse at `localhost` does not receive the cookie. One limit: browsers send a cookie to every port of its host, so a server you open at `nearhost.localhost` on another port receives it and can fetch the list.
 
 ## The local CA
 
@@ -22,13 +28,15 @@ The CA's private key is in the `caddy` folder named above, under `pki/authoritie
 
 From Nearhost 0.8.0 the key is in the data folder. Earlier versions kept it in `~/.config/nearhost/caddy`, or `$XDG_CONFIG_HOME/nearhost/caddy` when that variable is set. The next time you run `nearhost`, `nearhost up`, `nearhost trust` or `nearhost untrust`, Nearhost moves an existing old folder there, so the CA you already trust stays the same. It does not move it while another Nearhost is running. If a copy of the old folder is left behind, `nearhost doctor` warns with `old CA copy` and says which folder to delete.
 
-Trust it from the welcome box the first time you start Nearhost, or at any time with `nearhost trust`. `nearhost untrust` removes the CA from the system and browser stores. It leaves the key's folder where it is. See [First run](https://nearhost.dev/docs/getting-started/first-run.md) and, for Linux, Windows and Firefox, [Install](https://nearhost.dev/docs/getting-started/install.md).
+Trust it from the welcome box the first time you start Nearhost, or at any time with `nearhost trust`. `nearhost untrust` removes the CA from the system and browser stores. It leaves the key's folder where it is, unless you add `--delete-key`, which then deletes the CA's folder with its key and the certificates it issued. See [`nearhost untrust`](https://nearhost.dev/docs/reference/cli.md#nearhost-untrust). See [First run](https://nearhost.dev/docs/getting-started/first-run.md) and, for Linux, Windows and Firefox, [Install](https://nearhost.dev/docs/getting-started/install.md).
 
 Home shows whether it is trusted and when it expires. The date turns amber in the last 30 days.
 
 ## Per-name certificates
 
 Leaf certificates are issued automatically. Each exact name a project serves gets its own. A name under a wildcard pattern gets one the first time it is visited. Because the CA is created on your machine, nobody else holds a key that can sign for your `.test` names.
+
+Each certificate lasts 7 days, signed by an intermediate that lasts 30 days. Caddy checks for renewals every minute, so after a laptop wakes from a long sleep, a certificate that is due is replaced within a minute, with no restart. At start, Nearhost removes the certificates and keys of names under a wildcard pattern that expired more than a day ago, since Caddy renews only names it still serves. A name visited again gets a new one.
 
 ## What the proxy sets
 

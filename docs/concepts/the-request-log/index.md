@@ -22,13 +22,15 @@ Choose a request with `j` and `k`, then:
 | `w`     | Wrap long lines.                                        |
 | `esc`   | Clear the search, or close the log.                     |
 
-Compressed bodies are unpacked, and JSON is laid out to read.
+Compressed bodies are unpacked, and JSON is laid out to read. A zstd body is unpacked with a window of up to 8 MiB, which covers zstd's levels up to 19. One made with `--ultra` or `--long` needs more, so it shows as undecoded, like any encoding Nearhost cannot read.
+
+When a request body did not all reach the app, the opened request shows how much did: `(app read N of M)`, or `(none of M reached the app)` when the app was down or answered without reading it. Copy as `curl` leaves such a body out, and says why.
 
 ## Sending a request again
 
 `r` sends the request through the proxy again, so it is logged like any other, and shows the status that came back. `GET`, `HEAD` and `OPTIONS` are sent at once. Anything else could change something, so Nearhost asks first, and `y` sends it.
 
-A request cannot be sent again when it was a WebSocket or another upgraded connection, when only part of its body was kept, or when it is no longer kept.
+A request cannot be sent again when it was a WebSocket or another upgraded connection, when only part of its body was kept, or when it is no longer kept. Nor can one whose body did not all reach the app: the client stopped sending it, none of it reached the app, or the app stopped reading it. Nearhost says which.
 
 ## What is kept
 

@@ -67,7 +67,7 @@ Use `nearhost preset` and `nearhost preset registry` rather than editing the las
 
 `projects[].alias` is the project's main name: the address Nearhost shows, prints after `nearhost add` and gives to agents. It is `<name>.test` by default. It can be any one exact domain instead, such as `app.local.example.com`.
 
-A main name must be lowercase. It cannot be a wildcard pattern, `localhost` or an IP address.
+A main name must be lowercase. It cannot be a wildcard pattern, `localhost`, `nearhost.localhost` or an IP address.
 
 A main name that does not end in `.test` is a real domain, so it needs your approval before it goes live. Typing it with `nearhost add --alias` approves it. A name from a `.nearhostrc` that you did not type is asked about in the terminal by `nearhost add`. When a `.nearhostrc` or an agent proposes one later, it waits for you in the interface, and the old name keeps serving until you approve.
 

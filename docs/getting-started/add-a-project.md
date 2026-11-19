@@ -59,18 +59,18 @@ Start it with `nearhost up`.
 
 With no registry trusted, only the `.env` port variables are found, and every port but the web one is `ignore`. Here the Vite port should reach the browser as `localhost:5174`, so change it to `loopback` afterwards: select the project, press `tab`, choose the route and press `space`. The [Vite and Sail presets](https://nearhost.dev/docs/concepts/presets-and-registries.md) do that for you.
 
-At a terminal it asks what the interface asks: whether to trust the official presets, which suggested presets to enable, and which port is the web app when that is not clear. It also offers to add a server it does not know, and asks you to approve any real domain, wildcard, `localhost` or Docker access that the project's `.nearhostrc` or presets ask for. Without a terminal it takes the defaults, and stops if it cannot tell which port is web or if something needs approval. See [Approval](https://nearhost.dev/docs/reference/nearhostrc.md#approval).
+At a terminal it asks what the interface asks: whether to trust the official presets, which suggested presets to enable, and which port is the web app when that is not clear. It also offers to add a server it does not know, and asks you to approve, one at a time, any real domain, wildcard, `localhost` or Docker access that the project's `.nearhostrc` or presets ask for, and any loopback port its `.nearhostrc` adds. Without a terminal it takes the defaults, and stops if it cannot tell which port is web or if something needs approval. See [Approval](https://nearhost.dev/docs/reference/nearhostrc.md#approval).
 
-| Flag              | Effect                                                                                                                                                 |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `--server <name>` | The server the path is on. The default is `local`.                                                                                                     |
-| `--name <name>`   | The project name. The default is the directory's name.                                                                                                 |
-| `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost` or an IP address. Typing it approves it. |
-| `--web <port>`    | The port to serve at the alias.                                                                                                                        |
-| `--host <host>`   | Add this host to the primary web route. Repeat for more. Typing it approves it.                                                                        |
-| `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                    |
-| `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
-| `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
+| Flag              | Effect                                                                                                                                                                       |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--server <name>` | The server the path is on. The default is `local`.                                                                                                                           |
+| `--name <name>`   | The project name. The default is the directory's name.                                                                                                                       |
+| `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost`, `nearhost.localhost` or an IP address. Typing it approves it. |
+| `--web <port>`    | The port to serve at the alias.                                                                                                                                              |
+| `--host <host>`   | Add this host to the primary web route. Repeat for more. Typing it approves it.                                                                                              |
+| `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                                          |
+| `--no-presets`    | Use no presets and suggest none.                                                                                                                                             |
+| `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                                                    |
 
 A directory whose name has letters or digits outside ASCII, such as `café`, needs `--name` with only a-z, 0-9 and `-`, or `--alias`, or an `alias` in its `.nearhostrc`. From Nearhost 0.8.0, `nearhost add` stops and says so.
 

@@ -54,9 +54,8 @@ Run `nearhost add` without `--alias`, and it asks before using the name, since y
 
 ```text
 $ nearhost add --server mini '~/code/myapp'
-This project asks for these, which need your approval:
-  local.myapp.com on port 3000 (a real domain)
-Approve these? [y/N]
+Approving a name puts it in your hosts file on this machine, has Nearhost's local CA sign a certificate for it, and makes your browser send that site's cookies to this project.
+local.myapp.com on port 3000 (a real domain): approve? [y/N]
 ```
 
 The port is the one `next dev` listens on, 3000 unless you changed it. Give it the `web` role. The Next.js dev server serves pages, assets and hot reload from that one port, so it needs no `loopback` route.
