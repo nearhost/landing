@@ -23,9 +23,36 @@ nearhost version               print the version (also nearhost --version)
 
 Every command takes `--config <file>` to use another config file. A mistyped command gets a suggestion, as `Did you mean this?` with the closest command names. From Nearhost 0.8.0.
 
+A mistyped subcommand under `nearhost hosts`, `nearhost preset`, `nearhost preset registry` or `nearhost completion` is an error too. It prints `unknown command "<x>" for "nearhost <group>"`, suggests the closest command when there is one, and exits 1, so `nearhost hosts clear` no longer looks like a clean that worked. With no subcommand, each of them prints its help and exits 0.
+
+## Exit status
+
+These are the exit statuses a script can rely on:
+
+| Command                     | Status | When                                                                                                                |
+| --------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------- |
+| `nearhost`                  | 1      | There is no terminal. Use `nearhost up` instead.                                                                    |
+| `nearhost up`               | 1      | Nothing can be served once every project has tried to start.                                                        |
+| `nearhost add`              | 130    | Ctrl-C or another stop signal interrupted it, and nothing was added.                                                |
+| `nearhost untrust`          | not 0  | While trust remains: a system or browser store still trusts the CA, or could not be reached.                        |
+| `nearhost doctor`           | 1      | A check failed, or a project has an error. Warnings leave it at 0.                                                  |
+| `nearhost update --check`   | 0      | Nearhost is up to date, including when the newest release has no files for it yet.                                  |
+|                             | 1      | A newer release is out.                                                                                             |
+|                             | 2      | The check failed. The reason goes to stderr.                                                                        |
+| `nearhost update`           | 1      | The update command ran, but the copy that runs next did not start, printed no version, or is still the old version. |
+| A mistyped command or group | 1      | The command, or a subcommand under `hosts`, `preset` or `completion`, does not exist.                               |
+
 ## nearhost
 
-Opens the interface, at a terminal. It starts the proxy and every enabled project, and `q` stops them all. When stdin or stdout is not a terminal, as in a script or a pipe, it prints the help and starts nothing. See [First run](/docs/getting-started/first-run/).
+Opens the interface, at a terminal. It starts the proxy and every enabled project, and `q` stops them all. See [First run](/docs/getting-started/first-run/).
+
+It needs a terminal: stdin and stdout must both be one. Without one, as in a service, a cron job, a script or a pipe, it starts nothing, prints this to stderr and exits 1:
+
+```text
+nearhost needs a terminal for its interface. Use nearhost up to serve without one.
+```
+
+On Windows the message adds `In Git Bash, run it through winpty or use Windows Terminal.` `nearhost --help`, `-h` and `help` print the help and exit 0 without a terminal.
 
 | Flag                  | Effect                                                                                                      |
 | --------------------- | ----------------------------------------------------------------------------------------------------------- |
@@ -34,6 +61,8 @@ Opens the interface, at a terminal. It starts the proxy and every enabled projec
 | `--web-port <port>`   | Serve Nearhost's page at `https://localhost:<port>` instead of 6327. `0` turns it off. From Nearhost 0.8.0. |
 | `--no-hosts`          | Leave `/etc/hosts` alone. Add the aliases yourself.                                                         |
 | `--no-capture`        | Keep no requests or responses in memory. See [The request log](/docs/concepts/the-request-log/).            |
+
+Only one Nearhost runs at a time. A second one, the interface or `nearhost up`, stops with `Another Nearhost is already running (pid N). Stop it first.`, without the pid when it is not known. A different `--config` file does not change that. When the second one's ports are taken, it reports the ports first.
 
 ## nearhost up
 
@@ -47,11 +76,21 @@ Ctrl-C, a SIGTERM and closing the terminal all stop it the same way. It stops th
 
 `up` reads the config once, when it starts. To serve a project you add with `nearhost add` while it runs, stop `up` and start it again.
 
-When the hosts block needs to change, it asks for your password in the terminal. On Windows, the change goes through a User Account Control prompt, with no password.
+Once every project has tried to start, `up` checks that at least one is running, or is starting or reconnecting while it waits on its server. If none is, it prints the summary and `Nothing can be served, so nearhost up is stopping.`, stops as Ctrl-C does and exits 1, so a service manager sees the failure. It does the same when every change to the hosts block is refused.
+
+When the hosts block needs to change, it asks for your password in the terminal. Without a terminal, as under a service manager, CI or `nohup`, it cannot ask for your password, so it skips the hosts change and prints, once: `The hosts file needs sudo, and there is no terminal to ask in. Run nearhost up in a terminal once, or pass --no-hosts.` Do not give Nearhost a passwordless `sudo` rule to get around this: its binary is usually writable by you, so the rule would give your account root. On Windows, the change goes through a User Account Control prompt, with no password.
+
+On Linux, when this user may not bind port 80 or 443, `up` prints the `setcap` command for its binary under the error, then `Do not run nearhost with sudo.` It prints neither when the port is in use by another program, or when the system lets any user bind port 80.
 
 ## nearhost add
 
-Adds a project. It discovers the routes from the project's files, prints them and saves the project. At a terminal it asks when it needs to: whether to trust the official presets, which suggested presets to enable, which port is the web app, whether to add a server it does not know, and whether to approve hosts, a main name or Docker access that the project's `.nearhostrc` or presets ask for. Without a terminal it stops rather than approve them. It starts nothing and changes no file in the project.
+Adds a project. It discovers the routes from the project's files, prints them and saves the project. At a terminal it asks when it needs to: whether to trust the official presets, which suggested presets to enable, which port is the web app, whether to add a server it does not know, and whether to approve hosts, a main name or Docker access that the project's `.nearhostrc` or presets ask for, and loopback ports that its `.nearhostrc` adds. Without a terminal it stops rather than approve them. It starts nothing and changes no file in the project.
+
+Approval asks about each item on its own, as `<item>: approve? [y/N]`. Before it asks about a host or a main name, it says what approving a name does. A no drops that host, loopback port or `docker_clients`, and the add goes on. A refused main name falls back to the `.test` one, and the summary names what was left out. Nearhost asks about a refused item from the `.nearhostrc` again when it next reviews the project. See [Approval](/docs/reference/nearhostrc/#approval).
+
+Its last line says whether the Nearhost already running picks the project up. With the interface open, it says `The running Nearhost picks it up in a moment.` Under `nearhost up`, it says to stop `up` and start it again. With nothing running, it says to start it with `nearhost up`. When it cannot tell which kind of Nearhost runs, it says to stop it and start it again if the project does not appear. A project added with `--disabled` is listed by the interface, not started, and the line says how to start it.
+
+Ctrl-C, or any other signal that `nearhost up` stops on, ends the add cleanly: it closes the ssh connection, removes its temporary folder, saves nothing, prints `Interrupted, so the project was not added.` and exits 130. A second Ctrl-C ends it at once.
 
 | Flag              | Effect                                                                                                                                                 |
 | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -148,14 +187,23 @@ On Windows it adds the root to your user's certificate store, which Windows conf
 
 ## nearhost untrust
 
-Reverses `trust`: removes the local CA from the system and browser stores. It asks for your password, and runs `sudo` under the same rule as `trust`. On Windows it removes the root from your user's certificate store, with no password. The CA's key stays in its folder, so `nearhost trust` can add the same CA again. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
+Reverses `trust`: removes the local CA from the system and browser stores. It asks for your password, and runs `sudo` under the same rule as `trust`. On Windows it removes the root from your user's certificate store, with no password. Unless you pass `--delete-key`, the CA's key stays in its folder, so `nearhost trust` can add the same CA again. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
+
+When the system store does not hold the CA, it prints `Nearhost Local CA was not in the trust store.`, asks for no password, cleans the browser stores and exits 0. It exits non-zero when the system still trusts the root afterwards, or when a browser store still trusts it or `certutil` could not reach one, and names those stores.
+
+| Flag           | Effect                                                                                                                                         |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--delete-key` | After untrusting, delete the CA's folder with its private key, the site certificates it issued, and any copy Nearhost 0.7 left. It asks first. |
+| `-y`, `--yes`  | With `--delete-key`, delete without asking.                                                                                                    |
+
+`--delete-key` refuses while a Nearhost runs, without a terminal unless you also pass `--yes`, and under `sudo` on another user's files. If untrusting fails in a way you can fix, it deletes nothing and says what to fix. If trust remains that Nearhost cannot remove, it deletes the key anyway, then fails, names the old root by fingerprint and serial number, and keeps a copy of its certificate in `old-roots`.
 
 ## nearhost hosts
 
 - `apply` sets the nearhost block to the aliases read from stdin, one per line. It writes the file itself, so it runs as root: Nearhost calls it through `sudo`.
 - `clean` removes the block, and asks for your password through `sudo`.
 
-On Windows, Nearhost runs `apply` as administrator through User Account Control, and `clean` asks for your approval the same way.
+On Windows, Nearhost runs `apply` as administrator through User Account Control, and `clean` asks for your approval the same way. A hosts file with the read-only attribute is left as it is, with a message that says how to clear the attribute. See [The hosts file is read-only](/docs/troubleshooting/troubleshooting/#the-hosts-file-is-read-only).
 
 `apply` is left out of `nearhost --help` from Nearhost 0.8.0, because Nearhost runs it itself through `sudo`. Both take `--file <path>` to work on another file than `/etc/hosts`. See [The hosts file](/docs/concepts/the-hosts-file/).
 
@@ -163,21 +211,24 @@ On Windows, Nearhost runs `apply` as administrator through User Account Control,
 
 Checks the setup and changes nothing, apart from creating `~/.nearhost` on each server for the agents check. Each line is `ok`, `warn` or `FAIL`, with a fix where there is one, and only a failure makes it exit 1. After the machine checks, it checks each enabled project's files and setup and lists what it finds. See [Project checks](#project-checks). An error there also makes it exit 1. It takes `--https-port`, `--http-port`, `--web-port` and `--no-hosts`, and `--json` prints all of it as one JSON object. See [JSON output](#json-output).
 
-| Check                              | What it looks at                                                                                                                                                                                                                                                                                                                    |
-| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `config`                           | Whether the config file reads and is valid.                                                                                                                                                                                                                                                                                         |
-| `port 443`, `port 80`, `port 6327` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too. 6327 is Nearhost's page, or the port `--web-port` gives, and is left out with `--web-port 0`. A busy 6327 only warns. The 6327 check is from Nearhost 0.8.0. On Windows, a port held by HTTP.sys says how to find the service that holds it. |
-| `privileged ports`                 | On Linux, whether the binary may bind ports below 1024.                                                                                                                                                                                                                                                                             |
-| `local CA`                         | Whether it exists, whether the system trusts it, and when it expires.                                                                                                                                                                                                                                                               |
-| `old CA copy`                      | Only shown when `~/.config/nearhost/caddy` (or `$XDG_CONFIG_HOME/nearhost/caddy`), where Nearhost 0.7 and earlier kept the CA, is still there beside the new one. It warns, and the fix is to delete the old folder.                                                                                                                |
-| `browser stores`                   | Whether the Firefox and Chromium stores trust it.                                                                                                                                                                                                                                                                                   |
-| `ssh agent`                        | On Windows, whether the ssh-agent service is running. Only keys with a passphrase need it, so a stopped or disabled service is a note, with the commands to start it.                                                                                                                                                               |
-| `ssh`                              | On Windows, the version of `ssh.exe`. One older than the 9.5 that Windows 11 ships warns, and a missing one fails.                                                                                                                                                                                                                  |
-| `firefox`                          | Only shown on Windows when Firefox is set not to read Windows' trusted roots. It warns, and names the setting to change.                                                                                                                                                                                                            |
-| `aliases`                          | Only shown when a main name is not a valid domain. It fails, and the project does not start.                                                                                                                                                                                                                                        |
-| `hosts block`                      | Whether `/etc/hosts` has every name it needs: main names and web hosts, less exact names outside `.test` whose DNS answers are all loopback addresses. A block from Nearhost 0.7 or earlier, with no `::1` lines, warns. `nearhost up` fixes it.                                                                                    |
-| `server <name>`                    | Whether `ssh <host>` connects without a prompt, for each server.                                                                                                                                                                                                                                                                    |
-| `agents on <name>`                 | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.                                                                                                                                                                                                                                               |
+Each line prints as soon as its check finishes, so a slow server does not hold back the rest. At a terminal, a check that takes longer than 2 seconds prints `checking <name>…` on its own line to stderr. `--json` still prints one document at the end, with no such lines.
+
+| Check                              | What it looks at                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `config`                           | Whether the config file reads and is valid.                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `port 443`, `port 80`, `port 6327` | Whether the ports are free, and what holds them if not. 443 is checked for HTTP/3 too. 6327 is Nearhost's page, or the port `--web-port` gives, and is left out with `--web-port 0`. A busy 6327 only warns. The 6327 check is from Nearhost 0.8.0. On Windows, a port held by HTTP.sys says how to find the service that holds it. While Nearhost runs, a port it holds shows `in use by the running Nearhost` and passes. If no tool can name the holder while Nearhost runs, the check warns. |
+| `privileged ports`                 | On Linux, whether the binary may bind ports below 1024.                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `local CA`                         | Whether it exists, whether the system trusts it, and when it expires.                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `old CA copy`                      | Only shown when `~/.config/nearhost/caddy` (or `$XDG_CONFIG_HOME/nearhost/caddy`), where Nearhost 0.7 and earlier kept the CA, is still there beside the new one. It warns, and the fix is to delete the old folder.                                                                                                                                                                                                                                                                             |
+| `browser stores`                   | Whether the Firefox and Chromium stores trust it.                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `ssh agent`                        | On Windows, whether the ssh-agent service is running. Only keys with a passphrase need it, so a stopped or disabled service is a note, with the commands to start it.                                                                                                                                                                                                                                                                                                                            |
+| `ssh`                              | On Windows, the version of `ssh.exe`. One older than the 9.5 that Windows 11 ships warns, and a missing one fails.                                                                                                                                                                                                                                                                                                                                                                               |
+| `ssh vendor`                       | On Windows, where the `ssh` that Nearhost runs lives. One outside `%SystemRoot%\System32\OpenSSH` and `%ProgramFiles%\OpenSSH`, such as Git for Windows' ssh, warns with its path, and the fix is to put `%SystemRoot%\System32\OpenSSH` first on `PATH`.                                                                                                                                                                                                                                        |
+| `firefox`                          | Only shown on Windows when Firefox is set not to read Windows' trusted roots. It warns, and names the setting to change.                                                                                                                                                                                                                                                                                                                                                                         |
+| `aliases`                          | Only shown when a main name is not a valid domain. It fails, and the project does not start.                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `hosts block`                      | Whether `/etc/hosts` has every name it needs: main names and web hosts, less exact names outside `.test` whose DNS answers are all loopback addresses. A block from Nearhost 0.7 or earlier, with no `::1` lines, warns. `nearhost up` fixes it.                                                                                                                                                                                                                                                 |
+| `server <name>`                    | Whether `ssh <host>` connects without a prompt, for each server.                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `agents on <name>`                 | Whether the server takes the socket coding agents reach Nearhost on. A refusal warns.                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 ### Project checks
 
@@ -216,6 +267,7 @@ A few depend on the project:
 - `routes.unserved-port`, `routes.unserved-host` and `routes.stale-port` are for a project without a `.nearhostrc`. A project with one takes its routes from the file.
 - `routes.not-listening` and the `docker.*` findings are for a project on this machine. `routes.not-listening` is a warning only when Nearhost is running the project, which `nearhost doctor` does not know, so there it is always info.
 - `nearhost doctor` leaves out `hosts.unresolved` for a name the `hosts block` check already names. With `--no-hosts` it is not checked at all.
+- The `docker.*` findings read the Compose file and its override file as Compose does, and name the override when the service is defined there. A Compose file that is not valid YAML is reported, and a `COMPOSE_FILE` setting is noted. See [Discovery](/docs/concepts/discovery/#what-presets-add).
 - The `docker.*` findings come with the snippet to paste. [Callbacks from Docker containers to a local HTTPS domain](/docs/guides/container-callbacks/) explains each one.
 
 ### JSON output
@@ -314,14 +366,22 @@ Checks GitHub for the latest release and updates Nearhost the way it was install
 | The shell installer                           | The installer again, with `NEARHOST_INSTALL_DIR` set to the binary's folder     |
 | The PowerShell installer, or a zip on Windows | Downloads the release's zip from GitHub and replaces `nearhost.exe` where it is |
 
-Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. On macOS and Linux, when the binary's folder is not writable, it prints the installer command with `sudo` rather than running anything. On Linux, after a Homebrew or `go install` update, it prints the `setcap` command to run again, and after a shell installer update the installer prints it. On Linux, after an update from npm, pnpm or bun, run the command that `nearhost doctor` prints.
+Run through `npx`, it tells you to run `npx @nearhost/cli@latest` instead, since npx fetches a fresh copy. On macOS and Linux, when the binary's folder is not writable, it prints the installer command with `sudo` rather than running anything. For the shell installer, it downloads the script to a file and runs it only once the whole script has arrived, and installs the version it checked.
 
-On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. For a copy from the PowerShell installer or a zip it runs no other program: it downloads the release's zip itself and installs it only if it matches the release's `checksums.txt`. If the update fails, you keep the copy you had, and the error says so. When you cannot write to the binary's folder, it prints the installer command to run in Windows Terminal opened as administrator, rather than running anything.
+After the update, it runs `nearhost version` on the copy your next command starts: the Homebrew link, the pnpm shim on your `PATH`, or the binary itself. If that copy is still the old version, it prints `The update ran, but <path> is still <old>. Run it again, or install by hand: <command>.` and exits 1. It does the same when that copy does not start or prints no version. A copy built with `go install` reports its release version, so it is checked the same way.
 
-| Flag          | Effect                                                                                    |
-| ------------- | ----------------------------------------------------------------------------------------- |
-| `-y`, `--yes` | Update without asking.                                                                    |
-| `--check`     | Only report. Exits 1 when a newer release is out or when it cannot find out, 0 otherwise. |
+On Linux, replacing the binary drops its permission to bind ports 80 and 443. After any update, `nearhost update` prints the `setcap` command for the real binary file: the file behind Homebrew's link, or the platform package's binary behind pnpm's shim. It prints nothing when the binary keeps the capability, or when the system lets any user bind port 80. After a shell installer update, the installer prints the command as well.
+
+A release shows on GitHub a few minutes before its files are uploaded. Until this system's file is there, `nearhost update` does not offer that release.
+
+On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. For a copy from the PowerShell installer or a zip it runs no other program: it downloads the release's zip itself, to `nearhost.exe.new` beside the running copy, and installs it only if it matches the release's `checksums.txt`. Only then does the running copy move aside for the new one, with retries while a virus scanner holds the file. A failed, cancelled or slow download leaves the running copy as it was; the download has 5 minutes. A Ctrl-C after the download waits until the swap finishes. If the update fails, you keep the copy you had, and the error says so. When you cannot write to the binary's folder, it prints the installer command to run in Windows Terminal opened as administrator, rather than running anything.
+
+| Flag          | Effect                                                                                                                       |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `-y`, `--yes` | Update without asking.                                                                                                       |
+| `--check`     | Only report. Exits 0 when up to date, 1 when a newer release is out, and 2 when the check failed, with the reason on stderr. |
+
+At the `[Y/n]` question, an empty line is yes. End of input, or input that cannot be read, is No: nothing runs and the exit is 0. Without a terminal it asks nothing: it prints the command to run, or says to pass `--yes`, and exits 0.
 
 Nearhost also checks for a new release at most once a day, in the background, and prints a line after the command when one is out. The interface shows it in its log. When the day's check has to ask GitHub, a command that has finished waits up to 2 seconds for the answer. Later commands that day read the answer from a cache and don't wait. Set `NEARHOST_NO_UPDATE_CHECK=1` to turn the check off.
 

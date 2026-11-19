@@ -7,7 +7,7 @@ sidebar:
 
 A `.nearhostrc` is a YAML file in a project's root directory. You commit it with the project, so everyone who adds the project gets the same ports, hosts and main name, and each worktree can fill them from its own `.env`.
 
-The file only ever proposes. A host or main name that is not `.test`, a wildcard, `localhost` and Docker access all wait for your approval before they go live. See [Approval](#approval).
+The file only ever proposes. A host or main name that is not `.test`, a wildcard, `localhost`, a new loopback port and Docker access all wait for your approval before they go live. See [Approval](#approval).
 
 ```yaml
 version: 1
@@ -104,14 +104,15 @@ These need your approval before they go live:
 - a wildcard pattern, even one under `.test`;
 - `localhost`;
 - a main name that does not end in `.test`;
+- a `loopback` port that the approved project did not forward as loopback, since Nearhost binds that port on `localhost` on this machine;
 - `docker_clients: true`.
 
-A `.test` host, a port, a label or a role needs none. Neither does a host the project already serves.
+A `.test` host, a web port, a label or another role needs none. Neither does a host the project already serves, a new label on a loopback port you approved, or a loopback port that a preset such as Vite's proposes. A loopback port is shown for approval as `localhost:5173 (binds localhost:5173 on this machine)`, after the hosts.
 
 Each front end asks in its own way:
 
 - **The interface.** When you add a project, the last step lists what needs approval, and `enter` approves it and saves. When a project's file changes later, the project shows `.nearhostrc asks for 1 change that needs approval · a to review`. Press `a` to see what it asks for, then `y` to approve, `n` to decline or `esc` to leave it for later. A declined change is not asked about again until the file changes or Nearhost restarts.
-- **`nearhost add`.** At a terminal it lists each item and asks `Approve these? [y/N]`. A host typed with `--host`, or a main name typed with `--alias`, is approved by typing it. Without a terminal it adds nothing, and names the items. For the file at the top of this page:
+- **`nearhost add`.** At a terminal it first says what approving a name does, then asks about each item on its own, as `<item>: approve? [y/N]`. A no drops that host, loopback port or `docker_clients`, and the add goes on without it. A refused main name falls back to the `.test` one, and the summary names what was left out. Nearhost asks about a refused item again when it next reviews the project. A host typed with `--host`, or a main name typed with `--alias`, is approved by typing it. Without a terminal it adds nothing, and names the items. For the file at the top of this page:
 
   ```text
   nearhost: not added: this project asks for things that need your approval (*.status.local.example.com, api.local.example.com, ws.local.example.com, files.local.example.com, app.local.example.com, docker_clients); run nearhost add in a terminal, or open nearhost
