@@ -61,11 +61,11 @@ Without the page, an agent that asks to show a document is told `Nearhost's page
 
 ## nearhost.localhost does not resolve
 
-Safari cannot find the server at `https://nearhost.localhost:6327`, or a command-line tool cannot resolve the name. Chrome and Firefox resolve `nearhost.localhost` themselves. Safari and those tools ask the system, which reads the hosts file, and the line for `nearhost.localhost` is not there yet.
+A browser or a command-line tool cannot find `https://nearhost.localhost:6327`. Current macOS, Windows 11, Linux with systemd-resolved, Chrome and Firefox resolve `nearhost.localhost` themselves. An older system, or a resolver that does not, needs the name in the hosts file.
 
-Nearhost adds the line each time it writes [its block](/docs/concepts/the-hosts-file/), and does not ask for your password for that line alone. So the line is missing until a project's start next changes the block. With `--no-hosts`, or with no projects, Nearhost writes no block.
+Open `https://localhost:6327` instead. It shows the page without the document list. A document link works there too, with `localhost` in place of `nearhost.localhost`.
 
-Until then, open `https://localhost:6327`. It shows the page without the document list. A document link works there too, with `localhost` in place of `nearhost.localhost`. To have the name now, add these lines to the hosts file yourself, outside Nearhost's block:
+Nearhost adds the line for `nearhost.localhost` each time it writes [its block](/docs/concepts/the-hosts-file/), and does not ask for your password for that line alone, so the line arrives when a project's start next changes the block. With `--no-hosts`, or with no projects, Nearhost writes no block. Then add these lines to the hosts file yourself, outside Nearhost's block:
 
 ```text
 127.0.0.1 nearhost.localhost
