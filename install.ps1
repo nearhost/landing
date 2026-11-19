@@ -34,6 +34,7 @@ function Install-Nearhost {
   }
 
   $version = $env:NEARHOST_VERSION
+  $pinned = [bool]$version
   if (-not $version) {
     $latest = "https://github.com/$repo/releases/latest"
     $tag = ''
@@ -90,6 +91,12 @@ function Install-Nearhost {
           Copy-Item -LiteralPath (Join-Path $base $name) -Destination $file
         }
       } catch {
+        # Windows PowerShell 5.1 and PowerShell 7 both put the HTTP response on the exception.
+        $status = 0
+        if ($remote -and $_.Exception.Response) { $status = [int]$_.Exception.Response.StatusCode }
+        if ($status -eq 404 -and -not $pinned) {
+          throw "nearhost install: Nearhost $version is still being published. Try again in a few minutes, or set NEARHOST_VERSION to install an earlier release."
+        }
         throw "nearhost install: download failed: $base/$name"
       }
       $file
