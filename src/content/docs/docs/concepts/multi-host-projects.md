@@ -27,6 +27,7 @@ A host is an exact name, such as `api.local.example.com`, or a pattern with `*` 
 - `*` can be the leftmost label or one in the middle, as in `internal.*.local.example.com`.
 - The part to the right of the last `*` must be at least two labels, and more than a public suffix. A pattern that is only wildcards is refused, and so are `*.test`, `*.com` and `*.co.uk`. `*.myapp.test` is allowed.
 - `localhost` is allowed as an exact host. Any other name needs at least two labels, and an IP address is refused.
+- `nearhost.localhost` is refused with `nearhost.localhost is Nearhost's own page`, since [Nearhost's page](/docs/concepts/tls-and-the-proxy/) is served there.
 - Hosts are lowercase.
 
 ## Which route answers
@@ -61,7 +62,7 @@ A preset can name hosts as well as ports. The [`nearhost/sail`](/docs/concepts/p
 
 Only the host is taken from each value. A port in the URL is ignored, and the route's port comes from the variable beside it. The Reverb and MinIO hosts are read only when their port variable is set in `.env` or named in the Compose file.
 
-- Inference never proposes `localhost`, an IP address or a name without a dot. A malformed name is left out with a warning.
+- Inference never proposes `localhost`, an IP address or a name without a dot. A malformed name is left out with a warning, and so is `nearhost.localhost`, as `nearhost.localhost is Nearhost's own page, so it is left out`.
 - A route that has inferred hosts becomes a web route. A `loopback` route cannot have hosts, so they are dropped with a warning.
 - A `.nearhostrc` that lists a route wins over the hosts presets found for it. See [Keys](/docs/reference/nearhostrc/#keys).
 - `nearhost add` leaves out an inferred host that another enabled project already serves, with a note: `Not serving <host>: project "<other>" already serves it.` A later web route left with no hosts becomes `ignore`. A project added with `--disabled` keeps them, since it serves nothing yet. The interface does not leave them out: it refuses to save, and you remove the host with `h`.

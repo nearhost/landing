@@ -55,7 +55,22 @@ Run `nearhost up` once at a terminal so it can update the block, or add the name
 
 ## Port 6327 already in use
 
-Nearhost starts, serves every project and leaves out Nearhost's page, and the log says `port 6327 is in use; serving without Nearhost's page`. `nearhost doctor` warns about it. Another program holding the port is the usual cause. If it is another Nearhost, see [Another Nearhost is already running](#another-nearhost-is-already-running) and stop it. Otherwise pass `--web-port` with a free port, or `--web-port 0` to turn off the page's own port, leaving it at `https://localhost`. From Nearhost 0.8.0.
+Nearhost starts, serves every project and leaves out Nearhost's page, and the log says `port 6327 is in use; serving without Nearhost's page (pass --web-port to choose another)`. The reason after the port number varies: it may name the program holding the port, or read `needs permission to bind` or `is not available`. `nearhost doctor` warns about it. Another program holding the port is the usual cause. If it is another Nearhost, see [Another Nearhost is already running](#another-nearhost-is-already-running) and stop it. Otherwise pass `--web-port` with a free port, or `--web-port 0` to turn the page off. From Nearhost 0.8.0.
+
+Without the page, an agent that asks to show a document is told `Nearhost's page isn't served: port 6327 wasn't available when Nearhost started`.
+
+## nearhost.localhost does not resolve
+
+A browser or a command-line tool cannot find `https://nearhost.localhost:6327`. Current macOS, Windows 11, Linux with systemd-resolved, Chrome and Firefox resolve `nearhost.localhost` themselves. An older system, or a resolver that does not, needs the name in the hosts file.
+
+Open `https://localhost:6327` instead. It shows the page without the document list. A document link works there too, with `localhost` in place of `nearhost.localhost`.
+
+Nearhost adds the line for `nearhost.localhost` each time it writes [its block](/docs/concepts/the-hosts-file/), and does not ask for your password for that line alone, so the line arrives when a project's start next changes the block. With `--no-hosts`, or with no projects, Nearhost writes no block. Then add these lines to the hosts file yourself, outside Nearhost's block:
+
+```text
+127.0.0.1 nearhost.localhost
+::1 nearhost.localhost
+```
 
 ## A loopback port is already bound
 

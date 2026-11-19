@@ -9,7 +9,7 @@ With the [`nearhost` skill installed](/docs/coding-agents/#install-the-skill), w
 
 1. The agent asks, and Nearhost opens a prompt over the interface: `Claude Code on mini wants to show plans/2026-10-28-x.md`, with a line saying which folder Nearhost will serve.
 2. Answer the prompt. See [Prompts and Always allow](/docs/coding-agents/prompts-and-always-allow/#the-prompt) for the keys, and [Always allow](/docs/coding-agents/prompts-and-always-allow/#always-allow) to stop being asked. If you refuse, the agent does not offer that folder again in the session and only gives you the path.
-3. Once you allow it, your browser opens the document and the agent gives you the address. It looks like `https://localhost:<web port>/d/<random>/plans/2026-10-28-x.md`, where `<web port>` is Nearhost's web port, and `<random>` is a long random string that other pages cannot guess.
+3. Once you allow it, your browser opens the document and the agent gives you the address. It looks like `https://nearhost.localhost:<web port>/d/<random>/plans/2026-10-28-x.md`, where `<web port>` is Nearhost's web port, and `<random>` is a long random string that other pages cannot guess.
 
 With Always allow, the document opens in your browser at once, and Nearhost shows `Claude Code on mini opened plans/2026-10-28-x.md` in the status line. That holds for folders you have approved; a document in another folder prompts first. A server may open 5 documents a minute without a prompt, and past that you are asked. The same document opened again by the same agent within 5 seconds opens no second tab.
 
@@ -25,7 +25,7 @@ Nearhost keeps no copies. Each time the page loads, it reads the file again, fro
 
 ## Documents cannot reach your other pages
 
-Every file Nearhost serves from a document's folder is sandboxed by the browser. Its scripts run, but they cannot read other pages on `localhost`, your projects' cookies or storage, or other documents. Rendered markdown runs no scripts at all. Pages also send no referrer, so the address does not leak to sites a document links to.
+Every file Nearhost serves from a document's folder is sandboxed by the browser. Its scripts run, but they cannot read Nearhost's page, your projects' cookies or storage, or other documents. Rendered markdown runs no scripts at all. Pages also send no referrer, so the address does not leak to sites a document links to.
 
 A page's script can load the folder's scripts, stylesheets, fonts, images, audio, video and WebAssembly, but cannot read its other files, such as `config/secrets.json`. It can still read the files it may load, such as the folder's scripts, stylesheets, fonts and images, since modules and styles need that to load. So an HTML report that fetches its own JSON data does not work; put the data in the page or in a script.
 
@@ -37,6 +37,6 @@ Nearhost lists served folders on each server's panel; press `tab` to reach its `
 - you press `x` on it in the server's panel and confirm;
 - you remove the server from Nearhost, or rename it.
 
-Disconnecting a server does not remove its folders. Their pages say the server is not connected until it reconnects. The agent's session ending does not remove them either, so you can read yesterday's plan again while Nearhost runs. Home's web page also lists the folders served since Nearhost started, with links to each document. It lists them only in a browser that has opened a document link, or opened the page from Nearhost's interface: either one sets the cookie that the list needs. Elsewhere the page shows no list. Browsers send that cookie to every port on `localhost`, so a dev server or container you browse at `localhost` receives it and could fetch the list. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/).
+Disconnecting a server does not remove its folders. Their pages say the server is not connected until it reconnects. The agent's session ending does not remove them either, so you can read yesterday's plan again while Nearhost runs. Home's web page also lists the folders served since Nearhost started, with links to each document. It lists them only in a browser that has opened a document link, or opened the page from Nearhost's interface: either one sets the cookie that the list needs. Elsewhere the page shows no list. Nearhost sets and reads that cookie at `nearhost.localhost` only, so a dev server or container you browse at `localhost` does not receive it. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/).
 
-If Nearhost has no web port, because `--web-port 0` turned it off or the port was taken, and a project holds `localhost`, there is no page to serve from, and the agent is told so.
+If Nearhost has no web port, there is no page to serve from, and the agent is told so. With `--web-port 0` the message is `Nearhost's page isn't served: --web-port is 0`. When the port was taken, it is `Nearhost's page isn't served: port 6327 wasn't available when Nearhost started`, with the port you asked for.
