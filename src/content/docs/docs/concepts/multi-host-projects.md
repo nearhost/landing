@@ -27,6 +27,7 @@ A host is an exact name, such as `api.local.example.com`, or a pattern with `*` 
 - `*` can be the leftmost label or one in the middle, as in `internal.*.local.example.com`.
 - The part to the right of the last `*` must be at least two labels, and more than a public suffix. A pattern that is only wildcards is refused, and so are `*.test`, `*.com` and `*.co.uk`. `*.myapp.test` is allowed.
 - `localhost` is allowed as an exact host. Any other name needs at least two labels, and an IP address is refused.
+- `nearhost.localhost` is refused with `nearhost.localhost is Nearhost's own page`, since [Nearhost's page](/docs/concepts/tls-and-the-proxy/) is served there.
 - Hosts are lowercase.
 
 ## Which route answers

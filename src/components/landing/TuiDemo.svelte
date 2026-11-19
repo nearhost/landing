@@ -1538,7 +1538,7 @@
                 </div>
                 <div class="l">
                   <span class="d">{pad('page', 10)}</span><span class="b u"
-                    >https://localhost:6327</span
+                    >https://nearhost.localhost:6327</span
                   >
                 </div>
                 <div class="l">

@@ -15,12 +15,16 @@ Nearhost owns one block and touches nothing else in the file:
 # nearhost:start
 127.0.0.1 myapp.test
 ::1 myapp.test
+127.0.0.1 nearhost.localhost
+::1 nearhost.localhost
 127.0.0.1 other.test
 ::1 other.test
 # nearhost:end
 ```
 
 Each name has a `127.0.0.1` line and a `::1` line, so a browser that tries IPv6 first still reaches Nearhost. Nearhost 0.7 and earlier wrote only the `127.0.0.1` line. The block always lists `.test` names, running or not, sorted. Any other [main name](/docs/reference/config/#main-name) is listed only while its project is enabled, and only if DNS does not already resolve it to loopback addresses alone. Each enabled project's exact web hosts are listed too, under the same DNS rule for names that do not end in `.test`. `localhost` is never listed, because your system already maps it to loopback and Nearhost leaves that mapping alone. If the machine's nameserver runs on this machine, as systemd-resolved's does on Linux, Nearhost cannot tell what DNS would say, because that nameserver reads the hosts file too. It keeps the name in the block, so the entry stays where it is. Nearhost 0.7 and earlier dropped it. Wildcard patterns are never listed either, because a hosts file cannot express them: a pattern's names need DNS that sends them to 127.0.0.1, and `nearhost doctor` reports any that do not resolve. With no projects, the block is removed rather than left empty.
+
+Each block Nearhost writes also holds `nearhost.localhost`, the name of [Nearhost's page](/docs/concepts/tls-and-the-proxy/), for Safari and for command-line tools that leave the name to the system. Chrome and Firefox resolve it themselves. A block that lacks only that line counts as up to date, so Nearhost does not ask for your password to add it alone, and `nearhost doctor` does not report it. The line arrives the next time the block changes.
 
 ## How changes are applied
 

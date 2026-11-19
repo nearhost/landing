@@ -54,13 +54,13 @@ nearhost needs a terminal for its interface. Use nearhost up to serve without on
 
 On Windows the message adds `In Git Bash, run it through winpty or use Windows Terminal.` `nearhost --help`, `-h` and `help` print the help and exit 0 without a terminal.
 
-| Flag                  | Effect                                                                                                      |
-| --------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `--https-port <port>` | Serve HTTPS on this port instead of 443.                                                                    |
-| `--http-port <port>`  | Redirect HTTP on this port instead of 80.                                                                   |
-| `--web-port <port>`   | Serve Nearhost's page at `https://localhost:<port>` instead of 6327. `0` turns it off. From Nearhost 0.8.0. |
-| `--no-hosts`          | Leave `/etc/hosts` alone. Add the aliases yourself.                                                         |
-| `--no-capture`        | Keep no requests or responses in memory. See [The request log](/docs/concepts/the-request-log/).            |
+| Flag                  | Effect                                                                                                                     |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `--https-port <port>` | Serve HTTPS on this port instead of 443.                                                                                   |
+| `--http-port <port>`  | Redirect HTTP on this port instead of 80.                                                                                  |
+| `--web-port <port>`   | Serve Nearhost's page at `https://nearhost.localhost:<port>` instead of 6327. `0` turns the page off. From Nearhost 0.8.0. |
+| `--no-hosts`          | Leave `/etc/hosts` alone. Add the aliases yourself.                                                                        |
+| `--no-capture`        | Keep no requests or responses in memory. See [The request log](/docs/concepts/the-request-log/).                           |
 
 Only one Nearhost runs at a time. A second one, the interface or `nearhost up`, stops with `Another Nearhost is already running (pid N). Stop it first.`, without the pid when it is not known. A different `--config` file does not change that. When the second one's ports are taken, it reports the ports first.
 

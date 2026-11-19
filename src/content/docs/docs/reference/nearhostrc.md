@@ -64,7 +64,7 @@ The file is the authority on the routes it lists. Their hosts replace any that p
 - Only web routes have hosts.
 - The main name may be listed as a host only on the first web route, where it is served anyway.
 - `docker_clients` works only for a project on this machine, not one on a server.
-- Hosts and the main name must be lowercase. The main name cannot be a wildcard pattern, `localhost` or an IP address.
+- Hosts and the main name must be lowercase. The main name cannot be a wildcard pattern, `localhost`, `nearhost.localhost` or an IP address. No host can be `nearhost.localhost`.
 
 ## Variables
 
