@@ -92,16 +92,16 @@ Its last line says whether the Nearhost already running picks the project up. Wi
 
 Ctrl-C, or any other signal that `nearhost up` stops on, ends the add cleanly: it closes the ssh connection, removes its temporary folder, saves nothing, prints `Interrupted, so the project was not added.` and exits 130. A second Ctrl-C ends it at once.
 
-| Flag              | Effect                                                                                                                                                 |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `--server <name>` | The server the path is on. The default is `local`.                                                                                                     |
-| `--name <name>`   | The project name. The default is the directory's name.                                                                                                 |
-| `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost` or an IP address. Typing it approves it. |
-| `--web <port>`    | The port to serve at the alias.                                                                                                                        |
-| `--host <host>`   | Add this host to the primary web route. Repeat for more. Typing it approves it.                                                                        |
-| `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                    |
-| `--no-presets`    | Use no presets and suggest none.                                                                                                                       |
-| `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                              |
+| Flag              | Effect                                                                                                                                                                       |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--server <name>` | The server the path is on. The default is `local`.                                                                                                                           |
+| `--name <name>`   | The project name. The default is the directory's name.                                                                                                                       |
+| `--alias <alias>` | The main name. The default is `<name>.test`. Any lowercase domain name works, but not a wildcard, `localhost`, `nearhost.localhost` or an IP address. Typing it approves it. |
+| `--web <port>`    | The port to serve at the alias.                                                                                                                                              |
+| `--host <host>`   | Add this host to the primary web route. Repeat for more. Typing it approves it.                                                                                              |
+| `--preset <name>` | Enable this preset without asking. Repeat for more.                                                                                                                          |
+| `--no-presets`    | Use no presets and suggest none.                                                                                                                                             |
+| `--disabled`      | Add it disabled: `nearhost up` starts it only when named.                                                                                                                    |
 
 From Nearhost 0.8.0, `nearhost add` refuses a name with letters or digits outside ASCII, such as `café`, since the `.test` name made from it would lose them. Pass `--name` with a-z, 0-9 and `-`, or give the main name with `--alias` or in the project's `.nearhostrc`.
 
