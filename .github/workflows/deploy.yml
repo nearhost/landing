@@ -13,9 +13,14 @@ on:
 permissions:
   contents: read
 
+# One run at a time per pull request and per branch. A pull request's runs are keyed by its number,
+# because github.ref is the base branch once it has merged: keyed by ref, the run that removes a
+# merged preview joined main's group and replaced the deploy of main waiting there. A newer run
+# cancels the one before it, except on main, and except when a pull request closes: the removal
+# waits for a deploy of the same preview to end, so it never stops a push half way.
 concurrency:
-  group: pages-${{ github.ref }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+  group: pages-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event.action != 'closed' && github.ref != 'refs/heads/main' }}
 
 jobs:
   build:
@@ -113,10 +118,12 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    # Every deploy pushes to gh-pages, so deploys queue rather than race.
+    # Every deploy pushes to gh-pages, so deploys queue rather than race. Without queue: max the
+    # group holds one waiting job, and a newer one cancels it.
     concurrency:
       group: gh-pages
       cancel-in-progress: false
+      queue: max
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - if: github.event.action != 'closed'
@@ -130,6 +137,9 @@ jobs:
         with:
           folder: site
           branch: gh-pages
+          # A push that gh-pages rejects is rebased and sent again. The default is a force push,
+          # which the branch's ruleset refuses unless it is a fast-forward.
+          force: false
           # Previews and the daily stats snapshot (stats.yml) live beside the site, not in it.
           clean-exclude: |
             pr-preview/
