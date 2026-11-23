@@ -33,7 +33,7 @@ Nearhost stops at start with:
 Another Nearhost is already running (pid N). Stop it first.
 ```
 
-Two Nearhosts would end each other's ssh connections, so only one runs at a time, whatever `--config` file each is given. The pid is left out when it is not known. Stop the other one, which may be an interface in another terminal or a `nearhost up` under a service manager, then start Nearhost again.
+Two Nearhosts would end each other's ssh connections, so only one runs at a time, whatever `--config` file each is given. The pid is left out when it is not known. `nearhost up` and `nearhost daemon` end the message with the commands that deal with it. Run `nearhost status` to see what runs and what started it, and `nearhost stop` to stop it, whether it runs in the background, was started by a service, or is a `nearhost up` in another terminal. Then start Nearhost again. A service starts the background Nearhost at login, so after `nearhost stop` it stays stopped until you start it again or log in.
 
 ## nearhost up stops with nothing to serve
 
@@ -41,7 +41,7 @@ Two Nearhosts would end each other's ssh connections, so only one runs at a time
 
 ## Nearhost without a terminal
 
-Bare `nearhost` prints `nearhost needs a terminal for its interface. Use nearhost up to serve without one.` and exits 1. It was started from a service, a cron job, a script or a pipe, where there is no terminal for the interface. Run `nearhost up` there instead. On Windows the message adds `In Git Bash, run it through winpty or use Windows Terminal.`
+Bare `nearhost` prints `nearhost needs a terminal for its interface. Use nearhost -d to serve in the background, or nearhost up to serve without one.` and exits 1. It was started from a cron job, a script or a pipe, where there is no terminal for the interface. Run `nearhost -d` there to serve in the background, or `nearhost up` to serve in the foreground. To start Nearhost at login, use `nearhost service install`. On Windows the message adds `In Git Bash, run it through winpty or use Windows Terminal.`
 
 `nearhost up` without a terminal cannot ask for your password. When the hosts block needs to change, it skips the change and prints, once:
 

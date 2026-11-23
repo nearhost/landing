@@ -35,7 +35,7 @@ Start it. The first time, it offers to trust its local certificate authority so 
 nearhost
 ```
 
-Then press `s` to add a server, `n` to add a project on it or on this machine, and `o` to open it. Nearhost starts each project as soon as it is added, and every enabled project each time it opens. `q` quits and stops them all.
+Then press `s` to add a server, `n` to add a project on it or on this machine, and `o` to open it. Nearhost starts each project as soon as it is added, and every enabled project each time it opens. `q` quits, and asks whether to stop them all or leave Nearhost running in the background.
 
 The same steps from the command line, which offers to add `mini` when it is not a server yet:
 
