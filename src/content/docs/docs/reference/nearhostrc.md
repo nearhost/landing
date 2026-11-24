@@ -73,7 +73,7 @@ The file is the authority on the routes it lists. Their hosts replace any that p
 A variable with no value and no default is an error that names it:
 
 ```text
-.nearhostrc: ${APP_PORT} has no value in .env.local or .env, and no default
+.nearhostrc line 3: ${APP_PORT} has no value in .env.local or .env, and no default
 ```
 
 A variable can fill part of a value, as in `app.${APP_DOMAIN}`. Worktrees of one repository can then share the committed file and each serve its own hosts. Approval works on the filled values, so you approve the names that will actually be served, and a change in `.env` that gives a new real domain asks again.

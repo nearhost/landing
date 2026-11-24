@@ -27,13 +27,29 @@ Stop that service, for IIS with `net stop w3svc`, or run Nearhost with `--http-p
 
 ## Another Nearhost is already running
 
-Nearhost stops at start with:
+`nearhost up` and `nearhost daemon` stop at start with:
 
 ```text
-Another Nearhost is already running (pid N). Stop it first.
+Another Nearhost is already running (pid N). Stop it with `nearhost stop`, or see it with `nearhost status`.
 ```
 
-Two Nearhosts would end each other's ssh connections, so only one runs at a time, whatever `--config` file each is given. The pid is left out when it is not known. `nearhost up` and `nearhost daemon` end the message with the commands that deal with it. Run `nearhost status` to see what runs and what started it, and `nearhost stop` to stop it, whether it runs in the background, was started by a service, or is a `nearhost up` in another terminal. Then start Nearhost again. A service starts the background Nearhost at login, so after `nearhost stop` it stays stopped until you start it again or log in.
+`nearhost` opens the interface on the one that runs instead, and `nearhost -d` says it is already running.
+
+Two Nearhosts would end each other's ssh connections, so only one runs at a time, whatever `--config` file each is given. The pid is left out when it is not known. Run `nearhost status` to see what runs and what started it, and `nearhost stop` to stop it, whether it runs in the background, was started by a service, or is a `nearhost up` in another terminal. Then start Nearhost again. A service starts the background Nearhost at login, so after `nearhost stop` it stays stopped until you start it again or log in.
+
+## Nearhost in the background does not start
+
+`nearhost -d` prints `Nearhost stopped while starting. The end of <path>:` with the last lines of the core's log, and exits 1. Those lines say why it stopped, often a port in use or a config error. If it prints `Nearhost is still starting. See <path> for how it is going.`, it has not answered in 15 seconds and goes on starting: read the log it names. The log is `core.log` in the config folder. See [The core's log](/docs/guides/run-in-the-background/#the-cores-log).
+
+## A service's Nearhost cannot open links, reach ssh or Docker
+
+A service does not run with your shell's environment. `nearhost doctor` shows it as a warning on `core: browser`, `core: ssh agent` or `core: docker`, with the fix beside it, and on `service` when the service's log folder is missing. Most come to running `nearhost service install` again from a shell where the thing works. See [What doctor says](/docs/guides/run-in-the-background/#what-doctor-says).
+
+## A project waits for the hosts file
+
+Nearhost in the background never asks for your password, so a project whose names are missing from `/etc/hosts` stays stopped under `nearhost -d` or a service. `nearhost status` and the log say `Run nearhost hosts update in a terminal.`, and `nearhost add` ends with `The running Nearhost serves it once the hosts file is up to date. Run nearhost hosts update in a terminal.`
+
+Run `nearhost hosts update` in a terminal. It updates the block, then tells Nearhost, which starts the project. Opening `nearhost` does the same, asking for the password in its box. See [The hosts file](/docs/guides/run-in-the-background/#the-hosts-file).
 
 ## nearhost up stops with nothing to serve
 
@@ -140,7 +156,7 @@ Both come from an upgrade, and both are warnings, not failures.
 
 `old CA copy` means `~/.config/nearhost/caddy` (or `$XDG_CONFIG_HOME/nearhost/caddy`), where Nearhost 0.7 and earlier kept the local CA, is still there beside the new folder in Nearhost's data folder. It holds a copy of the CA's private key. Check that `nearhost doctor` shows the CA as trusted, then delete the old folder. See [The local CA](/docs/concepts/tls-and-the-proxy/#the-local-ca).
 
-`hosts block` saying the block has no IPv6 (`::1`) entries means an older Nearhost wrote it. Run `nearhost up`, which rewrites the block with the `::1` lines and asks for your password.
+`hosts block` saying the block has no IPv6 (`::1`) entries means an older Nearhost wrote it. Run `nearhost hosts update` in a terminal, which rewrites the block with the `::1` lines and asks for your password.
 
 ## SSH keeps reconnecting
 
@@ -176,6 +192,10 @@ The server's sshd refuses the socket coding agents reach Nearhost on, usually be
 
 The skill on the server says `this request has no valid Nearhost token: update the Nearhost skill on this machine`. A Windows laptop answers only requests that carry a token, which the skill sends with curl. The server needs curl 7.55 or later and a skill installed since Windows support. Run `npx skills add nearhost/nearhost -g` again on the server or, if you installed it as a Claude Code plugin, update the plugin from `/plugin`. See [Windows laptops](/docs/coding-agents/how-it-works/#windows-laptops).
 
+## The control socket path is too long for ssh
+
+A project on a server goes into `error` with `control socket path <path> is too long for ssh: it is N bytes and at most M bytes fit; the run directory <dir> is too long, set a shorter XDG_CONFIG_HOME`. ssh's control socket lives in the `run` folder beside the config, and a long home or config path leaves no room for it. Set `XDG_CONFIG_HOME` to a shorter path, move the `nearhost` folder that holds your config there, then start Nearhost again.
+
 ## A server shows dropped
 
 You pressed `c` on it, which holds its connection closed. Its projects wait. Press `c` again to connect it.
@@ -186,7 +206,7 @@ The routes step says no ports were found and asks for the web port. Enter it, or
 
 ## Config file invalid
 
-Nearhost exits naming the file and the problem, with the line for a YAML error. Fix it in `~/.config/nearhost/config.yaml`, or `%APPDATA%\nearhost\config.yaml` on Windows. `nearhost doctor` reports the same without exiting. See [config.yaml](/docs/reference/config/).
+Nearhost does not start, and names the file and the problem, with the line for a YAML error. Under `nearhost -d` it shows as `Nearhost stopped while starting.` with the end of the core's log. A Nearhost already running keeps serving the last good config and says so in its log. Fix it in `~/.config/nearhost/config.yaml`, or `%APPDATA%\nearhost\config.yaml` on Windows. `nearhost doctor` reports the same without exiting. See [config.yaml](/docs/reference/config/).
 
 ## Windows stops nearhost.exe from starting
 
