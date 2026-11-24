@@ -23,7 +23,7 @@ A passthrough ends when any of these happens:
 - you disconnect the server in Nearhost, remove it, or its connection fails (for example, authentication);
 - the server has been away for 10 minutes in a row;
 - the forwarded port stops answering for 5 minutes, checked every 30 seconds while the server is connected;
-- you close it, or Nearhost quits.
+- you close it, or the background Nearhost stops (`nearhost stop`, or a restart by `nearhost update`). Quitting the interface alone leaves it open while the background Nearhost keeps running.
 
 The `SessionEnd` hook ships with the Claude Code plugin, so it runs only for plugin installs. With the skill installed through the skills CLI, or in another agent, the other conditions apply. If the laptop port was taken by something else while the server was away, that passthrough closes when the server comes back. If closing a passthrough's forward fails, Nearhost keeps its laptop port and tries again on each check until it closes.
 
