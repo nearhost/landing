@@ -131,10 +131,10 @@ On macOS, run `nearhost service install` from Terminal on the Mac's desktop, not
 The core never asks for your password and never raises a User Account Control prompt: a prompt with no one at the terminal, or a dialog at login with no context, is not a thing Nearhost does. When a project's names are missing from the [hosts file](/docs/concepts/the-hosts-file/), the core leaves the project stopped and says so:
 
 ```text
-docdemo  stopped  https://docdemo.test  project "docdemo"'s hosts are not resolvable: the hosts file was not updated (the hosts file needs updating, and Nearhost in the background never asks for sudo. Run `nearhost hosts update` in a terminal.)
+docdemo  stopped  https://docdemo.test  project "docdemo"'s hosts are not resolvable: the hosts file was not updated (the hosts file needs updating, and Nearhost in the background never asks for sudo.)
 ```
 
-The core's log says the same, with `Fix: nearhost hosts update` under it. Run `nearhost hosts update` in a terminal. It asks for your password through `sudo` (on Windows, for your approval in a User Account Control prompt), brings the block up to date for every enabled project, and tells the core, which starts the projects that were waiting. `nearhost add` does the same at its end, and so does the interface, with its password box.
+`nearhost status` also warns `Warning: docdemo waits for the hosts file to be updated.`, and the core's log has the same refusal with `Fix: nearhost hosts update` under it. Run `nearhost hosts update` in a terminal. It asks for your password through `sudo` (on Windows, for your approval in a User Account Control prompt), brings the block up to date for every enabled project, and tells the core, which starts the projects that were waiting. `nearhost add` does the same at its end, and so does the interface, with its password box.
 
 Most starts need no change: the hosts file is only changed when a project's names are new, so a service that starts at login finds the block right after the first time.
 

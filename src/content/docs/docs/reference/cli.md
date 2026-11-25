@@ -144,7 +144,13 @@ Only one Nearhost runs at a time. `nearhost` attaches to the one that runs, as l
 ```text
 Error: Another Nearhost is already running (pid 4121).
 
-Stop it with `nearhost stop`, or see it with `nearhost status`.
+Stop it:
+
+  nearhost stop
+
+Or see what it serves:
+
+  nearhost status
 ```
 
 ### nearhost -d
@@ -211,7 +217,7 @@ When another program holds the port, it says so instead: quit that program, or p
 
 Runs the background Nearhost in the foreground, with no interface: it serves every enabled project, applies changes to the config as they are saved, and logs to `core.log` in the config folder, which is where its standard output and error go too. It takes `--https-port`, `--http-port`, `--web-port`, `--no-hosts` and `--no-capture`, as `nearhost` does. It is what `nearhost -d` and a service start, so you rarely run it yourself.
 
-It never asks for sudo or a User Account Control approval. When the hosts block needs a change, the projects that need it stay stopped, and the log and `nearhost status` say to run `nearhost hosts update` in a terminal. See [nearhost hosts](#nearhost-hosts).
+It never asks for sudo or a User Account Control approval. When the hosts block needs a change, the projects that need it stay stopped. The log says `the hosts file needs updating, and Nearhost in the background never asks for sudo.`, and `nearhost status` warns `Warning: <project> waits for the hosts file to be updated.`; both give `nearhost hosts update` to run in a terminal. See [nearhost hosts](#nearhost-hosts).
 
 `--started-by <how>`, left out of `nearhost daemon --help`, records what started it: `foreground`, the default, `detached`, `tui` or `service`. `nearhost -d`, the interface and a service pass it. It is what `nearhost status`, `nearhost doctor` and Nearhost's page report, and it changes how the core is treated. A `service` core exits 0 when another Nearhost runs, and `nearhost update` restarts it through the service manager. A `tui` core is the one the interface may stop when you quit. Pass it by hand only to reproduce how one of those starts behaves.
 
