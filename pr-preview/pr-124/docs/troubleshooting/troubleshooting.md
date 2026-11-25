@@ -31,7 +31,13 @@ Stop that service, for IIS with `net stop w3svc`, or run Nearhost with `--http-p
 ```text
 Error: Another Nearhost is already running (pid N).
 
-Stop it with `nearhost stop`, or see it with `nearhost status`.
+Stop it:
+
+  nearhost stop
+
+Or see what it serves:
+
+  nearhost status
 ```
 
 `nearhost` opens the interface on the one that runs instead, and `nearhost -d` says it is already running.
@@ -64,7 +70,7 @@ A service does not run with your shell's environment. `nearhost doctor` shows it
 
 ## A project waits for the hosts file
 
-Nearhost in the background never asks for your password, so a project whose names are missing from `/etc/hosts` stays stopped under `nearhost -d` or a service. `nearhost status` and the log say to run `nearhost hosts update` in a terminal, and `nearhost add` ends with `Warning: The running Nearhost serves the project once the hosts file is up to date.` and the same command.
+Nearhost in the background never asks for your password, so a project whose names are missing from `/etc/hosts` stays stopped under `nearhost -d` or a service. `nearhost status` warns `Warning: <project> waits for the hosts file to be updated.` and the log says the hosts file needs updating, both with `nearhost hosts update` to run in a terminal, and `nearhost add` ends with `Warning: The running Nearhost serves the project once the hosts file is up to date.` and the same command.
 
 Run `nearhost hosts update` in a terminal. It updates the block, then tells Nearhost, which starts the project. Opening `nearhost` does the same, asking for the password in its box. See [The hosts file](https://nearhost.dev/pr-preview/pr-124/docs/guides/run-in-the-background.md#the-hosts-file).
 
@@ -154,10 +160,14 @@ Clear the read-only attribute in an administrator terminal:
 
   attrib -r "<path>"
 
+Then start the project again to retry.
+
 Or serve without updating it:
 
   nearhost --no-hosts
 ```
+
+Under `nearhost up`, the steps after `attrib` say to start `nearhost up` again, or to run `nearhost up --no-hosts`. For Nearhost in the background, they say to run `nearhost hosts update` from a terminal once the attribute is cleared.
 
 Nearhost does not clear the attribute itself, since a read-only hosts file is often set on purpose. Run the `attrib` command in Windows Terminal opened as administrator, or add the names yourself and run Nearhost with `--no-hosts`. A read-only file whose block is already up to date needs no change, so it causes no error.
 

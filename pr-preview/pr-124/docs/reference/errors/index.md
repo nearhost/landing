@@ -779,6 +779,12 @@ See [Add a project](https://nearhost.dev/pr-preview/pr-124/docs/getting-started/
 
 The name the project asks to be served at is already another project's.
 
+<h3 id="add.bad-alias"><code>add.bad-alias</code></h3>
+
+**Error** · status 400
+
+The domain the project would be served at is not one Nearhost can serve, so nothing was saved.
+
 <h3 id="add.bad-config"><code>add.bad-config</code></h3>
 
 **Error** · status 400
@@ -789,7 +795,7 @@ The config file cannot be read, so nothing is added to it.
 
 **Error** · status 400
 
-The project's name holds characters a .test name cannot use.
+The project's name is not one Nearhost can use.
 
 <h3 id="add.host-taken"><code>add.host-taken</code></h3>
 
@@ -826,6 +832,12 @@ There is no directory at the path given to nearhost add.
 **Error** · status 400
 
 nearhost add could not tell which port serves the project, so nothing was saved.
+
+<h3 id="add.relative-path"><code>add.relative-path</code></h3>
+
+**Error** · status 400
+
+A project on a server was given a relative path, which Nearhost cannot find there.
 
 <h3 id="add.server-changed"><code>add.server-changed</code></h3>
 
