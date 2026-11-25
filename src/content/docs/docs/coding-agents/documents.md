@@ -33,7 +33,7 @@ A page's script can load the folder's scripts, stylesheets, fonts, images, audio
 
 ## When a served folder goes away
 
-The `documents` row at the bottom of the sidebar shows `● 2` while two folders are served, and a dim `none` otherwise. Select it to list every served folder across all your servers. Each row names the folder, then, on a dim line, the server it came from, which agent asked and how long ago. Press `tab` or `→` to move into the rows: `↑` and `↓` choose, `enter` or `o` opens the document in your browser, `x` stops serving it after you confirm, and `esc` goes back. There is no key to copy the address, because a plain address may not open in a browser that lacks Nearhost's page key. A server's panel shows a line such as `open  1 passthrough, 2 documents` instead of a list. A folder stays served until:
+The `documents` row at the bottom of the sidebar shows `● 2` while two folders are served, and a dim `none` otherwise. Select it to list every served folder across all your servers. Each row names the folder, then, on a dim line, the server it came from, which agent asked and how long ago. Press `tab` to move into the rows: `↑` and `↓` choose, `enter` or `o` opens the document in your browser, `x` stops serving it after you confirm, and `esc` goes back. There is no key to copy the address, because a plain address may not open in a browser that lacks Nearhost's page key. A server's panel shows a line such as `open  1 passthrough, 2 documents` instead of a list. A folder stays served until:
 
 - the background Nearhost stops or restarts, as nothing is saved across restarts (`nearhost update` restarts it). Quitting the interface alone does not clear them;
 - you press `x` on it in the `documents` panel and confirm;

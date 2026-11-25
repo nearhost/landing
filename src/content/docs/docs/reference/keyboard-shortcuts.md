@@ -85,7 +85,7 @@ On `local`, only `enter` and `tab` work.
 
 ## Passthroughs and documents
 
-The `passthroughs` and `documents` rows sit at the bottom of the sidebar. Select one, then press `tab` or `→` to move into its rows.
+The `passthroughs` and `documents` rows sit at the bottom of the sidebar. Select one, then press `tab` to move into its rows.
 
 | Key          | Action                                                                 |
 | ------------ | ---------------------------------------------------------------------- |
