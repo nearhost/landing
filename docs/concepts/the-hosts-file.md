@@ -35,7 +35,7 @@ sudo nearhost hosts apply --file /etc/hosts
 
 with the aliases on its standard input, one per line. The command is an internal step, so it does not appear in `nearhost --help`. Only one project's start asks at a time.
 
-In the interface, the password is asked for in a box, and `sudo` remembers it for a few minutes. Where `sudo` asks every time, Nearhost hands over to the terminal for it. See [First run](https://nearhost.dev/docs/getting-started/first-run.md#the-password-box). `nearhost up` asks in the terminal.
+In the interface, the password is asked for in a box, and `sudo` remembers it for a few minutes. Where `sudo` asks every time, Nearhost hands over to the terminal for it. See [First run](https://nearhost.dev/docs/getting-started/first-run.md#the-password-box). `nearhost up` asks in the terminal. The background Nearhost never asks: it leaves the project stopped, and `nearhost hosts update` in a terminal brings the block up to date and tells it to start the project.
 
 On Windows, Nearhost runs itself as administrator through User Account Control instead, which shows Windows' own prompt. The aliases go to it in a temporary file rather than on its standard input, and it checks them as strictly as the `sudo` step does. Windows does not remember the approval, so every change asks. If you choose No, the file stays as it was. After each change Nearhost clears Windows' DNS cache, so the new names resolve at once. See [First run](https://nearhost.dev/docs/getting-started/first-run.md#on-windows).
 

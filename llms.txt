@@ -1,6 +1,6 @@
 # Nearhost
 
-> Nearhost is a terminal app for macOS and Linux that opens a dev server running on another machine at a trusted https://name.test address on your laptop, over the SSH config you already have. It installs nothing on the server.
+> Nearhost is a terminal app for macOS, Linux and Windows 11 that opens a dev server running on another machine at a trusted https://name.test address on your laptop, over the SSH config you already have. It installs nothing on the server.
 
 - Nearhost is free and open source under MIT. Install it with `curl -fsSL https://nearhost.dev/install.sh | sh`, `brew install nearhost/tap/nearhost` or `npx @nearhost/cli`.
 - It works with any HTTP dev server. It reads ports from `.env`, and presets add Docker Compose, Vite and Laravel Sail.
@@ -72,6 +72,7 @@ Start with [Introduction](https://nearhost.dev/docs/getting-started/introduction
 - [Clerk sign-in on a remote dev server](https://nearhost.dev/docs/guides/clerk-sign-in.md): Run a Clerk and Next.js app at a local HTTPS domain, such as https://local.myapp.com, with hot reload working, when the dev server runs on another machine.
 - [Callbacks from Docker containers to a local HTTPS domain](https://nearhost.dev/docs/guides/container-callbacks.md): Let a Docker Compose service, such as a queue worker or a LocalStack job, call your app at its Nearhost HTTPS name on this machine.
 - [Cognito sign-in on a remote dev server](https://nearhost.dev/docs/guides/cognito-sign-in.md): Give an Amazon Cognito app client an HTTPS callback URL in local dev, such as https://local.myapp.com/auth/cognito/callback, when the dev server runs on another machine.
+- [Run Nearhost in the background](https://nearhost.dev/docs/guides/run-in-the-background.md): Keep your projects served with no terminal open, with nearhost -d or a service that starts at login, and what the background Nearhost does when it needs you.
 
 ## Documentation Sets
 

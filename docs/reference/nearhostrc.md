@@ -72,7 +72,7 @@ The file is the authority on the routes it lists. Their hosts replace any that p
 A variable with no value and no default is an error that names it:
 
 ```text
-.nearhostrc: ${APP_PORT} has no value in .env.local or .env, and no default
+.nearhostrc line 3: ${APP_PORT} has no value in .env.local or .env, and no default
 ```
 
 A variable can fill part of a value, as in `app.${APP_DOMAIN}`. Worktrees of one repository can then share the committed file and each serve its own hosts. Approval works on the filled values, so you approve the names that will actually be served, and a change in `.env` that gives a new real domain asks again.
@@ -117,7 +117,7 @@ Each front end asks in its own way:
   nearhost: not added: this project asks for things that need your approval (*.status.local.example.com, api.local.example.com, ws.local.example.com, files.local.example.com, app.local.example.com, docker_clients); run nearhost add in a terminal, or open nearhost
   ```
 
-- **`nearhost up`.** It cannot approve anything. A project whose file asks for something new keeps serving what was approved before, and its log says what is waiting. Open `nearhost` to approve it.
+- **`nearhost up` and the background Nearhost.** They ask no question of their own. A project whose file asks for something new keeps serving what was approved before, and the log says what is waiting. `nearhost status` lists it with a link to answer it on Nearhost's page. Approve it there, or open `nearhost`.
 
 Nothing approves itself.
 

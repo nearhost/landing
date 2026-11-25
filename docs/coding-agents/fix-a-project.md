@@ -14,4 +14,4 @@ When a project is not served as you expect, run `/nearhost doctor` in its direct
 
 After editing `.nearhostrc`, and for `nearhostrc.pending` and `nearhostrc.not-applied`, the agent asks Nearhost to read the file again. A change that needs no approval applies at once. One that needs it waits, and the agent tells you to approve it in Nearhost, then waits for your answer. See [Approval](https://nearhost.dev/docs/reference/nearhostrc.md#approval).
 
-Then it runs the doctor again, and stops when nothing is left that it can fix. It never edits Nearhost's `config.yaml` itself; Nearhost saves a change there when it applies one. Approving a change needs the full-screen interface: under `nearhost up`, the agent tells you to open `nearhost`.
+Then it runs the doctor again, and stops when nothing is left that it can fix. It never edits Nearhost's `config.yaml` itself; Nearhost saves a change there when it applies one. You approve a change in the interface, or on Nearhost's page by the link the agent prints, so it works with no interface open. See [Answer from the page](https://nearhost.dev/docs/coding-agents/prompts-and-always-allow.md#answer-from-the-page).

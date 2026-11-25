@@ -6,7 +6,7 @@ Every key in the Nearhost configuration file.
 
 The file is `~/.config/nearhost/config.yaml`, or `%APPDATA%\nearhost\config.yaml` on Windows, or `$XDG_CONFIG_HOME/nearhost/config.yaml` when that variable is an absolute path. `--config <file>` points any command at another file.
 
-Nearhost writes the file whenever you add or change something in the interface, or run `nearhost add`, `nearhost preset` or `nearhost preset registry`. `nearhost up` writes it too, when a project's `.nearhostrc` has changed in a way that needs no approval. It reads the file again first, so hand edits are kept, but comments and formatting are not.
+Nearhost writes the file whenever you add or change something in the interface, or run `nearhost add`, `nearhost export`, `nearhost preset` or `nearhost preset registry`. The running Nearhost writes it too, in the background or under `nearhost up`, when a project's `.nearhostrc` has changed in a way that needs no approval. It reads the file again first, so hand edits are kept, but comments and formatting are not.
 
 ```yaml
 servers:
@@ -39,29 +39,30 @@ presets:
 
 ## Keys
 
-| Key                         | Type    | Meaning                                                                                                         |
-| --------------------------- | ------- | --------------------------------------------------------------------------------------------------------------- |
-| `servers[].name`            | string  | Free text. `local` is reserved.                                                                                 |
-| `servers[].ssh_host`        | string  | An alias from `~/.ssh/config`, or `user@host`. For another port, use an alias with `Port`.                      |
-| `projects[].name`           | string  | The project name.                                                                                               |
-| `projects[].server`         | string  | The `name` of a server, or `local`.                                                                             |
-| `projects[].path`           | string  | The project directory on that server.                                                                           |
-| `projects[].alias`          | string  | The project's main name, served over HTTPS. `<name>.test` unless you change it. See below.                      |
-| `projects[].enabled`        | boolean | Start the project automatically when Nearhost launches.                                                         |
-| `projects[].routes[].port`  | integer | The port on the server.                                                                                         |
-| `projects[].routes[].role`  | string  | One of `web`, `loopback` or `ignore`.                                                                           |
-| `projects[].routes[].label` | string  | Optional. A description, usually from discovery.                                                                |
-| `projects[].routes[].hosts` | list    | Optional, web routes only. More names to serve the route at: exact names or wildcard patterns.                  |
-| `projects[].nearhostrc`     | map     | Written by Nearhost: the project's `.nearhostrc` as Nearhost last applied it. Do not edit it.                   |
-| `registries[].alias`        | string  | The name a registry's presets are known by, as in `nearhost/vite`.                                              |
-| `registries[].repo`         | string  | The registry's GitHub repository, as `owner/name`.                                                              |
-| `registry_prompt`           | boolean | `false` stops Nearhost offering to trust the official registry. Absent means ask.                               |
-| `notifications`             | boolean | `false` stops the terminal notification when an agent asks for a project, preview or document. Absent means on. |
-| `presets[].name`            | string  | An enabled preset: `<registry>/<name>`, or a plain name for a local file.                                       |
-| `presets[].ref`             | string  | For a registry preset, the commit it was installed from.                                                        |
-| `presets[].sha256`          | string  | For a registry preset, the hash of its file.                                                                    |
+| Key                         | Type    | Meaning                                                                                                                                                                                                       |
+| --------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `servers[].name`            | string  | Free text. `local` is reserved.                                                                                                                                                                               |
+| `servers[].ssh_host`        | string  | An alias from `~/.ssh/config`, or `user@host`. For another port, use an alias with `Port`.                                                                                                                    |
+| `projects[].name`           | string  | The project name.                                                                                                                                                                                             |
+| `projects[].server`         | string  | The `name` of a server, or `local`.                                                                                                                                                                           |
+| `projects[].path`           | string  | The project directory on that server.                                                                                                                                                                         |
+| `projects[].alias`          | string  | The project's main name, served over HTTPS. `<name>.test` unless you change it. See below.                                                                                                                    |
+| `projects[].enabled`        | boolean | Start the project automatically when Nearhost launches.                                                                                                                                                       |
+| `projects[].routes[].port`  | integer | The port on the server.                                                                                                                                                                                       |
+| `projects[].routes[].role`  | string  | One of `web`, `loopback` or `ignore`.                                                                                                                                                                         |
+| `projects[].routes[].label` | string  | Optional. A description, usually from discovery.                                                                                                                                                              |
+| `projects[].routes[].hosts` | list    | Optional, web routes only. More names to serve the route at: exact names or wildcard patterns.                                                                                                                |
+| `projects[].nearhostrc`     | map     | Written by Nearhost: the project's `.nearhostrc` as Nearhost last applied it. Do not edit it.                                                                                                                 |
+| `registries[].alias`        | string  | The name a registry's presets are known by, as in `nearhost/vite`.                                                                                                                                            |
+| `registries[].repo`         | string  | The registry's GitHub repository, as `owner/name`.                                                                                                                                                            |
+| `registry_prompt`           | boolean | `false` stops Nearhost offering to trust the official registry. Absent means ask.                                                                                                                             |
+| `notifications`             | boolean | `false` stops the terminal notification when an agent asks for a project, preview or document. Absent means on.                                                                                               |
+| `keep_running`              | boolean | What quitting does to a Nearhost that the interface started, while no other interface is open on it: `true` leaves it running in the background, `false` stops it. Absent means `q` asks and Ctrl-C stops it. |
+| `presets[].name`            | string  | An enabled preset: `<registry>/<name>`, or a plain name for a local file.                                                                                                                                     |
+| `presets[].ref`             | string  | For a registry preset, the commit it was installed from.                                                                                                                                                      |
+| `presets[].sha256`          | string  | For a registry preset, the hash of its file.                                                                                                                                                                  |
 
-Use `nearhost preset` and `nearhost preset registry` rather than editing the last five by hand. See [Presets and registries](https://nearhost.dev/docs/concepts/presets-and-registries.md).
+Use `nearhost preset` and `nearhost preset registry` rather than editing `registries` and `presets` by hand. See [Presets and registries](https://nearhost.dev/docs/concepts/presets-and-registries.md).
 
 ## Main name
 
@@ -89,9 +90,11 @@ A project's `.nearhostrc` can set the main name with `alias:`, filled from the p
 - Only web routes have hosts, and a project serves each host once.
 - `docker_clients` in a `.nearhostrc` works only for projects on `local`.
 - Loopback ports are unique across enabled projects.
-- Registry aliases are lowercase letters, digits and single hyphens. Each preset's registry is trusted. Registry presets have `ref` and `sha256`, and local ones do not.
+- Registry aliases are lowercase letters, digits and single hyphens. Registry aliases and repositories are each unique. Each preset's registry is trusted. Registry presets have `ref` and `sha256`, and local ones do not.
 
-If the file is not valid YAML, Nearhost exits with the error and its line. If it breaks a rule above, Nearhost exits naming the file and the problem. `nearhost doctor` reports either without exiting.
+If the file is not valid YAML, or breaks a rule above, Nearhost does not start, and names the file, the problem and, for YAML, the line. A Nearhost already running keeps serving the last good config and says so in its log and the interface. `nearhost doctor` reports either without exiting.
+
+A key Nearhost does not know, such as a misspelt one, does not stop Nearhost. But Nearhost refuses to save the file, from the interface or any command, until you fix or remove the key, so that saving does not delete it. `nearhost doctor` names each such key and its line.
 
 ## Beside the config
 
@@ -99,7 +102,9 @@ The folder that holds `config.yaml` also holds:
 
 - `presets/`: installed presets
 - `registry/`: each trusted registry's cached index
-- `run/`: the SSH control sockets
+- `run/`: the SSH control sockets, the background Nearhost's control socket and the lock that keeps a second Nearhost from starting
+- `core.log`: the background Nearhost's log, set aside as `core.log.1` once it passes 5 MiB
+- `grants.json`: the coding agents' Always allow grants
 - `config.yaml.lock`: held while a command or the interface changes the config, so two never save over each other. Leave it in place. From Nearhost 0.8.0.
 
 The proxy's storage, including the local certificate authority, is not in this folder. It is the `caddy` folder in Nearhost's data directory: `~/Library/Application Support/nearhost/caddy` on macOS, `~/.local/share/nearhost/caddy` on Linux and `%LOCALAPPDATA%\nearhost\caddy` on Windows, or `$XDG_DATA_HOME/nearhost/caddy` on any of them when that variable is set to an absolute path. Nearhost 0.7 and earlier kept it beside the config. See [The local CA](https://nearhost.dev/docs/concepts/tls-and-the-proxy.md#the-local-ca).

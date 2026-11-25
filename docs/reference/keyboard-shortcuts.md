@@ -22,24 +22,24 @@ Copies made with a key or the mouse, adds, saves, removals and failures are conf
 
 ## Anywhere
 
-`ctrl+c` quits, even from a form or the password box. While Nearhost is stopping, `q` or `ctrl+c` again stops it at once.
+`ctrl+c` quits, even from a form or the password box, and never asks first. It stops Nearhost when this interface started it, unless `keep_running: true` is set or another interface is open on it; otherwise Nearhost keeps running in the background. While Nearhost is stopping, `q` or `ctrl+c` again stops it at once.
 
 ## Main screen
 
-| Key      | Action                                                                  |
-| -------- | ----------------------------------------------------------------------- |
-| `↑`, `↓` | Move the selection. `k` and `j` too.                                    |
-| `h`      | Go to Home.                                                             |
-| `/`      | Filter the sidebar by name. `enter` keeps the filter.                   |
-| `esc`    | Clear the filter, or go to Home.                                        |
-| `l`      | Full-screen log of the selected row, or of everything from Home.        |
-| `n`      | Add a project, on the selected server or the selected project's server. |
-| `s`      | Add a server.                                                           |
-| `p`      | Review the next request a coding agent is waiting on.                   |
-| `?`      | Show or hide every key.                                                 |
-| `q`      | Quit. This stops every project.                                         |
+| Key      | Action                                                                                                                                                                                                       |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `↑`, `↓` | Move the selection. `k` and `j` too.                                                                                                                                                                         |
+| `h`      | Go to Home.                                                                                                                                                                                                  |
+| `/`      | Filter the sidebar by name. `enter` keeps the filter.                                                                                                                                                        |
+| `esc`    | Clear the filter, or go to Home.                                                                                                                                                                             |
+| `l`      | Full-screen log of the selected row, or of everything from Home.                                                                                                                                             |
+| `n`      | Add a project, on the selected server or the selected project's server.                                                                                                                                      |
+| `s`      | Add a server.                                                                                                                                                                                                |
+| `p`      | Review the next request a coding agent is waiting on.                                                                                                                                                        |
+| `?`      | Show or hide every key.                                                                                                                                                                                      |
+| `q`      | Quit. When this interface started Nearhost and no other interface is open on it, asks whether to stop it or leave it running, unless `keep_running` in the config answers. Otherwise Nearhost keeps running. |
 
-On Home, when a server cannot connect, `r` retries every such server now and `y` copies the `ssh` command that fixes access.
+On the first screen, with nothing added yet, `c` connects a server. On Home, when a server cannot connect, `r` retries every such server now and `y` copies the `ssh` command that fixes access.
 
 ## Project
 
@@ -71,33 +71,35 @@ On a project on this machine, a route is only `web` or `ignore`.
 
 ## Server
 
-| Key     | Action                                                       |
-| ------- | ------------------------------------------------------------ |
-| `enter` | Collapse or expand its projects.                             |
-| `r`     | Reconnect now.                                               |
-| `c`     | Drop the connection and hold it closed, or connect it again. |
-| `e`     | Edit its host and name.                                      |
-| `d`     | Remove it and its projects, after you confirm.               |
+| Key     | Action                                                                                                                                                                             |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `enter` | Collapse or expand its projects.                                                                                                                                                   |
+| `r`     | Reconnect now.                                                                                                                                                                     |
+| `c`     | Drop the connection and hold it closed, or connect it again.                                                                                                                       |
+| `e`     | Edit its host and name.                                                                                                                                                            |
+| `d`     | Remove it and its projects, after you confirm.                                                                                                                                     |
+| `tab`   | Move into its passthroughs and documents: `↑`, `↓` choose, `x` closes or revokes the selected one, `enter` opens a document folder, `tab` or `esc` is done. Shown when it has any. |
 
-Only `enter` works on `local`.
+On `local`, only `enter` and `tab` work.
 
 ## Full-screen log
 
-| Key               | Action                                            |
-| ----------------- | ------------------------------------------------- |
-| `j`, `k`          | Move. The arrow keys too.                         |
-| `space`, `pgdown` | Page down.                                        |
-| `pgup`            | Page up.                                          |
-| `g`               | Go to the oldest line.                            |
-| `G`               | Go to the end and follow new lines.               |
-| `tab`             | Show all entries, requests, events or errors.     |
-| `/`               | Search. `enter` keeps it, `esc` clears it.        |
-| `w`               | Wrap long lines.                                  |
-| `enter`           | Open or close a request.                          |
-| `v`               | Show or hide cookies and authorisation headers.   |
-| `c`               | Copy the request as a `curl` command.             |
-| `r`               | Send the request again. Unsafe methods ask first. |
-| `esc`, `q`        | Close the log. `esc` clears a search first.       |
+| Key               | Action                                                                        |
+| ----------------- | ----------------------------------------------------------------------------- |
+| `j`, `k`          | Move. The arrow keys too.                                                     |
+| `space`, `pgdown` | Page down.                                                                    |
+| `pgup`            | Page up.                                                                      |
+| `g`               | Go to the oldest line.                                                        |
+| `G`               | Go to the end and follow new lines.                                           |
+| `tab`             | Show all entries, requests, events or errors. `shift+tab` goes the other way. |
+| `/`               | Search. `enter` keeps it, `esc` clears it.                                    |
+| `w`               | Wrap long lines.                                                              |
+| `enter`           | Open or close a request.                                                      |
+| `v`               | Show or hide cookies and authorisation headers.                               |
+| `c`               | Copy the request as a `curl` command.                                         |
+| `r`               | Send the request again. Unsafe methods ask first.                             |
+| `p`               | Open the request a coding agent is waiting on.                                |
+| `esc`, `q`        | Close the log. `esc` clears a search first.                                   |
 
 See [The request log](https://nearhost.dev/docs/concepts/the-request-log.md).
 
@@ -105,21 +107,23 @@ See [The request log](https://nearhost.dev/docs/concepts/the-request-log.md).
 
 `esc` goes back a step, and from the first step closes the form. The footer of each step lists its keys.
 
-| Where        | Keys                                                                                                               |
-| ------------ | ------------------------------------------------------------------------------------------------------------------ |
-| Lists        | `↑`, `↓` to choose, `enter` to pick.                                                                               |
-| Path         | `tab` or `→` accepts the suggestion, `↑`, `↓` choose a match, `enter` uses the path as typed, `ctrl+r` reconnects. |
-| Presets      | `space` ticks or unticks, `enter` goes on.                                                                         |
-| Routes       | `space` serves or ignores a port, `←`, `→` change its role, `h` edits a web route's hosts.                         |
-| Name         | `tab` moves between name and alias.                                                                                |
-| Server check | `r` checks again after a failure.                                                                                  |
-| Confirm      | `enter` adds or saves. The last step lists anything that needs approval, which `enter` approves.                   |
-| Review       | `y` approves, `n` declines, `esc` leaves it for later.                                                             |
-| Remove       | `y` removes, `n` or `esc` keeps.                                                                                   |
+| Where         | Keys                                                                                                               |
+| ------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Lists         | `↑`, `↓` to choose, `enter` to pick.                                                                               |
+| Path          | `tab` or `→` accepts the suggestion, `↑`, `↓` choose a match, `enter` uses the path as typed, `ctrl+r` reconnects. |
+| Presets       | `space` ticks or unticks, `enter` goes on.                                                                         |
+| Routes        | `space` serves or ignores a port, `←`, `→` change its role, `h` edits a web route's hosts.                         |
+| Name          | `tab` moves between name and alias.                                                                                |
+| Server check  | `r` checks again after a failure.                                                                                  |
+| Confirm       | `enter` adds or saves. The last step lists anything that needs approval, which `enter` approves.                   |
+| Review        | `y` approves, `n` declines, `esc` leaves it for later.                                                             |
+| Remove        | `y` removes, `n` or `esc` keeps.                                                                                   |
+| Agent request | `y` allows, `A` always allows when offered, `n` or `esc` refuses.                                                  |
 
-## Welcome and password boxes
+## Welcome, password and quit boxes
 
-| Box      | Keys                                                 |
-| -------- | ---------------------------------------------------- |
-| Welcome  | `enter` trusts the certificate authority, `s` skips. |
-| Password | `enter` continues, `esc` cancels.                    |
+| Box      | Keys                                                                                                                                                                        |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Welcome  | `enter` trusts the certificate authority, `s` skips.                                                                                                                        |
+| Password | `enter` continues, `esc` cancels.                                                                                                                                           |
+| Quit     | `enter` stops Nearhost or leaves it running, as chosen; `tab` or `←`, `→` choose; `space` ticks Don't ask again, which saves the answer as `keep_running`; `esc` goes back. |

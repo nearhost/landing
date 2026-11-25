@@ -4,7 +4,7 @@
 
 Fix an sshd that refuses Nearhost's socket forward, or an agent sandbox that blocks the socket.
 
-Two things can stop an agent reaching Nearhost: the server's sshd, or the agent's own sandbox.
+Three things can stop an agent reaching Nearhost: the server's sshd, the agent's own sandbox, or Nearhost having nowhere to ask you.
 
 **The server refuses the forward.** Its sshd has `AllowStreamLocalForwarding no`. The server's panel shows `agents unavailable` with sshd's message, and so does `nearhost doctor`. Set `AllowStreamLocalForwarding yes` in the server's `sshd_config`, reload sshd and press `r` on the server to reconnect. Projects serve either way, and `r` on Home leaves such a server connected.
 
@@ -23,3 +23,13 @@ Two settings also work, but open far more than Nearhost:
 - **Codex's** `network_access = true` under `[sandbox_workspace_write]` gives its sandbox the network and every socket.
 
 Every socket includes ones like Docker's `/var/run/docker.sock`, and a command that reaches Docker's socket can take over the machine. Use these settings only if that is acceptable where the agent runs; otherwise approve the command when the agent asks.
+
+## Nearhost has no page or window to ask you in
+
+The agent reports that the request was refused, with:
+
+```text
+Nearhost on dev@laptop has no page or window to ask you in; open nearhost there, then ask again.
+```
+
+In the skill's script this is exit status 3, and the agent tells you to open `nearhost` on the laptop. Nearhost answers a request that needs your answer with this when it has no way to ask: no interface is open, and Nearhost's page is off because it runs with `--web-port 0`, or because the page's port was taken. Open `nearhost` and ask again, or run Nearhost with a page. `nearhost doctor` warns when the port is taken, and `nearhost status` prints the page's address. See [Answer from the page](https://nearhost.dev/docs/coding-agents/prompts-and-always-allow.md#answer-from-the-page).

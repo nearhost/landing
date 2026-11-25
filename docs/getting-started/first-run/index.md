@@ -10,7 +10,7 @@ Start the interface with:
 nearhost
 ```
 
-It starts the proxy and every enabled project, and creates the local certificate authority, "Nearhost Local CA", if it does not exist yet. Its key is kept in Nearhost's data folder, not in `~/.config`. See [The local CA](https://nearhost.dev/docs/concepts/tls-and-the-proxy.md#the-local-ca).
+It shows Nearhost, which serves your projects. With none running, it starts one in the background first, so the proxy and every enabled project run whether or not this window stays open. It creates the local certificate authority, "Nearhost Local CA", if it does not exist yet. Its key is kept in Nearhost's data folder, not in `~/.config`. See [The local CA](https://nearhost.dev/docs/concepts/tls-and-the-proxy.md#the-local-ca).
 
 ## Nothing to serve yet
 
@@ -112,5 +112,14 @@ Once a project exists, the screen has a sidebar on the left, with Home at the to
 - `running`: how many projects are running, on how many servers
 
 When something needs you, a problems section lists it, with why it happened and how to fix it. Below that is the recent log. Press `l` for the full-screen log, `/` to filter the sidebar by name, and `h` to come back to Home. `?` lists every key. See [Keyboard shortcuts](https://nearhost.dev/docs/reference/keyboard-shortcuts.md).
+
+## Quitting
+
+Press `q` to quit. What happens to the Nearhost behind the interface depends on who started it:
+
+- **The interface started it,** because none was running, and no other interface follows it. Nearhost asks `Stop Nearhost, or leave it running in the background?` Choose `Stop` to stop it, as quitting always did, or `Leave running` to keep your projects served with no terminal open. Tick `Don't ask again` to save the choice as [`keep_running`](https://nearhost.dev/docs/reference/config.md) in the config.
+- **Anything else started it:** `nearhost -d`, a service, or another interface that is still open. Quitting leaves it running, and prints `Nearhost is still running in the background. Stop it with nearhost stop.`
+
+`ctrl+c` never asks: where `q` would ask, it stops Nearhost. To stop one that runs in the background, from any terminal, run `nearhost stop`. `nearhost status` shows what it serves. See [Run Nearhost in the background](https://nearhost.dev/docs/guides/run-in-the-background.md).
 
 Next: [Add a server](https://nearhost.dev/docs/getting-started/add-a-server.md) or, for a project on this machine, [Add a project](https://nearhost.dev/docs/getting-started/add-a-project.md).

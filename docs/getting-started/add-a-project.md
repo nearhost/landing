@@ -59,6 +59,8 @@ Start it with `nearhost up`.
 
 With no registry trusted, only the `.env` port variables are found, and every port but the web one is `ignore`. Here the Vite port should reach the browser as `localhost:5174`, so change it to `loopback` afterwards: select the project, press `tab`, choose the route and press `space`. The [Vite and Sail presets](https://nearhost.dev/docs/concepts/presets-and-registries.md) do that for you.
 
+If Nearhost is already running, the last line says so instead: `The running Nearhost picks it up in a moment.` Before that, `nearhost add` brings the hosts file up to date, as `nearhost hosts update` does, since the background Nearhost never asks for your password. If it cannot, it tells you to run `nearhost hosts update` in a terminal. A `nearhost up` started with project names does not reload: stop it and start it again.
+
 At a terminal it asks what the interface asks: whether to trust the official presets, which suggested presets to enable, and which port is the web app when that is not clear. It also offers to add a server it does not know, and asks you to approve, one at a time, any real domain, wildcard, `localhost` or Docker access that the project's `.nearhostrc` or presets ask for, and any loopback port its `.nearhostrc` adds. Without a terminal it takes the defaults, and stops if it cannot tell which port is web or if something needs approval. See [Approval](https://nearhost.dev/docs/reference/nearhostrc.md#approval).
 
 | Flag              | Effect                                                                                                                                                                       |

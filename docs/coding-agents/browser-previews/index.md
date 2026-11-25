@@ -6,7 +6,7 @@ Let a coding agent on a server open its dev server's preview in your laptop's br
 
 With the [`nearhost` skill installed](https://nearhost.dev/docs/coding-agents.md#install-the-skill), an agent on a server can start a dev server, but you cannot see it in your browser until its port is forwarded to your laptop. With a passthrough, the agent asks Nearhost to forward that one port for the rest of the session, and you approve it first. The preview then opens on your laptop. It works for any HTTP dev server, whatever it is built with, as long as the page loads everything from that one port. Needs Nearhost 0.10.0 or later; an older Nearhost answers without passthrough, and the agent tells you to update it.
 
-1. The agent asks for a port, and Nearhost opens a prompt over the interface: `Claude Code on mini wants to open port 5173 on this laptop (browser preview).` If that port is in use on the laptop, the prompt says so and that it will open on another port; the agent reports the laptop URL once it opens.
+1. The agent asks for a port, and Nearhost opens a prompt over the interface, or, with no interface open, waits for your answer on its page, at a link the agent prints: `Claude Code on mini wants to open port 5173 on this laptop (browser preview).` If that port is in use on the laptop, the prompt says so and that it will open on another port; the agent reports the laptop URL once it opens.
 2. Answer the prompt. See [Prompts and Always allow](https://nearhost.dev/docs/coding-agents/prompts-and-always-allow.md#the-prompt) for the keys, and [Always allow](https://nearhost.dev/docs/coding-agents/prompts-and-always-allow.md#always-allow) to stop being asked. If you allow it and the port cannot be opened, the prompt shows why, and the agent is told it failed rather than that you refused, so it passes the reason on. If the port opens but Always allow cannot be saved, the passthrough stays open and the log says Always allow was not saved. If the request has ended by then, because it expired or the agent's session ended, pressing `y` or `A` tells you so; `n` or `esc` closes the prompt.
 3. Once you allow it, Nearhost forwards the port and the agent gives you the laptop URL. Asking again for a port that is already open, from the same agent session, returns the same passthrough without a second prompt. A port that a running project already forwards is answered at once, with no prompt.
 
@@ -22,7 +22,7 @@ A passthrough ends when any of these happens:
 - you disconnect the server in Nearhost, remove it, or its connection fails (for example, authentication);
 - the server has been away for 10 minutes in a row;
 - the forwarded port stops answering for 5 minutes, checked every 30 seconds while the server is connected;
-- you close it, or Nearhost quits.
+- you close it, or the background Nearhost stops (`nearhost stop`, or a restart by `nearhost update`). Quitting the interface alone leaves it open while the background Nearhost keeps running.
 
 The `SessionEnd` hook ships with the Claude Code plugin, so it runs only for plugin installs. With the skill installed through the skills CLI, or in another agent, the other conditions apply. If the laptop port was taken by something else while the server was away, that passthrough closes when the server comes back. If closing a passthrough's forward fails, Nearhost keeps its laptop port and tries again on each check until it closes.
 

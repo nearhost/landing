@@ -114,6 +114,8 @@ nearhost update
 
 updates Nearhost the way you installed it, after asking. Afterwards it checks the version of the copy your next command runs. If that copy is unchanged, it says so and exits 1. On Windows, for a copy from the PowerShell installer or a zip, `nearhost update` downloads the release's zip itself, checks it against the release's `checksums.txt` and only then replaces `nearhost.exe` where it is, so a failed or cancelled download leaves your copy as it was. See [`nearhost update`](https://nearhost.dev/docs/reference/cli.md#nearhost-update).
 
+If Nearhost is running in the background, `nearhost update` restarts it on the new version, and asks first when that would close open passthroughs or forwards. See [Updating](https://nearhost.dev/docs/guides/run-in-the-background.md#updating).
+
 `nearhost update --check` only reports, for scripts: it exits 0 when Nearhost is up to date, 1 when a newer release is out, and 2 when it could not check.
 
 ## Linux setup
