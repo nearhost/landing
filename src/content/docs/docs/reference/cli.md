@@ -132,6 +132,8 @@ Runs the background Nearhost in the foreground, with no interface: it serves eve
 
 It never asks for sudo or a User Account Control approval. When the hosts block needs a change, the projects that need it stay stopped, and the log and `nearhost status` say `Run nearhost hosts update in a terminal.` See [nearhost hosts](#nearhost-hosts).
 
+`--started-by <how>`, left out of `nearhost daemon --help`, records what started it: `foreground`, the default, `detached`, `tui` or `service`. `nearhost -d`, the interface and a service pass it. It is what `nearhost status`, `nearhost doctor` and Nearhost's page report, and it changes how the core is treated. A `service` core exits 0 when another Nearhost runs, and `nearhost update` restarts it through the service manager. A `tui` core is the one the interface may stop when you quit. Pass it by hand only to reproduce how one of those starts behaves.
+
 Started by a service, it exits 0 with `Another Nearhost is already running, so this service start does nothing.` in the log when one runs already, so the service manager sees no failure. Run by hand with one running, it stops as `nearhost up` does.
 
 ## nearhost stop
@@ -346,7 +348,22 @@ When the system store does not hold the CA, it prints `Nearhost Local CA was not
 
 On Windows, Nearhost runs `apply` as administrator through User Account Control, and `update` and `clean` ask for your approval the same way. A hosts file with the read-only attribute is left as it is, with a message that says how to clear the attribute. See [The hosts file is read-only](/docs/troubleshooting/troubleshooting/#the-hosts-file-is-read-only).
 
-`apply` is left out of `nearhost --help` from Nearhost 0.8.0, because Nearhost runs it itself through `sudo`. Both take `--file <path>` to work on another file than `/etc/hosts`. See [The hosts file](/docs/concepts/the-hosts-file/).
+`apply` is left out of `nearhost --help` from Nearhost 0.8.0, because Nearhost runs it itself through `sudo`. `apply` and `clean` take `--file <path>` to work on another file than `/etc/hosts`. See [The hosts file](/docs/concepts/the-hosts-file/).
+
+`apply` is the step that writes the file, so it is the one to run by hand when you want to see why a hosts update fails. `--file` points it at a copy, which needs no root:
+
+```sh
+printf 'myapp.test\napi.myapp.test\n' | nearhost hosts apply --file ./hosts-copy
+```
+
+It takes two more flags, which the Windows elevator uses:
+
+| Flag              | What it does                                                                     |
+| ----------------- | -------------------------------------------------------------------------------- |
+| `--input <file>`  | Read the aliases from this file instead of stdin. It reads at most 1 MiB.        |
+| `--report <file>` | When `apply` fails, write the error's text to this file, for the caller to show. |
+
+Run as root or administrator, `apply` refuses both flags on macOS and Linux. On Windows it takes them only for an `input` and a `report` file in a folder Nearhost made for the run. It exits 3 when it refuses them, so the caller can tell that no report came back.
 
 ## nearhost doctor
 
@@ -548,3 +565,16 @@ Prints a completion script for `bash`, `zsh`, `fish` or `powershell`. `nearhost 
 ## nearhost version
 
 Prints the version, as `nearhost 0.8.0`. From Nearhost 0.8.0, `nearhost --version` prints the same line.
+
+## Environment variables
+
+These change what Nearhost does. Set them in the shell that runs it. On macOS and Linux, a service gets only the ones `nearhost service install` copies from the shell it runs in: `XDG_CONFIG_HOME` and `XDG_DATA_HOME` here, with `PATH`, `DOCKER_HOST`, `DOCKER_CONTEXT` and `SSH_AUTH_SOCK`. On Windows, the service's task gets your user's environment variables, as set in Windows, not the shell's.
+
+| Variable                   | What it does                                                                                                                                                                                                                                                                                                                                   |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `XDG_CONFIG_HOME`          | Where the config folder is, when it is an absolute path. See [Config](/docs/reference/config/).                                                                                                                                                                                                                                                |
+| `XDG_DATA_HOME`            | Where the data folder, with the local certificate authority, is, when it is an absolute path. See [Beside the config](/docs/reference/config/#beside-the-config).                                                                                                                                                                              |
+| `NEARHOST_NO_UPDATE_CHECK` | `1` turns off the daily check for a new release. See [nearhost update](#nearhost-update).                                                                                                                                                                                                                                                      |
+| `NEARHOST_TRANSPORT`       | `per-process` makes Nearhost on macOS and Linux reach servers the way it does on Windows: one `ssh` process per forward instead of one shared ControlMaster connection per server. Use it to rule the ControlMaster out when a server's connection misbehaves. Any other value is ignored. See [SSH transport](/docs/concepts/ssh-transport/). |
+
+The installers take `NEARHOST_VERSION`, `NEARHOST_INSTALL_DIR`, `NEARHOST_NO_PATH` and `NEARHOST_SKIP_SETCAP`: see [Install](/docs/getting-started/install/). The coding agent skill takes `NEARHOST_SOCKET`: see [How it works](/docs/coding-agents/how-it-works/). Projects that call back into Nearhost from a container use `NEARHOST_CA_CERT`: see [Container callbacks](/docs/guides/container-callbacks/).
