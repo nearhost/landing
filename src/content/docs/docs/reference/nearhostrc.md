@@ -118,7 +118,7 @@ Each front end asks in its own way:
   nearhost: not added: this project asks for things that need your approval (*.status.local.example.com, api.local.example.com, ws.local.example.com, files.local.example.com, app.local.example.com, docker_clients); run nearhost add in a terminal, or open nearhost
   ```
 
-- **`nearhost up`.** It cannot approve anything. A project whose file asks for something new keeps serving what was approved before, and its log says what is waiting. Open `nearhost` to approve it.
+- **`nearhost up` and the background Nearhost.** They ask no question of their own. A project whose file asks for something new keeps serving what was approved before, and the log says what is waiting. `nearhost status` lists it with a link to answer it on Nearhost's page. Approve it there, or open `nearhost`.
 
 Nothing approves itself.
 

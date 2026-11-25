@@ -23,22 +23,22 @@ Copies made with a key or the mouse, adds, saves, removals and failures are conf
 
 ## Anywhere
 
-`ctrl+c` quits, even from a form or the password box. While Nearhost is stopping, `q` or `ctrl+c` again stops it at once.
+`ctrl+c` quits and stops Nearhost, even from a form or the password box, and never asks first. While Nearhost is stopping, `q` or `ctrl+c` again stops it at once.
 
 ## Main screen
 
-| Key      | Action                                                                  |
-| -------- | ----------------------------------------------------------------------- |
-| `↑`, `↓` | Move the selection. `k` and `j` too.                                    |
-| `h`      | Go to Home.                                                             |
-| `/`      | Filter the sidebar by name. `enter` keeps the filter.                   |
-| `esc`    | Clear the filter, or go to Home.                                        |
-| `l`      | Full-screen log of the selected row, or of everything from Home.        |
-| `n`      | Add a project, on the selected server or the selected project's server. |
-| `s`      | Add a server.                                                           |
-| `p`      | Review the next request a coding agent is waiting on.                   |
-| `?`      | Show or hide every key.                                                 |
-| `q`      | Quit. This stops every project.                                         |
+| Key      | Action                                                                                                     |
+| -------- | ---------------------------------------------------------------------------------------------------------- |
+| `↑`, `↓` | Move the selection. `k` and `j` too.                                                                       |
+| `h`      | Go to Home.                                                                                                |
+| `/`      | Filter the sidebar by name. `enter` keeps the filter.                                                      |
+| `esc`    | Clear the filter, or go to Home.                                                                           |
+| `l`      | Full-screen log of the selected row, or of everything from Home.                                           |
+| `n`      | Add a project, on the selected server or the selected project's server.                                    |
+| `s`      | Add a server.                                                                                              |
+| `p`      | Review the next request a coding agent is waiting on.                                                      |
+| `?`      | Show or hide every key.                                                                                    |
+| `q`      | Quit. Asks whether to stop Nearhost or leave it running in the background, when this interface started it. |
 
 On Home, when a server cannot connect, `r` retries every such server now and `y` copies the `ssh` command that fixes access.
 

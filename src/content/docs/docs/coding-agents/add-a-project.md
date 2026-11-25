@@ -20,4 +20,4 @@ If a form is already open, the proposal waits, and Home shows `1 request waiting
 
 `/nearhost status` reports the project holding the current directory: its address, every address it serves in `urls`, its state and any error. A project with several web routes or hosts has one URL for each, so you can see where each service lives. `/nearhost status --all` reports every project on the machine the agent runs on.
 
-Proposals need the full-screen interface. Under `nearhost up`, an agent can read the status but is told to open `nearhost` to propose.
+A proposal waits for you whenever Nearhost can ask: with the interface open, or with Nearhost's page served, as it is for the background Nearhost and `nearhost up`. With no interface open, the agent prints a link to the request on the page, and the page lets you decline it. To accept it, run `nearhost`, where the add form opens filled in. See [Answer from the page](/docs/coding-agents/prompts-and-always-allow/#answer-from-the-page).

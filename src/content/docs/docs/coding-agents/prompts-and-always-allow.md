@@ -15,6 +15,20 @@ For the first 750 ms after a prompt opens, it ignores every key but ctrl+c and h
 
 When you refuse a preview or a document, that server's requests of the same kind are held back for 30 seconds: a new one is refused at once, with no prompt, and the agent is told when it may ask again. Its other waiting requests of that kind are dropped. A request that carries a valid Always allow token still goes through. The prompt queues with proposals and passthroughs, and Home shows the same hint as for a [proposal](/docs/coding-agents/add-a-project/).
 
+## Answer from the page
+
+Nearhost's page, at `https://nearhost.localhost:6327` or on the port `--web-port` gives, takes answers whenever it is served, so a request does not need the interface open. That covers the background Nearhost, a service and `nearhost up`. The page shows what the prompt shows, with the same choices: Yes, No and, where it applies, Always allow. The first answer wins, from the page or from the interface. A request to add a project is the exception: the page shows it and lets you decline it, and accepting it takes `nearhost`, where the add form opens filled in.
+
+When a request waits and the agent knows the page's address, the skill prints a link to it:
+
+```text
+Answer in Nearhost on dev@laptop, or open https://nearhost.localhost:6327/approve/k3f9q2
+```
+
+For a proposal, it says to run `nearhost` on the laptop to review it, and gives the link to decline it. Open the link in your browser. The page shows the request only to a browser that holds its cookie, which `nearhost status` and the interface give you with their links, so a link that someone else opens shows nothing and approves nothing. Nearhost prints the same link in its own output, in `nearhost up` and in the core's log, and `nearhost status` lists what waits.
+
+With no interface attached and the page off, because you gave `--web-port 0` or its port was taken, there is nowhere to ask, and the agent is told so. See [Nearhost has no page or window to ask you in](/docs/coding-agents/troubleshooting/#nearhost-has-no-page-or-window-to-ask-you-in).
+
 ## Always allow
 
 Always allow covers one tool on one server: Claude Code on `mini`, say, but not Claude Code on another server, and not another tool on `mini`. Only Claude Code is offered it. Codex documents no variable that identifies it, so Codex and every other agent are shown as `An agent`, are always prompted and are never offered Always allow.
