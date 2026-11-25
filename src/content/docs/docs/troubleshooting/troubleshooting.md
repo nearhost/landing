@@ -5,7 +5,7 @@ sidebar:
   order: 1
 ---
 
-Every failure attaches to the thing that failed, with why it happened and how to fix it. A failure in one project or server never affects another. Home lists what needs you under problems. `nearhost doctor` checks most of the causes below at once.
+Every failure attaches to the thing that failed, with why it happened and how to fix it. Each has a code, which `--verbose` shows and the core's log always does: look it up in [Errors](/docs/reference/errors/). A failure in one project or server never affects another. Home lists what needs you under problems. `nearhost doctor` checks most of the causes below at once.
 
 ## Port 443 or 80 already in use
 
@@ -13,7 +13,7 @@ The proxy does not start. Home shows `proxy down`, names the port and, where it 
 
 Quit that program, or run Nearhost with `--https-port` and `--http-port`. If the holder is `nearhost`, another Nearhost is running: stop it rather than moving ports. Another local proxy is the usual cause: nginx, Caddy, Herd or Valet. On Linux, also check that the binary may bind low ports. See [Install](/docs/getting-started/install/).
 
-If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary, as in [Allow binding ports 80 and 443](/docs/getting-started/install/#allow-binding-ports-80-and-443); run it, then start Nearhost again. For an npm install, use the command `nearhost doctor` prints, which names the real binary. From Nearhost 0.8.0. `nearhost up` prints the same command under the error, followed by `Do not run nearhost with sudo.`
+If Home says the port needs permission to bind, nothing holds it, but this user may not use it. On Linux, the fix under it is the `setcap` command for the binary, as in [Allow binding ports 80 and 443](/docs/getting-started/install/#allow-binding-ports-80-and-443); run it, then start Nearhost again. For an npm install, use the command `nearhost doctor` prints, which names the real binary. From Nearhost 0.8.0. `nearhost up` stops with the same command in its error, as in [nearhost up](/docs/reference/cli/#nearhost-up), and so does the core's log when Nearhost runs in the background.
 
 `nearhost doctor` run while Nearhost serves shows the ports Nearhost holds as `in use by the running Nearhost`, which passes. If no tool can name what holds a port while Nearhost runs, the check warns and suggests a command to find it.
 
@@ -30,7 +30,9 @@ Stop that service, for IIS with `net stop w3svc`, or run Nearhost with `--http-p
 `nearhost up` and `nearhost daemon` stop at start with:
 
 ```text
-Another Nearhost is already running (pid N). Stop it with `nearhost stop`, or see it with `nearhost status`.
+Error: Another Nearhost is already running (pid N).
+
+Stop it with `nearhost stop`, or see it with `nearhost status`.
 ```
 
 `nearhost` opens the interface on the one that runs instead, and `nearhost -d` says it is already running.
@@ -39,7 +41,26 @@ Two Nearhosts would end each other's ssh connections, so only one runs at a time
 
 ## Nearhost in the background does not start
 
-`nearhost -d` prints `Nearhost stopped while starting. The end of <path>:` with the last lines of the core's log, and exits 1. Those lines say why it stopped, often a port in use or a config error. If it prints `Nearhost is still starting. See <path> for how it is going.`, it has not answered in 15 seconds and goes on starting: read the log it names. The log is `core.log` in the config folder. See [The core's log](/docs/guides/run-in-the-background/#the-cores-log).
+`nearhost -d` prints `Error: Nearhost stopped while starting.` with the last lines of the core's log, and exits 1. Those lines say why it stopped, often a port in use or a config error. On Linux, a copy of `nearhost` that may not use ports 80 and 443 stops like this:
+
+```text
+Error: Nearhost stopped while starting.
+
+The end of /home/you/.config/nearhost/core.log:
+
+  2026-11-25T14:29:57Z nearhost <version> starting (pid 4121, started by detached)
+  2026-11-25T14:29:57Z error [port.needs-permission] HTTPS port 443 needs permission to bind.
+  2026-11-25T14:29:57Z   On Linux, a program may use ports below 1024, such as 443 for HTTPS and 80 for HTTP, only when it has been given permission. The install script gives it; a nearhost you build or copy yourself does not have it.
+  2026-11-25T14:29:57Z   Fix: sudo setcap cap_net_bind_service=+ep '/home/you/go/bin/nearhost'
+  2026-11-25T14:29:57Z   Then start Nearhost again. Do not run nearhost with sudo.
+  2026-11-25T14:29:57Z   Run `nearhost doctor` to check this and the rest of what Nearhost needs.
+  2026-11-25T14:29:57Z   Cause: HTTPS port 443 needs permission to bind: listen tcp :443: bind: permission denied
+  2026-11-25T14:29:57Z   Cause: listen tcp :443: bind: permission denied
+  2026-11-25T14:29:57Z   Cause: bind: permission denied
+  2026-11-25T14:29:57Z   Cause: permission denied
+```
+
+If it prints `Error: Nearhost is still starting.`, it has not answered in 15 seconds and goes on starting: read the log it names. The log is `core.log` in the config folder. See [The core's log](/docs/guides/run-in-the-background/#the-cores-log).
 
 ## A service's Nearhost cannot open links, reach ssh or Docker
 
@@ -47,7 +68,7 @@ A service does not run with your shell's environment. `nearhost doctor` shows it
 
 ## A project waits for the hosts file
 
-Nearhost in the background never asks for your password, so a project whose names are missing from `/etc/hosts` stays stopped under `nearhost -d` or a service. `nearhost status` and the log say `Run nearhost hosts update in a terminal.`, and `nearhost add` ends with `The running Nearhost serves it once the hosts file is up to date. Run nearhost hosts update in a terminal.`
+Nearhost in the background never asks for your password, so a project whose names are missing from `/etc/hosts` stays stopped under `nearhost -d` or a service. `nearhost status` and the log say to run `nearhost hosts update` in a terminal, and `nearhost add` ends with `Warning: The running Nearhost serves the project once the hosts file is up to date.` and the same command.
 
 Run `nearhost hosts update` in a terminal. It updates the block, then tells Nearhost, which starts the project. Opening `nearhost` does the same, asking for the password in its box. See [The hosts file](/docs/guides/run-in-the-background/#the-hosts-file).
 
@@ -57,12 +78,20 @@ Run `nearhost hosts update` in a terminal. It updates the block, then tells Near
 
 ## Nearhost without a terminal
 
-Bare `nearhost` prints `nearhost needs a terminal for its interface. Use nearhost -d to serve in the background, or nearhost up to serve without one.` and exits 1. It was started from a cron job, a script or a pipe, where there is no terminal for the interface. Run `nearhost -d` there to serve in the background, or `nearhost up` to serve in the foreground. To start Nearhost at login, use `nearhost service install`. On Windows the message adds `In Git Bash, run it through winpty or use Windows Terminal.`
+Bare `nearhost` prints `Error: The interface needs a terminal, and there is none here.`, with the commands below, and exits 1. It was started from a cron job, a script or a pipe, where there is no terminal for the interface. Run `nearhost -d` there to serve in the background, or `nearhost up` to serve in the foreground. To start Nearhost at login, use `nearhost service install`. On Windows the message adds `In Git Bash, run it through winpty or use Windows Terminal.`
 
 `nearhost up` without a terminal cannot ask for your password. When the hosts block needs to change, it skips the change and prints, once:
 
 ```text
-The hosts file needs sudo, and there is no terminal to ask in. Run nearhost up in a terminal once, or pass --no-hosts.
+Warning: The hosts file needs sudo, and there is no terminal to ask in.
+
+Run it once in a terminal, where sudo can ask for your password:
+
+  nearhost up
+
+Or serve without updating the hosts file:
+
+  nearhost up --no-hosts
 ```
 
 Run `nearhost up` once at a terminal so it can update the block, or add the names to the hosts file yourself and run with `--no-hosts`. Do not give Nearhost a passwordless `sudo` rule instead: its binary is usually writable by you, so the rule would give your account root.
@@ -71,7 +100,7 @@ Run `nearhost up` once at a terminal so it can update the block, or add the name
 
 ## Port 6327 already in use
 
-Nearhost starts, serves every project and leaves out Nearhost's page, and the log says `port 6327 is in use; serving without Nearhost's page (pass --web-port to choose another)`. The reason after the port number varies: it may name the program holding the port, or read `needs permission to bind` or `is not available`. `nearhost doctor` warns about it. Another program holding the port is the usual cause. If it is another Nearhost, see [Another Nearhost is already running](#another-nearhost-is-already-running) and stop it. Otherwise pass `--web-port` with a free port, or `--web-port 0` to turn the page off. From Nearhost 0.8.0.
+Nearhost starts, serves every project and leaves out Nearhost's page, and the log has the warning `port 6327 is in use; serving without Nearhost's page (pass --web-port to choose another)`. The reason after the port number varies: it may name the program holding the port, or read `needs permission to bind` or `is not available`. `nearhost doctor` warns about it. Another program holding the port is the usual cause. If it is another Nearhost, see [Another Nearhost is already running](#another-nearhost-is-already-running) and stop it. Otherwise pass `--web-port` with a free port, or `--web-port 0` to turn the page off. From Nearhost 0.8.0.
 
 Without the page, an agent that asks to show a document is told `Nearhost's page isn't served: port 6327 wasn't available when Nearhost started`.
 
@@ -123,7 +152,9 @@ Press `enter` on the project to try again. Or add the alias to `/etc/hosts` your
 On Windows, a hosts file with the read-only attribute stops the change after the User Account Control prompt, and nothing changes on disk:
 
 ```text
-<path> is read-only. Clear it with: attrib -r "<path>" (in an administrator terminal), or run with --no-hosts.
+Error: <path> is read-only.
+
+Clear it with: attrib -r "<path>" (in an administrator terminal), or run with --no-hosts.
 ```
 
 Nearhost does not clear the attribute itself, since a read-only hosts file is often set on purpose. Run the `attrib` command in Windows Terminal opened as administrator, or add the names yourself and run Nearhost with `--no-hosts`. A read-only file whose block is already up to date needs no change, so it causes no error.
@@ -206,7 +237,7 @@ The routes step says no ports were found and asks for the web port. Enter it, or
 
 ## Config file invalid
 
-Nearhost does not start, and names the file and the problem, with the line for a YAML error. Under `nearhost -d` it shows as `Nearhost stopped while starting.` with the end of the core's log. A Nearhost already running keeps serving the last good config and says so in its log. Fix it in `~/.config/nearhost/config.yaml`, or `%APPDATA%\nearhost\config.yaml` on Windows. `nearhost doctor` reports the same without exiting. See [config.yaml](/docs/reference/config/).
+Nearhost does not start, and names the file and the problem, with the line for a YAML error. Under `nearhost -d` it shows as `Error: Nearhost stopped while starting.` with the end of the core's log. A Nearhost already running keeps serving the last good config and says so in its log. Fix it in `~/.config/nearhost/config.yaml`, or `%APPDATA%\nearhost\config.yaml` on Windows. `nearhost doctor` reports the same without exiting. See [config.yaml](/docs/reference/config/).
 
 ## Windows stops nearhost.exe from starting
 
@@ -216,7 +247,7 @@ If Smart App Control is on, Windows can block `nearhost.exe` outright, with no R
 
 ## An update ran but the version did not change
 
-`nearhost update` prints `The update ran, but <path> is still <old>. Run it again, or install by hand: <command>.` and exits 1. The update command succeeded, but the copy your next command runs, at `<path>`, did not start, printed no version, or is still the old version. Run the command it prints, then check with `nearhost --version`.
+`nearhost update` prints `Error: The update ran, but <path> is still <old>.`, with the command to install by hand, and exits 1. The update command succeeded, but the copy your next command runs, at `<path>`, did not start, printed no version, or is still the old version. Run the command it prints, then check with `nearhost --version`.
 
 ## The nearhost command is not found on Windows
 

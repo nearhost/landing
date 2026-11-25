@@ -24,9 +24,11 @@
     "test:tour": "node --test src/lib/agent-tour.test.mjs",
     "test:twin": "node --test src/lib/markdown-twin.test.mjs",
     "test:docs-index": "node --test src/lib/docs-index.test.mjs",
-    "verify": "npm run format:check && npm run lint && npm run check && npm run test:install && npm run test:stats && npm run test:og && npm run test:lastmod && npm run test:redirect && npm run test:tour && npm run test:twin && npm run test:docs-index && npm run build && node scripts/verify-dist.mjs",
+    "verify": "npm run format:check && npm run lint && npm run check && npm run test:install && npm run test:stats && npm run test:og && npm run test:lastmod && npm run test:redirect && npm run test:tour && npm run test:twin && npm run test:docs-index && npm run test:errors && npm run build && node scripts/verify-dist.mjs && node scripts/check-error-anchors.mjs",
     "prepare": "simple-git-hooks",
-    "logo": "node scripts/logo.mjs"
+    "logo": "node scripts/logo.mjs",
+    "errors:sync": "node scripts/sync-errors.mjs",
+    "test:errors": "node --test src/lib/errors-page.test.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "^0.4.3",
