@@ -1,13 +1,13 @@
 <script lang="ts">
   /* eslint-disable svelte/no-useless-mustaches -- a row's spaces are what lines it up, as in a terminal */
-  // A working mock-up of the nearhost interface (0.8.0): the same screens,
+  // A working mock-up of the nearhost interface (0.15.0): the same screens,
   // keys and footer as the real one, driven by made-up projects and requests.
   import { onMount } from 'svelte';
 
-  type State = 'running' | 'starting' | 'stopped' | 'error';
+  type State = 'running' | 'starting' | 'degraded' | 'stopped' | 'error';
   type Role = 'web' | 'loopback' | 'ignore';
   type Link = 'connected' | 'connecting' | 'reconnecting' | 'disconnected' | 'auth failed';
-  type Tone = '' | 'b' | 'a' | 'r' | 'd';
+  type Tone = '' | 'b' | 'a' | 'r' | 'd' | 't';
 
   interface Route {
     port: number;
@@ -21,6 +21,7 @@
     alias: string;
     preset: string;
     state: State;
+    message: string; // why it is in the state it is, as the panel's why says
     since: number;
     webLocal: number;
     routes: Route[];
@@ -31,12 +32,14 @@
     name: string;
     host: string;
     link: Link;
+    held: boolean; // dropped with c: its projects wait, and it is no problem
+    error: string; // what ssh said last
     tries: number;
   }
   interface Entry {
     seq: number;
     at: string;
-    key: string; // the row it belongs to: home, srv:<name> or prj:<name>
+    keys: string[]; // the rows whose logs show it, as srv:<name> or prj:<name>; home shows all
     source: string;
     method?: string;
     path?: string;
@@ -66,10 +69,22 @@
     snippet: `// vite.config.ts\nexport default defineConfig({\n  server: {\n    allowedHosts: ['${alias}'],\n  },\n})\n`,
   });
 
+  // What ssh says when the server turns the key down, as Nearhost shows it.
+  const DENIED = 'you@203.0.113.40: Permission denied (publickey).';
+  const deniedUntil = (t: number) =>
+    `${DENIED} Nearhost tries again at ${new Date(t + 15 * 60_000).toISOString().slice(11, 16)}.`;
+
   let servers = $state<Server[]>([
-    { name: 'local', host: '', link: 'connected', tries: 0 },
-    { name: 'mini', host: 'mini.lan', link: 'connected', tries: 0 },
-    { name: 'vps', host: '203.0.113.40', link: 'auth failed', tries: 3 },
+    { name: 'local', host: '', link: 'connected', held: false, error: '', tries: 0 },
+    { name: 'mini', host: 'mini.lan', link: 'connected', held: false, error: '', tries: 0 },
+    {
+      name: 'vps',
+      host: '203.0.113.40',
+      link: 'auth failed',
+      held: false,
+      error: deniedUntil(START - 364_000),
+      tries: 3,
+    },
   ]);
 
   let projects = $state<Project[]>([
@@ -80,6 +95,7 @@
       alias: 'website.test',
       preset: 'astro',
       state: 'running',
+      message: '',
       since: START - 47 * 60_000,
       webLocal: 4321,
       routes: [{ port: 4321, role: 'web', label: 'astro dev (astro.config)' }],
@@ -92,6 +108,7 @@
       alias: 'ipbar.test',
       preset: '',
       state: 'stopped',
+      message: '',
       since: 0,
       webLocal: 3000,
       routes: [{ port: 3000, role: 'web', label: 'app (PORT)' }],
@@ -104,6 +121,7 @@
       alias: 'myapp.test',
       preset: 'laravel, vite',
       state: 'running',
+      message: '',
       since: START - 2 * HOUR - 14 * 60_000,
       webLocal: 52114,
       routes: [
@@ -128,6 +146,7 @@
       alias: 'otherapp.test',
       preset: 'rails',
       state: 'starting',
+      message: '',
       since: 0,
       webLocal: 52130,
       routes: [{ port: 3000, role: 'web', label: 'rails server (PORT)' }],
@@ -140,6 +159,7 @@
       alias: 'clientsite.test',
       preset: 'wordpress',
       state: 'stopped',
+      message: '',
       since: 0,
       webLocal: 52141,
       routes: [{ port: 8000, role: 'web', label: 'app (WP_PORT)' }],
@@ -154,6 +174,15 @@
     seq: ++seq,
     at: stamp(START - offset * 1000),
   });
+  // The rows whose logs show a line about project p: its own, and its
+  // server's when it runs on one.
+  const projectKeys = (name: string, srv: string) =>
+    srv === 'local' ? ['prj:' + name] : ['prj:' + name, 'srv:' + srv];
+  // A line from a server shows in its log and in the logs of its projects.
+  const serverKeys = (srv: string) => [
+    'srv:' + srv,
+    ...projects.filter((p) => p.server === srv).map((p) => 'prj:' + p.name),
+  ];
   const req = (
     offset: number,
     project: string,
@@ -164,33 +193,45 @@
     type = 'application/json',
     size = '3.1 kB',
   ) =>
-    seed(offset, { key: 'prj:' + project, source: method, method, path, status, ms, type, size });
+    seed(offset, {
+      keys: projectKeys(project, projects.find((p) => p.name === project)?.server ?? 'local'),
+      source: project,
+      method,
+      path,
+      status,
+      ms,
+      type,
+      size,
+      tone: status >= 500 ? 'r' : '',
+    });
+  // A project's state, as the engine announces it.
+  const announced = (offset: number, project: string, srv: string, text: string, err = false) =>
+    seed(offset, { keys: projectKeys(project, srv), source: project, text, tone: err ? 'r' : '' });
+  const linked = (offset: number, srv: string, text: string) =>
+    seed(offset, { keys: serverKeys(srv), source: srv, text: `${srv}: ${text}` });
 
   let entries = $state<Entry[]>([
-    seed(372, { key: 'srv:mini', source: 'mini', text: 'connected over ssh, 2 forwards' }),
-    seed(369, { key: 'prj:myapp', source: 'forward', text: '127.0.0.1:52114 → mini:8080' }),
-    seed(369, { key: 'prj:myapp', source: 'forward', text: '127.0.0.1:5173 → mini:5173' }),
-    seed(368, { key: 'prj:myapp', source: 'proxy', text: 'https://myapp.test ready', tone: 'b' }),
-    seed(364, { key: 'srv:vps', source: 'vps', text: 'auth failed', tone: 'r' }),
-    seed(355, {
-      key: 'prj:website',
-      source: 'proxy',
-      text: 'https://website.test ready',
-      tone: 'b',
-    }),
+    seed(8050, { keys: [], source: 'proxy', text: 'proxy ready' }),
+    linked(8049, 'mini', 'connecting'),
+    linked(8048, 'mini', 'connected'),
+    announced(8047, 'myapp', 'mini', 'state: starting'),
+    announced(8046, 'myapp', 'mini', 'state: running'),
+    announced(2821, 'website', 'local', 'state: starting'),
+    announced(2820, 'website', 'local', 'state: running'),
+    linked(366, 'vps', 'connecting'),
+    linked(364, 'vps', 'auth failed: ' + deniedUntil(START - 364_000)),
     req(361, 'myapp', 'GET', '/', 200, 41, 'text/html', '14.2 kB'),
     req(361, 'myapp', 'GET', '/@vite/client', 200, 3, 'text/javascript', '182 kB'),
     req(339, 'myapp', 'GET', '/dashboard', 200, 88, 'text/html', '22.9 kB'),
     req(326, 'myapp', 'POST', '/login', 302, 63, 'text/html', '0 B'),
-    seed(308, { key: 'prj:myapp', source: 'hmr', text: 'src/pages/Dashboard.vue' }),
     req(297, 'myapp', 'GET', '/api/projects?sort=owner', 500, 212, 'application/json', '412 B'),
     req(296, 'myapp', 'GET', '/api/projects', 200, 54),
     req(290, 'myapp', 'GET', '/favicon.ico', 404, 1, 'text/html', '0 B'),
-    req(250, 'website', 'GET', '/docs/', 200, 31, 'text/html', '18.0 kB'),
-    seed(269, { key: 'prj:myapp', source: 'hmr', text: 'src/components/Card.vue' }),
     req(268, 'myapp', 'GET', '/dashboard', 200, 64, 'text/html', '22.9 kB'),
+    req(250, 'website', 'GET', '/docs/', 200, 31, 'text/html', '18.0 kB'),
     req(247, 'myapp', 'GET', '/api/projects?page=2', 200, 49, 'application/json', '2.8 kB'),
     req(247, 'myapp', 'GET', '/api/user', 200, 18, 'application/json', '611 B'),
+    announced(3, 'otherapp', 'mini', 'state: starting'),
     req(0, 'myapp', 'GET', '/settings', 200, 77, 'text/html', '18.4 kB'),
   ]);
 
@@ -203,9 +244,22 @@
   let filtering = $state(false);
   let query = $state('');
   let showHelp = $state(false);
-  let quitting = $state(false);
-  let exited = $state(false);
-  let flash = $state('');
+  // q asks in a box whether to stop Nearhost or leave it running, when this
+  // interface started it and keep_running is not set; quitting says which
+  // was chosen while it goes, and exited how it went.
+  let quitBox = $state<{ leave: boolean; remember: boolean } | null>(null);
+  let quitting = $state<'' | 'stop' | 'leave'>('');
+  let exited = $state<'' | 'stop' | 'leave'>('');
+  let keepRunning = $state<boolean | null>(null); // keep_running, once Don't ask again saved it
+  let startedHere = $state(true); // false after Leave running: the next run attaches to it
+  // A question asked before a change, as d asks before removing.
+  interface Confirm {
+    title: string;
+    ask: string;
+    then: () => void;
+  }
+  let confirmBox = $state<Confirm | null>(null);
+  let toast = $state<{ text: string; problem: boolean } | null>(null);
   let frame = $state(0);
   let now = $state(START);
   let focused = $state(false);
@@ -214,7 +268,14 @@
     key: string;
     kind: number;
     cursor: number; // seq of the line under the cursor; 0 follows the end
+    pausedAt: number; // the newest seq when following stopped
     open: number; // seq of the request opened
+    search: string;
+    searching: boolean;
+    wrap: boolean; // lines that are not requests wrap
+    reveal: boolean; // cookies show
+    said: string; // what the last replay said, until the next key
+    confirm: number; // seq of the request waiting for y to be sent again
   }
   let logView = $state<LogView | null>(null);
   const KINDS = ['all', 'requests', 'events', 'errors'];
@@ -237,7 +298,7 @@
   const STEPS = ['server', 'path', 'presets', 'presets', 'routes', 'name', 'confirm'];
 
   let term: HTMLDivElement | undefined = $state();
-  let flashTimer: ReturnType<typeof setTimeout> | undefined;
+  let toastTimer: ReturnType<typeof setTimeout> | undefined;
 
   // Helpers.
 
@@ -247,15 +308,51 @@
     key === 'home' ? 'home' : key.startsWith('srv:') ? 'server' : 'project';
   const nameOf = (key: string) => key.slice(4);
 
-  function say(text: string) {
-    flash = text;
-    clearTimeout(flashTimer);
-    flashTimer = setTimeout(() => (flash = ''), 2600);
+  // say shows text in a toast at the foot of the screen for two seconds, as
+  // the interface tells of what a key did. The demo's own notes, about what
+  // it cannot do, go no further.
+  function say(text: string, problem = false) {
+    toast = { text, problem };
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => (toast = null), 2000);
   }
 
-  function note(key: string, source: string, text: string, tone: Tone = '') {
-    entries.push({ seq: ++seq, at: stamp(now), key, source, text, tone });
+  // alert is say for the interface's own news, which its log keeps too,
+  // under the row with key.
+  function alert(key: string, text: string, problem = false) {
+    noteOn(key, text);
+    say(text, problem);
+  }
+
+  function push(e: Omit<Entry, 'seq' | 'at'>) {
+    entries.push({ ...e, seq: ++seq, at: stamp(now) });
     if (entries.length > 400) entries.splice(0, entries.length - 400);
+  }
+
+  // noteOn adds a line of the interface's own to the log of the row with key.
+  function noteOn(key: string, text: string) {
+    push({ keys: key === 'home' ? [] : [key], source: 'nearhost', text });
+  }
+
+  // setState moves p to st and announces it in its log, as the engine does.
+  function setState(p: Project, st: State, message = '') {
+    if (p.state === st && p.message === message) return;
+    p.state = st;
+    p.message = message;
+    if (st === 'running' && !p.since) p.since = now;
+    if (st !== 'running') p.since = 0;
+    push({
+      keys: projectKeys(p.name, p.server),
+      source: p.name,
+      text: `state: ${st}${message ? ': ' + message : ''}`,
+      tone: st === 'error' ? 'r' : '',
+    });
+  }
+
+  // serverLog adds a line of a server's connection to its log and its
+  // projects'.
+  function serverLog(s: Server, text: string) {
+    push({ keys: serverKeys(s.name), source: s.name, text: `${s.name}: ${text}` });
   }
 
   function uptime(p: Project) {
@@ -264,7 +361,8 @@
     const m = Math.floor(d / 60_000);
     if (m < 1) return `${Math.floor(d / 1000)}s`;
     if (m < 60) return `${m}m`;
-    return `${Math.floor(m / 60)}h ${m % 60}m`;
+    if (m < 24 * 60) return `${Math.floor(m / 60)}h ${m % 60}m`;
+    return `${Math.floor(m / 1440)}d ${Math.floor(m / 60) % 24}h`;
   }
 
   const matches = (name: string) => name.toLowerCase().includes(query.toLowerCase());
@@ -295,23 +393,100 @@
   let selProject = $derived(selKind === 'project' ? project(selName) : undefined);
   let selServer = $derived(selKind === 'server' ? server(selName) : undefined);
   let running = $derived(projects.filter((p) => p.state === 'running').length);
-  let problems = $derived(servers.filter((s) => s.link === 'auth failed'));
   let serversUp = $derived(
     new Set(projects.filter((p) => p.state === 'running').map((p) => p.server)).size,
   );
   let spin = $derived(SPIN[frame % SPIN.length]);
 
+  // What needs the user, as Home lists it: servers that cannot connect, and
+  // projects in error. A server dropped on purpose is no problem.
+  interface Problem {
+    dot: [string, Tone];
+    title: string;
+    what: string;
+    why: string;
+    fix: string;
+    blocks: string[];
+    server?: Server; // the server r and y act on
+  }
+  let problems = $derived.by(() => {
+    const out: Problem[] = [];
+    for (const s of servers) {
+      if (s.name === 'local' || s.link === 'connected' || s.held || !s.error) continue;
+      out.push({
+        dot: [linkMark(s.link), linkTone(s.link)],
+        title: s.name,
+        what: connectionText(s),
+        why: s.error,
+        fix: serverFix(s),
+        blocks: projects.filter((p) => p.server === s.name).map((p) => p.name),
+        server: s,
+      });
+    }
+    for (const p of projects) {
+      if (p.state !== 'error') continue;
+      out.push({
+        dot: ['✕', 'r'],
+        title: p.name,
+        what: 'error',
+        why: p.message,
+        fix: fixFor(p),
+        blocks: [],
+      });
+    }
+    return out;
+  });
+  let retryable = $derived(problems.filter((x) => x.server));
+
+  // Each state has a glyph of its own as well as a colour: ● running or
+  // connected, ○ off, ✕ an error, ◐ on its way, and the spinner while it
+  // starts or connects.
   function stateTone(st: State): Tone {
-    return st === 'running' ? 'b' : st === 'starting' ? 'a' : st === 'error' ? 'r' : 'd';
+    return st === 'running' ? 'b' : st === 'error' ? 'r' : st === 'stopped' ? 'd' : 'a';
   }
   function stateDot(st: State) {
-    return st === 'running' ? '●' : st === 'starting' ? spin : st === 'error' ? '●' : '○';
+    return st === 'running'
+      ? '●'
+      : st === 'starting'
+        ? spin
+        : st === 'degraded'
+          ? '◐'
+          : st === 'error'
+            ? '✕'
+            : '○';
   }
   function linkTone(l: Link): Tone {
     return l === 'connected' ? 'b' : l === 'auth failed' ? 'r' : l === 'disconnected' ? 'd' : 'a';
   }
+  // linkMark is a server's mark where the spinner does not turn.
+  function linkMark(l: Link) {
+    return l === 'connected' ? '●' : l === 'auth failed' ? '✕' : l === 'disconnected' ? '○' : '◐';
+  }
   function linkDot(l: Link) {
-    return l === 'connected' ? '●' : l === 'connecting' || l === 'reconnecting' ? spin : '○';
+    return l === 'connecting' || l === 'reconnecting' ? spin : linkMark(l);
+  }
+  // The word for a server's connection: dropped when dropped on purpose.
+  const linkWord = (s: Server) => (s.held ? 'dropped' : s.link);
+  function connectionText(s: Server) {
+    if (s.held) return 'dropped';
+    if (s.link === 'auth failed' && s.tries)
+      return `auth failed · ${s.tries === 1 ? 'tried once' : `tried ${s.tries} times`}`;
+    return s.link;
+  }
+  function serverFix(s: Server) {
+    if (s.link === 'reconnecting')
+      return `Nearhost tries again by itself. If it keeps failing, run ssh ${s.host} once in a terminal to check access.`;
+    return `Run ssh ${s.host} once in a terminal to fix access, then press r.`;
+  }
+  // fixFor says what to do about a project, for the panel's fix line.
+  function fixFor(p: Project) {
+    const host = server(p.server)?.host ?? '';
+    if (p.state === 'degraded')
+      return `None needed while Nearhost reconnects. If it stays degraded, run \`ssh ${host}\` once in a terminal to fix access.`;
+    if (p.state !== 'error') return '';
+    if (p.server !== 'local' && server(p.server)?.link !== 'connected')
+      return `Run \`ssh ${host}\` once in a terminal to fix access, then press enter.`;
+    return 'Resolve what is named above, then press enter to start it again.';
   }
   function statusTone(status: number): Tone {
     return status >= 500
@@ -325,35 +500,95 @@
             : '';
   }
   function localPort(p: Project, r: Route) {
-    if (r.role === 'web' && p.state === 'running') return String(p.webLocal);
-    if (r.role === 'loopback' && p.server !== 'local' && p.state === 'running')
-      return String(r.port);
+    if (r.role === 'web' && (p.state === 'running' || p.state === 'degraded'))
+      return String(p.webLocal);
+    if (r.role === 'loopback' && p.server !== 'local') return String(r.port);
     return '–';
   }
   function routeDot(p: Project, r: Route): [string, Tone] {
     if (r.role === 'ignore') return ['–', 'd'];
     if (p.state === 'running') return ['●', 'b'];
-    if (p.state === 'starting') return ['◐', 'a'];
+    if (p.state === 'starting' || p.state === 'degraded') return ['◐', 'a'];
     return ['○', 'd'];
   }
 
+  // Home shows the combined log; a row, the lines filed under it.
   const entriesFor = (key: string) =>
-    key === 'home' ? entries.filter((e) => !e.method) : entries.filter((e) => e.key === key);
+    key === 'home' ? entries : entries.filter((e) => e.keys.includes(key));
+
+  // The full-screen log's keys, the most useful first: its footer shows as
+  // many as fit, and ? lists them all, by group.
+  const LOG_KEYS = [
+    ['move', 'j/k', 'scroll'],
+    ['view', 'enter', 'expand'],
+    ['view', 'tab', 'kind'],
+    ['search', '/', 'search'],
+    ['log', '?', 'keys'],
+    ['request', 'c', 'copy curl'],
+    ['request', 'r', 'replay'],
+    ['log', 'esc', 'back'],
+    ['move', 'G', 'follow'],
+    ['view', 'w', 'wrap'],
+    ['view', 'v', 'reveal cookies'],
+    ['move', 'g', 'top'],
+    ['move', 'pgup/pgdn', 'page'],
+    ['view', 'shift+tab', 'kind back'],
+    ['log', 'q', 'back'],
+    ['log', 'p', 'review request'],
+  ];
+  const LOG_HELP = ['move', 'view', 'search', 'log', 'request'].map((title) => ({
+    title,
+    keys: LOG_KEYS.filter(([g]) => g === title).map(([, k, label]) => [
+      k,
+      k === '?' ? 'close this list' : label,
+    ]),
+  }));
+
+  // The terminal is 120 cells wide: the footer drops the minor keys, in
+  // this order, until the rest fit beside where the selection is, and ? then
+  // says there is more.
+  const COLUMNS = 120;
+  const MINOR = [
+    'q quit',
+    'n add',
+    's server',
+    'enter collapse',
+    'tab routes',
+    'd remove',
+    'e edit',
+  ];
+  const itemsWidth = (items: FooterItem[]) =>
+    items.reduce((w, it, i) => w + (i ? 3 : 0) + it.key.length + 1 + it.label.length, 0);
+  function fitFooter(items: FooterItem[], room: number) {
+    for (const minor of MINOR) {
+      if (itemsWidth(items) <= room) return items;
+      items = items
+        .filter((it) => `${it.key} ${it.label}` !== minor)
+        .map((it) => (it.key === '?' ? { key: '?', label: 'more' } : it));
+    }
+    return items;
+  }
 
   // The footer: the keys that work now, as the real one lists them.
   let footer = $derived.by((): FooterItem[] => {
     if (quitting || exited) return [];
-    if (form) return [];
-    if (logView)
-      return [
-        { key: 'j/k', label: 'scroll' },
-        { key: 'enter', label: 'expand' },
-        { key: 'tab', label: 'kind' },
-        { key: 'G', label: 'follow' },
-        { key: 'c', label: 'copy curl' },
-        { key: 'r', label: 'replay' },
-        { key: 'esc', label: 'back' },
-      ];
+    if (form || quitBox || confirmBox) return [];
+    if (logView) {
+      // As many as fit, the last cut short as the real one cuts it.
+      const room = COLUMNS - 3 - footerContext.length;
+      const out: FooterItem[] = [];
+      let used = 0;
+      for (const [, key, label] of LOG_KEYS) {
+        const w = (out.length ? 3 : 0) + key.length + 1 + label.length;
+        if (used + w > room - 2) {
+          out.push({ key: '…', label: '' });
+          break;
+        }
+        out.push({ key, label });
+        used += w;
+      }
+      return out;
+    }
     if (routeFocus)
       return [
         { key: '↑↓', label: 'route' },
@@ -380,32 +615,34 @@
         { key: 'd', label: 'remove' },
       ];
     } else if (selKind === 'home') {
-      if (problems.length) items = [{ key: 'r', label: 'retry' }];
+      if (retryable.length) items = [{ key: 'r', label: 'retry' }];
     } else if (selServer) {
       items = [{ key: 'enter', label: 'collapse' }];
       if (selServer.name !== 'local') {
-        const connect = selServer.link === 'disconnected' || selServer.link === 'auth failed';
         items.push(
           { key: 'r', label: 'reconnect' },
-          { key: 'c', label: connect ? 'connect' : 'drop' },
+          { key: 'c', label: connectsOnC(selServer) ? 'connect' : 'drop' },
           { key: 'e', label: 'edit' },
           { key: 'd', label: 'remove' },
         );
       }
     }
-    return [
-      ...items,
-      { key: 'l', label: 'log' },
-      { key: '/', label: 'filter' },
-      { key: 's', label: 'server' },
-      { key: 'n', label: 'add' },
-      { key: '?', label: 'help' },
-      { key: 'q', label: 'quit' },
-    ];
+    return fitFooter(
+      [
+        ...items,
+        { key: 'l', label: 'log' },
+        { key: '/', label: 'filter' },
+        { key: 's', label: 'server' },
+        { key: 'n', label: 'add' },
+        { key: '?', label: 'help' },
+        { key: 'q', label: 'quit' },
+      ],
+      COLUMNS - 3 - footerContext.length,
+    );
   });
 
   let footerContext = $derived.by(() => {
-    if (form || quitting || exited) return '';
+    if (form || quitBox || confirmBox || quitting || exited) return '';
     if (logView) return nameOf(logView.key) || 'home';
     if (selProject) {
       const at = projects.indexOf(selProject) + 1;
@@ -450,13 +687,17 @@
         ['c', 'connect or drop'],
         ['e', 'edit'],
         ['d', 'remove'],
+        ['tab', 'passthroughs, documents, grants'],
+        ['enter', 'collapse, or open a document'],
+        ['x', 'close, revoke or remove'],
       ],
     },
     {
       title: 'nearhost',
       keys: [
         ['n', 'add project'],
-        ['p', 'review proposal'],
+        ['p', 'review request'],
+        ['A', 'always allow'],
         ['l', 'full-screen log'],
         ['?', 'close help'],
         ['q', 'quit'],
@@ -484,37 +725,48 @@
     setTimeout(fn, ms);
   }
 
+  // waiting is the state of a project whose server s is not connected:
+  // starting while Nearhost waits for it, or an error when ssh was turned down.
+  function waiting(s: Server): [State, string] {
+    if (s.held) return ['starting', `waiting for ${s.name}: ${s.name} was disconnected on purpose`];
+    if (s.link === 'auth failed') return ['error', `ssh ${s.host}: ${s.error}`];
+    return ['starting', `waiting for ${s.name}${s.error ? ': ' + s.error : ''}`];
+  }
+
   function startProject(p: Project) {
-    const srv = server(p.server);
-    if (srv && srv.link !== 'connected') {
-      p.state = 'error';
-      note(
-        'prj:' + p.name,
-        'proxy',
-        `${p.server} is not connected, so ${p.name} cannot start`,
-        'r',
-      );
+    const s = server(p.server);
+    setState(p, 'starting');
+    if (s && s.name !== 'local' && s.link !== 'connected') {
+      const [st, message] = waiting(s);
+      setState(p, st, message);
       return;
     }
-    p.state = 'starting';
-    note('prj:' + p.name, 'nearhost', `Starting ${p.name}.`);
-    later(1400, () => {
-      if (p.state !== 'starting') return;
-      for (const r of p.routes) {
-        if (r.role === 'ignore' || p.server === 'local') continue;
-        const local = r.role === 'web' ? p.webLocal : r.port;
-        note('prj:' + p.name, 'forward', `127.0.0.1:${local} → ${p.server}:${r.port}`);
-      }
-      p.state = 'running';
-      p.since = now;
-      note('prj:' + p.name, 'proxy', `https://${p.alias} ready`, 'b');
+    later(1200, () => {
+      if (p.state === 'starting' && !p.message) setState(p, 'running');
     });
   }
 
   function stopProject(p: Project) {
-    p.state = 'stopped';
-    p.since = 0;
-    note('prj:' + p.name, 'nearhost', `Stopped ${p.name}.`);
+    setState(p, 'stopped');
+  }
+
+  // follow moves the projects on s with its connection: degraded while it
+  // is not connected, waiting while they start, and running again once it is.
+  function follow(s: Server) {
+    for (const p of projects) {
+      if (p.server !== s.name || p.state === 'stopped') continue;
+      if (s.link === 'connected') {
+        if (p.state === 'degraded') setState(p, 'running');
+        else if (p.state !== 'running') startProject(p);
+        continue;
+      }
+      if (p.state === 'running' || p.state === 'degraded') {
+        const why = s.held
+          ? `server ${s.name} was disconnected on purpose`
+          : `server ${s.name} is ${s.link}${s.error ? ': ' + s.error : ''}`;
+        setState(p, 'degraded', why);
+      } else setState(p, ...waiting(s));
+    }
   }
 
   function enter() {
@@ -527,63 +779,135 @@
     else stopProject(selProject);
   }
 
-  function reconnect(s: Server) {
-    s.link = 'reconnecting';
-    note('srv:' + s.name, s.name, `Reconnecting ${s.name}.`);
-    later(1500, () => {
+  // dial connects s again, as its session does: vps turns the key down.
+  function dial(s: Server) {
+    s.held = false;
+    s.link = 'connecting';
+    serverLog(s, 'connecting');
+    follow(s);
+    later(1400, () => {
+      if (s.link !== 'connecting') return;
       if (s.name === 'vps') {
+        s.tries = 1; // a retry counts its failures afresh
+        s.error = deniedUntil(now);
         s.link = 'auth failed';
-        s.tries += 1;
-        note('srv:vps', 'vps', 'auth failed', 'r');
-        return;
+        serverLog(s, 'auth failed: ' + s.error);
+      } else {
+        s.link = 'connected';
+        s.error = '';
+        s.tries = 0;
+        serverLog(s, 'connected');
       }
-      s.link = 'connected';
-      note('srv:' + s.name, s.name, 'connected over ssh');
+      follow(s);
     });
   }
+
+  function reconnect(s: Server) {
+    noteOn('srv:' + s.name, `Reconnecting ${s.name}.`);
+    dial(s);
+  }
+
+  const connectsOnC = (s: Server) =>
+    s.held || s.link === 'disconnected' || s.link === 'auth failed';
 
   function toggleConnection(s: Server) {
-    const connect = s.link === 'disconnected' || s.link === 'auth failed';
-    if (!connect) {
-      note('srv:' + s.name, s.name, `Dropping the connection to ${s.name}.`);
-      s.link = 'disconnected';
-      for (const p of projects) if (p.server === s.name && p.state !== 'stopped') p.state = 'error';
+    if (connectsOnC(s)) {
+      noteOn('srv:' + s.name, `Connecting ${s.name}.`);
+      dial(s);
       return;
     }
-    note('srv:' + s.name, s.name, `Connecting ${s.name}.`);
-    s.link = 'connecting';
-    later(1400, () => {
-      if (s.name === 'vps') {
-        s.link = 'auth failed';
-        s.tries += 1;
-        note('srv:vps', 'vps', 'auth failed', 'r');
-        return;
-      }
-      s.link = 'connected';
-      note('srv:' + s.name, s.name, 'connected over ssh');
-      for (const p of projects) if (p.server === s.name && p.state === 'error') startProject(p);
-    });
+    noteOn('srv:' + s.name, `Dropping the connection to ${s.name}.`);
+    s.held = true;
+    s.link = 'disconnected';
+    serverLog(s, 'disconnected');
+    follow(s);
   }
 
-  async function copy(text: string, said: string) {
+  async function copy(key: string, text: string, said: string) {
     try {
       await navigator.clipboard.writeText(text);
-      say(said);
+      alert(key, said);
     } catch {
-      say('The clipboard is not available here.');
+      say('The clipboard is not available here.', true);
     }
   }
 
-  function quit() {
-    quitting = true;
+  // quit quits as keep_running says: it stops Nearhost, leaves it running,
+  // or asks which in the quit box. A Nearhost this interface did not start
+  // is left running. Ctrl-C never asks, and at the box it stops.
+  function quit(ctrlC = false) {
+    if (quitting) return;
+    if (quitBox) {
+      if (ctrlC) end('stop', false);
+      return;
+    }
+    if (!startedHere || keepRunning) end('leave', false);
+    else if (keepRunning === null && !ctrlC) quitBox = { leave: false, remember: false };
+    else end('stop', false);
+  }
+
+  // end ends the interface, saving the choice as keep_running when asked.
+  function end(how: 'stop' | 'leave', remember: boolean) {
+    quitBox = null;
+    if (remember) keepRunning = how === 'leave';
+    showHelp = false;
+    quitting = how;
     later(900, () => {
-      quitting = false;
-      exited = true;
+      quitting = '';
+      exited = how;
     });
+  }
+
+  function quitBoxKey(k: string) {
+    const b = quitBox!;
+    if (k === 'Tab' || k === 'ArrowLeft' || k === 'ArrowRight') b.leave = !b.leave;
+    else if (k === ' ') b.remember = !b.remember;
+    else if (k === 'Enter') end(b.leave ? 'leave' : 'stop', b.remember);
+    else if (k === 'Escape') quitBox = null;
+    else return k.length === 1;
+    return true;
+  }
+
+  function confirmKey(k: string) {
+    const c = confirmBox!;
+    if (k === 'y') {
+      confirmBox = null;
+      c.then();
+    } else if (k === 'n' || k === 'Escape') confirmBox = null;
+    else return k.length === 1;
+    return true;
+  }
+
+  function removeProject(p: Project) {
+    confirmBox = {
+      title: `Remove ${p.name}?`,
+      ask: 'It stops now and leaves the config.',
+      then: () => {
+        projects.splice(projects.indexOf(p), 1);
+        selectRow('srv:' + p.server);
+        alert('srv:' + p.server, `Removed ${p.name}.`);
+      },
+    };
+  }
+
+  function removeServer(s: Server) {
+    const on = projects.filter((p) => p.server === s.name).map((p) => p.name);
+    confirmBox = {
+      title: `Remove ${s.name}?`,
+      ask: on.length ? `Its projects go with it and stop now: ${on.join(', ')}.` : '',
+      then: () => {
+        projects = projects.filter((p) => p.server !== s.name);
+        servers.splice(servers.indexOf(s), 1);
+        selectRow('home');
+        alert('home', `Removed ${s.name}.`);
+      },
+    };
   }
 
   function relaunch() {
-    exited = false;
+    // After Leave running, the next nearhost attaches to the one running.
+    startedHere = exited !== 'leave';
+    exited = '';
     showHelp = false;
     routeFocus = false;
     logView = null;
@@ -707,6 +1031,7 @@
       alias: form.alias.trim() || name + '.test',
       preset: ['laravel', 'vite'].filter((_, i) => form!.presets[i]).join(', '),
       state: 'stopped',
+      message: '',
       since: 0,
       webLocal: 52150 + projects.length,
       routes: form.routes.map((r) => ({ ...r })),
@@ -719,6 +1044,7 @@
     collapsed[added.server] = false;
     query = '';
     selectRow('prj:' + added.name);
+    alert('prj:' + added.name, `Added ${added.name}.`);
     startProject(added);
   }
 
@@ -772,7 +1098,8 @@
           const base = f.path.replace(/\/$/, '').split('/').pop() || 'shop';
           f.name = base;
           f.alias = base + '.test';
-          formBusy('Reading the project…', 900, () => {
+          const where = f.server === 'local' ? 'this machine' : f.server;
+          formBusy(`Reading ${f.path} on ${where}…`, 900, () => {
             if (form) form.step = 3;
           });
         } else if (k === 'Backspace') f.path = f.path.slice(0, -1);
@@ -804,7 +1131,8 @@
           const r = f.routes[f.routeRow];
           const step = k === 'ArrowRight' ? 1 : 2;
           r.role = roles[(roles.indexOf(r.role) + step) % 3];
-          flash = '';
+        } else if (k === 'h' && f.routes[f.routeRow].role === 'web') {
+          say('h types the names a web route is served at. Try it with nearhost.');
         } else if (k === 'Enter') {
           const web = f.routes.filter((r) => r.role === 'web');
           if (!web.length) {
@@ -849,16 +1177,25 @@
     return false;
   }
 
+  // An entry as text, as the log's search reads it.
+  const plain = (e: Entry) =>
+    e.method
+      ? `${e.at} ${e.source} ${e.method} ${e.path} ${e.status}`
+      : `${e.at} ${e.source} ${e.text}`;
+  const isError = (e: Entry) => (e.status ?? 0) >= 500 || e.tone === 'r';
+
   let logLines = $derived.by(() => {
     if (!logView) return [];
-    const all = entriesFor(logView.key);
+    const want = logView.search.toLowerCase();
+    let all = entriesFor(logView.key);
+    if (want) all = all.filter((e) => plain(e).toLowerCase().includes(want));
     switch (logView.kind) {
       case 1:
         return all.filter((e) => e.method);
       case 2:
         return all.filter((e) => !e.method);
       case 3:
-        return all.filter((e) => (e.status ?? 0) >= 500 || e.tone === 'r');
+        return all.filter(isError);
     }
     return all;
   });
@@ -869,65 +1206,134 @@
     const at = logLines.findIndex((e) => e.seq === logView!.cursor);
     return logLines.slice(Math.max(0, at - 12), at + 40);
   });
-  let errorCount = $derived(
-    logView
-      ? entriesFor(logView.key).filter((e) => (e.status ?? 0) >= 500 || e.tone === 'r').length
-      : 0,
+  let errorCount = $derived(logView ? entriesFor(logView.key).filter(isError).length : 0);
+  // The lines that came while the log was paused.
+  let newer = $derived(
+    logView?.cursor ? logLines.filter((e) => e.seq > logView!.pausedAt).length : 0,
   );
 
-  function logKey(k: string): boolean {
+  // pause moves the log's cursor to the line with seq, which stops it
+  // following; 0 follows again.
+  function pause(v: LogView, to: number) {
+    if (to && !v.cursor) v.pausedAt = seq;
+    v.cursor = to;
+  }
+
+  function logKey(k: string, ev: KeyboardEvent): boolean {
     const v = logView;
     if (!v) return false;
+    if (v.searching) {
+      if (k === 'Enter') v.searching = false;
+      else if (k === 'Escape') {
+        v.searching = false;
+        v.search = '';
+      } else if (k === 'Backspace') v.search = v.search.slice(0, -1);
+      else if (k.length === 1 && !ev.metaKey && !ev.ctrlKey) v.search += k;
+      else return false;
+      return true;
+    }
+    if (showHelp && (k === '?' || k === 'Escape')) {
+      showHelp = false;
+      return true;
+    }
     const lines = logLines;
     const at = v.cursor ? lines.findIndex((e) => e.seq === v.cursor) : lines.length - 1;
     const cur = lines[at];
+    v.said = '';
+    if (v.confirm) {
+      // Any key but y keeps the request unsent.
+      const e = lines.find((x) => x.seq === v.confirm);
+      v.confirm = 0;
+      if (k === 'y' && e) replay(v, e);
+      return true;
+    }
     switch (k) {
+      case '?':
+        showHelp = true;
+        return true;
       case 'Escape':
       case 'q':
-        logView = null;
+        if (v.search && k === 'Escape') v.search = '';
+        else {
+          logView = null;
+          showHelp = false;
+        }
+        return true;
+      case '/':
+        v.searching = true;
         return true;
       case 'j':
       case 'ArrowDown':
         if (at >= lines.length - 1) v.cursor = 0;
-        else v.cursor = lines[at + 1].seq;
+        else pause(v, lines[at + 1].seq);
         return true;
       case 'k':
       case 'ArrowUp':
-        if (lines.length) v.cursor = lines[Math.max(at - 1, 0)].seq;
+        if (lines.length) pause(v, lines[Math.max(at - 1, 0)].seq);
+        return true;
+      case 'g':
+      case 'Home':
+        if (lines.length) pause(v, lines[0].seq);
+        return true;
+      case 'PageUp':
+        if (lines.length) pause(v, lines[Math.max(at - 20, 0)].seq);
+        return true;
+      case 'PageDown':
+        if (at + 20 >= lines.length - 1) v.cursor = 0;
+        else pause(v, lines[at + 20].seq);
         return true;
       case 'G':
+      case 'End':
         v.cursor = 0;
-        v.open = 0;
         return true;
       case 'Tab':
-        v.kind = (v.kind + 1) % KINDS.length;
-        v.cursor = 0;
-        v.open = 0;
+        v.kind = (v.kind + (ev.shiftKey ? KINDS.length - 1 : 1)) % KINDS.length;
+        return true;
+      case 'w':
+        v.wrap = !v.wrap;
+        return true;
+      case 'v':
+        v.reveal = !v.reveal;
         return true;
       case 'Enter':
         if (cur?.method) {
           v.open = v.open === cur.seq ? 0 : cur.seq;
-          if (!v.cursor) v.cursor = cur.seq;
+          if (!v.cursor) pause(v, cur.seq);
         }
         return true;
       case 'c':
         if (cur?.method) {
-          const p = project(nameOf(v.key));
+          const p = project(cur.source);
+          const how = cur.method === 'GET' ? '' : ` -X ${cur.method}`;
           copy(
-            `curl -i -X ${cur.method} 'https://${p?.alias ?? 'myapp.test'}${cur.path}'`,
-            'Copied the request as curl.',
+            v.key,
+            `curl -i --globoff${how} 'https://${p?.alias ?? cur.source + '.test'}${cur.path}'`,
+            `Copied ${cur.method} ${cur.path} as curl.`,
           );
         }
         return true;
       case 'r':
         if (cur?.method) {
-          const p = project(nameOf(v.key));
-          if (p) request(p, cur.method, cur.path!, true);
-          say(`Sent ${cur.method} ${cur.path} again.`);
+          // A request that could change something asks first.
+          if (cur.method === 'GET' || cur.method === 'HEAD') replay(v, cur);
+          else v.confirm = cur.seq;
         }
         return true;
     }
     return false;
+  }
+
+  // replay sends a request again, and says how it went.
+  function replay(v: LogView, e: Entry) {
+    const p = project(e.source);
+    if (!p || p.state !== 'running') {
+      v.said = `Could not send ${e.method} ${e.path} again: ${e.source} is not running.`;
+      noteOn(v.key, v.said);
+      return;
+    }
+    const status = request(p, e.method!, e.path!, true);
+    v.said = `Sent ${e.method} ${e.path} again: ${status}.`;
+    noteOn(v.key, v.said);
   }
 
   function routesKey(k: string): boolean {
@@ -958,7 +1364,7 @@
         return true;
       }
       case 'y':
-        if (p.advice) copy(p.advice.snippet, 'Copied the fix for vite.config.ts.');
+        copyAdvice(p);
         return true;
       case 'Tab':
       case 'Escape':
@@ -1004,15 +1410,15 @@
           say('Editing opens the same form as adding. Try it with nearhost.');
         return true;
       case 'd':
-        if (selProject || (selServer && selServer.name !== 'local'))
-          say('Removing asks first. This demo keeps its projects.');
+        if (selProject) removeProject(selProject);
+        else if (selServer && selServer.name !== 'local') removeServer(selServer);
         return true;
       case 'c':
         if (selServer && selServer.name !== 'local') toggleConnection(selServer);
         return true;
       case 'r':
         if (selServer && selServer.name !== 'local') reconnect(selServer);
-        else if (selKind === 'home') for (const s of problems) reconnect(s);
+        else if (selKind === 'home') for (const x of retryable) reconnect(x.server!);
         return true;
       case 'tab':
       case 'Tab':
@@ -1020,12 +1426,12 @@
         routeFocus = true;
         routeRow = 0;
         return true;
-      case 'y':
-        if (selProject?.advice)
-          copy(selProject.advice.snippet, 'Copied the fix for vite.config.ts.');
-        else if (selKind === 'home' && problems.length)
-          copy('ssh 203.0.113.40', 'Copied ssh 203.0.113.40.');
+      case 'y': {
+        const host = retryable[0]?.server?.host;
+        if (selProject) copyAdvice(selProject);
+        else if (selKind === 'home' && host) copy('home', 'ssh ' + host, `Copied ssh ${host}.`);
         return true;
+      }
       case 'q':
         quit();
         return true;
@@ -1033,7 +1439,20 @@
         showHelp = !showHelp;
         return true;
       case 'l':
-        logView = { key: sel, kind: 0, cursor: 0, open: 0 };
+        showHelp = false;
+        logView = {
+          key: sel,
+          kind: 0,
+          cursor: 0,
+          pausedAt: 0,
+          open: 0,
+          search: '',
+          searching: false,
+          wrap: true,
+          reveal: false,
+          said: '',
+          confirm: 0,
+        };
         return true;
       case 'k':
       case 'up':
@@ -1069,7 +1488,7 @@
         enter();
         return true;
       case 'o':
-        if (selProject) say(`Opens https://${selProject.alias} in your browser.`);
+        if (selProject) say(`nearhost opens https://${selProject.alias} in your browser.`);
         return true;
       case 'i':
         // With the routes focused every route shows, so i changes nothing.
@@ -1084,14 +1503,16 @@
     const k = ev.key;
     let handled: boolean;
     if (ev.ctrlKey && k === 'c') {
-      if (!exited) quit();
+      if (!exited) quit(true);
       handled = true;
     } else if (exited) {
       if (k === 'Enter') relaunch();
       handled = k === 'Enter';
     } else if (quitting) handled = true;
+    else if (quitBox) handled = quitBoxKey(k);
+    else if (confirmBox) handled = confirmKey(k);
     else if (form) handled = formKey(k, ev);
-    else if (logView) handled = logKey(k);
+    else if (logView) handled = logKey(k, ev);
     else if (showHelp && (k === '?' || k === 'Escape')) {
       showHelp = false;
       handled = true;
@@ -1116,7 +1537,7 @@
   }
 
   function clickRow(r: Row) {
-    if (form || logView) return;
+    if (form || logView || quitBox || confirmBox) return;
     term?.focus();
     selectRow(r.key);
   }
@@ -1128,33 +1549,29 @@
     if (!replay && roll < 0.04) status = 500;
     else if (!replay && roll < 0.09) status = 404;
     const html = !path.startsWith('/api') && !path.includes('.');
-    entries.push({
-      seq: ++seq,
-      at: stamp(now),
-      key: 'prj:' + p.name,
-      source: method,
+    push({
+      keys: projectKeys(p.name, p.server),
+      source: p.name,
       method,
       path,
       status,
       ms: Math.round(8 + Math.random() * (html ? 90 : 40)),
       type: html ? 'text/html' : path.endsWith('.js') ? 'text/javascript' : 'application/json',
       size: `${(0.4 + Math.random() * 20).toFixed(1)} kB`,
+      tone: status >= 500 ? 'r' : '',
     });
-    if (entries.length > 400) entries.splice(0, entries.length - 400);
+    return status;
+  }
+
+  function copyAdvice(p: Project) {
+    if (p.advice) copy('prj:' + p.name, p.advice.snippet, `Copied the advice for ${p.name}.`);
+    else alert('prj:' + p.name, `${p.name} has no advice to copy.`, true);
   }
 
   function tick() {
     const live = projects.filter((p) => p.state === 'running');
     if (!live.length) return;
     const p = live[Math.floor(Math.random() * live.length)];
-    if (Math.random() < 0.1 && p.preset.includes('vite')) {
-      note(
-        'prj:' + p.name,
-        'hmr',
-        'src/components/' + ['Card', 'Nav', 'Table', 'Modal'][seq % 4] + '.vue',
-      );
-      return;
-    }
     const path = p.paths[Math.floor(Math.random() * p.paths.length)];
     request(p, path === '/login' ? 'POST' : 'GET', path);
   }
@@ -1184,12 +1601,7 @@
     next();
     later(2200, () => {
       const other = project('otherapp');
-      if (other?.state === 'starting') {
-        other.state = 'running';
-        other.since = now;
-        note('prj:otherapp', 'forward', '127.0.0.1:52130 → mini:3000');
-        note('prj:otherapp', 'proxy', 'https://otherapp.test ready', 'b');
-      }
+      if (other?.state === 'starting' && !other.message) setState(other, 'running');
     });
     return () => {
       seen.disconnect();
@@ -1202,18 +1614,20 @@
   // Rendering helpers for the panel's log.
   const pad = (s: string | number, n: number) => String(s).padEnd(n);
   const took = (ms?: number) => (ms === undefined ? '' : `${ms}ms`.padStart(5));
+  // A source in its eight cells, cut short with … as the real log cuts it.
+  const fit8 = (s: string) => (s.length > 8 ? s.slice(0, 7) + '…' : s);
   const recent = (key: string, n: number) => entriesFor(key).slice(-n);
 </script>
 
-{#snippet line(e: Entry, wide: boolean)}
-  <span class="d c10">{e.at}</span>{#if e.method}<span class="c10">{e.method}</span><span
-      class="grow">{e.path}</span
-    ><span class="st {statusTone(e.status ?? 0)}">{e.status}</span><span class="d took"
+{#snippet line(e: Entry, sources: boolean)}
+  <span class="d c10">{e.at}</span>{#if e.method}{#if sources}<span class="c10"
+        >{fit8(e.source)}</span
+      ><span class="grow">{e.method} {e.path}</span>{:else}<span class="c10">{e.method}</span><span
+        class="grow">{e.path}</span
+      >{/if}<span class="st {statusTone(e.status ?? 0)}">{e.status}</span><span class="d took"
       >{took(e.ms)}</span
-    >{#if wide}<span class="d wideonly c27"
-        >{pad(e.type ?? '', 17)}{(e.size ?? '').padStart(8)}</span
-      >{/if}
-  {:else}<span class="c10">{e.source}</span><span class="grow {e.tone}">{e.text}</span>{/if}
+    >
+  {:else}<span class="c10">{fit8(e.source)}</span><span class="grow {e.tone}">{e.text}</span>{/if}
 {/snippet}
 
 {#snippet rule(label: string, right: string = '')}
@@ -1221,6 +1635,40 @@
     <span class="d">{label}{' '}</span><span class="hr"></span>{#if right}<span class="d"
         >{' '}{right}{' '}</span
       ><span class="b">●</span>{/if}
+  </div>
+{/snippet}
+
+<!-- A labelled value of a panel, its later lines under its first. -->
+{#snippet field(label: string, value: string, tone: Tone = '')}
+  <div class="fld">
+    <span class="d lab">{label}</span><span class="val {tone}">{value}</span>
+  </div>
+{/snippet}
+
+<!-- How the machine is, as the header says it: in full, or one dot on a phone. -->
+{#snippet summary()}
+  <span class="wideonly"
+    ><span class="d">proxy</span> <span class="b">●</span> :443 <span class="d">·</span>
+    <span class="d">CA</span> trusted <span class="d">·</span>
+    <span class="d">hosts</span>
+    ok{#if problems.length}{' '}<span class="d">·</span>{' '}<span class="r"
+        >{problems.length} problem{problems.length > 1 ? 's' : ''}</span
+      >{/if}{' '}</span
+  ><span class="narrowonly"
+    ><span class={problems.length ? 'r' : 'b'}>{problems.length ? '✕' : '●'}</span>
+    <span class="d">proxy · CA · hosts</span>{' '}</span
+  >
+{/snippet}
+
+{#snippet panelLog(label: string, key: string, sources: boolean)}
+  <div class="l"></div>
+  {@render rule(label, 'following')}
+  <div class="tail">
+    <div class="tailin">
+      {#each recent(key, 30) as e (e.seq)}<div class="l lr" class:wrapped={!e.method}>
+          {@render line(e, sources)}
+        </div>{/each}
+    </div>
   </div>
 {/snippet}
 
@@ -1248,7 +1696,11 @@
     {#if exited}
       <div class="screen shell">
         <div class="l"><span class="d">~/code/myapp</span> <span class="b">$</span> nearhost</div>
-        <div class="l d">Stopped the forwards and the proxy. Bye.</div>
+        {#if exited === 'leave'}
+          <div class="l wrap">
+            Nearhost is still running in the background. Stop it with nearhost stop.
+          </div>
+        {/if}
         <div class="l">
           <span class="d">~/code/myapp</span> <span class="b">$</span> <span class="caret"></span>
         </div>
@@ -1258,20 +1710,21 @@
         </button>
       </div>
     {:else}
-      <div class="screen" class:dimmed={!!form}>
+      <div class="screen" class:dimmed={!!form || !!quitBox || !!confirmBox}>
         {#if logView}
           {@const lp = project(nameOf(logView.key))}
+          {@const sources = !logView.key.startsWith('prj:')}
           <div class="f head">
             <span
               >{' '}<span class="b s">∩</span> <span class="s">nearhost</span>
-              <span class="d">›</span>
-              {nameOf(logView.key) || 'home'} <span class="d">›</span> log</span
+              {#if logView.key !== 'home'}<span class="d">›</span>
+                {nameOf(logView.key)}{' '}{/if}<span class="d">›</span> log</span
             >
             {#if lp}<span
                 ><span class={stateTone(lp.state)}>{stateDot(lp.state)}</span>
                 {lp.state} <span class="d">·</span>
                 <span class="b u">https://{lp.alias}</span>{' '}</span
-              >{/if}
+              >{:else}<span>{@render summary()}</span>{/if}
           </div>
           <div class="hr row"></div>
           <div class="f">
@@ -1279,14 +1732,14 @@
               >{' '}{#each KINDS as kind, i (kind)}<button
                   type="button"
                   class:on={logView.kind === i}
-                  onclick={() =>
-                    logView && ((logView.kind = i), (logView.cursor = 0), (logView.open = 0))}
-                  >{' '}{kind}{' '}</button
-                >{#if kind === 'errors' && errorCount}<span class="r">{errorCount}</span
-                  >{/if}{' '}{/each}</span
+                  onclick={() => logView && (logView.kind = i)}
+                  >{' '}{kind}{kind === 'errors' && errorCount ? ` ${errorCount}` : ''}{' '}</button
+                >{' '}{/each}{#if logView.searching || logView.search}{'   '}<span class="b">/</span
+                >{' '}{logView.search}{#if logView.searching}<span class="caret"
+                  ></span>{/if}{/if}</span
             >
             <span class="d"
-              >{logView.kind
+              >{logView.kind || logView.search
                 ? `${logLines.length} of ${entriesFor(logView.key).length}`
                 : logLines.length} lines · {logView.cursor ? 'paused' : 'following'}{' '}</span
             >
@@ -1295,14 +1748,17 @@
           <div class="logfull" class:following={!logView.cursor}>
             {#each logWindow as e (e.seq)}
               {@const on = logView.cursor ? e.seq === logView.cursor : false}
-              <div class="l lr" class:sel={on}>
-                <span class="b bar">{on ? '▌' : ' '}</span>{@render line(e, true)}
+              <div class="l lr" class:sel={on} class:wrapped={logView.wrap && !e.method}>
+                <span class="b bar">{on ? '▌' : ' '}</span>{@render line(e, sources)}
               </div>
               {#if logView.open === e.seq}
+                {@const rp = project(e.source)}
                 <div class="l">
-                  <span class="d">{'   │ '}{pad('request', 9)}</span>host: {lp?.alias}
+                  <span class="d">{'   │ '}{pad('request', 9)}</span>host: {rp?.alias}
                   <span class="d">·</span>
-                  accept: {e.type} <span class="d">·</span> cookie: •••
+                  accept: {e.type} <span class="d">·</span> cookie: {logView.reveal
+                    ? 'session=8f3a1c9e2b'
+                    : '•••'}
                 </div>
                 <div class="l">
                   <span class="d">{'   │ '}{pad('response', 9)}</span><span
@@ -1319,42 +1775,56 @@
                     >
                   </div>
                 {/if}
-                {#if lp}
-                  {@const web = lp.routes.find((r) => r.role === 'web')}
+                {#if rp}
+                  {@const web = rp.routes.find((r) => r.role === 'web')}
                   <div class="l">
                     <span class="d">{'   │ '}{pad('route', 9)}</span>{web?.port} web
                     <span class="d">→</span>
-                    127.0.0.1:{lp.webLocal}{#if lp.server !== 'local'}{' '}<span class="d">→</span>
-                      {lp.server}:{web?.port} <span class="d">over ssh</span>{/if}
+                    127.0.0.1:{rp.webLocal}{#if rp.server !== 'local'}{' '}<span class="d">→</span>
+                      {rp.server}:{web?.port} <span class="d">over ssh</span>{/if}
                   </div>
                 {/if}
                 <div class="l">
                   <span class="d">{'   │ '}</span><span class="b">c</span>
                   <span class="d">copy as curl ·</span>
                   <span class="b">r</span> <span class="d">replay ·</span>
+                  <span class="b">v</span>
+                  <span class="d">{logView.reveal ? 'hide' : 'reveal'} ·</span>
                   <span class="b">enter</span>
                   <span class="d">collapse</span>
                 </div>
               {/if}
             {/each}
           </div>
+          {#if logView.confirm}
+            {@const e = logLines.find((x) => x.seq === logView!.confirm)}
+            <div class="f">
+              <span class="a">{' '}Send {e?.method} {e?.path} again? It may change something.</span>
+              <span
+                ><span class="b">y</span>
+                <span class="d">send · any other key keeps it</span>{' '}</span
+              >
+            </div>
+          {:else if logView.said}
+            <div class="f"><span>{' '}{logView.said}</span></div>
+          {:else if newer}
+            <div class="f">
+              <span class="a">{' '}▼ {newer} new lines below</span>
+              <span
+                ><span class="b">G</span>
+                <span class="d">jump to the end and follow</span>{' '}</span
+              >
+            </div>
+          {/if}
         {:else}
           <div class="f head">
             <span>{' '}<span class="b s">∩</span> <span class="s">nearhost</span></span>
-            <span
-              ><span class="d">proxy</span> <span class="b">●</span> :443 <span class="d">·</span>
-              <span class="d">CA</span> trusted <span class="d">·</span>
-              <span class="d">hosts</span>
-              ok{#if problems.length}{' '}<span class="d">·</span>{' '}<span class="r"
-                  >{problems.length} problem</span
-                >{/if}{' '}</span
-            >
+            <span>{@render summary()}</span>
           </div>
           <div class="hr row"></div>
 
           <div class="body">
             <nav class="side" aria-label="Projects and servers">
-              <div class="l"></div>
               {#if filtering || query}
                 <div class="l">
                   {' '}<span class="b">/</span>
@@ -1371,7 +1841,9 @@
                     <span
                       ><span class="b">{on ? '▌' : ' '}</span><span class:s={on}>home</span></span
                     >
-                    <span class={running ? 'b' : 'd'}>{running} running{' '}</span>
+                    <span class={running ? 'b' : 'd'}
+                      >{running ? `${running} running` : 'nothing running'}{' '}</span
+                    >
                   {:else if r.kind === 'server'}
                     {@const s = server(r.name)!}
                     <span
@@ -1381,11 +1853,19 @@
                       <span class:s={on}>{s.name}</span></span
                     >
                     {#if s.name === 'local'}
+                      {@const here = projects.filter((p) => p.server === 'local')}
                       <span class="d"
-                        >{projects.filter((p) => p.server === 'local').length}{' '}</span
+                        >{query
+                          ? `${here.filter((p) => matches(p.name)).length} of ${here.length}`
+                          : here.length}{' '}</span
                       >
                     {:else}
-                      <span class={linkTone(s.link)}>{linkDot(s.link)} {s.link}{' '}</span>
+                      <span
+                        ><span class={linkTone(s.link)}>{linkDot(s.link)}</span><span
+                          class={s.link === 'connected' ? '' : linkTone(s.link)}
+                          >{' '}{linkWord(s)}{' '}</span
+                        ></span
+                      >
                     {/if}
                   {:else}
                     {@const p = project(r.name)!}
@@ -1406,10 +1886,10 @@
             </nav>
 
             <div class="panel">
-              <div class="l"></div>
               {#if selProject}
                 {@const p = selProject}
                 {@const up = uptime(p)}
+                {@const fix = fixFor(p)}
                 <div class="f">
                   <span
                     ><span class="s">{p.name}</span>{'  '}<span class="b u">https://{p.alias}</span
@@ -1428,15 +1908,8 @@
                     ><span class="d">path</span> {p.path}</span
                   >
                 </div>
-                {#if p.state === 'error'}
-                  <div class="l">
-                    <span class="d">{pad('why', 10)}</span>{p.server} is not connected.
-                  </div>
-                  <div class="l">
-                    <span class="d">{pad('fix', 10)}</span>Select {p.server} and press
-                    <span class="b">c</span> to connect.
-                  </div>
-                {/if}
+                {#if p.message}{@render field('why', p.message)}{/if}
+                {#if fix}{@render field('fix', fix)}{/if}
                 <div class="l"></div>
                 <div class="l d routes">
                   <span class="bar"></span><span class="c8">port</span><span class="c12">role</span
@@ -1488,48 +1961,38 @@
                     >
                   </div>
                 {/if}
+                {@render panelLog('log', sel, false)}
+              {:else if selServer?.name === 'local'}
+                <div class="l s">local</div>
                 <div class="l"></div>
-                {@render rule('log', 'following')}
-                <div class="tail">
-                  {#each recent(sel, 30) as e (e.seq)}<div class="l lr">
-                      {@render line(e, false)}
-                    </div>{/each}
-                </div>
+                <div class="l wrap">Projects on this machine. There is nothing to connect to.</div>
+                {@render panelLog('log', sel, true)}
               {:else if selServer}
                 {@const s = selServer}
                 <div class="f">
                   <span class="s">{s.name}</span>
-                  {#if s.name === 'local'}<span class="d">this machine</span>{:else}<span
-                      class={linkTone(s.link)}>{linkDot(s.link)} {s.link}</span
-                    >{/if}
+                  <span
+                    ><span class={linkTone(s.link)}>{linkDot(s.link)}</span>
+                    {connectionText(s)}</span
+                  >
                 </div>
                 <div class="l"></div>
-                {#if s.name !== 'local'}<div class="l">
-                    <span class="d">{pad('ssh host', 10)}</span>{s.host}
-                  </div>{/if}
-                {#if s.link === 'auth failed'}
-                  <div class="l">
-                    <span class="d">{pad('why', 10)}</span
-                    >{'ssh: handshake failed: Permission denied (publickey)'}
-                  </div>
-                  <div class="l">
-                    <span class="d">{pad('fix', 10)}</span>Run <span class="b">ssh {s.host}</span>
-                    once in a terminal to fix access, then press <span class="b">r</span>.
-                  </div>
+                {@render field('ssh host', s.host)}
+                {#if s.held}
+                  {@render field('why', 'you dropped the connection; its projects wait')}
+                  {@render field('fix', 'Press c to connect it.')}
+                {:else if s.error && s.link !== 'connected'}
+                  {@render field('why', s.error)}
+                  {@render field('fix', serverFix(s))}
                 {/if}
-                <div class="l">
-                  <span class="d">{pad('projects', 10)}</span>{projects
+                {@render field(
+                  'projects',
+                  projects
                     .filter((p) => p.server === s.name)
                     .map((p) => p.name)
-                    .join(', ') || 'none'}
-                </div>
-                <div class="l"></div>
-                {@render rule('log', 'following')}
-                <div class="tail">
-                  {#each recent(sel, 30) as e (e.seq)}<div class="l lr">
-                      {@render line(e, false)}
-                    </div>{/each}
-                </div>
+                    .join(', ') || 'none',
+                )}
+                {@render panelLog('log', sel, true)}
               {:else}
                 <div class="l s">Nearhost</div>
                 <div class="l">
@@ -1547,7 +2010,7 @@
                 </div>
                 <div class="l">
                   <span class="d">{pad('hosts', 10)}</span><span class="b">●</span>
-                  {projects.length} aliases
+                  {running ? `${running} name${running > 1 ? 's' : ''}` : 'no names configured'}
                 </div>
                 <div class="l">
                   <span class="d">{pad('config', 10)}</span>~/.config/nearhost/config.yaml
@@ -1557,62 +2020,57 @@
                   <span class="d">on</span>
                   {`${serversUp} of ${servers.length} servers`}
                 </div>
-                <div class="l"></div>
                 {#if problems.length}
-                  {@render rule('problems')}
                   <div class="l"></div>
-                  {#each problems as s (s.name)}
+                  {@render rule('problems')}
+                  {#each problems as x (x.title)}
+                    <div class="l"></div>
                     <div class="l">
-                      <span class="r">○</span> <span class="s">{s.name}</span>{'  '}<span class="r"
-                        >{s.link}</span
-                      >
-                      <span class="d">· retried {s.tries} times</span>
+                      <span class={x.dot[1]}>{x.dot[0]}</span>
+                      <span class="s">{x.title}</span>{'  '}<span class={x.dot[1]}>{x.what}</span>
                     </div>
-                    <div class="l">
-                      <span class="d">{'  '}{pad('why', 10)}</span
-                      >{'ssh: handshake failed: Permission denied (publickey)'}
+                    <div class="indent">
+                      {#if x.why}{@render field('why', x.why)}{/if}
+                      {#if x.fix}{@render field('fix', x.fix)}{/if}
+                      {#if x.blocks.length}{@render field('blocks', x.blocks.join(', '))}{/if}
                     </div>
-                    <div class="l">
-                      <span class="d">{'  '}{pad('fix', 10)}</span>Run
-                      <span class="b">ssh {s.host}</span>
-                      once in a terminal to fix access, then press <span class="b">r</span>.
-                    </div>
-                    <div class="l">
-                      <span class="d">{'  '}{pad('blocks', 10)}</span>{projects
-                        .filter((p) => p.server === s.name)
-                        .map((p) => p.name)
-                        .join(', ')}
-                    </div>
+                  {/each}
+                  {#if retryable.length}
                     <div class="l"></div>
                     <div class="l">
                       {'  '}<span class="b">r</span> <span class="d">retry now ·</span>
                       <span class="b">y</span>
                       <span class="d">copy command</span>
                     </div>
-                  {/each}
-                  <div class="l"></div>
+                  {/if}
                 {/if}
-                {@render rule('recent', 'following')}
-                <div class="tail">
-                  {#each recent('home', 30) as e (e.seq)}<div class="l lr">
-                      <span class="d c10">{e.at}</span><span class="c12"
-                        >{nameOf(e.key) || e.source}</span
-                      ><span class="grow {e.tone}">{e.text}</span>
-                    </div>{/each}
-                </div>
+                {@render panelLog('recent', 'home', true)}
               {/if}
             </div>
           </div>
         {/if}
 
+        <!-- What a key did, for two seconds, above the footer. -->
+        <div class="toastwrap" role="status">
+          {#if toast}
+            <div class="toast">
+              <span class={toast.problem ? 'a' : 'b'}>●</span>
+              {toast.text}
+            </div>
+          {/if}
+        </div>
         <div class="hr row"></div>
-        {#if showHelp && !logView}
+        {#if showHelp}
           <div class="help">
-            {#each HELP as g (g.title)}
+            {#each logView ? LOG_HELP : HELP as g (g.title)}
               <div>
                 <div class="l s">{g.title}</div>
                 {#each g.keys as [k, label] (k + label)}
-                  <div class="l"><span class="b k">{k}</span><span class="d">{label}</span></div>
+                  <div class="l">
+                    <span class="b k" class:kw={k.length > 6}>{k}</span><span class="d"
+                      >{label}</span
+                    >
+                  </div>
                 {/each}
               </div>
             {/each}
@@ -1621,18 +2079,71 @@
           <div class="f foot">
             <span class="keys">
               {#if quitting}
-                <span class="a">{' '}Stopping…</span>
+                <span class="a"
+                  >{' '}{quitting === 'leave' ? 'Leaving Nearhost running…' : 'Stopping…'}</span
+                >
               {:else}
-                {#each footer as it, i (it.key + it.label)}{#if i}<span class="d sep">{' · '}</span
-                    >{/if}<button type="button" onclick={() => footerClick(it.key)}
-                    ><span class="b">{it.key}</span> <span class="d">{it.label}</span></button
-                  >{/each}
+                {#each footer as it, i (it.key + it.label)}{#if it.key === '…'}<span class="d"
+                      >{' '}…</span
+                    >{:else}{#if i}<span class="d sep">{' · '}</span>{/if}<button
+                      type="button"
+                      onclick={() => footerClick(it.key)}
+                      ><span class="b">{it.key}</span> <span class="d">{it.label}</span></button
+                    >{/if}{/each}
               {/if}
             </span>
-            <span class="d ctx" aria-live="polite">{flash || footerContext}{' '}</span>
+            <span class="d ctx">{footerContext}{' '}</span>
           </div>
         {/if}
       </div>
+
+      {#if quitBox}
+        {@const b = quitBox}
+        <div class="overlay small" role="dialog" aria-label="Quit Nearhost">
+          <div class="l s">Quit Nearhost</div>
+          <div class="l"></div>
+          <div class="wrap">Stop Nearhost, or leave it running in the background?</div>
+          <div class="l"></div>
+          <div class="l">
+            <button type="button" onclick={() => end('stop', b.remember)}
+              ><span class="b">{b.leave ? '  ' : '▸ '}</span><span class:chosen={!b.leave}
+                >[ Stop ]</span
+              ></button
+            >{'   '}<button type="button" onclick={() => end('leave', b.remember)}
+              ><span class="b">{b.leave ? '▸ ' : '  '}</span><span class:chosen={b.leave}
+                >[ Leave running ]</span
+              ></button
+            >
+          </div>
+          <div class="l"></div>
+          <div class="l">
+            {'  '}<button
+              type="button"
+              role="checkbox"
+              aria-checked={b.remember}
+              onclick={() => (b.remember = !b.remember)}
+              >{#if b.remember}<span class="b">[x]</span>{:else}[ ]{/if} Don't ask again</button
+            >
+          </div>
+          <div class="formkeys">
+            <span class="b">enter</span> <span class="d">choose ·</span> <span class="b">tab</span>
+            <span class="d">move ·</span> <span class="b">space</span> <span class="d">tick ·</span>
+            <span class="b">esc</span> <span class="d">cancel</span>
+          </div>
+        </div>
+      {/if}
+
+      {#if confirmBox}
+        <div class="overlay small" role="dialog" aria-label={confirmBox.title}>
+          <div class="l s">{confirmBox.title}</div>
+          <div class="l"></div>
+          {#if confirmBox.ask}<div class="wrap">{confirmBox.ask}</div>{/if}
+          <div class="formkeys">
+            <span class="b">y</span> <span class="d">remove ·</span> <span class="b">n</span>
+            <span class="d">keep</span>
+          </div>
+        </div>
+      {/if}
 
       {#if form}
         {@const f = form}
@@ -1691,7 +2202,7 @@
           {:else if f.step === 3}
             <div class="l">Presets that suit this project:</div>
             <div class="l"></div>
-            {#each ['laravel  Laravel with Sail', 'vite  Vite dev server'] as text, i (text)}
+            {#each ['laravel  Laravel', 'vite  Vite'] as text, i (text)}
               <div class="l">
                 <span class="b">{f.routeRow === i ? '▸ ' : '  '}</span>{#if f.presets[i]}<span
                     class="b">[x]</span
@@ -1773,7 +2284,7 @@
           {/if}
           {#if f.busy}
             <div class="l"></div>
-            <div class="l"><span class="a">{spin}</span> {f.busy}</div>
+            <div class="l"><span class="a">◐</span> {f.busy}</div>
           {/if}
           <div class="formkeys">
             {#if f.busy}
@@ -1782,24 +2293,30 @@
               <span class="b">enter</span> <span class="d">choose ·</span> <span class="b">↑↓</span>
               <span class="d">move ·</span> <span class="b">esc</span> <span class="d">cancel</span>
             {:else if f.step === 1}
-              <span class="b">enter</span> <span class="d">next ·</span> <span class="b">tab</span>
-              <span class="d">complete ·</span> <span class="b">esc</span>
+              <span class="b">tab</span> <span class="d">complete ·</span> <span class="b">←→</span>
+              <span class="d">move ·</span>{#if f.path.endsWith('/')}{' '}<span class="b">↑↓</span>
+                <span class="d">choose ·</span>{/if}
+              <span class="b">enter</span> <span class="d">next ·</span> <span class="b">esc</span>
               <span class="d">back</span>
             {:else if f.step === 3}
-              <span class="b">space</span> <span class="d">toggle ·</span>
+              <span class="b">space</span> <span class="d">tick ·</span>
               <span class="b">enter</span>
               <span class="d">next ·</span> <span class="b">esc</span> <span class="d">back</span>
             {:else if f.step === 4}
               <span class="b">space</span> <span class="d">toggle ·</span>
               <span class="b">←/→</span>
-              <span class="d">role ·</span> <span class="b">enter</span>
+              <span class="d">role ·</span>
+              {#if f.routes[f.routeRow].role === 'web'}<span class="b">h</span>
+                <span class="d">hosts ·</span>{/if}
+              <span class="b">enter</span>
               <span class="d">next ·</span>
               <span class="b">esc</span> <span class="d">back</span>
             {:else if f.step === 5}
-              <span class="b">tab</span> <span class="d">field ·</span> <span class="b">enter</span>
+              <span class="b">tab</span> <span class="d">switch ·</span> <span class="b">←→</span>
+              <span class="d">move ·</span> <span class="b">enter</span>
               <span class="d">next ·</span> <span class="b">esc</span> <span class="d">back</span>
             {:else}
-              <span class="b">enter</span> <span class="d">save and start ·</span>
+              <span class="b">enter</span> <span class="d">add ·</span>
               <span class="b">esc</span>
               <span class="d">back</span>
             {/if}
@@ -1944,6 +2461,18 @@
   .logfull:not(.following) {
     justify-content: flex-start;
   }
+  .logfull {
+    padding-right: 2ch;
+  }
+  /* The newest lines that fit, from the top, as the panel's log draws them:
+     at least as tall as the log, so a short log starts at its top, and a long
+     one loses its oldest lines over the top. */
+  .tailin {
+    flex: none;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
   .lr {
     display: flex;
   }
@@ -1952,6 +2481,32 @@
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  /* A log line that is not a request wraps, its later lines under its text. */
+  .wrapped .grow {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .wrapped {
+    flex: none;
+  }
+  /* A panel's field: the label, then the value, wrapped under itself. */
+  .fld {
+    display: flex;
+    min-height: var(--cell);
+  }
+  .lab {
+    width: 10ch;
+    flex: none;
+    white-space: pre;
+  }
+  .val {
+    min-width: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .indent {
+    padding-left: 2ch;
   }
   .routes {
     display: flex;
@@ -1971,11 +2526,6 @@
   }
   .st {
     width: 5ch;
-    flex: none;
-    text-align: right;
-  }
-  .c27 {
-    width: 30ch;
     flex: none;
     text-align: right;
   }
@@ -2029,19 +2579,48 @@
     padding: calc(var(--cell) / 2 - 1px) 1.5ch;
     border: 1px solid #6b5524;
     border-radius: 6px;
-    background: #1a1810;
   }
   .nowrap {
     white-space: pre;
   }
   .help {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(4, max-content);
+    column-gap: 1ch;
     padding-left: 1ch;
   }
   .k {
     display: inline-block;
     width: 7ch;
+  }
+  /* A key longer than the column, such as pgup/pgdn, widens it. */
+  .k.kw {
+    width: 10ch;
+  }
+  /* The toast sits over the screen's foot, above the footer's rule. */
+  .toastwrap {
+    position: relative;
+    height: 0;
+  }
+  .toast {
+    position: absolute;
+    right: 1ch;
+    bottom: 0;
+    max-width: min(62ch, calc(100% - 4ch));
+    padding: calc(var(--cell) / 4) 1.5ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: pre;
+    background: var(--ground);
+    border: 1px solid #4a5449;
+    border-radius: 6px;
+  }
+  .narrowonly {
+    display: none;
+  }
+  .chosen {
+    background: var(--beacon);
+    color: var(--ground);
   }
   .foot .keys {
     display: flex;
@@ -2096,7 +2675,7 @@
     left: 50%;
     top: calc(30px + 4 * var(--cell));
     transform: translateX(-50%);
-    width: min(76ch, calc(100% - 4ch));
+    width: min(96ch, calc(100% - 4ch));
     min-height: calc(22 * var(--cell));
     box-sizing: border-box;
     display: flex;
@@ -2105,6 +2684,14 @@
     background: #121613;
     border: 1px solid #4a5449;
     border-radius: 6px;
+  }
+  /* A box with no steps, such as the quit box, is as tall as what it says. */
+  .overlay.small {
+    width: min(76ch, calc(100% - 4ch));
+    min-height: 0;
+  }
+  .overlay.small .formkeys {
+    padding-top: var(--cell);
   }
   .progress {
     background: linear-gradient(var(--faint), var(--faint)) 0 50% / 100% 3px no-repeat;
@@ -2190,9 +2777,11 @@
     .logfull {
       max-height: calc(24 * var(--cell));
     }
-    .head > span:last-child,
     .wideonly {
       display: none;
+    }
+    .narrowonly {
+      display: inline;
     }
     .l,
     .lr {
@@ -2212,8 +2801,16 @@
       padding-right: 1ch;
     }
     .help {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       row-gap: var(--cell);
+    }
+    /* A description too long for its column wraps under itself. */
+    .help .l {
+      display: flex;
+      white-space: normal;
+    }
+    .help .k {
+      flex: none;
     }
     .foot {
       flex-direction: column;
@@ -2222,7 +2819,8 @@
     .foot .keys {
       row-gap: 2px;
     }
-    .overlay {
+    .overlay,
+    .overlay.small {
       top: 30px;
       width: 100%;
       min-height: 0;
