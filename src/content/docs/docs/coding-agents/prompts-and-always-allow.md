@@ -51,7 +51,7 @@ If `grants.json` cannot be read, Nearhost still serves coding agents but turns p
 
 ## Turn notifications off
 
-Nearhost notifies the terminal when an agent asks to add a project, open a preview or show a document. To stop that, add this to the [config](/docs/reference/config/). The prompts still open in Nearhost:
+The interface notifies the terminal it runs in when an agent asks to add a project, open a preview or show a document. To stop that, add this to the [config](/docs/reference/config/). The prompts still open in Nearhost:
 
 ```yaml
 notifications: false

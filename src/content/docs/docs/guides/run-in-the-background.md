@@ -5,7 +5,7 @@ sidebar:
   order: 9
 ---
 
-`nearhost up` serves until you press Ctrl-C, and `nearhost` serves while its interface is open. Nearhost can also run as a background process, called the core in these pages, that serves your projects whether or not a terminal is open. Start it by hand with `nearhost -d`, or install a service that starts it each time you log in.
+`nearhost up` serves until you press Ctrl-C. `nearhost` opens an interface on the background Nearhost, starting one if none runs, and when you quit it asks whether to stop it or leave it serving. That background process, called the core in these pages, serves your projects whether or not a terminal is open. Start it by hand with `nearhost -d`, or install a service that starts it each time you log in.
 
 The core is the one Nearhost that serves: the proxy, the projects, the ssh connections, [Nearhost's page](/docs/concepts/tls-and-the-proxy/) and the socket coding agents reach. The interface, `nearhost status` and the page are ways to look at it and answer it.
 
@@ -26,6 +26,8 @@ With no core running, `nearhost -d` waits up to 15 seconds for it. If the core s
 ```text
 Nearhost is already running in the background (pid 4121, started by detached).
 ```
+
+If the running one is a `nearhost up` in a terminal, it says so and tells you to stop it first.
 
 It takes the same `--https-port`, `--http-port`, `--web-port`, `--no-hosts` and `--no-capture` flags as `nearhost`, and `--config`. They apply only when the core starts. See [CLI](/docs/reference/cli/#nearhost--d).
 
@@ -67,14 +69,14 @@ What quitting does depends on who started the core:
 - **Anything else started it.** `nearhost -d`, a service, or another interface that is still open. Quitting leaves it running and says `Nearhost is still running in the background. Stop it with nearhost stop.`
 - **Ctrl-C, or the terminal closing,** never asks, as no one may be there to answer. Where `q` would ask, it stops the core.
 
-When the core runs another release than the `nearhost` you opened, which is what happens after an update, the interface asks `Nearhost in the background is <old>; this is <new>. Restart it now? [Y/n]`. See [Updating](#updating).
+When the core runs another release than the `nearhost` you opened, which is what happens after an update, the interface asks `Nearhost in the background is <old>; this is <new>. Restart it now? [Y/n]`. A core started in a terminal, or by a service that runs another copy of `nearhost`, is not restarted for you: the interface says how to. `nearhost --config <file>` refuses when the running core serves another file. See [Updating](#updating).
 
 ## Nearhost's page
 
 The core serves [Nearhost's page](/docs/concepts/tls-and-the-proxy/) at `https://nearhost.localhost:6327`, or on the port `--web-port` gives, for as long as it runs. With no interface open, it is the place to look and to answer:
 
 - **Status.** The servers with their health, the projects with their state and address, the open passthroughs, and the core's version and when it started.
-- **Waiting for your answer.** Each request from a coding agent, and each change to a project's `.nearhostrc` that needs your approval, has its own page, with the same information and the same choices as the interface's prompt: Yes, No, and Always allow where it applies. The first answer wins, whether it comes from the page or the interface.
+- **Waiting for your answer.** Each request from a coding agent has its own page, with the same choices as the interface's prompt: Yes, No, and Always allow where it applies. Each change to a project's `.nearhostrc` that needs your approval has one too, with Approve and Decline. The first answer wins, whether it comes from the page or the interface.
 - **Documents** that agents have shown.
 
 The page shows its project list and approvals only to a browser that holds its cookie. `nearhost status` prints the address that sets it when you run it at a terminal, and the interface opens the page with the same kind of link. An approval link on its own, without the cookie, shows nothing and approves nothing.
@@ -87,13 +89,15 @@ A request to add a project is the exception. The page shows what the agent propo
 nearhost service install
 ```
 
-This installs a service for your user that runs `nearhost daemon`, the core with no interface, and starts it. It starts again at each login. Run it as yourself, not as root.
+This installs a service for your user that runs `nearhost daemon`, the core with no interface, and starts it. It starts again at each login. Run it as yourself, not as root. On the first install it prints `Installed the Nearhost service. It starts at login and runs <path>.` and starts the core. If another Nearhost already runs, the service leaves it and takes over at your next login; run `nearhost stop`, then `nearhost -d`, to hand over now.
 
 | System     | What is written                                                                                 | Where it runs                               |
 | ---------- | ----------------------------------------------------------------------------------------------- | ------------------------------------------- |
 | macOS      | A launchd agent, `~/Library/LaunchAgents/dev.nearhost.core.plist`                               | In your login session                       |
 | Linux      | A systemd user unit, `~/.config/systemd/user/nearhost.service`, enabled with `systemctl --user` | Under your user manager                     |
 | Windows 11 | A Task Scheduler task named `Nearhost`, which runs at your logon                                | In your interactive session, with no window |
+
+Linux needs systemd with a user manager. Without one, `service install` says so; run `nearhost -d` from your shell's startup instead.
 
 The service runs the copy of `nearhost` that you ran `service install` from, at that path. It refuses a copy that will not be there at your next login: one fetched by `npx`, `bunx` or `pnpm dlx` for a single run, one built by `go run`, and one inside Homebrew's versioned folder, which the next upgrade removes. The message says how to install a lasting copy. A copy under an nvm Node version runs from there, so install the service again if you change your default Node version.
 
@@ -105,7 +109,7 @@ Run it again at any time. When nothing changed it says `The Nearhost service is 
 nearhost service uninstall
 ```
 
-This stops the core the service started, if it is running, and removes the service. A core you started with `nearhost -d` or the interface is left running. It prints `Removed the Nearhost service.`, with `Stopped Nearhost, which it ran.` after it when it stopped one.
+This stops the core the service started, if it is running, and removes the service. A core you started with `nearhost -d` or the interface is left running. It prints `Removed the Nearhost service.`, with `Stopped Nearhost, which it ran.` after it when it stopped one, or `No Nearhost service is installed.` when there is none.
 
 ### What the service carries from your shell
 
@@ -133,6 +137,8 @@ docdemo  stopped  https://docdemo.test  project "docdemo"'s hosts are not resolv
 Run `nearhost hosts update` in a terminal. It asks for your password through `sudo` (on Windows, for your approval in a User Account Control prompt), brings the block up to date for every enabled project, and tells the core, which starts the projects that were waiting. `nearhost add` does the same at its end, and so does the interface, with its password box.
 
 Most starts need no change: the hosts file is only changed when a project's names are new, so a service that starts at login finds the block right after the first time.
+
+The core does not trust the local certificate authority for you either. If browsers warn about the certificate, run `nearhost trust` once in a terminal. The core's log says so when the CA is not trusted.
 
 ## The core's log
 
