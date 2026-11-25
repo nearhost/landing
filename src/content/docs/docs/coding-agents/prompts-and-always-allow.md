@@ -37,7 +37,7 @@ Previews and documents are approved separately, so revoking one leaves the other
 
 For documents, Always allow covers the folders you have approved, not every folder on the server. A document in a folder you approved opens without a prompt. One in any other folder prompts, and the prompt names the folder. Always allow there adds that folder to the same approval; Yes opens the document and adds nothing. Approvals saved by an earlier version name no folders, so after you update, each folder prompts once.
 
-To revoke one, press `tab` on the server's panel to reach its `always allowed` section, and `x` on a row. Nearhost asks you to confirm first. Revoking leaves open passthroughs and documents in place.
+To revoke one, press `tab` on the server's panel to reach its `always allowed` section, and `x` on a row. Nearhost asks you to confirm first. Revoking leaves open passthroughs and documents in place. They are listed under `passthroughs` and `documents` at the bottom of the sidebar, not on the server's panel.
 
 ## What the token protects
 
