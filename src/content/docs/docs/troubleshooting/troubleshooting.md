@@ -55,9 +55,6 @@ The end of /home/you/.config/nearhost/core.log:
   2026-11-25T14:29:57Z   Then start Nearhost again. Do not run nearhost with sudo.
   2026-11-25T14:29:57Z   Run `nearhost doctor` to check this and the rest of what Nearhost needs.
   2026-11-25T14:29:57Z   Cause: HTTPS port 443 needs permission to bind: listen tcp :443: bind: permission denied
-  2026-11-25T14:29:57Z   Cause: listen tcp :443: bind: permission denied
-  2026-11-25T14:29:57Z   Cause: bind: permission denied
-  2026-11-25T14:29:57Z   Cause: permission denied
 ```
 
 If it prints `Error: Nearhost is still starting.`, it has not answered in 15 seconds and goes on starting: read the log it names. The log is `core.log` in the config folder. See [The core's log](/docs/guides/run-in-the-background/#the-cores-log).
@@ -154,7 +151,13 @@ On Windows, a hosts file with the read-only attribute stops the change after the
 ```text
 Error: <path> is read-only.
 
-Clear it with: attrib -r "<path>" (in an administrator terminal), or run with --no-hosts.
+Clear the read-only attribute in an administrator terminal:
+
+  attrib -r "<path>"
+
+Or serve without updating it:
+
+  nearhost --no-hosts
 ```
 
 Nearhost does not clear the attribute itself, since a read-only hosts file is often set on purpose. Run the `attrib` command in Windows Terminal opened as administrator, or add the names yourself and run Nearhost with `--no-hosts`. A read-only file whose block is already up to date needs no change, so it causes no error.

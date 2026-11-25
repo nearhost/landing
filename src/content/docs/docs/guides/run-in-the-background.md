@@ -134,7 +134,7 @@ The core never asks for your password and never raises a User Account Control pr
 docdemo  stopped  https://docdemo.test  project "docdemo"'s hosts are not resolvable: the hosts file was not updated (the hosts file needs updating, and Nearhost in the background never asks for sudo. Run `nearhost hosts update` in a terminal.)
 ```
 
-Run `nearhost hosts update` in a terminal. It asks for your password through `sudo` (on Windows, for your approval in a User Account Control prompt), brings the block up to date for every enabled project, and tells the core, which starts the projects that were waiting. `nearhost add` does the same at its end, and so does the interface, with its password box.
+The core's log says the same, with `Fix: nearhost hosts update` under it. Run `nearhost hosts update` in a terminal. It asks for your password through `sudo` (on Windows, for your approval in a User Account Control prompt), brings the block up to date for every enabled project, and tells the core, which starts the projects that were waiting. `nearhost add` does the same at its end, and so does the interface, with its password box.
 
 Most starts need no change: the hosts file is only changed when a project's names are new, so a service that starts at login finds the block right after the first time.
 
@@ -151,9 +151,6 @@ The core writes to `core.log` in the config folder: `~/.config/nearhost/core.log
 2026-11-25T14:29:57Z   Then start Nearhost again. Do not run nearhost with sudo.
 2026-11-25T14:29:57Z   Run `nearhost doctor` to check this and the rest of what Nearhost needs.
 2026-11-25T14:29:57Z   Cause: HTTPS port 443 needs permission to bind: listen tcp :443: bind: permission denied
-2026-11-25T14:29:57Z   Cause: listen tcp :443: bind: permission denied
-2026-11-25T14:29:57Z   Cause: bind: permission denied
-2026-11-25T14:29:57Z   Cause: permission denied
 ```
 
 When the core crashes, the log has it as an error with the code `crash`, with the path of a crash file, `crash-<time>.log` beside `core.log`, that holds the details. Attach that file when you report it.

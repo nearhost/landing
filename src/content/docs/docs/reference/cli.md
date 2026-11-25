@@ -44,7 +44,21 @@ With no subcommand, each of them prints its help and exits 0.
 
 ## Errors, warnings and notes
 
-Errors, warnings and notes go to stderr, so stdout holds only what the command prints when it works, for a pipe or `--json`. An error starts with `Error:` and what happened. Under it come why, in plain words, the steps to fix it, each command on a line of its own so that you can copy it, and a pointer to `nearhost doctor` when it checks the cause. A warning starts with `Warning:`, and a note, which needs nothing done, with `Note:`. At a terminal the label is in colour, unless `NO_COLOR` is set. The text wraps to the terminal's width, but a command never does.
+Errors, warnings and notes go to stderr, so stdout holds only what the command prints when it works, for a pipe or `--json`. A blank line separates one from the next. An error starts with `Error:` and what happened. Under it come why, in plain words, the steps to fix it, each command on a line of its own so that you can copy it, and a pointer to `nearhost doctor` when it checks the cause. A warning starts with `Warning:`, and a note, which needs nothing done, with `Note:`. At a terminal the label is in colour, unless `NO_COLOR` is set. The text wraps to the terminal's width, but a command never does. A mistyped command, an unknown flag or an argument a command does not take is an error too, which says how to see what the command takes, as `nearhost <command> --help`.
+
+With `--json`, which `nearhost status` and `nearhost doctor` take, each error, warning and note goes to stderr as one JSON object per line instead, with its `code`, `level`, `title` and, when it has them, `detail` and `fix`:
+
+```json
+{
+  "code": "core.not-running",
+  "level": "error",
+  "title": "Nearhost is not running.",
+  "fix": [
+    { "text": "Start it in the background:", "command": "nearhost -d" },
+    { "text": "Or open its interface:", "command": "nearhost" }
+  ]
+}
+```
 
 On Linux, for example, `nearhost service install` refuses a copy of `nearhost` that may not use ports 80 and 443, such as one you built yourself:
 
@@ -64,7 +78,7 @@ Then run nearhost service install again.
 Run `nearhost doctor` to check this and the rest of what Nearhost needs.
 ```
 
-`--verbose` adds the code on the line under the title, here `(service.cannot-bind)`, and ends with the causes, one `Cause:` line each, when there are any. A code names the problem wherever it shows up: in the core's log, in `nearhost doctor --verbose` and in the APIs. [Errors](/docs/reference/errors/) lists every code.
+`--verbose` adds the code on the line under the title, here `(service.cannot-bind)`, and ends with what caused it, on a `Cause:` line, when that adds to the title. A code names the problem wherever it shows up: in the core's log, in `nearhost doctor --verbose` and in the APIs. [Errors](/docs/reference/errors/) lists every code.
 
 If Nearhost itself fails unexpectedly, it prints `Error: Nearhost stopped unexpectedly.` with the path of a crash file, and asks you to report it at the Nearhost issues page with that file attached. Crash files are named `crash-<time>.log` and kept beside `core.log` in the config folder. A file holds Nearhost's version, the system, the time and where it failed, and nothing from your config.
 
@@ -257,7 +271,7 @@ Notes go to stderr, so they stay out of a pipe. When a newer release is out, one
 
 `startedBy` is `foreground` for `nearhost up` and `nearhost daemon` run by hand, `detached` for `nearhost -d`, `tui` for a core the interface started, and `service`. `page` is empty when the page is off, and `update` appears only when a newer release is out. Each entry in `approvals` has `id`, `summary` and `url`. A server or project with a problem, such as a project in `error`, also has `problem`: the problem as a message, with its `code`, `level`, `title` and, when it has them, `detail` and the `fix` steps. Its `title` is the `message`.
 
-With no Nearhost running, `nearhost status` prints this to stderr and exits 3. When a service is installed, it adds `A service is installed, and nearhost -d starts it.` under the title. With `--json` the error is the same, so standard output stays JSON or nothing.
+With no Nearhost running, `nearhost status` prints this to stderr and exits 3. When a service is installed, it adds `A service is installed, and nearhost -d starts it.` under the title. With `--json` the error goes to stderr as one line of JSON, as in [Errors, warnings and notes](#errors-warnings-and-notes), so standard output stays JSON or nothing.
 
 ```text
 Error: Nearhost is not running.
@@ -683,7 +697,7 @@ On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. For a
 | `-y`, `--yes` | Update without asking.                                                                                                       |
 | `--check`     | Only report. Exits 0 when up to date, 1 when a newer release is out, and 2 when the check failed, with the reason on stderr. |
 
-With `--check`, up to date prints to stdout, as in `nearhost 0.15.0 is the latest.` A newer release is an error on stderr, so a script sees exit status 1: `Error: nearhost <new> is available; this is <old>, installed with <how>.`, with the command to update. A check that fails prints `Error: Nearhost could not find out whether a newer release is out.`, with the reason under it, such as GitHub not answering.
+With `--check`, up to date prints to stdout, as in `nearhost 0.15.0 is the latest.` A newer release is a note on stderr, `Note: nearhost <new> is available; this is <old>, installed with <how>.`, with the command to update, and the exit status is 1 so that a script can tell. A check that fails prints `Error: Nearhost could not find out whether a newer release is out.`, with the reason under it, such as GitHub not answering.
 
 At the `[Y/n]` question, an empty line is yes. End of input, or input that cannot be read, is No: nothing runs and the exit is 0. Without a terminal it asks nothing: it prints the command to run, or says to pass `--yes`, and exits 0.
 

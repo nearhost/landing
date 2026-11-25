@@ -119,6 +119,18 @@ The connection to the running Nearhost was lost.
 
 Nearhost in the background runs outside the desktop session, so it cannot open links.
 
+<h3 id="core.no-enabled-projects"><code>core.no-enabled-projects</code></h3>
+
+**Error** · status 409
+
+Every project in the config is disabled, and none was named to start.
+
+<h3 id="core.no-projects"><code>core.no-projects</code></h3>
+
+**Error** · status 404
+
+The config has no projects, so there is nothing to start.
+
 <h3 id="core.no-reload"><code>core.no-reload</code></h3>
 
 **Note**
@@ -208,6 +220,12 @@ Nearhost was asked to stop and had not stopped in time.
 **Error** · status 503
 
 Nearhost stopped while it was starting in the background.
+
+<h3 id="core.unknown-project"><code>core.unknown-project</code></h3>
+
+**Error** · status 404
+
+No project in the config has the name given.
 
 ## The service
 
@@ -801,11 +819,23 @@ A name the project would be served at is already another project's, so it is lef
 
 Discovery found one port only, so nearhost add made it the web route.
 
+<h3 id="add.name-taken"><code>add.name-taken</code></h3>
+
+**Error** · status 409
+
+Another project already has the name the project would be added under.
+
 <h3 id="add.needs-approval"><code>add.needs-approval</code></h3>
 
 **Error** · status 409
 
 The project asks for things that need approval, and there is nobody to ask.
+
+<h3 id="add.no-directory"><code>add.no-directory</code></h3>
+
+**Error** · status 404
+
+There is no directory at the path given to nearhost add.
 
 <h3 id="add.no-web-port"><code>add.no-web-port</code></h3>
 
