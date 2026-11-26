@@ -1916,7 +1916,7 @@ Waiting for your answer:
 Page: https://nearhost.localhost:6327
 ```
 
-The `Waiting for your answer` list is left out when nothing waits. With no project served, it says ``No projects are being served. Enable one in the config, or add one with `nearhost add <path>`.``
+The `Waiting for your answer` list is left out when nothing waits. With no project served, a note says `No projects are being served.`, with `nearhost add <path>` as the step to add one.
 
 Notes go to stderr, so they stay out of a pipe. When a newer release is out, one says `Note: Nearhost <version> is available.`, with the command to update, or, when this copy is already that release, `Note: This copy is <version>; restart Nearhost to run it.`, with the commands to stop and start it. A Nearhost started by `nearhost up` with project names gets `Note: Nearhost serves the projects it was started with and does not reload the config.` At a terminal, the page’s address carries the key that lets your browser see the project list and the approvals, so do not paste it where others can read it. Piped, it is plain.
 
@@ -2098,7 +2098,7 @@ Wrote /home/you/code/shop/.nearhostrc on server mini. Commit it so others get th
 
 ## nearhost ls
 
-Lists the projects in the config, with their server, alias, whether they are enabled, and the routes that are not ignored.
+Lists the projects in the config, with their server, alias, whether they are enabled, and the routes that are not ignored. With no projects, it prints nothing on standard output, and a note says `No projects yet.` with `nearhost add <path>` as the step.
 
 ## nearhost trust
 
@@ -2601,6 +2601,12 @@ docker is not on the PATH of Nearhost in the background; only Docker projects ne
 **Warning**
 
 Docker does not answer Nearhost in the background.
+
+### `core.in-terminal`
+
+**Note**
+
+Nearhost is already running in a terminal, so nearhost -d leaves it there rather than start another in the background.
 
 ### `core.log-unavailable`
 
@@ -3514,6 +3520,12 @@ The project’s .nearhostrc uses a variable that is not set.
 
 The project’s .nearhostrc needs a newer Nearhost.
 
+### `projects.none`
+
+**Note**
+
+There are no projects to list or serve yet.
+
 ### `projects.unchecked`
 
 **Note**
@@ -3893,6 +3905,116 @@ A path of Nearhost’s page was asked with a method it does not take.
 **Error** · status 404
 
 Nearhost’s page at a project’s domain has nothing at the path asked for.
+
+## Networked mode and paired devices
+
+### `devices.unknown`
+
+**Error** · status 404
+
+No paired device has the name asked for.
+
+### `network.apply-failed`
+
+**Error** · status 500
+
+Nearhost could not change how it serves to other devices on the network after the config changed.
+
+### `network.cert`
+
+**Error** · status 503
+
+The certificate for Nearhost’s page on the network is missing or not the one the config asks for.
+
+### `network.devices-unavailable`
+
+**Warning**
+
+Nearhost could not open its list of paired devices, so no other device can pair or sign in.
+
+### `network.dns`
+
+**Warning**
+
+The name of Nearhost’s page on the network does not point at this machine.
+
+### `network.firewall`
+
+**Error** · status 503
+
+The firewall does not let other devices reach Nearhost.
+
+### `network.firewall-refused`
+
+**Error** · status 400
+
+The elevated firewall helper refused a program other than the one running, or its input or report file.
+
+### `network.no-page`
+
+**Error** · status 503
+
+Networked mode needs Nearhost’s page, where devices pair, and the page is not served.
+
+### `network.no-token`
+
+**Error** · status 503
+
+Networked mode gets its certificate with a DNS token, and none is set.
+
+### `network.not-listening`
+
+**Error** · status 503
+
+Networked mode is on, but Nearhost does not serve to the network yet, so no device could reach it.
+
+### `network.off`
+
+**Error** · status 409
+
+Something was asked that needs networked mode, and the config does not turn it on.
+
+### `pair.bad-target`
+
+**Error** · status 400
+
+A device asked to be signed in to an address outside the network domain.
+
+### `pair.code-invalid`
+
+**Error** · status 400
+
+The pairing code typed on a device is wrong, has been used or has expired.
+
+Get a new code on the machine Nearhost runs on:
+
+```sh
+nearhost pair
+```
+
+### `pair.link-used`
+
+**Error** · status 403
+
+The link that signs a paired device in to a site has been used or has expired.
+
+### `pair.needed`
+
+**Error** · status 401
+
+A site on the network domain was asked for by a device that is not paired.
+
+### `pair.too-many-tries`
+
+**Error** · status 429
+
+A device made too many wrong attempts to pair or sign in, so it must wait.
+
+### `pair.unavailable`
+
+**Error** · status 503
+
+A site on the network domain needs a paired device, and Nearhost’s page, where devices pair, is not served.
 
 ## The control API
 
