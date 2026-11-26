@@ -71,16 +71,31 @@ On a project on this machine, a route is only `web` or `ignore`.
 
 ## Server
 
-| Key     | Action                                                                                                                                                                             |
-| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `enter` | Collapse or expand its projects.                                                                                                                                                   |
-| `r`     | Reconnect now.                                                                                                                                                                     |
-| `c`     | Drop the connection and hold it closed, or connect it again.                                                                                                                       |
-| `e`     | Edit its host and name.                                                                                                                                                            |
-| `d`     | Remove it and its projects, after you confirm.                                                                                                                                     |
-| `tab`   | Move into its passthroughs and documents: `↑`, `↓` choose, `x` closes or revokes the selected one, `enter` opens a document folder, `tab` or `esc` is done. Shown when it has any. |
+| Key     | Action                                                                                                                           |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `enter` | Collapse or expand its projects.                                                                                                 |
+| `r`     | Reconnect now.                                                                                                                   |
+| `c`     | Drop the connection and hold it closed, or connect it again.                                                                     |
+| `e`     | Edit its host and name.                                                                                                          |
+| `d`     | Remove it and its projects, after you confirm.                                                                                   |
+| `tab`   | Move into its always allowed list: `↑`, `↓` choose, `x` revokes the selected one, `tab` or `esc` is done. Shown when it has any. |
 
 On `local`, only `enter` and `tab` work.
+
+## Passthroughs and documents
+
+The `passthroughs` and `documents` rows sit at the bottom of the sidebar. Select one, then press `tab` to move into its rows.
+
+| Key          | Action                                                                 |
+| ------------ | ---------------------------------------------------------------------- |
+| `↑`, `↓`     | Choose a row. `k` and `j` too.                                         |
+| `o`          | Open the passthrough's address, or the document, in your browser.      |
+| `enter`      | Open the selected document. Documents only.                            |
+| `y`          | Copy the passthrough's address. Passthroughs only.                     |
+| `x`          | Close the passthrough, or stop serving the document after you confirm. |
+| `tab`, `esc` | Done.                                                                  |
+
+See [Browser previews](https://nearhost.dev/docs/coding-agents/browser-previews.md#see-what-is-open) and [Documents](https://nearhost.dev/docs/coding-agents/documents.md#when-a-served-folder-goes-away).
 
 ## Full-screen log
 

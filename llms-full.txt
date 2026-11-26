@@ -393,6 +393,8 @@ Once a project exists, the screen has a sidebar on the left, with Home at the to
 * `config`: the path of the config file
 * `running`: how many projects are running, on how many servers
 
+Two rows stay at the bottom of the sidebar, `passthroughs` and `documents`, which show what coding agents have opened, and `none` when nothing is. See [Browser previews](/docs/coding-agents/browser-previews/#see-what-is-open).
+
 When something needs you, a problems section lists it, with why it happened and how to fix it. When something you do fails, such as a save or a start, an alert box opens over the screen with the same: `enter` or `esc` closes it, and `c` copies its command. Below that is the recent log. Press `l` for the full-screen log, `/` to filter the sidebar by name, and `h` to come back to Home. `?` lists every key. See [Keyboard shortcuts](/docs/reference/keyboard-shortcuts/).
 
 ## Quitting
@@ -644,7 +646,45 @@ With the [`nearhost` skill installed](/docs/coding-agents/#install-the-skill), a
 
 A server can have at most 16 passthroughs open or opening at once, with or without Always allow. The next request is refused with `16 passthroughs are open for this server; close one first`, and the agent passes that on rather than asking again. A prompt you allow after the limit is reached ends with the same reason. Close a passthrough to make room.
 
-On a server’s panel, press `tab` to move to the server’s open passthroughs, which are shown only when there are any. When there are more than fit, they scroll with the selection, and a `+N more` line says how many are hidden above or below. Use `j` and `k` or the arrow keys to move, and `tab` or `esc` to leave. Press `x` on a passthrough to close it at once. Home shows a `passthroughs` count while any are open.
+## See what is open
+
+The `passthroughs` row at the bottom of the sidebar shows `● 2` while two are open, and a dim `none` when none are. It stays in place while the list above it scrolls. Select it to list every open passthrough across all your servers:
+
+```text
+passthroughs                                       2 open
+
+
+▌ http://localhost:7480   preflash demo
+    from leto, port 7480 · Claude Code · 12m
+
+
+  http://localhost:5174   storybook
+    from apollo, port 6006 · Codex · 2h
+```
+
+Each row starts with the address to open on your laptop, then the agent’s label. The dim line under it says which server the passthrough came from, that server’s port, which agent asked and how long ago. Rows are in the order of your servers, `local` first, then by port. When there are more than fit, they scroll with the selection, and a `+N more` line says how many are hidden above or below.
+
+Press `tab` to move into the rows, then:
+
+| Key      | Action                                 |
+| -------- | -------------------------------------- |
+| `↑`, `↓` | Choose a passthrough. `k` and `j` too. |
+| `o`      | Open its address in your browser.      |
+| `y`      | Copy its address.                      |
+| `x`      | Close it at once.                      |
+| `esc`    | Go back to the sidebar.                |
+
+With none open, the panel says `No ports are open for agents. When an agent asks to open one, Nearhost asks you first.` A server’s panel shows only a line such as `open 1 passthrough, 2 documents`, and Home has no line for them. While anything is open, Nearhost shows this layout instead of the first-run screen, so the row is there to find.
+
+Nearhost lists the passthroughs it opened. A tunnel an agent or you made with `ssh -L` is invisible to it.
+
+## When the app runs on another machine
+
+Sometimes an agent works on one machine while the app runs on another it reaches over SSH. The skill then asks for the passthrough on the machine the app runs on, with `--on <host>`: `passthrough <port> --on <host>`, and the same option on `passthrough-wait` and `passthrough-close`. Nothing needs installing on that host. The passthrough comes from that server, and Nearhost lists it under that server’s name, so the panel shows where the app is. Always allow works there as it does for any server, and the token is kept on that host.
+
+If no Nearhost reaches that machine, the skill falls back to forwarding the port itself with `ssh -L`, opens the passthrough from the machine it is on, and puts where the app runs in the label, for example `preflash on apollo`. The passthrough then lists the agent’s own machine as its server, and the label says where the app is. If SSH cannot reach the host at all, the agent tells you and stops, because forwarding the port itself would fail the same way.
+
+A session can open passthroughs on several machines. When the session ends, Claude Code’s `SessionEnd` hook closes all of them, within about 2.5 seconds. One it cannot close in time, because that host is unreachable, stays open until Nearhost drops that server’s connection or you close it with `x` in the `passthroughs` panel. The same option works from `nearhost.ps1` on Windows; the host it runs on must be a Linux or macOS server.
 
 ## When a passthrough ends
 
@@ -698,10 +738,10 @@ A page’s script can load the folder’s scripts, stylesheets, fonts, images, a
 
 ## When a served folder goes away
 
-Nearhost lists served folders on each server’s panel; press `tab` to reach its `documents` section. Home shows a count in its `agents` line. A folder stays served until:
+The `documents` row at the bottom of the sidebar shows `● 2` while two folders are served, and a dim `none` otherwise. Select it to list every served folder across all your servers. Each row names the folder, then, on a dim line, the server it came from, which agent asked and how long ago. Press `tab` to move into the rows: `↑` and `↓` choose, `enter` or `o` opens the document in your browser, `x` stops serving it after you confirm, and `esc` goes back. There is no key to copy the address, because a plain address may not open in a browser that lacks Nearhost’s page key. A server’s panel shows a line such as `open 1 passthrough, 2 documents` instead of a list. A folder stays served until:
 
 * the background Nearhost stops or restarts, as nothing is saved across restarts (`nearhost update` restarts it). Quitting the interface alone does not clear them;
-* you press `x` on it in the server’s panel and confirm;
+* you press `x` on it in the `documents` panel and confirm;
 * you remove the server from Nearhost, or rename it.
 
 Disconnecting a server does not remove its folders. Their pages say the server is not connected until it reconnects. The agent’s session ending does not remove them either, so you can read yesterday’s plan again while Nearhost runs. Home’s web page also lists the folders served since Nearhost started, with links to each document. It lists them only in a browser that has opened a document link, or opened the page from Nearhost’s interface or from the address `nearhost status` prints at a terminal: each sets the cookie that the list needs. Elsewhere the page shows no list. Nearhost sets and reads that cookie at `nearhost.localhost` only, so a dev server or container you browse at `localhost` does not receive it. See [TLS and the proxy](/docs/concepts/tls-and-the-proxy/).
@@ -761,6 +801,12 @@ Any program on the laptop can connect to that port, so Nearhost answers there on
 * **A current skill.** A skill installed before Windows support sends no token, and Nearhost answers `this request has no valid Nearhost token: update the Nearhost skill on this machine`. Run `npx skills add nearhost/nearhost -g` again on the server or, if you installed it as a Claude Code plugin, update the plugin from `/plugin`. See [Install the skill](/docs/coding-agents/#install-the-skill).
 
 On the laptop itself, the skill runs its PowerShell script, which needs only Windows PowerShell 5.1 or PowerShell 7 and the `curl.exe` that Windows ships.
+
+## A passthrough on another machine
+
+An agent can ask for a passthrough on a machine other than its own, with `--on <host>`, where `<host>` is an SSH host the agent’s machine reaches. The skill’s script runs itself on that host over SSH (`ssh -o BatchMode=yes -o ConnectTimeout=5 -- <host> 'sh -s'`, with the script on standard input), so nothing is installed there. Because the environment does not cross SSH, the script passes the agent’s name and session along as arguments. On that host the script finds Nearhost’s socket as usual, so the passthrough comes from that server and is listed under it.
+
+The script records every place a session opened a passthrough, as one line per target in the session’s marker file. When the session ends, `passthrough-close --session` closes them all at once, over the same `ssh` that opened them. The close gives each SSH connection 2 seconds to connect and stops the whole session close after about 2.5 seconds, inside the hook’s 3 second limit. A target that cannot be closed stays open. If SSH itself fails, the script exits with status 2 and says SSH could not reach the host. See [Browser previews](/docs/coding-agents/browser-previews/#when-the-app-runs-on-another-machine).
 
 ## Agent API
 
@@ -826,7 +872,7 @@ Previews and documents are approved separately, so revoking one leaves the other
 
 For documents, Always allow covers the folders you have approved, not every folder on the server. A document in a folder you approved opens without a prompt. One in any other folder prompts, and the prompt names the folder. Always allow there adds that folder to the same approval; Yes opens the document and adds nothing. Approvals saved by an earlier version name no folders, so after you update, each folder prompts once.
 
-To revoke one, press `tab` on the server’s panel to reach its `always allowed` section, and `x` on a row. Nearhost asks you to confirm first. Revoking leaves open passthroughs and documents in place.
+To revoke one, press `tab` on the server’s panel to reach its `always allowed` section, and `x` on a row. Nearhost asks you to confirm first. Revoking leaves open passthroughs and documents in place. They are listed under `passthroughs` and `documents` at the bottom of the sidebar, not on the server’s panel.
 
 ## What the token protects
 
@@ -4131,16 +4177,31 @@ On a project on this machine, a route is only `web` or `ignore`.
 
 ## Server
 
-| Key     | Action                                                                                                                                                                             |
-| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `enter` | Collapse or expand its projects.                                                                                                                                                   |
-| `r`     | Reconnect now.                                                                                                                                                                     |
-| `c`     | Drop the connection and hold it closed, or connect it again.                                                                                                                       |
-| `e`     | Edit its host and name.                                                                                                                                                            |
-| `d`     | Remove it and its projects, after you confirm.                                                                                                                                     |
-| `tab`   | Move into its passthroughs and documents: `↑`, `↓` choose, `x` closes or revokes the selected one, `enter` opens a document folder, `tab` or `esc` is done. Shown when it has any. |
+| Key     | Action                                                                                                                           |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `enter` | Collapse or expand its projects.                                                                                                 |
+| `r`     | Reconnect now.                                                                                                                   |
+| `c`     | Drop the connection and hold it closed, or connect it again.                                                                     |
+| `e`     | Edit its host and name.                                                                                                          |
+| `d`     | Remove it and its projects, after you confirm.                                                                                   |
+| `tab`   | Move into its always allowed list: `↑`, `↓` choose, `x` revokes the selected one, `tab` or `esc` is done. Shown when it has any. |
 
 On `local`, only `enter` and `tab` work.
+
+## Passthroughs and documents
+
+The `passthroughs` and `documents` rows sit at the bottom of the sidebar. Select one, then press `tab` to move into its rows.
+
+| Key          | Action                                                                 |
+| ------------ | ---------------------------------------------------------------------- |
+| `↑`, `↓`     | Choose a row. `k` and `j` too.                                         |
+| `o`          | Open the passthrough’s address, or the document, in your browser.      |
+| `enter`      | Open the selected document. Documents only.                            |
+| `y`          | Copy the passthrough’s address. Passthroughs only.                     |
+| `x`          | Close the passthrough, or stop serving the document after you confirm. |
+| `tab`, `esc` | Done.                                                                  |
+
+See [Browser previews](/docs/coding-agents/browser-previews/#see-what-is-open) and [Documents](/docs/coding-agents/documents/#when-a-served-folder-goes-away).
 
 ## Full-screen log
 
