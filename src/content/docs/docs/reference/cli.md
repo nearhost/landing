@@ -252,7 +252,7 @@ Waiting for your answer:
 Page: https://nearhost.localhost:6327
 ```
 
-The `Waiting for your answer` list is left out when nothing waits. With no project served, it says ``No projects are being served. Enable one in the config, or add one with `nearhost add <path>`.``
+The `Waiting for your answer` list is left out when nothing waits. With no project served, a note says `No projects are being served.`, with `nearhost add <path>` as the step to add one.
 
 Notes go to stderr, so they stay out of a pipe. When a newer release is out, one says `Note: Nearhost <version> is available.`, with the command to update, or, when this copy is already that release, `Note: This copy is <version>; restart Nearhost to run it.`, with the commands to stop and start it. A Nearhost started by `nearhost up` with project names gets `Note: Nearhost serves the projects it was started with and does not reload the config.` At a terminal, the page's address carries the key that lets your browser see the project list and the approvals, so do not paste it where others can read it. Piped, it is plain.
 
@@ -426,7 +426,7 @@ Wrote /home/you/code/shop/.nearhostrc on server mini. Commit it so others get th
 
 ## nearhost ls
 
-Lists the projects in the config, with their server, alias, whether they are enabled, and the routes that are not ignored.
+Lists the projects in the config, with their server, alias, whether they are enabled, and the routes that are not ignored. With no projects, it prints nothing on standard output, and a note says `No projects yet.` with `nearhost add <path>` as the step.
 
 ## nearhost trust
 

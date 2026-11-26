@@ -101,6 +101,12 @@ docker is not on the PATH of Nearhost in the background; only Docker projects ne
 
 Docker does not answer Nearhost in the background.
 
+<h3 id="core.in-terminal"><code>core.in-terminal</code></h3>
+
+**Note**
+
+Nearhost is already running in a terminal, so nearhost -d leaves it there rather than start another in the background.
+
 <h3 id="core.log-unavailable"><code>core.log-unavailable</code></h3>
 
 **Warning**
@@ -1013,6 +1019,12 @@ The project's .nearhostrc uses a variable that is not set.
 
 The project's .nearhostrc needs a newer Nearhost.
 
+<h3 id="projects.none"><code>projects.none</code></h3>
+
+**Note**
+
+There are no projects to list or serve yet.
+
 <h3 id="projects.unchecked"><code>projects.unchecked</code></h3>
 
 **Note**
@@ -1392,6 +1404,116 @@ A path of Nearhost's page was asked with a method it does not take.
 **Error** · status 404
 
 Nearhost's page at a project's domain has nothing at the path asked for.
+
+## Networked mode and paired devices
+
+<h3 id="devices.unknown"><code>devices.unknown</code></h3>
+
+**Error** · status 404
+
+No paired device has the name asked for.
+
+<h3 id="network.apply-failed"><code>network.apply-failed</code></h3>
+
+**Error** · status 500
+
+Nearhost could not change how it serves to other devices on the network after the config changed.
+
+<h3 id="network.cert"><code>network.cert</code></h3>
+
+**Error** · status 503
+
+The certificate for Nearhost's page on the network is missing or not the one the config asks for.
+
+<h3 id="network.devices-unavailable"><code>network.devices-unavailable</code></h3>
+
+**Warning**
+
+Nearhost could not open its list of paired devices, so no other device can pair or sign in.
+
+<h3 id="network.dns"><code>network.dns</code></h3>
+
+**Warning**
+
+The name of Nearhost's page on the network does not point at this machine.
+
+<h3 id="network.firewall"><code>network.firewall</code></h3>
+
+**Error** · status 503
+
+The firewall does not let other devices reach Nearhost.
+
+<h3 id="network.firewall-refused"><code>network.firewall-refused</code></h3>
+
+**Error** · status 400
+
+The elevated firewall helper refused a program other than the one running, or its input or report file.
+
+<h3 id="network.no-page"><code>network.no-page</code></h3>
+
+**Error** · status 503
+
+Networked mode needs Nearhost's page, where devices pair, and the page is not served.
+
+<h3 id="network.no-token"><code>network.no-token</code></h3>
+
+**Error** · status 503
+
+Networked mode gets its certificate with a DNS token, and none is set.
+
+<h3 id="network.not-listening"><code>network.not-listening</code></h3>
+
+**Error** · status 503
+
+Networked mode is on, but Nearhost does not serve to the network yet, so no device could reach it.
+
+<h3 id="network.off"><code>network.off</code></h3>
+
+**Error** · status 409
+
+Something was asked that needs networked mode, and the config does not turn it on.
+
+<h3 id="pair.bad-target"><code>pair.bad-target</code></h3>
+
+**Error** · status 400
+
+A device asked to be signed in to an address outside the network domain.
+
+<h3 id="pair.code-invalid"><code>pair.code-invalid</code></h3>
+
+**Error** · status 400
+
+The pairing code typed on a device is wrong, has been used or has expired.
+
+Get a new code on the machine Nearhost runs on:
+
+```sh
+nearhost pair
+```
+
+<h3 id="pair.link-used"><code>pair.link-used</code></h3>
+
+**Error** · status 403
+
+The link that signs a paired device in to a site has been used or has expired.
+
+<h3 id="pair.needed"><code>pair.needed</code></h3>
+
+**Error** · status 401
+
+A site on the network domain was asked for by a device that is not paired.
+
+<h3 id="pair.too-many-tries"><code>pair.too-many-tries</code></h3>
+
+**Error** · status 429
+
+A device made too many wrong attempts to pair or sign in, so it must wait.
+
+<h3 id="pair.unavailable"><code>pair.unavailable</code></h3>
+
+**Error** · status 503
+
+A site on the network domain needs a paired device, and Nearhost's page, where devices pair, is not served.
 
 ## The control API
 

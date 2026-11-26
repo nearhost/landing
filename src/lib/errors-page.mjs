@@ -85,6 +85,7 @@ export const sections = [
     areas: ['page', 'proxy'],
     see: "[Nearhost's page](/docs/guides/run-in-the-background/#nearhosts-page)",
   },
+  { label: 'Networked mode and paired devices', areas: ['network', 'pair', 'devices'] },
   { label: 'The control API', areas: ['control'] },
 ];
 

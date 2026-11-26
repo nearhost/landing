@@ -260,6 +260,16 @@
       "summary": "The running Nearhost serves the projects it was started with and does not reload the config."
     },
     {
+      "code": "core.in-terminal",
+      "level": "info",
+      "summary": "Nearhost is already running in a terminal, so nearhost -d leaves it there rather than start another in the background."
+    },
+    {
+      "code": "projects.none",
+      "level": "info",
+      "summary": "There are no projects to list or serve yet."
+    },
+    {
       "code": "core.log-unavailable",
       "level": "warning",
       "summary": "The core could not send its standard error to its log, so a crash may not be logged."
@@ -759,6 +769,109 @@
       "level": "error",
       "status": 403,
       "summary": "A request to Nearhost's page was refused."
+    },
+    {
+      "code": "pair.code-invalid",
+      "level": "error",
+      "status": 400,
+      "summary": "The pairing code typed on a device is wrong, has been used or has expired.",
+      "steps": [
+        { "text": "Get a new code on the machine Nearhost runs on:", "command": "nearhost pair" }
+      ]
+    },
+    {
+      "code": "pair.link-used",
+      "level": "error",
+      "status": 403,
+      "summary": "The link that signs a paired device in to a site has been used or has expired."
+    },
+    {
+      "code": "pair.bad-target",
+      "level": "error",
+      "status": 400,
+      "summary": "A device asked to be signed in to an address outside the network domain."
+    },
+    {
+      "code": "pair.too-many-tries",
+      "level": "error",
+      "status": 429,
+      "summary": "A device made too many wrong attempts to pair or sign in, so it must wait."
+    },
+    {
+      "code": "pair.needed",
+      "level": "error",
+      "status": 401,
+      "summary": "A site on the network domain was asked for by a device that is not paired."
+    },
+    {
+      "code": "pair.unavailable",
+      "level": "error",
+      "status": 503,
+      "summary": "A site on the network domain needs a paired device, and Nearhost's page, where devices pair, is not served."
+    },
+    {
+      "code": "network.apply-failed",
+      "level": "error",
+      "status": 500,
+      "summary": "Nearhost could not change how it serves to other devices on the network after the config changed."
+    },
+    {
+      "code": "network.devices-unavailable",
+      "level": "warning",
+      "summary": "Nearhost could not open its list of paired devices, so no other device can pair or sign in."
+    },
+    {
+      "code": "network.off",
+      "level": "error",
+      "status": 409,
+      "summary": "Something was asked that needs networked mode, and the config does not turn it on."
+    },
+    {
+      "code": "network.no-token",
+      "level": "error",
+      "status": 503,
+      "summary": "Networked mode gets its certificate with a DNS token, and none is set."
+    },
+    {
+      "code": "network.dns",
+      "level": "warning",
+      "summary": "The name of Nearhost's page on the network does not point at this machine."
+    },
+    {
+      "code": "network.firewall",
+      "level": "error",
+      "status": 503,
+      "summary": "The firewall does not let other devices reach Nearhost."
+    },
+    {
+      "code": "network.firewall-refused",
+      "level": "error",
+      "status": 400,
+      "summary": "The elevated firewall helper refused a program other than the one running, or its input or report file."
+    },
+    {
+      "code": "network.cert",
+      "level": "error",
+      "status": 503,
+      "summary": "The certificate for Nearhost's page on the network is missing or not the one the config asks for."
+    },
+    {
+      "code": "network.no-page",
+      "level": "error",
+      "status": 503,
+      "summary": "Networked mode needs Nearhost's page, where devices pair, and the page is not served."
+    },
+    {
+      "code": "network.not-listening",
+      "level": "error",
+      "status": 503,
+      "summary": "Networked mode is on, but Nearhost does not serve to the network yet, so no device could reach it."
+    },
+    {
+      "code": "devices.unknown",
+      "level": "error",
+      "status": 404,
+      "summary": "No paired device has the name asked for."
     },
     {
       "code": "documents.missing",
