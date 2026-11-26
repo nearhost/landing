@@ -19,7 +19,7 @@ Nearhost takes the mouse for those clicks, so it selects text and opens links it
 | Double-click     | Copies the word under the pointer.                                                                                                           |
 | Click an address | Opens an `http` or `https` address in your browser, whether it is a link or written in a log line.                                           |
 
-Copies made with a key or the mouse, adds, saves, removals and failures are confirmed in a toast for two seconds and written to the log too. Copies go to the clipboard through the terminal, over OSC 52, and through `pbcopy` on macOS, `wl-copy`, `xclip` or `xsel` on Linux, or the Windows clipboard on Windows, so they work in terminals without OSC 52 too. In most terminals, holding Shift hands the mouse back to the terminal for its own selection and links. In Ghostty, Shift+Cmd+click opens a link the terminal's way. Needs Nearhost 0.8.0 or later.
+Copies made with a key or the mouse, adds, saves and removals are confirmed in a toast for two seconds and written to the log too, and so are warnings and notes. An action of yours that fails opens an alert box instead, with what went wrong, why and how to fix it, and writes it to the log as well. A problem that arrives on its own, such as a project failing in the background, never opens the alert: it shows in a toast and stays under problems on Home. Copies go to the clipboard through the terminal, over OSC 52, and through `pbcopy` on macOS, `wl-copy`, `xclip` or `xsel` on Linux, or the Windows clipboard on Windows, so they work in terminals without OSC 52 too. In most terminals, holding Shift hands the mouse back to the terminal for its own selection and links. In Ghostty, Shift+Cmd+click opens a link the terminal's way. Needs Nearhost 0.8.0 or later.
 
 ## Anywhere
 
@@ -136,10 +136,11 @@ See [The request log](/docs/concepts/the-request-log/).
 | Remove        | `y` removes, `n` or `esc` keeps.                                                                                   |
 | Agent request | `y` allows, `A` always allows when offered, `n` or `esc` refuses.                                                  |
 
-## Welcome, password and quit boxes
+## Welcome, password, quit and alert boxes
 
 | Box      | Keys                                                                                                                                                                        |
 | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Welcome  | `enter` trusts the certificate authority, `s` skips.                                                                                                                        |
 | Password | `enter` continues, `esc` cancels.                                                                                                                                           |
 | Quit     | `enter` stops Nearhost or leaves it running, as chosen; `tab` or `←`, `→` choose; `space` ticks Don't ask again, which saves the answer as `keep_running`; `esc` goes back. |
+| Alert    | `enter` or `esc` closes it, and `c` copies its first command.                                                                                                               |

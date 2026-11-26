@@ -115,7 +115,18 @@ Each front end asks in its own way:
 - **`nearhost add`.** At a terminal it first says what approving a name does, then asks about each item on its own, as `<item>: approve? [y/N]`. A no drops that host, loopback port or `docker_clients`, and the add goes on without it. A refused main name falls back to the `.test` one, and the summary names what was left out. Nearhost asks about a refused item again when it next reviews the project. A host typed with `--host`, or a main name typed with `--alias`, is approved by typing it. Without a terminal it adds nothing, and names the items. For the file at the top of this page:
 
   ```text
-  nearhost: not added: this project asks for things that need your approval (*.status.local.example.com, api.local.example.com, ws.local.example.com, files.local.example.com, app.local.example.com, docker_clients); run nearhost add in a terminal, or open nearhost
+  Error: Not added: this project asks for things that need your approval
+  (*.status.local.example.com, api.local.example.com,
+  ws.local.example.com, files.local.example.com, app.local.example.com,
+  docker_clients).
+
+  Run the add in a terminal, where it can ask:
+
+    nearhost add
+
+  Or approve them in the interface:
+
+    nearhost
   ```
 
 - **`nearhost up` and the background Nearhost.** They ask no question of their own. A project whose file asks for something new keeps serving what was approved before, and the log says what is waiting. `nearhost status` lists it with a link to answer it on Nearhost's page. Approve it there, or open `nearhost`.
