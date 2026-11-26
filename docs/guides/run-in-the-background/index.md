@@ -187,6 +187,4 @@ Each warning has a fix beside it. Most come to running `nearhost service install
 
 ## On Windows
 
-Windows 11 has all of this: `nearhost -d`, `nearhost stop`, `nearhost status` and the logon task. The Windows binaries are not code signed. Where Smart App Control is on, Windows blocks an unsigned `nearhost.exe` outright, with no Run anyway, so none of it runs on that machine. With it off, SmartScreen may ask you to confirm the first run. See [SmartScreen](https://nearhost.dev/docs/getting-started/install.md#smartscreen).
-
-Until signed builds ship, you have two choices on a machine with Smart App Control on. Run Nearhost on a machine where it is off, or on macOS or Linux, and reach your servers from there. Or turn Smart App Control off in Windows Security, under App & browser control, which is your decision to make about your machine: read what Microsoft says there first, as it affects every unsigned program, not only Nearhost.
+Windows 11 has all of this: `nearhost -d`, `nearhost stop`, `nearhost status` and the logon task. From Nearhost 0.16.0 the Windows binaries are code signed, so it all runs where Smart App Control is on. Windows blocks an earlier, unsigned release there outright, so update first. See [Code signing](https://nearhost.dev/docs/getting-started/install.md#code-signing).
