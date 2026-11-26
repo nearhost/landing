@@ -94,7 +94,7 @@ A project's `.nearhostrc` can set the main name with `alias:`, filled from the p
 
 If the file is not valid YAML, or breaks a rule above, Nearhost does not start, and names the file, the problem and, for YAML, the line. A Nearhost already running keeps serving the last good config and says so in its log and the interface. `nearhost doctor` reports either without exiting.
 
-A key Nearhost does not know, such as a misspelt one, does not stop Nearhost. But Nearhost refuses to save the file, from the interface or any command, until you fix or remove the key, so that saving does not delete it. `nearhost doctor` names each such key and its line.
+A key Nearhost does not know, such as a misspelt one, does not stop Nearhost. But Nearhost refuses to save the file, from the interface or any command, until you fix or remove the key, so that saving does not delete it. The refusal names the file, each key and its line, with the code `config.unknown-keys`. `nearhost doctor` names each such key and its line.
 
 ## Beside the config
 
