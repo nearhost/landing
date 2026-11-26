@@ -106,6 +106,7 @@ These are the exit statuses a script can rely on:
 |                             | 1      | A newer release is out.                                                                                                    |
 |                             | 2      | The check failed. The reason goes to stderr.                                                                               |
 | `nearhost update`           | 1      | The update command ran, but the copy that runs next did not start, printed no version, or is still the old version.        |
+|                             | 1      | With `--next` on a Homebrew copy when the newest is a beta, which Homebrew does not have.                                  |
 | A mistyped command or group | 1      | The command, or a subcommand under `hosts`, `service`, `preset` or `completion`, does not exist.                           |
 
 ## nearhost
@@ -702,6 +703,9 @@ On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. For a
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `-y`, `--yes` | Update without asking.                                                                                                       |
 | `--check`     | Only report. Exits 0 when up to date, 1 when a newer release is out, and 2 when the check failed, with the reason on stderr. |
+| `--next`      | Update to the newest beta, or to the newest release when no beta is newer. Works with `--check` and `--yes`.                 |
+
+With `--next` it looks at betas as well as releases, takes the highest version that has a file for this system, and installs that exact version: `@nearhost/cli@<version>` for npm, pnpm and bun, `@v<version>` for `go install`, `NEARHOST_VERSION=v<version>` for the shell installer, and that version's zip on Windows. Run through `npx`, it tells you to run `npx @nearhost/cli@next`. Betas are not published to Homebrew, so when the newest is a beta, a Homebrew copy installs nothing: it says to run `brew uninstall --cask nearhost`, then install the beta with npm or the shell installer, and to run `nearhost service install` if a service runs Nearhost, and exits 1. When the newest is a release, it runs `brew upgrade` as usual. Once a copy runs a beta, a plain `nearhost update` follows newer betas and then the release, and stays on releases from there.
 
 With `--check`, up to date prints to stdout, as in `nearhost 0.15.0 is the latest.` A newer release is a note on stderr, `Note: nearhost <new> is available; this is <old>, installed with <how>.`, with the command to update, and the exit status is 1 so that a script can tell. A check that fails prints `Error: Nearhost could not find out whether a newer release is out.`, with the reason under it, such as GitHub not answering.
 
