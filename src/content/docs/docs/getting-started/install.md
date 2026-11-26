@@ -93,6 +93,8 @@ npx @nearhost/cli
 
 or `npm install -g @nearhost/cli` to keep the `nearhost` command. This works the same in PowerShell on Windows. npm installs the binary for your machine as a platform package, such as `@nearhost/cli-linux-x64` or `@nearhost/cli-win32-x64`, with no install script, so pnpm, bun and `--ignore-scripts` work too.
 
+To try the next release before it ships, install a beta with `npm install -g @nearhost/cli@next`. A new beta is published each time a change lands for the next release. Right after a release, `next` points at that release until the next beta. On a beta, `nearhost update` moves to newer betas and then to the release, and stays on releases from there.
+
 ## Verifying a download
 
 The shell and PowerShell installers check the archive against the release's `checksums.txt`. They do not check the attestation. Releases also carry build provenance attestations, and you can check any file you downloaded with the GitHub CLI:
