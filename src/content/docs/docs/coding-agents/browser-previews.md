@@ -13,7 +13,43 @@ With the [`nearhost` skill installed](/docs/coding-agents/#install-the-skill), a
 
 A server can have at most 16 passthroughs open or opening at once, with or without Always allow. The next request is refused with `16 passthroughs are open for this server; close one first`, and the agent passes that on rather than asking again. A prompt you allow after the limit is reached ends with the same reason. Close a passthrough to make room.
 
-On a server's panel, press `tab` to move to the server's open passthroughs, which are shown only when there are any. When there are more than fit, they scroll with the selection, and a `+N more` line says how many are hidden above or below. Use `j` and `k` or the arrow keys to move, and `tab` or `esc` to leave. Press `x` on a passthrough to close it at once. Home shows a `passthroughs` count while any are open.
+## See what is open
+
+The `passthroughs` row at the bottom of the sidebar shows `● 2` while two are open, and a dim `none` when none are. It stays in place while the list above it scrolls. Select it to list every open passthrough across all your servers:
+
+```text
+passthroughs                                       2 open
+
+▌ http://localhost:7480   preflash demo
+    from leto, port 7480 · Claude Code · 12m
+
+  http://localhost:5174   storybook
+    from apollo, port 6006 · Codex · 2h
+```
+
+Each row starts with the address to open on your laptop, then the agent's label. The dim line under it says which server the passthrough came from, that server's port, which agent asked and how long ago. Rows are in the order of your servers, `local` first, then by port. When there are more than fit, they scroll with the selection, and a `+N more` line says how many are hidden above or below.
+
+Press `tab` to move into the rows, then:
+
+| Key      | Action                                 |
+| -------- | -------------------------------------- |
+| `↑`, `↓` | Choose a passthrough. `k` and `j` too. |
+| `o`      | Open its address in your browser.      |
+| `y`      | Copy its address.                      |
+| `x`      | Close it at once.                      |
+| `esc`    | Go back to the sidebar.                |
+
+With none open, the panel says `No ports are open for agents. When an agent asks to open one, Nearhost asks you first.` A server's panel shows only a line such as `open  1 passthrough, 2 documents`, and Home has no line for them. While anything is open, Nearhost shows this layout instead of the first-run screen, so the row is there to find.
+
+Nearhost lists the passthroughs it opened. A tunnel an agent or you made with `ssh -L` is invisible to it.
+
+## When the app runs on another machine
+
+Sometimes an agent works on one machine while the app runs on another it reaches over SSH. The skill then asks for the passthrough on the machine the app runs on, with `--on <host>`: `passthrough <port> --on <host>`, and the same option on `passthrough-wait` and `passthrough-close`. Nothing needs installing on that host. The passthrough comes from that server, and Nearhost lists it under that server's name, so the panel shows where the app is. Always allow works there as it does for any server, and the token is kept on that host.
+
+If no Nearhost reaches that machine, the skill falls back to forwarding the port itself with `ssh -L`, opens the passthrough from the machine it is on, and puts where the app runs in the label, for example `preflash on apollo`. The passthrough then lists the agent's own machine as its server, and the label says where the app is. If SSH cannot reach the host at all, the agent tells you and stops, because forwarding the port itself would fail the same way.
+
+A session can open passthroughs on several machines. When the session ends, Claude Code's `SessionEnd` hook closes all of them, within about 2.5 seconds. One it cannot close in time, because that host is unreachable, stays open until Nearhost drops that server's connection or you close it with `x` in the `passthroughs` panel. The same option works from `nearhost.ps1` on Windows; the host it runs on must be a Linux or macOS server.
 
 ## When a passthrough ends
 

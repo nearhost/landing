@@ -21,7 +21,7 @@ This starts the core with no interface and returns once it answers. It prints:
 Nearhost is running in the background (pid 4121). Stop it with nearhost stop.
 ```
 
-With no core running, `nearhost -d` waits up to 15 seconds for it. If the core stops while starting, `nearhost -d` prints the end of its log and exits 1. If it is still starting when the wait is over, it says `Nearhost is still starting. See <path> for how it is going.` and exits 1, and the core goes on starting. Run again with a core already running, it starts nothing and says how that one was started:
+With no core running, `nearhost -d` waits up to 15 seconds for it. If the core stops while starting, `nearhost -d` prints `Error: Nearhost stopped while starting.` with the end of its log, and exits 1. If it is still starting when the wait is over, it says `Error: Nearhost is still starting.` with the path of its log, and exits 1, and the core goes on starting. Ctrl-C during the wait exits 130, and says whether the core goes on starting. Run again with a core already running, it starts nothing and says how that one was started:
 
 ```text
 Nearhost is already running in the background (pid 4121, started by detached).
@@ -31,7 +31,7 @@ If the running one is a `nearhost up` in a terminal, it says so and tells you to
 
 It takes the same `--https-port`, `--http-port`, `--web-port`, `--no-hosts` and `--no-capture` flags as `nearhost`, and `--config`. They apply only when the core starts. See [CLI](/docs/reference/cli/#nearhost--d).
 
-With a [service](#start-it-at-login) installed, `nearhost -d` starts the core through the service, and says `Nearhost is running in the background as a service (pid 4121). Stop it with nearhost stop.` The service has its own settings, so when you give `--config` or one of those flags, Nearhost starts the core directly with yours, and says `A service is installed, but it runs with its own settings, so Nearhost was started directly with yours.`
+With a [service](#start-it-at-login) installed, `nearhost -d` starts the core through the service, and says `Nearhost is running in the background as a service (pid 4121). Stop it with nearhost stop.` The service has its own settings, so when you give `--config` or one of those flags, Nearhost starts the core directly with yours, and says `Note: A service is installed, but it runs with its own settings, so Nearhost was started directly with yours.` on stderr.
 
 `nearhost status` shows what the core serves:
 
@@ -47,7 +47,7 @@ myapp    running  https://myapp.test
 Page: https://nearhost.localhost:6327
 ```
 
-It lists each server and project, any request from a coding agent that waits for your answer, and the address of the page. At a terminal the page's address carries the key that lets your browser see the project list and the approvals. `nearhost status --json` prints the same as JSON. When no core is running, it says so and exits 3, so a script can tell.
+It lists each server and project, any request from a coding agent that waits for your answer, and the address of the page. At a terminal the page's address carries the key that lets your browser see the project list and the approvals. `nearhost status --json` prints the same as JSON. When no core is running, it says `Error: Nearhost is not running.`, with the commands to start one, and exits 3, so a script can tell. Notes about the core, such as a newer release, go to stderr.
 
 `nearhost stop` asks the core to stop and waits until its ports are free again:
 
@@ -99,7 +99,7 @@ This installs a service for your user that runs `nearhost daemon`, the core with
 
 Linux needs systemd with a user manager. Without one, `service install` says so; run `nearhost -d` from your shell's startup instead.
 
-The service runs the copy of `nearhost` that you ran `service install` from, at that path. It refuses a copy that will not be there at your next login: one fetched by `npx`, `bunx` or `pnpm dlx` for a single run, one built by `go run`, and one inside Homebrew's versioned folder, which the next upgrade removes. The message says how to install a lasting copy. A copy under an nvm Node version runs from there, so install the service again if you change your default Node version.
+The service runs the copy of `nearhost` that you ran `service install` from, at that path. It refuses a copy that will not be there at your next login: one fetched by `npx`, `bunx` or `pnpm dlx` for a single run, one built by `go run`, and one inside Homebrew's versioned folder, which the next upgrade removes. The message says how to install a lasting copy. On Linux it also refuses a copy that may not use ports 80 and 443, such as one you built yourself, and gives the `setcap` command to run first. See [Errors, warnings and notes](/docs/reference/cli/#errors-warnings-and-notes). A copy under an nvm Node version runs from there, so install the service again if you change your default Node version.
 
 If the core fails, the service manager starts it again. systemd gives up after five tries in a minute, and Task Scheduler after three tries a minute apart. A clean `nearhost stop` is not a failure, so the core stays stopped until you start it again or log in.
 
@@ -117,7 +117,7 @@ A service does not get your shell's environment, so `service install` writes wha
 
 - **macOS and Linux:** `PATH`, so the service finds `ssh`, `docker` and the tools projects run, and `DOCKER_HOST`, `DOCKER_CONTEXT`, `XDG_CONFIG_HOME` and `XDG_DATA_HOME` when they are set. Nearhost keeps its config and its data in the folders the last two name, so a service without them would serve another config than the one you edit.
 - **Linux:** `DISPLAY`, `WAYLAND_DISPLAY` and `DBUS_SESSION_BUS_ADDRESS`, when your session's differ from the user manager's, so the core can open links in your browser. The unit is wanted by `graphical-session.target` when a desktop session is running, and by `default.target` otherwise.
-- **`SSH_AUTH_SOCK`,** when it points into your home folder or your runtime folder, where it lasts. When the service manager already gives the service the same socket, as launchd does for the system's agent, nothing is written. When it points somewhere that changes at each login, such as an agent that ssh forwarded to this shell, `service install` says `SSH_AUTH_SOCK here (<path>) changes at each login, so the service cannot use it.` and writes nothing. When it is not set, it says `SSH_AUTH_SOCK is not set here, so the service uses the agent your login session provides.` Either way, set `IdentityAgent` in `~/.ssh/config` to an agent socket that lasts. Nearhost runs your `ssh`, so the setting applies as it does in a terminal.
+- **`SSH_AUTH_SOCK`,** when it points into your home folder or your runtime folder, where it lasts. When the service manager already gives the service the same socket, as launchd does for the system's agent, nothing is written. When it points somewhere that changes at each login, such as an agent that ssh forwarded to this shell, `service install` warns `Warning: SSH_AUTH_SOCK here (<path>) changes at each login, so the service cannot use it.` and writes nothing. When it is not set, it notes `Note: SSH_AUTH_SOCK is not set here, so the service uses the agent your login session provides.` Either way, set `IdentityAgent` in `~/.ssh/config` to an agent socket that lasts. Nearhost runs your `ssh`, so the setting applies as it does in a terminal.
 - **Windows:** nothing is written. The task runs with your own environment, through `conhost.exe --headless`, so no console window opens and none stays on your screen.
 
 `nearhost doctor` checks the core's view of this. See [What doctor says](#what-doctor-says).
@@ -131,10 +131,10 @@ On macOS, run `nearhost service install` from Terminal on the Mac's desktop, not
 The core never asks for your password and never raises a User Account Control prompt: a prompt with no one at the terminal, or a dialog at login with no context, is not a thing Nearhost does. When a project's names are missing from the [hosts file](/docs/concepts/the-hosts-file/), the core leaves the project stopped and says so:
 
 ```text
-docdemo  stopped  https://docdemo.test  project "docdemo"'s hosts are not resolvable: the hosts file was not updated (the hosts file needs updating, and Nearhost in the background never asks for sudo. Run `nearhost hosts update` in a terminal.); start the project again to retry
+docdemo  stopped  https://docdemo.test  project "docdemo"'s hosts are not resolvable: the hosts file was not updated (the hosts file needs updating, and Nearhost in the background never asks for sudo.)
 ```
 
-Run `nearhost hosts update` in a terminal. It asks for your password through `sudo` (on Windows, for your approval in a User Account Control prompt), brings the block up to date for every enabled project, and tells the core, which starts the projects that were waiting. `nearhost add` does the same at its end, and so does the interface, with its password box.
+`nearhost status` also warns `Warning: docdemo waits for the hosts file to be updated.`, and the core's log has the same refusal with `Fix: nearhost hosts update` under it. Run `nearhost hosts update` in a terminal. It asks for your password through `sudo` (on Windows, for your approval in a User Account Control prompt), brings the block up to date for every enabled project, and tells the core, which starts the projects that were waiting. `nearhost add` does the same at its end, and so does the interface, with its password box.
 
 Most starts need no change: the hosts file is only changed when a project's names are new, so a service that starts at login finds the block right after the first time.
 
@@ -142,7 +142,18 @@ The core does not trust the local certificate authority for you either. If brows
 
 ## The core's log
 
-The core writes to `core.log` in the config folder: `~/.config/nearhost/core.log`, `%APPDATA%\nearhost\core.log` on Windows, or under `XDG_CONFIG_HOME` when that is set to an absolute path. Each line has a timestamp. It holds what `nearhost up` prints, a line for each request from a coding agent with the link to answer it, and why the core stopped. A panic goes there too.
+The core writes to `core.log` in the config folder: `~/.config/nearhost/core.log`, `%APPDATA%\nearhost\core.log` on Windows, or under `XDG_CONFIG_HOME` when that is set to an absolute path. Each line has a timestamp. It holds what `nearhost up` prints, a line for each request from a coding agent with the link to answer it, and why the core stopped. An error, a warning or a note is a block of lines: the first has its level and its code in brackets, and the lines under it, indented, say why, how to fix it and what caused it. Look the code up in [Errors](/docs/reference/errors/).
+
+```text
+2026-11-25T14:29:57Z error [port.needs-permission] HTTPS port 443 needs permission to bind.
+2026-11-25T14:29:57Z   On Linux, a program may use ports below 1024, such as 443 for HTTPS and 80 for HTTP, only when it has been given permission. The install script gives it; a nearhost you build or copy yourself does not have it.
+2026-11-25T14:29:57Z   Fix: sudo setcap cap_net_bind_service=+ep '/home/you/go/bin/nearhost'
+2026-11-25T14:29:57Z   Then start Nearhost again. Do not run nearhost with sudo.
+2026-11-25T14:29:57Z   Run `nearhost doctor` to check this and the rest of what Nearhost needs.
+2026-11-25T14:29:57Z   Cause: HTTPS port 443 needs permission to bind: listen tcp :443: bind: permission denied
+```
+
+When the core crashes, the log has it as an error with the code `crash`, with the path of a crash file, `crash-<time>.log` beside `core.log`, that holds the details. Attach that file when you report it.
 
 At 5 MiB the log is set aside as `core.log.1`, replacing the older one, and a new `core.log` starts. That happens while the core runs, so the log never grows without bound: the two files together stay near 10 MiB at most.
 
@@ -150,7 +161,7 @@ At 5 MiB the log is set aside as `core.log.1`, replacing the older one, and a ne
 
 `nearhost update` replaces the binary as it always has, and then restarts the core on the new one, so the update is not left half done. A core that a service started comes back through the service. Any other core comes back started by `nearhost -d`, with the same config file, ports and flags as before.
 
-- **Open passthroughs and forwards close for a moment.** When there are any, it asks first, as `Restart Nearhost now to run <version>? This closes 2 passthroughs for a moment. [Y/n]`. `--yes` restarts without asking. Without a terminal, or when you answer no, it leaves the core as it is, and says `Nearhost in the background still runs <old>. Restart it when you are ready: nearhost stop, then nearhost -d.` With nothing to close it restarts at once, and prints `Restarted Nearhost (pid <pid>); it now runs <version>.`
+- **Open passthroughs and forwards close for a moment.** When there are any, it asks first, as `Restart Nearhost now to run <version>? This closes 2 passthroughs for a moment. [Y/n]`. `--yes` restarts without asking. Without a terminal, or when you answer no, it leaves the core as it is, and says `Note: Nearhost in the background still runs <old>.`, with the commands to restart it when you are ready. With nothing to close it restarts at once, and prints `Restarted Nearhost (pid <pid>); it now runs <version>.`
 - **A core started by the interface closes the interface.** The open `nearhost` window ends, and you open it again.
 - **A core in a terminal is yours to restart,** with Ctrl-C and then the command you started it with.
 - **A service that runs another copy** of nearhost than the one you updated is left running. Run `nearhost service install` from the copy you use to bring the service across.
@@ -177,6 +188,4 @@ Each warning has a fix beside it. Most come to running `nearhost service install
 
 ## On Windows
 
-Windows 11 has all of this: `nearhost -d`, `nearhost stop`, `nearhost status` and the logon task. The Windows binaries are not code signed. Where Smart App Control is on, Windows blocks an unsigned `nearhost.exe` outright, with no Run anyway, so none of it runs on that machine. With it off, SmartScreen may ask you to confirm the first run. See [SmartScreen](/docs/getting-started/install/#smartscreen).
-
-Until signed builds ship, you have two choices on a machine with Smart App Control on. Run Nearhost on a machine where it is off, or on macOS or Linux, and reach your servers from there. Or turn Smart App Control off in Windows Security, under App & browser control, which is your decision to make about your machine: read what Microsoft says there first, as it affects every unsigned program, not only Nearhost.
+Windows 11 has all of this: `nearhost -d`, `nearhost stop`, `nearhost status` and the logon task. From Nearhost 0.16.0 the Windows binaries are code signed, so it all runs where Smart App Control is on. Windows blocks an earlier, unsigned release there outright, so update first. See [Code signing](/docs/getting-started/install/#code-signing).
