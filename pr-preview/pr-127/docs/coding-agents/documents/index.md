@@ -32,10 +32,10 @@ A page's script can load the folder's scripts, stylesheets, fonts, images, audio
 
 ## When a served folder goes away
 
-Nearhost lists served folders on each server's panel; press `tab` to reach its `documents` section. Home shows a count in its `agents` line. A folder stays served until:
+The `documents` row at the bottom of the sidebar shows `● 2` while two folders are served, and a dim `none` otherwise. Select it to list every served folder across all your servers. Each row names the folder, then, on a dim line, the server it came from, which agent asked and how long ago. Press `tab` to move into the rows: `↑` and `↓` choose, `enter` or `o` opens the document in your browser, `x` stops serving it after you confirm, and `esc` goes back. There is no key to copy the address, because a plain address may not open in a browser that lacks Nearhost's page key. A server's panel shows a line such as `open  1 passthrough, 2 documents` instead of a list. A folder stays served until:
 
 - the background Nearhost stops or restarts, as nothing is saved across restarts (`nearhost update` restarts it). Quitting the interface alone does not clear them;
-- you press `x` on it in the server's panel and confirm;
+- you press `x` on it in the `documents` panel and confirm;
 - you remove the server from Nearhost, or rename it.
 
 Disconnecting a server does not remove its folders. Their pages say the server is not connected until it reconnects. The agent's session ending does not remove them either, so you can read yesterday's plan again while Nearhost runs. Home's web page also lists the folders served since Nearhost started, with links to each document. It lists them only in a browser that has opened a document link, or opened the page from Nearhost's interface or from the address `nearhost status` prints at a terminal: each sets the cookie that the list needs. Elsewhere the page shows no list. Nearhost sets and reads that cookie at `nearhost.localhost` only, so a dev server or container you browse at `localhost` does not receive it. See [TLS and the proxy](https://nearhost.dev/pr-preview/pr-127/docs/concepts/tls-and-the-proxy.md).
