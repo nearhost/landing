@@ -303,6 +303,12 @@ Start it:
 nearhost -d
 ```
 
+<h3 id="service.not-signed-in"><code>service.not-signed-in</code></h3>
+
+**Note**
+
+You are not signed in to Windows, so the service could not start Nearhost, and it was started directly.
+
 <h3 id="service.other-copy"><code>service.other-copy</code></h3>
 
 **Warning**
@@ -314,6 +320,12 @@ The installed service runs another copy of nearhost than this one.
 **Note**
 
 A service is installed, but it runs with its own settings, so Nearhost was started directly with the ones given.
+
+<h3 id="service.restarting"><code>service.restarting</code></h3>
+
+**Warning**
+
+The service is starting Nearhost again after it stopped.
 
 <h3 id="service.ssh-agent-changes"><code>service.ssh-agent-changes</code></h3>
 

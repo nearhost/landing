@@ -24,7 +24,7 @@ Nearhost is running in the background (pid 4121). Stop it with nearhost stop.
 With no core running, `nearhost -d` waits up to 15 seconds for it. If the core stops while starting, `nearhost -d` prints `Error: Nearhost stopped while starting.` with the end of its log, and exits 1. If it is still starting when the wait is over, it says `Error: Nearhost is still starting.` with the path of its log, and exits 1, and the core goes on starting. Ctrl-C during the wait exits 130, and says whether the core goes on starting. Run again with a core already running, it starts nothing and says how that one was started:
 
 ```text
-Nearhost is already running in the background (pid 4121, started by detached).
+Nearhost is already running in the background (pid 4121, started with nearhost -d).
 ```
 
 If the running one is a `nearhost up` in a terminal, it says so and tells you to stop it first.
@@ -36,7 +36,7 @@ With a [service](#start-it-at-login) installed, `nearhost -d` starts the core th
 `nearhost status` shows what the core serves:
 
 ```text
-Nearhost 0.15.0 is running (pid 4121, started by detached at 2026-11-23 09:12:40).
+Nearhost 0.16.0 is running (pid 4121, started with nearhost -d at 2026-11-23 09:12:40).
 
 SERVER  STATE      MESSAGE
 local   connected
@@ -99,9 +99,11 @@ This installs a service for your user that runs `nearhost daemon`, the core with
 
 Linux needs systemd with a user manager. Without one, `service install` says so; run `nearhost -d` from your shell's startup instead.
 
-The service runs the copy of `nearhost` that you ran `service install` from, at that path. It refuses a copy that will not be there at your next login: one fetched by `npx`, `bunx` or `pnpm dlx` for a single run, one built by `go run`, and one inside Homebrew's versioned folder, which the next upgrade removes. The message says how to install a lasting copy. On Linux it also refuses a copy that may not use ports 80 and 443, such as one you built yourself, and gives the `setcap` command to run first. See [Errors, warnings and notes](/docs/reference/cli/#errors-warnings-and-notes). A copy under an nvm Node version runs from there, so install the service again if you change your default Node version.
+The service runs the copy of `nearhost` that you ran `service install` from, at that path. It refuses a copy that will not be there at your next login: one fetched by `npx`, `bunx` or `pnpm dlx` for a single run, one built by `go run`, and one inside Homebrew's versioned folder, which the next upgrade removes. The message says how to install a lasting copy. On Linux it also refuses a copy that may not use ports 80 and 443, such as one you built yourself, and gives the `setcap` command to run first. See [Errors, warnings and notes](/docs/reference/cli/#errors-warnings-and-notes). A copy under an nvm or fnm Node version runs from there, so install the service again if you change your default Node version; `service install` notes this.
 
-If the core fails, the service manager starts it again. systemd gives up after five tries in a minute, and Task Scheduler after three tries a minute apart. A clean `nearhost stop` is not a failure, so the core stays stopped until you start it again or log in.
+If the core fails, it is started again. On macOS and Linux the service manager does it, and systemd gives up after five tries in a minute. Task Scheduler never restarts a program that fails, so on Windows the service's own `nearhost` does it: it runs the core as a second `nearhost.exe`, which is why Task Manager shows two, and starts it again 5 seconds after it fails or is ended, giving up after five tries in a minute, as systemd does. Each restart is a line in [the core's log](#the-cores-log), and while one is due `nearhost doctor` warns `installed; it is starting Nearhost again after it stopped`. A core that stops within 10 seconds of the service starting it failed to start, for example because port 443 is taken, so it is not started again, and `nearhost -d` or `service install` shows why. A clean `nearhost stop` is not a failure, so the core stays stopped until you start it again or log in.
+
+On Windows the task runs only while you are signed in, at the screen or over Remote Desktop. With nobody signed in, as over SSH, `nearhost -d` and `service install` start the core directly and say `Note: You are not signed in to Windows, so the service could not start Nearhost, and it was started directly.` The service starts it from your next sign-in.
 
 Run it again at any time. When nothing changed it says `The Nearhost service is installed and up to date.` and does nothing else. When something did, such as your `PATH`, it brings the service up to date. If the service's core is running, it asks `The service's settings changed. Restart Nearhost now to apply them? Open passthroughs close. [Y/n]`. Answer no, or run it without a terminal, and the new settings apply at the next start. `--yes` restarts without asking.
 
