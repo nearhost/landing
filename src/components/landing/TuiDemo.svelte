@@ -1,6 +1,6 @@
 <script lang="ts">
   /* eslint-disable svelte/no-useless-mustaches -- a row's spaces are what lines it up, as in a terminal */
-  // A working mock-up of the nearhost interface (0.15.0): the same screens,
+  // A working mock-up of the nearhost interface (0.16.0): the same screens,
   // keys and footer as the real one, driven by made-up projects and requests.
   import { onMount } from 'svelte';
 
@@ -52,8 +52,28 @@
   }
   interface Row {
     key: string;
-    kind: 'home' | 'server' | 'project';
+    kind: 'home' | 'server' | 'project' | 'passthroughs' | 'documents';
     name: string;
+  }
+  // A port a coding agent opened on a server, reached at local on this machine.
+  interface Passthrough {
+    id: string;
+    server: string;
+    remote: number;
+    local: number;
+    label: string;
+    requester: string;
+    opened: number;
+  }
+  // A folder of documents an agent asked Nearhost to serve, with its newest
+  // document.
+  interface Tree {
+    id: string;
+    server: string;
+    root: string; // as the panel shows it: ~ for this machine's home
+    requester: string;
+    doc: string;
+    opened: number;
   }
   interface FooterItem {
     key: string;
@@ -167,6 +187,47 @@
     },
   ]);
 
+  // What coding agents have opened: the pinned passthroughs and documents
+  // rows list them, and each server's panel counts its own.
+  let passes = $state<Passthrough[]>([
+    {
+      id: 'p1',
+      server: 'mini',
+      remote: 6006,
+      local: 6006,
+      label: 'storybook',
+      requester: 'claude-code',
+      opened: START - 12 * 60_000,
+    },
+    {
+      id: 'p2',
+      server: 'mini',
+      remote: 8025,
+      local: 8025,
+      label: 'mailpit',
+      requester: 'codex',
+      opened: START - 41 * 60_000,
+    },
+  ]);
+  let trees = $state<Tree[]>([
+    {
+      id: 't1',
+      server: 'local',
+      root: '~/code/website',
+      requester: 'claude-code',
+      doc: 'plans/docs-search.md',
+      opened: START - 9 * 60_000,
+    },
+    {
+      id: 't2',
+      server: 'mini',
+      root: '/Users/you/code/myapp',
+      requester: 'codex',
+      doc: 'docs/billing-export-plan.md',
+      opened: START - 2 * HOUR - 5 * 60_000,
+    },
+  ]);
+
   let seq = 0;
   const stamp = (t: number) => new Date(t).toISOString().slice(11, 19);
   const seed = (offset: number, e: Omit<Entry, 'seq' | 'at'>): Entry => ({
@@ -240,6 +301,9 @@
   let collapsed = $state<Record<string, boolean>>({});
   let routeFocus = $state(false);
   let routeRow = $state(0);
+  // The pinned rows' panels: their rows have the keys, and passRow is the one selected.
+  let passFocus = $state(false);
+  let passRow = $state(0);
   let showIgnored = $state(false); // ignored routes fold into one line until i shows them
   let filtering = $state(false);
   let query = $state('');
@@ -256,6 +320,7 @@
   interface Confirm {
     title: string;
     ask: string;
+    yes?: string; // what y does, when it does not remove
     then: () => void;
   }
   let confirmBox = $state<Confirm | null>(null);
@@ -305,7 +370,11 @@
   const project = (name: string) => projects.find((p) => p.name === name);
   const server = (name: string) => servers.find((s) => s.name === name);
   const kindOf = (key: string): Row['kind'] =>
-    key === 'home' ? 'home' : key.startsWith('srv:') ? 'server' : 'project';
+    key === 'home' || key === 'passthroughs' || key === 'documents'
+      ? key
+      : key.startsWith('srv:')
+        ? 'server'
+        : 'project';
   const nameOf = (key: string) => key.slice(4);
 
   // say shows text in a toast at the foot of the screen for two seconds, as
@@ -374,7 +443,8 @@
     return [name.slice(0, at), name.slice(at, at + query.length), name.slice(at + query.length)];
   }
 
-  // The sidebar's rows, in order; groups whose projects are filtered out go.
+  // The sidebar's rows, in order, with the pinned passthroughs and documents
+  // rows last; filtered, only the projects that match, under their servers.
   let rows = $derived.by(() => {
     const out: Row[] = [];
     if (!query) out.push({ key: 'home', kind: 'home', name: 'home' });
@@ -385,7 +455,69 @@
       if (collapsed[s.name] && !query) continue;
       for (const p of ps) out.push({ key: 'prj:' + p.name, kind: 'project', name: p.name });
     }
+    if (!query)
+      out.push(
+        { key: 'passthroughs', kind: 'passthroughs', name: 'passthroughs' },
+        { key: 'documents', kind: 'documents', name: 'documents' },
+      );
     return out;
+  });
+
+  // The agent's name, as the interface shows a requester.
+  const who = (r: string) =>
+    r === 'claude-code' ? 'Claude Code' : r === 'codex' ? 'Codex' : r === 'agent' ? 'An agent' : r;
+  // How long ago t was, as a short word: 12m.
+  function age(t: number) {
+    const d = now - t;
+    if (d < 60_000) return '<1m';
+    if (d < HOUR) return `${Math.floor(d / 60_000)}m`;
+    if (d < 48 * HOUR) return `${Math.floor(d / HOUR)}h`;
+    return `${Math.floor(d / (24 * HOUR))}d`;
+  }
+  // Servers in order: this machine first, then the config's.
+  const rank = (name: string) => servers.findIndex((s) => s.name === name);
+  const plural = (n: number, noun: string) => `${n} ${noun}${n === 1 ? '' : 's'}`;
+  // What agents have open on a server, as its panel's open field says it.
+  function openCounts(name: string) {
+    const out: string[] = [];
+    const p = passes.filter((x) => x.server === name).length;
+    const t = trees.filter((x) => x.server === name).length;
+    if (p) out.push(plural(p, 'passthrough'));
+    if (t) out.push(plural(t, 'document'));
+    return out.join(', ');
+  }
+
+  // The rows of the selected pinned row's panel, each two lines: what to
+  // open, then, dim, where it came from, who asked and how long ago.
+  interface AgentRow {
+    id: string;
+    first: string;
+    detail: string;
+    pass?: Passthrough;
+    tree?: Tree;
+  }
+  let agentRows = $derived.by((): AgentRow[] => {
+    if (selKind === 'passthroughs')
+      return [...passes]
+        .sort((a, b) => rank(a.server) - rank(b.server) || a.remote - b.remote)
+        .map((p) => ({
+          id: p.id,
+          first: `http://localhost:${p.local}${p.label ? '   ' + p.label : ''}`,
+          detail: [`from ${p.server}, port ${p.remote}`, who(p.requester), age(p.opened)].join(
+            ' · ',
+          ),
+          pass: p,
+        }));
+    if (selKind === 'documents')
+      return [...trees]
+        .sort((a, b) => rank(a.server) - rank(b.server) || b.opened - a.opened)
+        .map((t) => ({
+          id: t.id,
+          first: [t.root, who(t.requester), t.doc, age(t.opened)].join(' · '),
+          detail: [`from ${t.server}`, who(t.requester), age(t.opened)].join(' · '),
+          tree: t,
+        }));
+    return [];
   });
 
   let selKind = $derived(kindOf(sel));
@@ -554,6 +686,8 @@
     's server',
     'enter collapse',
     'tab routes',
+    'tab always allowed',
+    'tab select',
     'd remove',
     'e edit',
   ];
@@ -597,6 +731,21 @@
         { key: 'y', label: 'copy advice' },
         { key: 'tab', label: 'done' },
       ];
+    if (passFocus && agentRows[passRow])
+      return agentRows[passRow].tree
+        ? [
+            { key: '↑↓', label: 'select' },
+            { key: 'enter', label: 'open' },
+            { key: 'x', label: 'remove' },
+            { key: 'esc', label: 'done' },
+          ]
+        : [
+            { key: '↑↓', label: 'select' },
+            { key: 'o', label: 'open' },
+            { key: 'y', label: 'copy' },
+            { key: 'x', label: 'close' },
+            { key: 'esc', label: 'done' },
+          ];
     if (filtering)
       return [
         { key: '↑↓', label: 'move' },
@@ -626,7 +775,7 @@
           { key: 'd', label: 'remove' },
         );
       }
-    }
+    } else if (agentRows.length) items = [{ key: 'tab', label: 'select' }];
     return fitFooter(
       [
         ...items,
@@ -658,7 +807,7 @@
       keys: [
         ['j/k', 'up and down'],
         ['h', 'home'],
-        ['tab', 'routes'],
+        ['tab', 'routes, rows'],
         ['/', 'filter by name'],
         ['esc', 'clear filter'],
         ['drag', 'copy text'],
@@ -687,9 +836,9 @@
         ['c', 'connect or drop'],
         ['e', 'edit'],
         ['d', 'remove'],
-        ['tab', 'passthroughs, documents, grants'],
-        ['enter', 'collapse, or open a document'],
-        ['x', 'close, revoke or remove'],
+        ['tab', 'always allowed'],
+        ['enter', 'collapse'],
+        ['x', 'revoke or remove'],
       ],
     },
     {
@@ -708,7 +857,10 @@
   // Actions.
 
   function selectRow(key: string) {
-    if (key !== sel) routeFocus = false;
+    if (key !== sel) {
+      routeFocus = false;
+      passFocus = false;
+    }
     sel = key;
   }
 
@@ -820,13 +972,101 @@
     s.held = true;
     s.link = 'disconnected';
     serverLog(s, 'disconnected');
+    closePasses(s, `${s.name} was disconnected`);
     follow(s);
+  }
+
+  // closePasses closes the passthroughs from s, as the engine does when its
+  // connection goes.
+  function closePasses(s: Server, reason: string) {
+    for (const p of passes.filter((x) => x.server === s.name))
+      serverLog(s, `closed port ${p.remote} for ${p.requester}: ${reason}`);
+    passes = passes.filter((x) => x.server !== s.name);
+  }
+
+  // settle keeps the selection in a pinned row's panel on a row once one
+  // goes, and ends the focus when none are left.
+  function settle() {
+    const n = agentRows.length;
+    passRow = Math.max(0, Math.min(passRow, n - 1));
+    if (!n) passFocus = false;
+  }
+
+  // closePass closes a passthrough from its panel.
+  function closePass(p: Passthrough) {
+    passes = passes.filter((x) => x.id !== p.id);
+    const s = server(p.server);
+    if (s) serverLog(s, `closed port ${p.remote} for ${p.requester}: closed in Nearhost`);
+    noteOn('passthroughs', `Closed port ${p.remote} for ${who(p.requester)}.`);
+    settle();
+  }
+
+  // stopServing asks before no longer serving a folder of documents.
+  function stopServing(t: Tree) {
+    confirmBox = {
+      title: `Stop serving ${t.root}?`,
+      ask: 'Its pages stop loading in the browser. The files stay where they are.',
+      yes: 'stop serving',
+      then: () => {
+        trees = trees.filter((x) => x.id !== t.id);
+        noteOn('srv:' + t.server, `Stopped serving ${t.root}.`);
+        settle();
+      },
+    };
+  }
+
+  // openTree opens a folder's newest document in the browser.
+  function openTree(t: Tree) {
+    noteOn(sel, `Opened ${t.doc} from ${t.root}.`);
+    say(`nearhost opens ${t.doc} in your browser.`);
+  }
+
+  // passKey handles a key while a pinned row's panel has the keys, and
+  // reports whether it was one of its keys.
+  function passKey(k: string): boolean {
+    const list = agentRows;
+    const r = list[passRow];
+    if (!r) {
+      passFocus = false;
+      return false;
+    }
+    switch (k) {
+      case 'Tab':
+      case 'Escape':
+        passFocus = false;
+        return true;
+      case 'ArrowUp':
+      case 'k':
+        passRow = Math.max(passRow - 1, 0);
+        return true;
+      case 'ArrowDown':
+      case 'j':
+        passRow = Math.min(passRow + 1, list.length - 1);
+        return true;
+      case 'Enter':
+        if (!r.tree) return false;
+        openTree(r.tree);
+        return true;
+      case 'o':
+        if (r.tree) openTree(r.tree);
+        else if (r.pass) say(`nearhost opens http://localhost:${r.pass.local} in your browser.`);
+        return true;
+      case 'y':
+        if (!r.pass) return false;
+        copy('', `http://localhost:${r.pass.local}`, ''); // as the interface does, without a word
+        return true;
+      case 'x':
+        if (r.pass) closePass(r.pass);
+        else if (r.tree) stopServing(r.tree);
+        return true;
+    }
+    return false;
   }
 
   async function copy(key: string, text: string, said: string) {
     try {
       await navigator.clipboard.writeText(text);
-      alert(key, said);
+      if (said) alert(key, said);
     } catch {
       say('The clipboard is not available here.', true);
     }
@@ -897,6 +1137,7 @@
       ask: on.length ? `Its projects go with it and stop now: ${on.join(', ')}.` : '',
       then: () => {
         projects = projects.filter((p) => p.server !== s.name);
+        passes = passes.filter((p) => p.server !== s.name);
         servers.splice(servers.indexOf(s), 1);
         selectRow('home');
         alert('home', `Removed ${s.name}.`);
@@ -910,6 +1151,7 @@
     exited = '';
     showHelp = false;
     routeFocus = false;
+    passFocus = false;
     logView = null;
     form = null;
     sel = 'home';
@@ -1422,6 +1664,11 @@
         return true;
       case 'tab':
       case 'Tab':
+        if (agentRows.length) {
+          passFocus = true;
+          passRow = 0;
+          return true;
+        }
         if (!selProject) return false;
         routeFocus = true;
         routeRow = 0;
@@ -1517,6 +1764,7 @@
       showHelp = false;
       handled = true;
     } else if (routeFocus && !filtering && routesKey(k)) handled = true;
+    else if (passFocus && !filtering && passKey(k)) handled = true;
     else if (filtering) handled = filterKey(k, ev);
     else handled = action(k);
     if (handled) ev.preventDefault();
@@ -1834,7 +2082,7 @@
                   {' '}{projects.filter((p) => matches(p.name)).length} of {projects.length} match
                 </div>
               {/if}
-              {#each rows as r (r.key)}
+              {#each rows.filter((x) => x.kind !== 'passthroughs' && x.kind !== 'documents') as r (r.key)}
                 {@const on = r.key === sel}
                 <button type="button" class="f rowbtn" class:sel={on} onclick={() => clickRow(r)}>
                   {#if r.kind === 'home'}
@@ -1883,6 +2131,29 @@
                 </button>
                 {#if r.kind === 'home'}<div class="l"></div>{/if}
               {/each}
+              <!-- Pinned below the list, after a blank line, while no filter is on. -->
+              {#if !query}
+                <div class="pinned">
+                  <div class="l"></div>
+                  {#each rows.filter((x) => x.kind === 'passthroughs' || x.kind === 'documents') as r (r.key)}
+                    {@const on = r.key === sel}
+                    {@const n = r.kind === 'passthroughs' ? passes.length : trees.length}
+                    <button
+                      type="button"
+                      class="f rowbtn"
+                      class:sel={on}
+                      onclick={() => clickRow(r)}
+                    >
+                      <span
+                        ><span class="b">{on ? '▌' : ' '}</span><span class:s={on}>{r.name}</span
+                        ></span
+                      >
+                      {#if n}<span class="b">● {n}{' '}</span>{:else}<span class="d">none{' '}</span
+                        >{/if}
+                    </button>
+                  {/each}
+                </div>
+              {/if}
             </nav>
 
             <div class="panel">
@@ -1966,6 +2237,7 @@
                 <div class="l s">local</div>
                 <div class="l"></div>
                 <div class="l wrap">Projects on this machine. There is nothing to connect to.</div>
+                {#if openCounts('local')}{@render field('open', openCounts('local'))}{/if}
                 {@render panelLog('log', sel, true)}
               {:else if selServer}
                 {@const s = selServer}
@@ -1992,6 +2264,31 @@
                     .map((p) => p.name)
                     .join(', ') || 'none',
                 )}
+                {#if openCounts(s.name)}{@render field('open', openCounts(s.name))}{/if}
+                {@render panelLog('log', sel, true)}
+              {:else if selKind === 'passthroughs' || selKind === 'documents'}
+                <div class="f">
+                  <span class="s">{selKind}</span>
+                  {#if selKind === 'passthroughs' && agentRows.length}<span class="d"
+                      >{agentRows.length} open</span
+                    >{/if}
+                </div>
+                <div class="l"></div>
+                {#if !agentRows.length}
+                  <div class="l wrap">
+                    {selKind === 'passthroughs'
+                      ? 'No ports are open for agents. When an agent asks to open one, Nearhost asks you first.'
+                      : 'No documents are being served. When an agent writes a plan or report for you, it can ask to open it here.'}
+                  </div>
+                {/if}
+                {#each agentRows as r, i (r.id)}
+                  {@const on = passFocus && i === passRow}
+                  {#if i}<div class="l"></div>{/if}
+                  <div class="l">
+                    <span class="b">{on ? '▌' : ' '}</span> <span class:sel={on}>{r.first}</span>
+                  </div>
+                  <div class="l">{'  '}<span class="d" class:sel={on}>{'  '}{r.detail}</span></div>
+                {/each}
                 {@render panelLog('log', sel, true)}
               {:else}
                 <div class="l s">Nearhost</div>
@@ -2139,7 +2436,8 @@
           <div class="l"></div>
           {#if confirmBox.ask}<div class="wrap">{confirmBox.ask}</div>{/if}
           <div class="formkeys">
-            <span class="b">y</span> <span class="d">remove ·</span> <span class="b">n</span>
+            <span class="b">y</span> <span class="d">{confirmBox.yes ?? 'remove'} ·</span>
+            <span class="b">n</span>
             <span class="d">keep</span>
           </div>
         </div>
@@ -2440,6 +2738,12 @@
     border-right: 1px solid var(--line);
     margin-right: 0.5ch;
     overflow: hidden;
+  }
+  /* The passthroughs and documents rows stay at the sidebar's foot. */
+  .pinned {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
   }
   .panel {
     flex: 1;
