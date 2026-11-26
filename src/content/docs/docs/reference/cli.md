@@ -54,6 +54,7 @@ These are the exit statuses a script can rely on:
 |                             | 1      | A newer release is out.                                                                                                    |
 |                             | 2      | The check failed. The reason goes to stderr.                                                                               |
 | `nearhost update`           | 1      | The update command ran, but the copy that runs next did not start, printed no version, or is still the old version.        |
+|                             | 1      | With `--next` on a Homebrew copy, which has no betas.                                                                      |
 | A mistyped command or group | 1      | The command, or a subcommand under `hosts`, `service`, `preset` or `completion`, does not exist.                           |
 
 ## nearhost
@@ -553,6 +554,9 @@ On Windows, `nearhost update` can replace the `nearhost.exe` it runs from. For a
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `-y`, `--yes` | Update without asking.                                                                                                       |
 | `--check`     | Only report. Exits 0 when up to date, 1 when a newer release is out, and 2 when the check failed, with the reason on stderr. |
+| `--next`      | Update to the newest beta, or to the newest release when no beta is newer. Works with `--check` and `--yes`.                 |
+
+With `--next` it looks at betas as well as releases, takes the highest version that has a file for this system, and installs that exact version: `@nearhost/cli@<version>` for npm, pnpm and bun, `@v<version>` for `go install`, `NEARHOST_VERSION=v<version>` for the shell installer, and that version's zip on Windows. Run through `npx`, it tells you to run `npx @nearhost/cli@next`. Betas are not published to Homebrew, so on a Homebrew copy it installs nothing: it says to run `brew uninstall --cask nearhost`, then install the beta with npm or the shell installer, and exits 1. Once a copy runs a beta, a plain `nearhost update` follows newer betas and then the release, and stays on releases from there.
 
 At the `[Y/n]` question, an empty line is yes. End of input, or input that cannot be read, is No: nothing runs and the exit is 0. Without a terminal it asks nothing: it prints the command to run, or says to pass `--yes`, and exits 0.
 
