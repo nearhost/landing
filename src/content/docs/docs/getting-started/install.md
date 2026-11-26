@@ -180,7 +180,7 @@ Nearhost needs Windows 11, and Windows Terminal is the terminal it supports. `ne
 
 ### Code signing
 
-From Nearhost 0.16.0, `nearhost.exe` is code signed through Microsoft's Artifact Signing, with ECS Software Consulting Ltd. as the publisher. That holds however you install it: the PowerShell installer, the zip or npm. Smart App Control runs it. SmartScreen may still ask you to confirm the first run while the certificate builds a reputation, and it names the publisher when it does: choose More info, check the publisher, then Run anyway.
+From Nearhost 0.16.0, `nearhost.exe` is code signed through Microsoft's Artifact Signing, with ECS Software Consulting Ltd. as the publisher. That holds however you install it: the PowerShell installer, the zip or npm. Smart App Control runs it. If you downloaded the zip in a browser, SmartScreen may still ask you to confirm the first run while the certificate builds a reputation. It names the publisher when it does: choose More info, check the publisher, then Run anyway. The PowerShell installer and npm don't trigger it.
 
 To check a copy, run this in PowerShell, with the path to your `nearhost.exe`:
 

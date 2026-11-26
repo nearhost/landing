@@ -254,9 +254,9 @@ Nearhost does not start, and names the file and the problem, with the line for a
 
 ## Windows stops nearhost.exe from starting
 
-Releases before 0.16.0 are not code signed. Where Smart App Control is on, Windows blocks them outright, with no Run anyway. Elsewhere, SmartScreen may stop one the first time it runs: choose More info, then Run anyway. Updating to 0.16.0 or later, which is signed, fixes both.
+Releases before 0.16.0 are not code signed. Where Smart App Control is on, Windows blocks them outright, with no Run anyway. Elsewhere, SmartScreen may stop one downloaded in a browser the first time it runs: choose More info, then Run anyway. Updating to 0.16.0 or later, which is signed, fixes both.
 
-A signed copy can still meet SmartScreen on its first run while the certificate builds a reputation. It names ECS Software Consulting Ltd. as the publisher: choose More info, then Run anyway. If Windows blocks a copy that should be signed, check its signature as [Code signing](/docs/getting-started/install/#code-signing) shows. A copy whose status is not `Valid` is not one Nearhost published.
+A signed copy from a zip downloaded in a browser can still meet SmartScreen on its first run while the certificate builds a reputation. It names ECS Software Consulting Ltd. as the publisher: choose More info, then Run anyway. If Windows blocks a copy that should be signed, check its signature as [Code signing](/docs/getting-started/install/#code-signing) shows. A copy whose status is not `Valid` is not one Nearhost published.
 
 ## An update ran but the version did not change
 
