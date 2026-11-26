@@ -105,7 +105,7 @@ Each archive comes with a software bill of materials, `<archive>.sbom.json`, lis
 
 The macOS binaries are signed with a Developer ID certificate and notarised by Apple, so Gatekeeper runs them however you download them. A copy downloaded in a browser may need an internet connection the first time it runs, while macOS checks the notarisation with Apple. From Nearhost 0.9.0.
 
-The Windows binaries are not signed. See [SmartScreen](#smartscreen) below.
+The Windows binaries are code signed, with ECS Software Consulting Ltd. as the publisher, so Smart App Control runs them. From Nearhost 0.16.0. See [Code signing](#code-signing) below.
 
 ## Updating
 
@@ -178,11 +178,19 @@ nearhost trust
 
 Nearhost needs Windows 11, and Windows Terminal is the terminal it supports. `nearhost doctor` checks the parts below that it can.
 
-### SmartScreen
+### Code signing
 
-The Windows binaries are not code signed, so the first time you run `nearhost.exe`, Microsoft Defender SmartScreen may stop it and say it prevented an unrecognised app from starting. Choose More info, check that the file is the `nearhost.exe` you installed, then choose Run anyway.
+From Nearhost 0.16.0, `nearhost.exe` is code signed through Microsoft's Artifact Signing, with ECS Software Consulting Ltd. as the publisher. That holds however you install it: the PowerShell installer, the zip or npm. Smart App Control runs it. SmartScreen may still ask you to confirm the first run while the certificate builds a reputation, and it names the publisher when it does: choose More info, check the publisher, then Run anyway.
 
-If Smart App Control is on, Windows can block `nearhost.exe` outright, with no Run anyway, because the binary is not code signed. Nearhost cannot run on that machine until its Windows binaries are signed.
+To check a copy, run this in PowerShell, with the path to your `nearhost.exe`:
+
+```powershell
+Get-AuthenticodeSignature "$env:LOCALAPPDATA\Programs\nearhost\nearhost.exe"
+```
+
+`Status` should be `Valid`, and the signer certificate's subject should name ECS Software Consulting Ltd. Installed from npm, the binary is in the `@nearhost/cli-win32-x64` or `@nearhost/cli-win32-arm64` package under your global `node_modules`.
+
+Earlier releases are not signed. Where Smart App Control is on, Windows blocks them outright, with no Run anyway, so install 0.16.0 or later.
 
 ### OpenSSH
 
