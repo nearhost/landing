@@ -39,6 +39,12 @@ Any program on the laptop can connect to that port, so Nearhost answers there on
 
 On the laptop itself, the skill runs its PowerShell script, which needs only Windows PowerShell 5.1 or PowerShell 7 and the `curl.exe` that Windows ships.
 
+## A passthrough on another machine
+
+An agent can ask for a passthrough on a machine other than its own, with `--on <host>`, where `<host>` is an SSH host the agent's machine reaches. The skill's script runs itself on that host over SSH (`ssh -o BatchMode=yes -o ConnectTimeout=5 -- <host> 'sh -s'`, with the script on standard input), so nothing is installed there. Because the environment does not cross SSH, the script passes the agent's name and session along as arguments. On that host the script finds Nearhost's socket as usual, so the passthrough comes from that server and is listed under it.
+
+The script records every place a session opened a passthrough, as one line per target in the session's marker file. When the session ends, `passthrough-close --session` closes them all at once, over the same `ssh` that opened them. The close gives each SSH connection 2 seconds to connect and stops the whole session close after about 2.5 seconds, inside the hook's 3 second limit. A target that cannot be closed stays open. If SSH itself fails, the script exits with status 2 and says SSH could not reach the host. See [Browser previews](/docs/coding-agents/browser-previews/#when-the-app-runs-on-another-machine).
+
 ## Agent API
 
 The skill's script talks to Nearhost over that socket, with `curl --unix-socket`. Nearhost answers JSON for the machine the socket belongs to. These calls are the ones the doctor uses:
