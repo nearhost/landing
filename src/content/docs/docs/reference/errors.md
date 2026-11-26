@@ -711,6 +711,12 @@ Nearhost could not find out whether a newer release exists.
 
 The update ran, but the installed nearhost is not the new release.
 
+<h3 id="update.next-homebrew"><code>update.next-homebrew</code></h3>
+
+**Error** · status 409
+
+Betas are not published to Homebrew.
+
 ## The interface
 
 <h3 id="interface.address-too-long"><code>interface.address-too-long</code></h3>

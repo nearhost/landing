@@ -228,6 +228,12 @@
       "steps": [{ "text": "Update it:", "command": "nearhost update" }]
     },
     {
+      "code": "update.next-homebrew",
+      "level": "error",
+      "status": 409,
+      "summary": "Betas are not published to Homebrew."
+    },
+    {
       "code": "interface.no-terminal",
       "level": "error",
       "status": 400,
