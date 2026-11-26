@@ -107,7 +107,7 @@ Each archive comes with a software bill of materials, `<archive>.sbom.json`, lis
 
 The macOS binaries are signed with a Developer ID certificate and notarised by Apple, so Gatekeeper runs them however you download them. A copy downloaded in a browser may need an internet connection the first time it runs, while macOS checks the notarisation with Apple. From Nearhost 0.9.0.
 
-The Windows binaries are not signed. See [SmartScreen](#smartscreen) below.
+The Windows binaries are code signed, with ECS Software Consulting Ltd. as the publisher, so Smart App Control runs them. From Nearhost 0.16.0. See [Code signing](#code-signing) below.
 
 ## Updating
 
@@ -115,7 +115,7 @@ The Windows binaries are not signed. See [SmartScreen](#smartscreen) below.
 nearhost update
 ```
 
-updates Nearhost the way you installed it, after asking. Afterwards it checks the version of the copy your next command runs. If that copy is unchanged, it says so and exits 1. On Windows, for a copy from the PowerShell installer or a zip, `nearhost update` downloads the release's zip itself, checks it against the release's `checksums.txt` and only then replaces `nearhost.exe` where it is, so a failed or cancelled download leaves your copy as it was. See [`nearhost update`](/docs/reference/cli/#nearhost-update).
+updates Nearhost the way you installed it, after asking. Afterwards it checks the version of the copy your next command runs. If that copy is unchanged, it fails with `Error: The update ran, but <path> is still <old>.` and exits 1. On Windows, for a copy from the PowerShell installer or a zip, `nearhost update` downloads the release's zip itself, checks it against the release's `checksums.txt` and only then replaces `nearhost.exe` where it is, so a failed or cancelled download leaves your copy as it was. See [`nearhost update`](/docs/reference/cli/#nearhost-update).
 
 If Nearhost is running in the background, `nearhost update` restarts it on the new version, and asks first when that would close open passthroughs or forwards. See [Updating](/docs/guides/run-in-the-background/#updating).
 
@@ -135,7 +135,7 @@ sudo setcap cap_net_bind_service=+ep "$(command -v nearhost)"
 
 Run it again after each upgrade, because replacing the binary clears the capability. After any update, `nearhost update` prints the command, naming the real binary file, even for Homebrew, npm, pnpm and bun installs. It prints nothing when the binary still has the capability, or when the system lets any user bind port 80. The shell installer prints it as it installs, also when `nearhost update` runs it. Run from a downloaded copy at a terminal, rather than through `curl | sh`, the installer asks whether to run it, and only uses `sudo` if you say yes.
 
-`nearhost up` prints the same command when it cannot bind port 80 or 443 for want of the capability, with `Do not run nearhost with sudo.` Running Nearhost with `sudo` leaves files owned by root in your config and data folders.
+`nearhost up` stops with the same command when it cannot bind port 80 or 443 for want of the capability, and says `Do not run nearhost with sudo.` So does `nearhost service install`, which refuses a copy without the capability. See [nearhost up](/docs/reference/cli/#nearhost-up). Running Nearhost with `sudo` leaves files owned by root in your config and data folders.
 
 Installed from npm, `command -v nearhost` finds the Node launcher rather than the binary, so run the command `nearhost doctor` prints instead: it names the binary itself.
 
@@ -180,11 +180,19 @@ nearhost trust
 
 Nearhost needs Windows 11, and Windows Terminal is the terminal it supports. `nearhost doctor` checks the parts below that it can.
 
-### SmartScreen
+### Code signing
 
-The Windows binaries are not code signed, so the first time you run `nearhost.exe`, Microsoft Defender SmartScreen may stop it and say it prevented an unrecognised app from starting. Choose More info, check that the file is the `nearhost.exe` you installed, then choose Run anyway.
+From Nearhost 0.16.0, `nearhost.exe` is code signed through Microsoft's Artifact Signing, with ECS Software Consulting Ltd. as the publisher. That holds however you install it: the PowerShell installer, the zip or npm. Smart App Control runs it. If you downloaded the zip in a browser, SmartScreen may still ask you to confirm the first run while the certificate builds a reputation. It names the publisher when it does: choose More info, check the publisher, then Run anyway. The PowerShell installer and npm don't trigger it.
 
-If Smart App Control is on, Windows can block `nearhost.exe` outright, with no Run anyway, because the binary is not code signed. Nearhost cannot run on that machine until its Windows binaries are signed.
+To check a copy, run this in PowerShell, with the path to your `nearhost.exe`:
+
+```powershell
+Get-AuthenticodeSignature "$env:LOCALAPPDATA\Programs\nearhost\nearhost.exe"
+```
+
+`Status` should be `Valid`, and the signer certificate's subject should name ECS Software Consulting Ltd. Installed from npm, the binary is in the `@nearhost/cli-win32-x64` or `@nearhost/cli-win32-arm64` package under your global `node_modules`.
+
+Earlier releases are not signed. Where Smart App Control is on, Windows blocks them outright, with no Run anyway, so install 0.16.0 or later.
 
 ### OpenSSH
 
