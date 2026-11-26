@@ -56,6 +56,7 @@ Start with [Introduction](https://nearhost.dev/pr-preview/pr-125/docs/getting-st
 - [.nearhostrc](https://nearhost.dev/pr-preview/pr-125/docs/reference/nearhostrc.md): Every key in a project's .nearhostrc, how its variables are filled, and what it asks you to approve.
 - [Keyboard shortcuts](https://nearhost.dev/pr-preview/pr-125/docs/reference/keyboard-shortcuts.md): Every key in the Nearhost interface, by screen.
 - [Advisories](https://nearhost.dev/pr-preview/pr-125/docs/reference/advisories.md): The advice Nearhost gives about a project, when each appears and how to fix it.
+- [Errors](https://nearhost.dev/pr-preview/pr-125/docs/reference/errors.md): Every code Nearhost puts on an error, a warning or a note, and what it means.
 
 ## Troubleshooting
 

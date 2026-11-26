@@ -64,7 +64,7 @@ Only the host is taken from each value. A port in the URL is ignored, and the ro
 - Inference never proposes `localhost`, an IP address or a name without a dot. A malformed name is left out with a warning, and so is `nearhost.localhost`, as `nearhost.localhost is Nearhost's own page, so it is left out`.
 - A route that has inferred hosts becomes a web route. A `loopback` route cannot have hosts, so they are dropped with a warning.
 - A `.nearhostrc` that lists a route wins over the hosts presets found for it. See [Keys](https://nearhost.dev/pr-preview/pr-125/docs/reference/nearhostrc.md#keys).
-- `nearhost add` leaves out an inferred host that another enabled project already serves, with a note: `Not serving <host>: project "<other>" already serves it.` A later web route left with no hosts becomes `ignore`. A project added with `--disabled` keeps them, since it serves nothing yet. The interface does not leave them out: it refuses to save, and you remove the host with `h`.
+- `nearhost add` leaves out an inferred host that another enabled project already serves, with a note: `Note: Not serving <host>: project "<other>" already serves it.` A later web route left with no hosts becomes `ignore`. A project added with `--disabled` keeps them, since it serves nothing yet. The interface does not leave them out: it refuses to save, and you remove the host with `h`.
 
 Inferred hosts are fixed when the project is added or edited. Changing `APP_URL` later does not change what is served. Editing the project, with `e` in the interface, adds any newly inferred hosts to a saved web route and never removes a saved one. `nearhost doctor` reports a host the project's settings name that no web route serves, as `routes.unserved-host`, and tells you to edit the project.
 

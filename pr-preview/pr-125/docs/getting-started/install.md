@@ -112,7 +112,7 @@ The Windows binaries are not signed. See [SmartScreen](#smartscreen) below.
 nearhost update
 ```
 
-updates Nearhost the way you installed it, after asking. Afterwards it checks the version of the copy your next command runs. If that copy is unchanged, it says so and exits 1. On Windows, for a copy from the PowerShell installer or a zip, `nearhost update` downloads the release's zip itself, checks it against the release's `checksums.txt` and only then replaces `nearhost.exe` where it is, so a failed or cancelled download leaves your copy as it was. See [`nearhost update`](https://nearhost.dev/pr-preview/pr-125/docs/reference/cli.md#nearhost-update).
+updates Nearhost the way you installed it, after asking. Afterwards it checks the version of the copy your next command runs. If that copy is unchanged, it fails with `Error: The update ran, but <path> is still <old>.` and exits 1. On Windows, for a copy from the PowerShell installer or a zip, `nearhost update` downloads the release's zip itself, checks it against the release's `checksums.txt` and only then replaces `nearhost.exe` where it is, so a failed or cancelled download leaves your copy as it was. See [`nearhost update`](https://nearhost.dev/pr-preview/pr-125/docs/reference/cli.md#nearhost-update).
 
 If Nearhost is running in the background, `nearhost update` restarts it on the new version, and asks first when that would close open passthroughs or forwards. See [Updating](https://nearhost.dev/pr-preview/pr-125/docs/guides/run-in-the-background.md#updating).
 
@@ -132,7 +132,7 @@ sudo setcap cap_net_bind_service=+ep "$(command -v nearhost)"
 
 Run it again after each upgrade, because replacing the binary clears the capability. After any update, `nearhost update` prints the command, naming the real binary file, even for Homebrew, npm, pnpm and bun installs. It prints nothing when the binary still has the capability, or when the system lets any user bind port 80. The shell installer prints it as it installs, also when `nearhost update` runs it. Run from a downloaded copy at a terminal, rather than through `curl | sh`, the installer asks whether to run it, and only uses `sudo` if you say yes.
 
-`nearhost up` prints the same command when it cannot bind port 80 or 443 for want of the capability, with `Do not run nearhost with sudo.` Running Nearhost with `sudo` leaves files owned by root in your config and data folders.
+`nearhost up` stops with the same command when it cannot bind port 80 or 443 for want of the capability, and says `Do not run nearhost with sudo.` So does `nearhost service install`, which refuses a copy without the capability. See [nearhost up](https://nearhost.dev/pr-preview/pr-125/docs/reference/cli.md#nearhost-up). Running Nearhost with `sudo` leaves files owned by root in your config and data folders.
 
 Installed from npm, `command -v nearhost` finds the Node launcher rather than the binary, so run the command `nearhost doctor` prints instead: it names the binary itself.
 

@@ -113,7 +113,7 @@ Once a project exists, the screen has a sidebar on the left, with Home at the to
 
 Two rows stay at the bottom of the sidebar, `passthroughs` and `documents`, which show what coding agents have opened, and `none` when nothing is. See [Browser previews](https://nearhost.dev/pr-preview/pr-125/docs/coding-agents/browser-previews.md#see-what-is-open).
 
-When something needs you, a problems section lists it, with why it happened and how to fix it. Below that is the recent log. Press `l` for the full-screen log, `/` to filter the sidebar by name, and `h` to come back to Home. `?` lists every key. See [Keyboard shortcuts](https://nearhost.dev/pr-preview/pr-125/docs/reference/keyboard-shortcuts.md).
+When something needs you, a problems section lists it, with why it happened and how to fix it. When something you do fails, such as a save or a start, an alert box opens over the screen with the same: `enter` or `esc` closes it, and `c` copies its command. Below that is the recent log. Press `l` for the full-screen log, `/` to filter the sidebar by name, and `h` to come back to Home. `?` lists every key. See [Keyboard shortcuts](https://nearhost.dev/pr-preview/pr-125/docs/reference/keyboard-shortcuts.md).
 
 ## Quitting
 

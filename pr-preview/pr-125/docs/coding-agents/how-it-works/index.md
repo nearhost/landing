@@ -52,3 +52,22 @@ The skill's script talks to Nearhost over that socket, with `curl --unix-socket`
 - `GET /v1/doctor?path=…` returns `project` and `findings` for the project holding the absolute path, in the shape that [`nearhost doctor --json`](https://nearhost.dev/pr-preview/pr-125/docs/reference/cli.md#json-output) gives its findings. For a project already in Nearhost, it first reads the project's `.nearhostrc` again, as a reload does: a change that needs no approval is applied, restarting the project if it runs under `nearhost up`, and one that needs approval waits in Nearhost. For a directory that is not in Nearhost yet, `project` is `null`, each finding's `project` is empty, and the findings are for the project as it would be added.
 - `POST /v1/projects/reload`, with `{"path": "/abs/dir"}`, asks Nearhost to read the `.nearhostrc` of the project holding the path again. The project must be added first. It answers `applied` when nothing needs approval, or `pending` with an `id` the agent waits on, as it does for a proposal, while you decide. A change you declined stays declined until the file changes or Nearhost restarts.
 - A request that waits for your answer replies `202` with an `id` and, when Nearhost's page is served, an `approve_url` for it. A proposal also carries `advice`, because the page can only decline it. `GET /v1` reports `interface`, whether anyone can answer right now.
+
+### Errors and warnings
+
+An error answers with `Content-Type: application/problem+json`, as [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) defines, and with the status code it has always had. `error` comes first and holds the same text as before, so a skill installed before these fields reads it as it did:
+
+```json
+{
+  "error": "Nearhost on dev@laptop has no page or window to ask you in; open nearhost there, then ask again.",
+  "type": "https://nearhost.dev/docs/reference/errors/#agent.no-reviewer",
+  "title": "Nearhost on dev@laptop has no page or window to ask you in; open nearhost there, then ask again.",
+  "status": 409,
+  "code": "agent.no-reviewer",
+  "level": "error"
+}
+```
+
+`code` is the error's code, and `type` links to its entry in [Errors](https://nearhost.dev/pr-preview/pr-125/docs/reference/errors.md). When the error has them, `detail` says why, `fix` lists the steps, each with its `text` and any `command`, `doctor` is `true` when `nearhost doctor` checks the cause, and `data` holds facts such as a port or a path.
+
+`GET /v1/projects` gives a project with a problem, such as one in `error`, a `problem` beside its `error` text: the same message, with its `code`, `level`, `title` and any `detail` and `fix`. A reply that came with warnings lists them last, under `warnings`, in the same shape. A reply with none has no `warnings` key.
