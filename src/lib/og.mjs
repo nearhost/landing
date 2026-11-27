@@ -9,12 +9,12 @@ import satori from 'satori';
 const require = createRequire(import.meta.url);
 
 // Hex values mirror src/styles/tokens.css; this module runs in Node and cannot read CSS tokens.
-const ground = '#0F1210';
-// Between the ground and the line colour, so the backdrop arch stays behind the text.
-const shade = '#181C19';
-const text = '#ECEFE8';
-const muted = '#A4ADA5';
-const accent = '#D6F26B';
+const ground = '#111013';
+// Between the ground and the line colour, so the backdrop mark stays behind the text.
+const shade = '#19171C';
+const text = '#F4EEF2';
+const muted = '#B9A8B4';
+const accent = '#FF70C8';
 
 export const width = 1200;
 export const height = 630;
@@ -76,16 +76,16 @@ const el = (type, style, children, props = {}) => ({
 });
 
 /**
- * The tunnel-arch mark from src/components/Mark.astro, as an image satori can draw.
+ * The prompt mark (chevron and dot) from src/components/Mark.astro, as an image satori can draw.
  * @param {number} size
- * @param {string} arch
+ * @param {string} chevron
  * @param {string} dot
  */
-function mark(size, arch, dot) {
+function mark(size, chevron, dot) {
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">` +
-    `<path d="M14 56V32a18 18 0 0 1 36 0v24" fill="none" stroke="${arch}" stroke-width="11" stroke-linecap="round"/>` +
-    `<circle cx="32" cy="48" r="6" fill="${dot}"/></svg>`;
+    `<path d="M13 17l15 15-15 15" fill="none" stroke="${chevron}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>` +
+    `<circle cx="46" cy="44" r="7.5" fill="${dot}"/></svg>`;
   const src = `data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`;
   return el('img', {}, undefined, { src, width: size, height: size });
 }
@@ -127,10 +127,10 @@ const frame = (children, style = {}) =>
     children,
   );
 
-// A large faint arch behind the text, cut off by the right edge.
+// A large faint mark behind the text, cut off by the right edge.
 const backdrop = el(
   'div',
-  { position: 'absolute', right: '-150px', bottom: '-230px', display: 'flex' },
+  { position: 'absolute', right: '-20px', bottom: '-120px', display: 'flex' },
   [mark(520, shade, ground)],
 );
 
