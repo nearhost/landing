@@ -174,10 +174,21 @@ if (existsSync(index)) {
   );
   const at = (re) => html.search(re);
   // Each anchor must be found, so a missing one fails rather than passing as -1.
-  const order = [/Your browser is on this one\./, /id="agents"/, /id="how"/].map(at);
+  // Problem, then how to set it up, the demo to try it, what agents add and the tools it works with.
+  const order = [
+    /Your browser is on this one\./,
+    /id="how"/,
+    /id="demo"/,
+    /id="agents"/,
+    /id="tools"/,
+  ].map(at);
   check(
-    order[0] >= 0 && order[0] < order[1] && order[1] < order[2],
-    'the agents section must sit between the problem and the steps',
+    order.every((pos, i) => pos >= 0 && (i === 0 || order[i - 1] < pos)),
+    'sections must run problem, steps, demo, agents, works with',
+  );
+  check(
+    /id="demo"[\s\S]*?<h2[^>]*>Try the terminal app\.<\/h2>/.test(html),
+    'the demo needs its heading',
   );
   check(/<nav[\s\S]*?href="#agents"[\s\S]*?<\/nav>/.test(html), 'the nav must link to #agents');
   // The hero shows the terminal app and the web app on three devices; the mock text is not
@@ -308,11 +319,6 @@ if (existsSync(index)) {
   check(
     decode(tools).includes('Works with the tools you already run.'),
     'the works-with heading is missing or changed',
-  );
-  const toolsOrder = [/id="agents"/, /id="tools"/, /No servers were harmed/].map(at);
-  check(
-    toolsOrder[0] >= 0 && toolsOrder[0] < toolsOrder[1] && toolsOrder[1] < toolsOrder[2],
-    'the works-with section must sit between the agent gallery and the interface demo',
   );
   for (const slug of [
     'ios-simulator-from-another-mac',
