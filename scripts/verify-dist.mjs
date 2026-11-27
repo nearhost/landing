@@ -630,6 +630,7 @@ const newGuides = [
   'ios-simulator-from-another-mac',
   'esp32-boards-in-the-browser',
   'review-claude-code-plans',
+  'agent-browser-previews',
 ];
 const llmsFile = join(dist, 'llms.txt');
 const llmsText = existsSync(llmsFile) ? readFileSync(llmsFile, 'utf8') : '';

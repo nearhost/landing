@@ -66,6 +66,7 @@ export default defineConfig({
             `- [The iOS Simulator from another Mac](${twin('docs/guides/ios-simulator-from-another-mac')})`,
             `- [ESP32 firmware in the browser](${twin('docs/guides/esp32-boards-in-the-browser')})`,
             `- [Review Claude Code's plans in your browser](${twin('docs/guides/review-claude-code-plans')})`,
+            `- [See what an agent is building, live](${twin('docs/guides/agent-browser-previews')})`,
             '',
             docsIndex(fileURLToPath(new URL('./src/content/docs/', import.meta.url)), site),
           ].join('\n'),
