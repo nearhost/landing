@@ -61,7 +61,7 @@ test('uses the site URL', () => {
 test('lists the real docs', () => {
   const contentDir = fileURLToPath(new URL('../content/docs/', import.meta.url));
   const index = docsIndex(contentDir, siteUrl('/'));
-  assert.equal(links(index).length, 40);
+  assert.equal(links(index).length, 41);
   const headings = index.split('\n').filter((line) => line.startsWith('## '));
   assert.deepEqual(
     headings,

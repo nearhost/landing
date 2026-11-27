@@ -63,6 +63,7 @@ export default defineConfig({
             `- [WorkOS sign-in on a remote dev server](${twin('docs/guides/workos-sign-in')})`,
             `- [Clerk sign-in on a remote dev server](${twin('docs/guides/clerk-sign-in')})`,
             `- [Cognito sign-in on a remote dev server](${twin('docs/guides/cognito-sign-in')})`,
+            `- [The iOS Simulator from another Mac](${twin('docs/guides/ios-simulator-from-another-mac')})`,
             '',
             docsIndex(fileURLToPath(new URL('./src/content/docs/', import.meta.url)), site),
           ].join('\n'),

@@ -625,6 +625,20 @@ if (existsSync(notFound)) {
   check(!html.includes('data-markdown-menu'), '404.html must not carry the Markdown menu');
 }
 
+// 13. Each new guide exists, says which Nearhost it needs, and is listed in llms.txt.
+const newGuides = ['ios-simulator-from-another-mac'];
+const llmsFile = join(dist, 'llms.txt');
+const llmsText = existsSync(llmsFile) ? readFileSync(llmsFile, 'utf8') : '';
+for (const slug of newGuides) {
+  const file = join(dist, 'docs', 'guides', slug, 'index.html');
+  check(existsSync(file), `docs/guides/${slug}/index.html is missing`);
+  if (existsSync(file)) {
+    const text = readFileSync(file, 'utf8').replace(/<[^>]*>/g, '');
+    check(text.includes('Needs Nearhost'), `docs/guides/${slug} must say "Needs Nearhost"`);
+  }
+  check(llmsText.includes(`docs/guides/${slug}`), `llms.txt must link docs/guides/${slug}`);
+}
+
 if (failures.length) {
   console.error(
     `verify-dist: ${failures.length} failure(s)\n` + failures.map((f) => `  - ${f}`).join('\n'),
