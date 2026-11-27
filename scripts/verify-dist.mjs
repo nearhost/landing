@@ -192,9 +192,13 @@ if (existsSync(index)) {
     devices.every((m) => /role="img"/.test(m[0]) && /aria-label="[^"]{20,}"/.test(m[0])),
     'each hero device needs role="img" and an aria-label',
   );
+  // The caption stays quotable, so data-nosnippet sits on the two device groups, not the figure.
   check(
-    /<[^>]+data-hero-devices[^>]*data-nosnippet/.test(html),
-    'hero devices must be data-nosnippet',
+    /<figure[^>]*\sdata-hero-devices[\s=>]/.test(html) &&
+      !/<figure[^>]*data-hero-devices[^>]*data-nosnippet/.test(html) &&
+      /<div class="(?:[^"]*\s)?desk(?:\s[^"]*)?"[^>]*\sdata-nosnippet[\s=>]/.test(html) &&
+      /<div class="(?:[^"]*\s)?desk-small(?:\s[^"]*)?"[^>]*\sdata-nosnippet[\s=>]/.test(html),
+    'both hero device groups must be data-nosnippet, with the caption left quotable',
   );
   check(
     /from the web app on your tablet and phone/.test(html),
@@ -229,7 +233,7 @@ if (existsSync(index)) {
   const tabCount = [...agents.matchAll(/role="tab"/g)].length;
   check(tabCount === 4, `the agent gallery must have exactly 4 scene tabs, found ${tabCount}`);
   check(
-    ['Preview another machine', 'New in 0.17', '--on apollo'].every((text) =>
+    ['Preview another machine', 'New in 0.16', '--on apollo'].every((text) =>
       decode(agents).includes(text),
     ),
     'the previews-from-another-machine scene is missing',

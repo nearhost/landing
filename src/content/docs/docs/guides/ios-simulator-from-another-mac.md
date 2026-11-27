@@ -17,7 +17,7 @@ New to Nearhost? [Install it](/docs/getting-started/install/) and [add a server]
 
 - A Mac with Apple Silicon, Xcode's command line tools and Node 20 or later. These are serve-sim's own requirements; it does not run on Intel Macs.
 - That Mac added to Nearhost as a server.
-- For a tablet or phone, the Nearhost web app on an always-on machine, with the device paired.
+- For a tablet or phone, the Nearhost web app.
 
 ## 1. Start serve-sim on the Mac
 
@@ -44,7 +44,7 @@ Ask the agent to start serve-sim and show it to you. With the [skill installed](
 
 ## 3. Use it from a tablet
 
-In the web app, the project appears under the Mac's server. Open it from there to get the Simulator's screen. The web app has no docs page yet, so this guide does not link one.
+Open the project from the web app on your tablet to get the Simulator's screen.
 
 serve-sim forwards keyboard commands to the Simulator, including `⌘⇧H` to go home, and you can swipe up from the bottom of the screen to go home too. Hold the option key to pinch.
 
@@ -52,4 +52,4 @@ serve-sim forwards keyboard commands to the Simulator, including `⌘⇧H` to go
 
 - **The screen stays black or empty.** serve-sim attaches to a booted Simulator. Boot one, then restart serve-sim.
 - **Nearhost can't reach the page.** Check that serve-sim is running on the Mac, and which port it printed. If it printed another port, change the project's web port to match.
-- **Typing does nothing on Xcode 27.** serve-sim needs Device Hub running with the Simulator window visible and frontmost. macOS may also need the app that started serve-sim, such as Terminal, enabled under System Settings, Privacy & Security, Accessibility. See [serve-sim's README](https://github.com/EvanBacon/serve-sim) for more, including `serve-sim repair-input`.
+- **If typing or touch stops working on Xcode 27.** serve-sim needs Device Hub running with the Simulator window visible and frontmost. macOS may also need the app that started serve-sim, such as Terminal, enabled under System Settings, Privacy & Security, Accessibility. See [serve-sim's README](https://github.com/EvanBacon/serve-sim) for more, including `serve-sim repair-input`.

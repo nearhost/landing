@@ -62,7 +62,7 @@ export const scenes: Scene[] = [
   {
     id: 'elsewhere',
     title: 'Preview another machine',
-    tag: 'New in 0.17',
+    tag: 'New in 0.16',
     caption:
       'An agent on one server can open an app running on another with --on. Here Claude Code on leto starts preflash on apollo, the Mac with the board set up. Nearhost lists the passthrough under apollo, pinned in the sidebar, so you know where the app is.',
     link: {
