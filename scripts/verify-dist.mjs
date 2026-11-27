@@ -118,6 +118,18 @@ if (existsSync(index)) {
     /data-version[^>]*>(v\d+\.\d+\.\d+[^<]*|latest)</.test(html),
     'footer version is neither a tag nor "latest"',
   );
+  // The prompt mark: a chevron and a dot, never the old arch.
+  const chevron = 'M13 17l15 15-15 15';
+  const favicon = join(dist, 'favicon.svg');
+  const faviconSvg = existsSync(favicon) ? readFileSync(favicon, 'utf8') : '';
+  check(faviconSvg.includes(chevron), 'dist/favicon.svg must draw the prompt chevron');
+  check(
+    !faviconSvg.includes('a18 18') && !faviconSvg.includes('a14 14'),
+    'dist/favicon.svg still draws the arch',
+  );
+  check(html.includes(chevron), 'the landing page mark must draw the prompt chevron');
+  check(!html.includes('a18 18'), 'the landing page still draws the arch mark');
+  check(existsSync(join(dist, 'logo.png')), 'dist/logo.png is missing');
   const ld = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
   const nodes = graphNodes(ld);
   const types = nodes.map((node) => node['@type']);
