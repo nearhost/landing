@@ -7,7 +7,7 @@
   type State = 'running' | 'starting' | 'degraded' | 'stopped' | 'error';
   type Role = 'web' | 'loopback' | 'ignore';
   type Link = 'connected' | 'connecting' | 'reconnecting' | 'disconnected' | 'auth failed';
-  type Tone = '' | 'b' | 'a' | 'r' | 'd' | 't';
+  type Tone = '' | 'b' | 'g' | 'a' | 'r' | 'd' | 't';
 
   interface Route {
     port: number;
@@ -574,7 +574,7 @@
   // connected, ○ off, ✕ an error, ◐ on its way, and the spinner while it
   // starts or connects.
   function stateTone(st: State): Tone {
-    return st === 'running' ? 'b' : st === 'error' ? 'r' : st === 'stopped' ? 'd' : 'a';
+    return st === 'running' ? 'g' : st === 'error' ? 'r' : st === 'stopped' ? 'd' : 'a';
   }
   function stateDot(st: State) {
     return st === 'running'
@@ -588,7 +588,7 @@
             : '○';
   }
   function linkTone(l: Link): Tone {
-    return l === 'connected' ? 'b' : l === 'auth failed' ? 'r' : l === 'disconnected' ? 'd' : 'a';
+    return l === 'connected' ? 'g' : l === 'auth failed' ? 'r' : l === 'disconnected' ? 'd' : 'a';
   }
   // linkMark is a server's mark where the spinner does not turn.
   function linkMark(l: Link) {
@@ -639,7 +639,7 @@
   }
   function routeDot(p: Project, r: Route): [string, Tone] {
     if (r.role === 'ignore') return ['–', 'd'];
-    if (p.state === 'running') return ['●', 'b'];
+    if (p.state === 'running') return ['●', 'g'];
     if (p.state === 'starting' || p.state === 'degraded') return ['◐', 'a'];
     return ['○', 'd'];
   }
@@ -1882,7 +1882,7 @@
   <div class="ruled">
     <span class="d">{label}{' '}</span><span class="hr"></span>{#if right}<span class="d"
         >{' '}{right}{' '}</span
-      ><span class="b">●</span>{/if}
+      ><span class="g">●</span>{/if}
   </div>
 {/snippet}
 
@@ -1896,14 +1896,14 @@
 <!-- How the machine is, as the header says it: in full, or one dot on a phone. -->
 {#snippet summary()}
   <span class="wideonly"
-    ><span class="d">proxy</span> <span class="b">●</span> :443 <span class="d">·</span>
+    ><span class="d">proxy</span> <span class="g">●</span> :443 <span class="d">·</span>
     <span class="d">CA</span> trusted <span class="d">·</span>
     <span class="d">hosts</span>
     ok{#if problems.length}{' '}<span class="d">·</span>{' '}<span class="r"
         >{problems.length} problem{problems.length > 1 ? 's' : ''}</span
       >{/if}{' '}</span
   ><span class="narrowonly"
-    ><span class={problems.length ? 'r' : 'b'}>{problems.length ? '✕' : '●'}</span>
+    ><span class={problems.length ? 'r' : 'g'}>{problems.length ? '✕' : '●'}</span>
     <span class="d">proxy · CA · hosts</span>{' '}</span
   >
 {/snippet}
@@ -1964,7 +1964,8 @@
           {@const sources = !logView.key.startsWith('prj:')}
           <div class="f head">
             <span
-              >{' '}<span class="b s">∩</span> <span class="s">nearhost</span>
+              >{' '}<span class="b s">&gt;</span><span class="s">.</span>
+              <span class="s">nearhost</span>
               {#if logView.key !== 'home'}<span class="d">›</span>
                 {nameOf(logView.key)}{' '}{/if}<span class="d">›</span> log</span
             >
@@ -2066,7 +2067,10 @@
           {/if}
         {:else}
           <div class="f head">
-            <span>{' '}<span class="b s">∩</span> <span class="s">nearhost</span></span>
+            <span
+              >{' '}<span class="b s">&gt;</span><span class="s">.</span>
+              <span class="s">nearhost</span></span
+            >
             <span>{@render summary()}</span>
           </div>
           <div class="hr row"></div>
@@ -2089,7 +2093,7 @@
                     <span
                       ><span class="b">{on ? '▌' : ' '}</span><span class:s={on}>home</span></span
                     >
-                    <span class={running ? 'b' : 'd'}
+                    <span class={running ? 'g' : 'd'}
                       >{running ? `${running} running` : 'nothing running'}{' '}</span
                     >
                   {:else if r.kind === 'server'}
@@ -2148,7 +2152,7 @@
                         ><span class="b">{on ? '▌' : ' '}</span><span class:s={on}>{r.name}</span
                         ></span
                       >
-                      {#if n}<span class="b">● {n}{' '}</span>{:else}<span class="d">none{' '}</span
+                      {#if n}<span class="g">● {n}{' '}</span>{:else}<span class="d">none{' '}</span
                         >{/if}
                     </button>
                   {/each}
@@ -2293,7 +2297,7 @@
               {:else}
                 <div class="l s">Nearhost</div>
                 <div class="l">
-                  <span class="d">{pad('proxy', 10)}</span><span class="b">●</span> https :443
+                  <span class="d">{pad('proxy', 10)}</span><span class="g">●</span> https :443
                   <span class="d">·</span> http :80
                 </div>
                 <div class="l">
@@ -2302,11 +2306,11 @@
                   >
                 </div>
                 <div class="l">
-                  <span class="d">{pad('local CA', 10)}</span><span class="b">●</span> trusted
+                  <span class="d">{pad('local CA', 10)}</span><span class="g">●</span> trusted
                   <span class="d">· expires 2036-10-13</span>
                 </div>
                 <div class="l">
-                  <span class="d">{pad('hosts', 10)}</span><span class="b">●</span>
+                  <span class="d">{pad('hosts', 10)}</span><span class="g">●</span>
                   {running ? `${running} name${running > 1 ? 's' : ''}` : 'no names configured'}
                 </div>
                 <div class="l">
@@ -2351,7 +2355,7 @@
         <div class="toastwrap" role="status">
           {#if toast}
             <div class="toast">
-              <span class={toast.problem ? 'a' : 'b'}>●</span>
+              <span class={toast.problem ? 'a' : 'g'}>●</span>
               {toast.text}
             </div>
           {/if}
@@ -3027,6 +3031,9 @@
   }
   .b {
     color: var(--beacon);
+  }
+  .g {
+    color: #7fdb8a;
   }
   .d {
     color: var(--dim);

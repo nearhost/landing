@@ -12,8 +12,8 @@ const text = '#F4EEF2';
 const ink = '#1E1820';
 const accentOnLight = '#B0156C';
 
-// The prompt mark on a 64 unit grid: a chevron and a dot. Its painted box is 44.5 by 38 units,
-// centred on (31.25, 32).
+// The prompt mark on a 64 unit grid: a chevron and a dot. Its painted box is 44.5 by 38.5 units,
+// centred on (31.25, 32.25).
 const mark = (chevron, dot) =>
   `<path d="M13 17l15 15-15 15" fill="none" stroke="${chevron}" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>` +
   `<circle cx="46" cy="44" r="7.5" fill="${dot}"/>`;

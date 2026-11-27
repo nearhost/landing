@@ -620,6 +620,14 @@ for (const file of filesMatching(dist, ['.html', '.css', '.js', '.svg'])) {
   }
 }
 
+// The title glyph is the prompt mark, not the old arch.
+if (existsSync(index)) {
+  check(
+    !readFileSync(index, 'utf8').includes('∩'),
+    'dist/index.html still has the old arch glyph ∩',
+  );
+}
+
 if (failures.length) {
   console.error(
     `verify-dist: ${failures.length} failure(s)\n` + failures.map((f) => `  - ${f}`).join('\n'),
