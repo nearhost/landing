@@ -6,7 +6,7 @@ sidebar:
 ---
 
 :::note
-Needs Nearhost 0.11.0 or later. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
+Needs Nearhost 0.11.0 or later; the web app needs 0.17.0. Run `nearhost update` to get it. See [CLI](/docs/reference/cli/#nearhost-update).
 :::
 
 Claude Code on a server writes a plan or a spec as a Markdown file. Reading it in the terminal means scrolling, and reading it anywhere else means copying it off the server. With Nearhost, Claude Code asks to show it, and the plan opens in your browser as a page. Open it on your laptop, or from the web app on a tablet.
@@ -49,7 +49,7 @@ The address looks like `https://nearhost.localhost:6327/d/<random>/plans/checkou
 
 Nearhost serves the plan's git repository, so images and linked documents work too. A plan in a hidden folder such as `~/.claude` opens as well, but there Nearhost serves only Markdown, HTML and web assets. See [What is served](/docs/coding-agents/documents/#what-is-served).
 
-To open a plan again later, select the `documents` row at the bottom of the sidebar, move into the rows with `tab`, and press `enter` on one. Press `x` to stop serving it. See [When a served folder goes away](/docs/coding-agents/documents/#when-a-served-folder-goes-away).
+To open a plan again later, select the `documents` row (0.16 or later) at the bottom of the sidebar, move into the rows with `tab`, and press `enter` on one. Press `x` to stop serving it and confirm. See [When a served folder goes away](/docs/coding-agents/documents/#when-a-served-folder-goes-away).
 
 ## If it doesn't work
 

@@ -7,9 +7,9 @@ import Tablet from './Tablet.astro';
 import Phone from './Phone.astro';
 ---
 
-<figure class="devices" data-hero-devices data-nosnippet>
+<figure class="devices" data-hero-devices>
   <div class="inner">
-    <div class="desk">
+    <div class="desk" data-nosnippet>
       <div class="pool" aria-hidden="true"></div>
       <div class="line" aria-hidden="true"></div>
       <div class="contact" aria-hidden="true"></div>
@@ -23,7 +23,7 @@ import Phone from './Phone.astro';
         <Phone />
       </div>
     </div>
-    <div class="desk-small">
+    <div class="desk-small" data-nosnippet>
       <div class="small-laptop">
         <Laptop />
       </div>

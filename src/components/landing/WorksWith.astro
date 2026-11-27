@@ -362,7 +362,7 @@ const bootLog = [
     font-size: 16px;
     font-weight: 600;
   }
-  .guide-link:hover {
+  .guide-link:is(:hover, :focus-visible) {
     text-decoration: underline;
     text-underline-offset: 3px;
   }
@@ -628,7 +628,7 @@ const bootLog = [
     text-decoration-color: var(--nh-faint);
     text-underline-offset: 4px;
   }
-  .list h3 a:hover {
+  .list h3 a:is(:hover, :focus-visible) {
     text-decoration-color: currentColor;
   }
   .list p {

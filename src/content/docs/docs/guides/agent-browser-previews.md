@@ -45,7 +45,7 @@ The agent may work on one server while the app runs on another that it reaches o
 
 ## When it closes
 
-A passthrough ends when the session ends (Claude Code closes its passthroughs within about 2.5 seconds), when you close it, or when Nearhost drops the server's connection. To close one, select the `passthroughs` row at the bottom of the sidebar, press `tab` to move into the rows, and press `x` on it. See [When a passthrough ends](/docs/coding-agents/browser-previews/#when-a-passthrough-ends) for the full list.
+A passthrough ends when the session ends (with the Claude Code plugin, within about 2.5 seconds), when you close it, or when Nearhost drops the server's connection. To close one, select the `passthroughs` row (0.16 or later) at the bottom of the sidebar, press `tab` to move into the rows, and press `x` on it. See [When a passthrough ends](/docs/coding-agents/browser-previews/#when-a-passthrough-ends) for the full list.
 
 To keep an app past the session, [add it as a project](/docs/getting-started/add-a-project/) instead, and it gets a name such as `https://myapp.test`.
 
