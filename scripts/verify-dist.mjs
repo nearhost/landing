@@ -608,6 +608,18 @@ if (existsSync(notFound)) {
   check(!html.includes('data-markdown-menu'), '404.html must not carry the Markdown menu');
 }
 
+// The old lime-on-green palette is gone from everything the site ships.
+const oldPalette =
+  '#d6f26b #0f1210 #161a17 #1d221e #2a312b #ecefe8 #c5ccc6 #a4ada5 #818a82 #f4f5f1 #e6e9e0 #dde0d9 #1b1f1c #3e463f #5c645d #626b63 #4a6200'.split(
+    ' ',
+  );
+for (const file of filesMatching(dist, ['.html', '.css', '.js', '.svg'])) {
+  const text = readFileSync(file, 'utf8').toLowerCase();
+  for (const hex of oldPalette) {
+    check(!text.includes(hex), `${relative(dist, file)} still uses the old palette colour ${hex}`);
+  }
+}
+
 if (failures.length) {
   console.error(
     `verify-dist: ${failures.length} failure(s)\n` + failures.map((f) => `  - ${f}`).join('\n'),
