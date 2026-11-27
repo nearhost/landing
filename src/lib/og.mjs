@@ -130,7 +130,7 @@ const frame = (children, style = {}) =>
 // A large faint mark behind the text, cut off by the right edge.
 const backdrop = el(
   'div',
-  { position: 'absolute', right: '-150px', bottom: '-230px', display: 'flex' },
+  { position: 'absolute', right: '-20px', bottom: '-120px', display: 'flex' },
   [mark(520, shade, ground)],
 );
 
