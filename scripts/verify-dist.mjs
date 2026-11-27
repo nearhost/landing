@@ -297,6 +297,35 @@ if (existsSync(index)) {
     ),
     'the passthrough prompt text changed',
   );
+  // 0.17 names real tools: a section after the gallery, before the interface demo, linking the
+  // four new guides. Its two tool pictures are decoration and must not be quoted.
+  const tools = html.match(/<section[^>]*id="tools"[\s\S]*?<\/section>/)?.[0] ?? '';
+  check(tools !== '', 'the works-with section (id="tools") is missing');
+  check(
+    decode(tools).includes('Works with the tools you already run.'),
+    'the works-with heading is missing or changed',
+  );
+  const toolsOrder = [/id="agents"/, /id="tools"/, /No servers were harmed/].map(at);
+  check(
+    toolsOrder[0] >= 0 && toolsOrder[0] < toolsOrder[1] && toolsOrder[1] < toolsOrder[2],
+    'the works-with section must sit between the agent gallery and the interface demo',
+  );
+  for (const slug of [
+    'ios-simulator-from-another-mac',
+    'esp32-boards-in-the-browser',
+    'review-claude-code-plans',
+    'agent-browser-previews',
+  ]) {
+    check(
+      tools.includes(`href="${base}docs/guides/${slug}/"`),
+      `the works-with section must link the ${slug} guide`,
+    );
+  }
+  const shots = [...tools.matchAll(/<[^>]+data-tool-shot[^>]*>/g)].map((m) => m[0]);
+  check(
+    shots.length === 2 && shots.every((tag) => /data-nosnippet/.test(tag)),
+    `the two tool illustrations must be data-nosnippet, found ${shots.length} marked`,
+  );
 }
 
 // 5. The docs entry point exists, and every docs page is a dated technical article.

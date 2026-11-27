@@ -1,0 +1,728 @@
+---
+// Works with the tools you already run: two tools that turn a device into a page (serve-sim and
+// Preflash), the lists of what Nearhost sits alongside, and the guides. The card text carries
+// the meaning; the browser windows above it are pictures, hidden from screen readers and kept
+// out of search snippets, and keep their own dark colours in both themes, as a screenshot would.
+import { url } from '../../lib/url';
+
+const guides = {
+  serveSim: url('/docs/guides/ios-simulator-from-another-mac/'),
+  preflash: url('/docs/guides/esp32-boards-in-the-browser/'),
+  plans: url('/docs/guides/review-claude-code-plans/'),
+  previews: url('/docs/guides/agent-browser-previews/'),
+};
+
+// Titles match the guides' own titles.
+const guideList = [
+  {
+    href: guides.serveSim,
+    title: 'The iOS Simulator from another Mac',
+    blurb: 'serve-sim on the Mac with Xcode, open on your tablet',
+  },
+  {
+    href: guides.preflash,
+    title: 'ESP32 firmware in the browser',
+    blurb: "Preflash's board and terminal, from any machine",
+  },
+  {
+    href: guides.plans,
+    title: "Review Claude Code's plans in your browser",
+    blurb: 'Plans and specs written on a server, rendered as pages',
+  },
+  {
+    href: guides.previews,
+    title: 'See what an agent is building, live',
+    blurb: "An agent's dev server, opened in your own browser",
+  },
+];
+
+const lists: { title: string; href?: string; note: string; items: string }[] = [
+  {
+    title: 'Dev servers',
+    href: url('/docs/concepts/presets-and-registries/'),
+    note: 'Presets know the ports and the fixes.',
+    items: 'Vite, Next.js, Astro, SvelteKit, Laravel Sail, Rails, Django, Storybook',
+  },
+  {
+    title: 'Coding agents',
+    href: url('/docs/coding-agents/'),
+    note: 'Through the Nearhost skill.',
+    items: 'Claude Code, Codex, Qwen Code, Cursor, Gemini CLI',
+  },
+  {
+    title: 'Where they run',
+    href: url('/docs/concepts/ssh-transport/'),
+    note: 'Anything you reach over SSH.',
+    items: 'tmux, Herdr, Docker Compose, code-server',
+  },
+  {
+    // No link until the web app's names and DNS page exists.
+    title: 'Your network',
+    note: "For the web app's names.",
+    items: 'Your OpenSSH config, Tailscale, Pi-hole, any DNS',
+  },
+];
+
+const bootLog = [
+  ['I (341)', 'rtc: PCF85063 at 0x51'],
+  ['I (350)', 'pmu: battery 82%'],
+  ['I (402)', 'wifi: connected'],
+  ['I (612)', 'ui: clock face v2 ready'],
+];
+---
+
+<section id="tools" class="tools">
+  <div class="container inner">
+    <div class="intro">
+      <h2>Works with the tools you already run.</h2>
+      <p>
+        If it serves a page on a port, Nearhost can open it on your laptop, tablet or phone. That
+        reaches further than dev servers: some tools turn a whole device into a page.
+      </p>
+    </div>
+
+    <div class="cards">
+      <article class="card">
+        <div class="shot" data-tool-shot data-nosnippet aria-hidden="true">
+          <span class="where">
+            <b>npx serve-sim</b> on apollo, the Mac with Xcode, opened here as https://sim.test
+          </span>
+          <div class="window">
+            <div class="bar">
+              <span class="lights">
+                <i></i>
+                <i></i>
+                <i></i>
+              </span>
+              <span class="address">
+                <svg
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#7fdb8a"
+                  stroke-width="2.4"
+                >
+                  <rect x="5" y="10" width="14" height="10" rx="2"></rect>
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+                </svg>
+                sim.test
+              </span>
+              <span class="spacer"></span>
+            </div>
+            <div class="sim">
+              <div class="iphone">
+                <div class="island">
+                  <span></span>
+                </div>
+                <div class="app-title">Trips</div>
+                <div class="hero-card"></div>
+                <div class="trip">
+                  Lisbon
+                  <br />
+                  <small>12–16 Mar</small>
+                </div>
+                <div class="trip">
+                  Kyoto
+                  <br />
+                  <small>2–9 Apr</small>
+                </div>
+              </div>
+              <div class="specs">
+                <span class="model">iPhone 17 Pro</span>
+                <span>iOS 27.1</span>
+                <span>60 fps</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <h3>serve-sim: the iOS Simulator, in a tab</h3>
+          <p>
+            serve-sim streams a booted Simulator to a page on port 3200, touches and keys included.
+            Run it on the Mac that has Xcode, and Nearhost opens that page on your laptop or tablet,
+            so you can tap through your app from another room.
+          </p>
+          <a class="guide-link" href={guides.serveSim}>
+            Guide: the iOS Simulator from another Mac
+          </a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="shot" data-tool-shot data-nosnippet aria-hidden="true">
+          <span class="where">
+            <b>preflash web</b> on apollo, opened here as https://clock-face.test
+          </span>
+          <div class="window">
+            <div class="bar">
+              <span class="lights">
+                <i></i>
+                <i></i>
+                <i></i>
+              </span>
+              <span class="address">
+                <svg
+                  width="11"
+                  height="11"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#7fdb8a"
+                  stroke-width="2.4"
+                >
+                  <rect x="5" y="10" width="14" height="10" rx="2"></rect>
+                  <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+                </svg>
+                clock-face.test
+              </span>
+              <span class="spacer"></span>
+            </div>
+            <div class="preflash">
+              <div class="term">
+                <span class="term-title">preflash: clock-face</span>
+                {bootLog.map(([tag, line]) => (
+                  <span>
+                    <span class="tag">{tag}</span> {line}
+                  </span>
+                ))}
+                <span>
+                  <span class="prompt">›</span> <span class="typed">status</span>
+                </span>
+              </div>
+              <div class="panel">
+                <div class="screen">
+                  <div class="clock">09:41</div>
+                  <div class="tiles">
+                    <i class="on"></i>
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                    <i></i>
+                    <i class="alert"></i>
+                  </div>
+                </div>
+                <div class="buttons">
+                  <i></i>
+                  <i></i>
+                  <i></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="body">
+          <h3>Preflash: an ESP32 board, without the board</h3>
+          <p>
+            Preflash builds an unmodified ESP-IDF project for your computer and runs it on a screen
+            the shape of the board's. <code>preflash web</code> serves the terminal app and the
+            panel on one page, listening on localhost only, so Nearhost is how it reaches your
+            tablet.
+          </p>
+          <a class="guide-link" href={guides.preflash}>
+            Guide: ESP32 firmware in the browser
+          </a>
+        </div>
+      </article>
+    </div>
+
+    <div class="lists">
+      {lists.map(({ title, href, note, items }) => (
+        <div class="list">
+          <h3>{href ? <a href={href}>{title}</a> : title}</h3>
+          <p class="note">{note}</p>
+          <p class="items">
+            {items.split(', ').map((item, i) => (
+              <>
+                {i > 0 && ', '}
+                <span class="item">{item}</span>
+              </>
+            ))}
+          </p>
+        </div>
+      ))}
+    </div>
+
+    <div class="guides">
+      <div class="guides-intro">
+        <h3>Guides</h3>
+        <p>
+          Step by step, from the command on the server to the page on your screen. Not on the list?
+          If it serves HTTP on a port, it works.
+        </p>
+      </div>
+      <ul>
+        {guideList.map(({ href, title, blurb }) => (
+          <li>
+            <a href={href}>
+              <span class="guide-title">{title}</span>
+              <span class="guide-blurb">{blurb}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tools {
+    border-top: 1px solid var(--nh-line);
+  }
+  .inner {
+    padding-block: 112px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 760px;
+  }
+  .intro h2 {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-weight: 700;
+    font-size: clamp(36px, 4.5vw, 56px);
+    line-height: 1;
+    letter-spacing: var(--nh-track-display);
+    text-wrap: balance;
+  }
+  .intro p {
+    margin: 0;
+    color: var(--nh-body);
+    font-size: 19px;
+  }
+
+  /* Two tool cards side by side, stacked below 1000px. */
+  .cards {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+  @media (min-width: 1000px) {
+    .cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .card {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--nh-line);
+    border-radius: var(--nh-radius-l);
+    background: var(--nh-surface);
+    overflow: hidden;
+  }
+  .shot {
+    height: 320px;
+    box-sizing: border-box;
+    padding: 28px 28px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+    background: var(--nh-ground);
+    border-bottom: 1px solid var(--nh-line);
+  }
+  .where {
+    font-size: 13px;
+    color: var(--nh-faint);
+    overflow-wrap: anywhere;
+  }
+  .where b {
+    font-weight: inherit;
+    color: var(--nh-text);
+  }
+  .body {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .body h3 {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+  .body p {
+    margin: 0;
+    color: var(--nh-body);
+  }
+  .guide-link {
+    align-self: flex-start;
+    margin-top: 4px;
+    color: var(--nh-accent);
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .guide-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* The browser window: a dark screenshot in both themes. */
+  .window {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #2a312b;
+    border-bottom: 0;
+    border-radius: 12px 12px 0 0;
+    overflow: hidden;
+    background: #161a17;
+    color-scheme: dark;
+  }
+  .bar {
+    flex: none;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 12px;
+    border-bottom: 1px solid #2a312b;
+  }
+  .lights {
+    display: flex;
+    gap: 6px;
+  }
+  .lights i {
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2f3530;
+  }
+  .address {
+    flex: 1;
+    min-width: 0;
+    max-width: 300px;
+    margin: 0 auto;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 6px;
+    background: #0f1210;
+    font-family: var(--nh-font-mono);
+    font-size: 12px;
+    color: #ecefe8;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .address svg {
+    flex: none;
+  }
+  .spacer {
+    width: 46px;
+    flex: none;
+  }
+
+  /* serve-sim: a Simulator streaming a booted iPhone. */
+  .sim {
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 18px;
+    padding: 18px 18px 0;
+    background: #1c1c1e;
+  }
+  .iphone {
+    width: 150px;
+    height: 300px;
+    flex: none;
+    box-sizing: border-box;
+    border-radius: 30px;
+    border: 5px solid #3a3a3c;
+    background: #f2f2f7;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, system-ui, sans-serif;
+    color: #000;
+    line-height: 1.3;
+  }
+  .island {
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 6px;
+    box-sizing: border-box;
+  }
+  .island span {
+    width: 46px;
+    height: 13px;
+    border-radius: 10px;
+    background: #000;
+  }
+  .app-title {
+    padding: 2px 12px 6px;
+    font-weight: 700;
+    font-size: 19px;
+  }
+  .hero-card {
+    margin: 0 10px 8px;
+    height: 70px;
+    flex: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #5e8bd6, #8ab0e8);
+  }
+  .trip {
+    margin: 0 10px 6px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 10px;
+  }
+  .trip small {
+    font-size: inherit;
+    color: #8e8e93;
+  }
+  .specs {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-top: 6px;
+    font-family: var(--nh-font-mono);
+    font-size: 11px;
+    color: #8e8e93;
+    white-space: nowrap;
+  }
+  .specs .model {
+    color: #e5e5ea;
+  }
+
+  /* Preflash: the terminal app beside the board's screen. */
+  .preflash {
+    flex: 1;
+    display: flex;
+    background: #0c0e12;
+  }
+  .term {
+    flex: 1;
+    min-width: 0;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: var(--nh-font-mono);
+    font-size: 11px;
+    line-height: 1.6;
+    color: #b9c0cc;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 1px solid #222832;
+  }
+  .term-title {
+    padding-bottom: 4px;
+    font-weight: 600;
+    color: #f0f4ff;
+  }
+  .term .tag {
+    color: #7c8798;
+  }
+  .term .prompt {
+    color: #8fb4ff;
+  }
+  .term .typed {
+    color: #f0f4ff;
+  }
+  .panel {
+    flex: 0 0 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding-top: 16px;
+    background: #111419;
+  }
+  .screen {
+    width: 150px;
+    height: 150px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    border: 7px solid #2a2e35;
+    background: #0a0f1a;
+    padding: 9px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .clock {
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1;
+    color: #f0f4ff;
+    text-align: center;
+  }
+  .tiles {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .tiles i {
+    border-radius: 4px;
+    background: #22324a;
+  }
+  .tiles i.on {
+    background: #1f3b66;
+  }
+  .tiles i.alert {
+    background: #4a2626;
+  }
+  .buttons {
+    display: flex;
+    gap: 6px;
+  }
+  .buttons i {
+    width: 38px;
+    height: 12px;
+    border-radius: 4px;
+    background: #2a2e35;
+  }
+
+  /* The four lists: a row of four, two by two on a tablet, one column on a phone. */
+  .lists {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 24px;
+    border-top: 1px solid var(--nh-line);
+  }
+  @media (min-width: 600px) {
+    .lists {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (min-width: 1000px) {
+    .lists {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+  .list {
+    min-width: 0;
+    padding-block: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .list h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--nh-text);
+  }
+  .list h3 a {
+    text-decoration: underline;
+    text-decoration-color: var(--nh-faint);
+    text-underline-offset: 4px;
+  }
+  .list h3 a:hover {
+    text-decoration-color: currentColor;
+  }
+  .list p {
+    margin: 0;
+  }
+  .note {
+    font-size: 15px;
+    color: var(--nh-muted);
+  }
+  /* A name never breaks across lines, so "Pi-hole" and "Laravel Sail" stay whole. */
+  .item {
+    white-space: nowrap;
+  }
+  .items {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--nh-text);
+  }
+
+  /* The guides, two columns of links beside the intro, one column on a phone. */
+  .guides {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 48px;
+    padding-top: 28px;
+    border-top: 1px solid var(--nh-line);
+  }
+  .guides-intro {
+    flex: 1 1 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .guides-intro h3 {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .guides-intro p {
+    margin: 0;
+    font-size: 15px;
+    color: var(--nh-muted);
+  }
+  .guides ul {
+    flex: 2 1 520px;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 32px;
+  }
+  .guides li {
+    border-bottom: 1px solid var(--nh-line);
+  }
+  .guides li a {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 0;
+  }
+  .guide-title {
+    font-weight: 600;
+  }
+  .guide-blurb {
+    font-size: 14px;
+    color: var(--nh-muted);
+  }
+
+  @media (max-width: 719px) {
+    .shot {
+      padding: 20px 20px 0;
+    }
+    .body {
+      padding: 24px 20px;
+    }
+    /* On a phone the Preflash picture shows only the board. */
+    .term {
+      display: none;
+    }
+    .panel {
+      flex: 1;
+    }
+    .guides ul {
+      grid-template-columns: minmax(0, 1fr);
+      flex-basis: 100%;
+    }
+  }
+  @media (max-width: 420px) {
+    .specs,
+    .spacer {
+      display: none;
+    }
+  }
+</style>
