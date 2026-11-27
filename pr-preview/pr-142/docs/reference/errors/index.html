@@ -1,0 +1,853 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-theme="dark" data-has-toc data-has-sidebar class="astro-g5ptsecz"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Errors | Nearhost</title><link rel="canonical" href="https://nearhost.dev/pr-preview/pr-142/docs/reference/errors/"/><link rel="sitemap" href="/pr-preview/pr-142/sitemap-index.xml"/><script>addEventListener('DOMContentLoaded', function () {
+  function go() {
+    var id = decodeURIComponent(location.hash.slice(1));
+    if (id.indexOf('advice.') === 0 && !document.getElementById(id)) {
+      var to = document.getElementById('advice');
+      if (to) to.scrollIntoView();
+    }
+  }
+  addEventListener('hashchange', go);
+  go();
+});
+</script><link rel="shortcut icon" href="/pr-preview/pr-142/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v7.4.12"/><meta name="generator" content="Starlight v0.42.6"/><meta property="og:title" content="Errors"/><meta property="og:type" content="article"/><meta property="og:url" content="https://nearhost.dev/pr-preview/pr-142/docs/reference/errors/"/><meta property="og:locale" content="en"/><meta property="og:description" content="Every code Nearhost puts on an error, a warning or a note, and what it means."/><meta property="og:site_name" content="Nearhost"/><meta name="twitter:card" content="summary_large_image"/><meta name="description" content="Every code Nearhost puts on an error, a warning or a note, and what it means."/><meta property="og:image" content="https://nearhost.dev/pr-preview/pr-142/og/docs/reference/errors.png"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image:alt" content="Errors: Nearhost docs"/><meta name="twitter:image" content="https://nearhost.dev/pr-preview/pr-142/og/docs/reference/errors.png"/><meta name="twitter:image:alt" content="Errors: Nearhost docs"/><link rel="alternate" type="text/markdown" href="https://nearhost.dev/pr-preview/pr-142/docs/reference/errors.md"/><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","@id":"https://nearhost.dev/pr-preview/pr-142/docs/reference/errors/#article","headline":"Errors","description":"Every code Nearhost puts on an error, a warning or a note, and what it means.","url":"https://nearhost.dev/pr-preview/pr-142/docs/reference/errors/","image":"https://nearhost.dev/pr-preview/pr-142/og/docs/reference/errors.png","dateModified":"2026-11-26T18:06:28.000Z","inLanguage":"en","author":{"@id":"https://nearhost.dev/#maker"},"publisher":{"@id":"https://nearhost.dev/#organization"},"isPartOf":{"@id":"https://nearhost.dev/#website"},"about":{"@id":"https://nearhost.dev/#software"}},{"@type":"Organization","@id":"https://nearhost.dev/#organization","name":"Nearhost","url":"https://nearhost.dev/","logo":"https://nearhost.dev/logo.png","founder":{"@id":"https://nearhost.dev/#maker"},"sameAs":["https://github.com/nearhost"]},{"@type":"Person","@id":"https://nearhost.dev/#maker","name":"Edward Coleridge Smith","url":"https://github.com/edcs","sameAs":["https://github.com/edcs"]},{"@type":"WebSite","@id":"https://nearhost.dev/#website","name":"Nearhost","url":"https://nearhost.dev/","publisher":{"@id":"https://nearhost.dev/#organization"}}]}</script><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/pr-preview/pr-142/_astro/print.ehPL0gv-.css" media="print"><link rel="stylesheet" href="/pr-preview/pr-142/_astro/structured-data.7qWibK-u.css"><link rel="stylesheet" href="/pr-preview/pr-142/_astro/common.CFy1mfxp.css"><script type="module" src="/pr-preview/pr-142/_astro/page.cNngjUgL.js"></script></head><body class="astro-g5ptsecz"><a class="sl-skip-link astro-qb7clj6f" href="#_top">Skip to content</a><div class="page sl-flex astro-yntsjkba"><header class="header astro-yntsjkba"><div class="header astro-ktgj4fl6"><div class="title-wrapper astro-ktgj4fl6"><div class="title astro-ipmp35fu"><a href="/pr-preview/pr-142/" class="brand astro-ipmp35fu" aria-label="Nearhost home"><svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true" class="mark astro-4pt2nqzy"><path d="M14 56V32a18 18 0 0 1 36 0v24" fill="none" stroke="var(--nh-mark-arch)" stroke-width="11" stroke-linecap="round" class="astro-4pt2nqzy"></path><circle cx="32" cy="48" r="6" fill="var(--nh-mark-dot)" class="astro-4pt2nqzy"></circle></svg><span class="word astro-ipmp35fu">nearhost</span></a><span class="sep astro-ipmp35fu" aria-hidden="true">/</span><a href="/pr-preview/pr-142/docs/getting-started/introduction/" class="docs astro-ipmp35fu">Docs</a></div></div><div class="middle astro-ktgj4fl6"><site-search class="astro-ktgj4fl6 astro-b5kgnn7o" data-translations="{&quot;placeholder&quot;:&quot;Search&quot;}"><button data-open-modal disabled aria-label="Search" aria-keyshortcuts="Control+K" class="astro-b5kgnn7o"><svg aria-hidden="true" class="astro-b5kgnn7o astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-b5kgnn7o" aria-hidden="true">Search</span><kbd class="sl-hidden md:sl-flex astro-b5kgnn7o" style="display: none;"><kbd class="astro-b5kgnn7o">Ctrl</kbd><kbd class="astro-b5kgnn7o">K</kbd></kbd></button><dialog style="padding:0" aria-label="Search" class="astro-b5kgnn7o"><div class="dialog-frame sl-flex astro-b5kgnn7o"><button data-close-modal class="sl-flex md:sl-hidden astro-b5kgnn7o">Cancel</button><div class="search-container astro-b5kgnn7o"><div id="starlight__search" class="astro-b5kgnn7o"></div></div></div></dialog></site-search><script>
+	(() => {
+		const openBtn = document.querySelector('button[data-open-modal]');
+		const shortcut = openBtn?.querySelector('kbd');
+		if (!openBtn || !(shortcut instanceof HTMLElement)) return;
+		const platformKey = shortcut.querySelector('kbd');
+		if (platformKey && /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform)) {
+			platformKey.textContent = '⌘';
+			openBtn.setAttribute('aria-keyshortcuts', 'Meta+K');
+		}
+		shortcut.style.display = '';
+	})();
+</script><script type="module" src="/pr-preview/pr-142/_astro/Search.astro_astro_type_script_index_0_lang.C-X8wt1B.js"></script></div><div class="right sl-hidden md:sl-flex astro-ktgj4fl6"><a href="/pr-preview/pr-142/" class="home astro-ktgj4fl6">Home</a><a href="https://github.com/nearhost/nearhost" rel="me" class="sl-flex astro-n2mnl6yq"><span class="sr-only astro-n2mnl6yq">GitHub</span><svg aria-hidden="true" class="astro-n2mnl6yq astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-2z5xp7gb"><span class="sr-only astro-2z5xp7gb">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-2z5xp7gb astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-2z5xp7gb"><option value="dark" class="astro-2z5xp7gb">Dark</option><option value="light" class="astro-2z5xp7gb">Light</option><option value="auto" selected class="astro-2z5xp7gb">Auto</option></select><svg aria-hidden="true" class="icon caret astro-2z5xp7gb astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script><script type="module">var e=`starlight-theme`,t=e=>e===`auto`||e===`dark`||e===`light`?e:`auto`,n=()=>t(typeof localStorage<`u`&&localStorage.getItem(e));function r(t){typeof localStorage<`u`&&localStorage.setItem(e,t===`light`||t===`dark`?t:``)}var i=()=>matchMedia(`(prefers-color-scheme: light)`).matches?`light`:`dark`;function a(e){StarlightThemeProvider.updatePickers(e),document.documentElement.dataset.theme=e===`auto`?i():e,r(e)}matchMedia(`(prefers-color-scheme: light)`).addEventListener(`change`,()=>{n()===`auto`&&a(`auto`)});var o=class extends HTMLElement{constructor(){super(),a(n()),this.querySelector(`select`)?.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&a(t(e.currentTarget.value))})}};customElements.define(`starlight-theme-select`,o);</script></div></div></header><nav class="sidebar print:hidden astro-yntsjkba" aria-label="Main"><button popovertarget="starlight__sidebar" class="sl-menu-button sl-flex md:sl-hidden print:hidden astro-r2osgdlg"><svg aria-hidden="true" class="open-menu astro-r2osgdlg astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg><svg aria-hidden="true" class="close-menu astro-r2osgdlg astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="m13.41 12 6.3-6.29a1.004 1.004 0 1 0-1.42-1.42L12 10.59l-6.29-6.3a1.004 1.004 0 0 0-1.42 1.42l6.3 6.29-6.3 6.29a1 1 0 0 0 0 1.42.998.998 0 0 0 1.42 0l6.29-6.3 6.29 6.3a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.42L13.41 12Z"/></svg><span class="sr-only astro-r2osgdlg">Menu</span></button><script type="module">var e=class extends HTMLElement{constructor(){super();let e=matchMedia(`(min-width: 50em)`),t=()=>{this.popover=e.matches?null:`auto`};t(),e.addEventListener(`change`,()=>t()),this.addEventListener(`toggle`,({newState:e})=>this.trapFocus(e===`open`))}trapFocus(e){document.querySelectorAll(`.main-frame, .sl-skip-link`).forEach(t=>{t.toggleAttribute(`inert`,e)})}};customElements.define(`sl-sidebar-pane`,e);</script><script type="module">var e=class extends HTMLElement{constructor(){super();let e=this.querySelector(`select`);e&&(e.addEventListener(`change`,e=>{e.currentTarget instanceof HTMLSelectElement&&(window.location.pathname=e.currentTarget.value)}),window.addEventListener(`pageshow`,t=>{if(!t.persisted)return;let n=e.querySelector(`option[selected]`)?.index;n!==e.selectedIndex&&(e.selectedIndex=n??0)}))}};customElements.define(`starlight-lang-select`,e);</script><sl-sidebar-pane popover id="starlight__sidebar" class="sidebar-pane astro-yntsjkba"><div class="sidebar-content sl-flex astro-yntsjkba"><sl-sidebar-state-persist data-hash="1ktqvo6" class="astro-ipdry5cl"><script aria-hidden="true">
+		(() => {
+			try {
+				if (!matchMedia('(min-width: 50em)').matches) return;
+				/** @type {HTMLElement | null} */
+				const target = document.querySelector('sl-sidebar-state-persist');
+				const state = JSON.parse(sessionStorage.getItem('sl-sidebar-state') || '0');
+				if (!target || !state || target.dataset.hash !== state.hash) return;
+				window._starlightScrollRestore = state.scroll;
+				customElements.define(
+					'sl-sidebar-restore',
+					class SidebarRestore extends HTMLElement {
+						connectedCallback() {
+							try {
+								const idx = parseInt(this.dataset.index || '');
+								const details = this.closest('details');
+								if (details && typeof state.open[idx] === 'boolean') details.open = state.open[idx];
+							} catch {}
+						}
+					}
+				);
+			} catch {}
+		})();
+	</script><ul class="top-level astro-rmhv4bp6"><li class="astro-rmhv4bp6"><details open class="astro-rmhv4bp6"><summary class="astro-rmhv4bp6"><span class="group-label astro-rmhv4bp6"><span class="large astro-rmhv4bp6">Getting started</span></span><svg aria-hidden="true" class="caret astro-rmhv4bp6 astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="0"></sl-sidebar-restore><ul class="astro-rmhv4bp6"><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/getting-started/introduction/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Introduction</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/getting-started/install/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Install</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/getting-started/first-run/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">First run</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/getting-started/add-a-server/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Add a server</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/getting-started/add-a-project/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Add a project</span></a></li></ul></details></li><li class="astro-rmhv4bp6"><details open class="astro-rmhv4bp6"><summary class="astro-rmhv4bp6"><span class="group-label astro-rmhv4bp6"><span class="large astro-rmhv4bp6">Coding agents</span></span><svg aria-hidden="true" class="caret astro-rmhv4bp6 astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="1"></sl-sidebar-restore><ul class="astro-rmhv4bp6"><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/coding-agents/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Overview</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/coding-agents/add-a-project/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Add a project</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/coding-agents/fix-a-project/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Fix a project</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/coding-agents/browser-previews/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Browser previews from a server</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/coding-agents/documents/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Documents from coding agents</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/coding-agents/prompts-and-always-allow/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Prompts and Always allow</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/coding-agents/how-it-works/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">How agents reach Nearhost</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/coding-agents/troubleshooting/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">When agents cannot reach Nearhost</span></a></li></ul></details></li><li class="astro-rmhv4bp6"><details open class="astro-rmhv4bp6"><summary class="astro-rmhv4bp6"><span class="group-label astro-rmhv4bp6"><span class="large astro-rmhv4bp6">Concepts</span></span><svg aria-hidden="true" class="caret astro-rmhv4bp6 astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="2"></sl-sidebar-restore><ul class="astro-rmhv4bp6"><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/concepts/routes-and-roles/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Routes and roles</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/concepts/multi-host-projects/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Multi-host projects</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/concepts/discovery/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Discovery</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/concepts/presets-and-registries/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Presets and registries</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/concepts/ssh-transport/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">SSH transport</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/concepts/tls-and-the-proxy/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">TLS and the proxy</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/concepts/the-hosts-file/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">The hosts file</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/concepts/dev-servers-and-hot-reload/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Dev servers and hot reload</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/concepts/the-request-log/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">The request log</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/concepts/what-nearhost-changes/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">What Nearhost changes on your machine</span></a></li></ul></details></li><li class="astro-rmhv4bp6"><details open class="astro-rmhv4bp6"><summary class="astro-rmhv4bp6"><span class="group-label astro-rmhv4bp6"><span class="large astro-rmhv4bp6">Reference</span></span><svg aria-hidden="true" class="caret astro-rmhv4bp6 astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="3"></sl-sidebar-restore><ul class="astro-rmhv4bp6"><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/reference/cli/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">CLI</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/reference/config/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">config.yaml</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/reference/nearhostrc/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">.nearhostrc</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/reference/keyboard-shortcuts/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Keyboard shortcuts</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/reference/advisories/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Advisories</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/reference/errors/" aria-current="page" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Errors</span></a></li></ul></details></li><li class="astro-rmhv4bp6"><details open class="astro-rmhv4bp6"><summary class="astro-rmhv4bp6"><span class="group-label astro-rmhv4bp6"><span class="large astro-rmhv4bp6">Troubleshooting</span></span><svg aria-hidden="true" class="caret astro-rmhv4bp6 astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="4"></sl-sidebar-restore><ul class="astro-rmhv4bp6"><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/troubleshooting/troubleshooting/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Troubleshooting</span></a></li></ul></details></li><li class="astro-rmhv4bp6"><details open class="astro-rmhv4bp6"><summary class="astro-rmhv4bp6"><span class="group-label astro-rmhv4bp6"><span class="large astro-rmhv4bp6">Guides</span></span><svg aria-hidden="true" class="caret astro-rmhv4bp6 astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><sl-sidebar-restore data-index="5"></sl-sidebar-restore><ul class="astro-rmhv4bp6"><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/ngrok-assets-on-localhost/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">ngrok loads the page, but assets point at localhost</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/sso-callback-on-a-remote-dev-server/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">SSO callback fails on a remote dev server</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/vite-hot-reload-over-ssh/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Vite hot reload fails over SSH port forwarding</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/forward-ports-over-ssh/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Forward several ports over SSH without retyping -L</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/https-on-a-local-dev-domain/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">HTTPS on a local dev domain</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/workos-sign-in/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">WorkOS sign-in on a remote dev server</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/clerk-sign-in/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Clerk sign-in on a remote dev server</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/container-callbacks/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Callbacks from Docker containers to a local HTTPS domain</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/cognito-sign-in/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Cognito sign-in on a remote dev server</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/run-in-the-background/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Run Nearhost in the background</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/ios-simulator-from-another-mac/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">The iOS Simulator from another Mac, with serve-sim</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/esp32-boards-in-the-browser/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">ESP32 firmware in the browser, with Preflash</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/review-claude-code-plans/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Review Claude Code&#39;s plans in your browser</span></a></li><li class="astro-rmhv4bp6"><a href="/pr-preview/pr-142/docs/guides/agent-browser-previews/" class="astro-rmhv4bp6"><span class="astro-rmhv4bp6">Open a coding agent&#39;s localhost preview in your browser</span></a></li></ul></details></li></ul><script aria-hidden="true">
+		(() => {
+			const scroller = document.getElementById('starlight__sidebar');
+			if (!window._starlightScrollRestore || !scroller) return;
+			scroller.scrollTop = window._starlightScrollRestore;
+			delete window._starlightScrollRestore;
+		})();
+	</script></sl-sidebar-state-persist><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-p4azlveh"><div class="social-icons astro-p4azlveh"><a href="https://github.com/nearhost/nearhost" rel="me" class="sl-flex astro-n2mnl6yq"><span class="sr-only astro-n2mnl6yq">GitHub</span><svg aria-hidden="true" class="astro-n2mnl6yq astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-2z5xp7gb"><span class="sr-only astro-2z5xp7gb">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-2z5xp7gb astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select autocomplete="off" class="astro-2z5xp7gb"><option value="dark" class="astro-2z5xp7gb">Dark</option><option value="light" class="astro-2z5xp7gb">Light</option><option value="auto" selected class="astro-2z5xp7gb">Auto</option></select><svg aria-hidden="true" class="icon caret astro-2z5xp7gb astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script></div></div></div></sl-sidebar-pane></nav><div class="main-frame astro-yntsjkba"><script type="module">var e=document.getElementById(`starlight__sidebar`),t=e?.querySelector(`sl-sidebar-state-persist`),n=`sl-sidebar-state`,r=()=>{let r=[],i=t?.dataset.hash||``;try{let e=sessionStorage.getItem(n),t=JSON.parse(e||`{}`);Array.isArray(t.open)&&t.hash===i&&(r=t.open)}catch{}return{hash:i,open:r,scroll:e?.scrollTop||0}},i=e=>{try{sessionStorage.setItem(n,JSON.stringify(e))}catch{}},a=()=>i(r()),o=(e,t)=>{let n=r();n.open[t]=e,i(n)};t?.addEventListener(`click`,e=>{if(!(e.target instanceof Element))return;let t=e.target.closest(`summary`)?.closest(`details`);if(!t)return;let n=t.querySelector(`sl-sidebar-restore`),r=parseInt(n?.dataset.index||``);isNaN(r)||o(!t.open,r)}),addEventListener(`visibilitychange`,()=>{document.visibilityState===`hidden`&&a()});</script><div class="lg:sl-flex astro-lrzkfocr"><aside class="right-sidebar-container print:hidden astro-lrzkfocr"><div class="right-sidebar astro-lrzkfocr"><div class="lg:sl-hidden astro-qok35upx"><mobile-starlight-toc data-min-h="2" data-max-h="3" class="astro-66cqc7ze"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-66cqc7ze"><details id="starlight__mobile-toc" class="astro-66cqc7ze"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-66cqc7ze"><span class="toggle sl-flex astro-66cqc7ze">On this page<svg aria-hidden="true" class="caret astro-66cqc7ze astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></span><span class="display-current astro-66cqc7ze"></span></summary><div class="dropdown astro-66cqc7ze"><ul class="isMobile astro-jugkfwgx" style="--depth: 0;"><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#_top" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Overview</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#general" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">General</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#ports" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Ports</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#nearhost-in-the-background" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Nearhost in the background</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#the-service" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">The service</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#configyaml" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">config.yaml</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#the-hosts-file" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">The hosts file</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#the-local-ca" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">The local CA</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#ssh-and-forwards" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">SSH and forwards</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#docker" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Docker</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#updates" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Updates</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#the-interface" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">The interface</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#adding-and-exporting-projects" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Adding and exporting projects</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#presets" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Presets</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#project-checks" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Project checks</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#coding-agents" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Coding agents</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#documents" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Documents</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#nearhosts-page" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Nearhost’s page</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#networked-mode-and-paired-devices" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Networked mode and paired devices</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#the-control-api" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">The control API</span></a></li></ul></div></details></nav></mobile-starlight-toc><script type="module" src="/pr-preview/pr-142/_astro/MobileTableOfContents.astro_astro_type_script_index_0_lang.C3fM4Kra.js"></script></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-qok35upx"><div class="sl-container astro-qok35upx"><starlight-toc data-min-h="2" data-max-h="3"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-jugkfwgx" style="--depth: 0;"><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#_top" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Overview</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#general" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">General</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#ports" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Ports</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#nearhost-in-the-background" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Nearhost in the background</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#the-service" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">The service</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#configyaml" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">config.yaml</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#the-hosts-file" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">The hosts file</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#the-local-ca" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">The local CA</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#ssh-and-forwards" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">SSH and forwards</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#docker" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Docker</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#updates" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Updates</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#the-interface" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">The interface</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#adding-and-exporting-projects" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Adding and exporting projects</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#presets" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Presets</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#project-checks" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Project checks</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#coding-agents" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Coding agents</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#documents" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Documents</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#nearhosts-page" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Nearhost’s page</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#networked-mode-and-paired-devices" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">Networked mode and paired devices</span></a></li><li style="--depth: 0;" class="astro-jugkfwgx"><a href="#the-control-api" style="--depth: 0;" class="astro-jugkfwgx"><span style="--depth: 0;" class="astro-jugkfwgx">The control API</span></a></li></ul></nav></starlight-toc><script type="module" src="/pr-preview/pr-142/_astro/TableOfContents.astro_astro_type_script_index_0_lang.BpJaGz7G.js"></script></div></div></div></aside><div class="main-pane astro-lrzkfocr"><main data-pagefind-body class="astro-g5ptsecz" lang="en" dir="ltr"><div class="content-panel astro-a7po4psb"><div class="sl-container astro-a7po4psb"><div class="title-row astro-o5cuzwyp"><h1 id="_top" class="astro-bebwqqxs">Errors</h1><style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(function(){let e=async e=>{await(await e())()};(self.Astro||(self.Astro={})).load=e,window.dispatchEvent(new Event(`astro:load`))})();</script><script>(function(){function e(t){"@babel/helpers - typeof";return e=typeof Symbol==`function`&&typeof Symbol.iterator==`symbol`?function(e){return typeof e}:function(e){return e&&typeof Symbol==`function`&&e.constructor===Symbol&&e!==Symbol.prototype?`symbol`:typeof e},e(t)}function t(t,n){if(e(t)!=`object`||!t)return t;var r=t[Symbol.toPrimitive];if(r!==void 0){var i=r.call(t,n||`default`);if(e(i)!=`object`)return i;throw TypeError(`@@toPrimitive must return a primitive value.`)}return(n===`string`?String:Number)(t)}function n(n){var r=t(n,`string`);return e(r)==`symbol`?r:r+``}function r(e,t,r){return(t=n(t))in e?Object.defineProperty(e,t,{value:r,enumerable:!0,configurable:!0,writable:!0}):e[t]=r,e}let i=/* @__PURE__ */ new Set([`__proto__`,`constructor`,`prototype`]);{let e={0:e=>a(e),1:e=>n(e),2:e=>new RegExp(e),3:e=>new Date(e),4:e=>new Map(n(e)),5:e=>new Set(n(e)),6:e=>BigInt(e),7:e=>new URL(e),8:e=>new Uint8Array(e),9:e=>new Uint16Array(e),10:e=>new Uint32Array(e),11:e=>1/0*e},t=t=>{let[n,r]=t;return n in e?e[n](r):void 0},n=e=>e.map(t),a=e=>typeof e!=`object`||!e?e:Object.fromEntries(Object.entries(e).map(([e,n])=>[e,t(n)]));class o extends HTMLElement{constructor(...e){super(...e),r(this,`Component`,void 0),r(this,`hydrator`,void 0),r(this,`hydrate`,async()=>{var e;if(!this.hydrator||!this.isConnected)return;let t=(e=this.parentElement)==null?void 0:e.closest(`astro-island[ssr]`);if(t){t.addEventListener(`astro:hydrate`,this.hydrate,{once:!0});return}let n=this.querySelectorAll(`astro-slot`),r={},i=this.querySelectorAll(`template[data-astro-template]`);for(let e of i){let t=e.closest(this.tagName);t!=null&&t.isSameNode(this)&&(r[e.getAttribute(`data-astro-template`)||`default`]=e.innerHTML,e.remove())}for(let e of n){let t=e.closest(this.tagName);t!=null&&t.isSameNode(this)&&(r[e.getAttribute(`name`)||`default`]=e.innerHTML)}let o;try{o=this.hasAttribute(`props`)?a(JSON.parse(this.getAttribute(`props`))):{}}catch(e){let t=this.getAttribute(`component-url`)||`<unknown>`,n=this.getAttribute(`component-export`);throw n&&(t+=` (export ${n})`),console.error(`[hydrate] Error parsing props for component ${t}`,this.getAttribute(`props`),e),e}await this.hydrator(this)(this.Component,o,r,{client:this.getAttribute(`client`)}),this.removeAttribute(`ssr`),this.dispatchEvent(new CustomEvent(`astro:hydrate`))}),r(this,`unmount`,()=>{this.isConnected||this.dispatchEvent(new CustomEvent(`astro:unmount`))})}disconnectedCallback(){document.removeEventListener(`astro:after-swap`,this.unmount),document.addEventListener(`astro:after-swap`,this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute(`await-children`)||document.readyState===`interactive`||document.readyState===`complete`)this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener(`DOMContentLoaded`,e),t.disconnect(),this.childrenConnectedCallback()},t=new MutationObserver(()=>{var t;((t=this.lastChild)==null?void 0:t.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue===`astro:end`&&(this.lastChild.remove(),e())});t.observe(this,{childList:!0}),document.addEventListener(`DOMContentLoaded`,e)}}async childrenConnectedCallback(){let e=this.getAttribute(`before-hydration-url`);e&&await import(e),this.start()}getRetryImportUrl(e){let t=new URL(e,document.baseURI);return t.searchParams.set(`astro-retry`,Date.now().toString()),t.toString()}async importWithRetry(e){try{return await import(e)}catch(t){return await new Promise(e=>setTimeout(e,1e3)),import(this.getRetryImportUrl(e))}}handleHydrationError(e){let t=this.getAttribute(`component-url`),n=new CustomEvent(`astro:hydration-error`,{cancelable:!0,bubbles:!0,composed:!0,detail:{error:e,componentUrl:t}});this.dispatchEvent(n)&&console.error(`[astro-island] Error hydrating ${t}`,e)}async start(){let e=JSON.parse(this.getAttribute(`opts`)),t=this.getAttribute(`client`);if(Astro[t]===void 0)window.addEventListener(`astro:${t}`,()=>this.start(),{once:!0});else try{await Astro[t](async()=>{let e=this.getAttribute(`renderer-url`);try{let[t,{default:n}]=await Promise.all([this.importWithRetry(this.getAttribute(`component-url`)),e?this.importWithRetry(e):Promise.resolve({default:()=>()=>{}})]),r=this.getAttribute(`component-export`)||`default`;if(r.includes(`.`)){this.Component=t;for(let e of r.split(`.`)){if(i.has(e)||!this.Component||typeof this.Component!=`object`&&typeof this.Component!=`function`||!Object.hasOwn(this.Component,e))throw Error(`Invalid component export path: ${r}`);this.Component=this.Component[e]}}else{if(i.has(r))throw Error(`Invalid component export path: ${r}`);this.Component=t[r]}return this.hydrator=n,this.hydrate}catch(e){return this.handleHydrationError(e),()=>{}}},e,this)}catch(e){this.handleHydrationError(e)}}attributeChangedCallback(){this.hydrate()}}r(o,`observedAttributes`,[`props`]),customElements.get(`astro-island`)||customElements.define(`astro-island`,o)}})();</script><astro-island uid="2vAWPI" component-url="/pr-preview/pr-142/_astro/MarkdownMenu.Df01s7Wi.js" component-export="default" renderer-url="/pr-preview/pr-142/_astro/client.svelte.DR3aDSfX.js" props="{&quot;twin&quot;:[0,&quot;https://nearhost.dev/pr-preview/pr-142/docs/reference/errors.md&quot;],&quot;llms&quot;:[0,&quot;https://nearhost.dev/pr-preview/pr-142/llms.txt&quot;],&quot;class&quot;:[0,&quot;astro-o5cuzwyp&quot;]}" ssr client="load" opts="{&quot;name&quot;:&quot;MarkdownMenu&quot;,&quot;value&quot;:true}" await-children><!--[--><div class="markdown-menu svelte-61shcx" data-markdown-menu=""><!--[0--><a class="btn svelte-61shcx" href="https://nearhost.dev/pr-preview/pr-142/docs/reference/errors.md">View Markdown</a><!--]--> <span class="sr-only" aria-live="polite"></span></div><!--]--><!--astro:end--></astro-island></div><p class="sr-only astro-o5cuzwyp" aria-hidden="true" data-agent-note>For AI agents: the full Nearhost documentation index is at https://nearhost.dev/pr-preview/pr-142/llms.txt. Every docs page is also available as Markdown: replace the trailing slash with `.md`, so https://nearhost.dev/pr-preview/pr-142/docs/getting-started/install/ becomes https://nearhost.dev/pr-preview/pr-142/docs/getting-started/install.md.</p></div></div><div class="content-panel astro-a7po4psb"><div class="sl-container astro-a7po4psb"><div class="sl-markdown-content"><p>Every error, warning and note Nearhost shows has a code, such as <code dir="auto">port.needs-permission</code>. A code names one problem wherever it shows up, and it never changes once released, so you can search for it here or match on it in a script. Each entry below says what the code means. Where the fix is always the same, it gives the fix too; otherwise the message itself says what to do, as it names the path, port or server involved.</p>
+<p>Where codes show up:</p>
+<ul>
+<li><code dir="auto">nearhost &lt;command&gt; --verbose</code> prints the code under the title of an error, a warning or a note. See <a href="/pr-preview/pr-142/docs/reference/cli/#errors-warnings-and-notes">Errors, warnings and notes</a>.</li>
+<li>The core log has it in brackets, as in <code dir="auto">error [port.needs-permission] HTTPS port 443 needs permission to bind.</code> See <a href="/pr-preview/pr-142/docs/guides/run-in-the-background/#the-cores-log">The core’s log</a>.</li>
+<li><code dir="auto">nearhost doctor --verbose</code> prints a <code dir="auto">code:</code> line under each row that did not pass, and <code dir="auto">nearhost doctor --json</code> gives each check and finding a <code dir="auto">code</code>.</li>
+<li>The APIs answer an error with its <code dir="auto">code</code>, and a <code dir="auto">type</code> that links to its entry on this page. See <a href="/pr-preview/pr-142/docs/coding-agents/how-it-works/#errors-and-warnings">Agent API</a>.</li>
+</ul>
+<p>An entry is an error, a warning or a note, as Nearhost labels it. The status is the HTTP status the APIs answer with when the code is the error of a request; an entry without one is never an API error.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="general">General</h2><a class="sl-anchor-link" href="#general"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “General”</span></a></div>
+<h3 id="cli.usage"><code>cli.usage</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>A command was given arguments or flags it does not take.</p>
+<h3 id="crash"><code>crash</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>Nearhost stopped unexpectedly; the details are in a crash file.</p>
+<h3 id="interrupted"><code>interrupted</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>The command was interrupted before it finished.</p>
+<h3 id="unexpected"><code>unexpected</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>Something failed that Nearhost has no explanation for; the message holds the error as it came.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="ports">Ports</h2><a class="sl-anchor-link" href="#ports"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Ports”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/troubleshooting/troubleshooting/#port-443-or-80-already-in-use">Port 443 or 80 already in use</a>.</p>
+<h3 id="port.in-use"><code>port.in-use</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>Another program is already listening on a port Nearhost needs.</p>
+<h3 id="port.needs-permission"><code>port.needs-permission</code></h3>
+<p><strong>Error</strong> · status 403</p>
+<p>Nearhost may not listen on a port below 1024, such as 443 or 80, without permission.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="nearhost-in-the-background">Nearhost in the background</h2><a class="sl-anchor-link" href="#nearhost-in-the-background"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Nearhost in the background”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/guides/run-in-the-background/">Run Nearhost in the background</a>.</p>
+<h3 id="core.already-running"><code>core.already-running</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>Nearhost is already running for this config.</p>
+<h3 id="core.api-mismatch"><code>core.api-mismatch</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The running Nearhost is a different version that this copy cannot talk to.</p>
+<h3 id="core.docker-missing"><code>core.docker-missing</code></h3>
+<p><strong>Note</strong></p>
+<p>docker is not on the PATH of Nearhost in the background; only Docker projects need it.</p>
+<h3 id="core.docker-unreachable"><code>core.docker-unreachable</code></h3>
+<p><strong>Warning</strong></p>
+<p>Docker does not answer Nearhost in the background.</p>
+<h3 id="core.in-terminal"><code>core.in-terminal</code></h3>
+<p><strong>Note</strong></p>
+<p>Nearhost is already running in a terminal, so nearhost -d leaves it there rather than start another in the background.</p>
+<h3 id="core.log-unavailable"><code>core.log-unavailable</code></h3>
+<p><strong>Warning</strong></p>
+<p>The core could not send its standard error to its log, so a crash may not be logged.</p>
+<h3 id="core.lost"><code>core.lost</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>The connection to the running Nearhost was lost.</p>
+<h3 id="core.no-desktop"><code>core.no-desktop</code></h3>
+<p><strong>Warning</strong></p>
+<p>Nearhost in the background runs outside the desktop session, so it cannot open links.</p>
+<h3 id="core.no-enabled-projects"><code>core.no-enabled-projects</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>Every project in the config is disabled, and none was named to start.</p>
+<h3 id="core.no-projects"><code>core.no-projects</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>The config has no projects, so there is nothing to start.</p>
+<h3 id="core.no-reload"><code>core.no-reload</code></h3>
+<p><strong>Note</strong></p>
+<p>The running Nearhost serves the projects it was started with and does not reload the config.</p>
+<h3 id="core.not-running"><code>core.not-running</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>Nearhost is not running.</p>
+<p>Start it in the background:</p>
+<div class="expressive-code"><link rel="stylesheet" href="/pr-preview/pr-142/_astro/ec.w36nc.css"><script type="module" src="/pr-preview/pr-142/_astro/ec.0vx5m.js"></script><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">nearhost</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#82AAFF;--1:#3B61B0">-d</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="nearhost -d"><div></div></button></div></figure></div>
+<p>Or open its interface:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">nearhost</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="nearhost"><div></div></button></div></figure></div>
+<h3 id="core.nothing-to-serve"><code>core.nothing-to-serve</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>nearhost up found no project it can serve, and none still starting, so it stopped.</p>
+<h3 id="core.other-config"><code>core.other-config</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The running Nearhost uses a different config file.</p>
+<h3 id="core.other-version"><code>core.other-version</code></h3>
+<p><strong>Warning</strong></p>
+<p>The running Nearhost is another release than this copy.</p>
+<h3 id="core.outdated"><code>core.outdated</code></h3>
+<p><strong>Note</strong></p>
+<p>The running Nearhost is an older release than this copy, and runs it once restarted.</p>
+<h3 id="core.run-dir-failed"><code>core.run-dir-failed</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>Nearhost could not create its run directory, which holds its sockets and its lock.</p>
+<h3 id="core.session-unchecked"><code>core.session-unchecked</code></h3>
+<p><strong>Note</strong></p>
+<p>Nearhost in the background could not tell whether it runs in the sign-in session, so it may not open links.</p>
+<h3 id="core.ssh-agent-unreachable"><code>core.ssh-agent-unreachable</code></h3>
+<p><strong>Warning</strong></p>
+<p>The SSH agent Nearhost in the background was given does not answer.</p>
+<h3 id="core.ssh-agent-unset"><code>core.ssh-agent-unset</code></h3>
+<p><strong>Note</strong></p>
+<p>SSH_AUTH_SOCK is not set for Nearhost in the background, so ssh uses the agent in the SSH config, if any.</p>
+<h3 id="core.still-starting"><code>core.still-starting</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>Nearhost is still starting in the background.</p>
+<h3 id="core.stop-timeout"><code>core.stop-timeout</code></h3>
+<p><strong>Error</strong> · status 504</p>
+<p>Nearhost was asked to stop and had not stopped in time.</p>
+<h3 id="core.stopped-while-starting"><code>core.stopped-while-starting</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>Nearhost stopped while it was starting in the background.</p>
+<h3 id="core.unknown-project"><code>core.unknown-project</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>No project in the config has the name given.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="the-service">The service</h2><a class="sl-anchor-link" href="#the-service"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “The service”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/guides/run-in-the-background/#start-it-at-login">Start it at login</a>.</p>
+<h3 id="service.as-root"><code>service.as-root</code></h3>
+<p><strong>Error</strong> · status 403</p>
+<p>The service must be installed as the user who runs it, not as root.</p>
+<h3 id="service.cannot-bind"><code>service.cannot-bind</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The service cannot run this copy of nearhost, as it lacks permission to use ports 443 and 80.</p>
+<h3 id="service.copy"><code>service.copy</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>This copy of nearhost cannot be run by a service later, such as a one-run copy.</p>
+<h3 id="service.log-folder-missing"><code>service.log-folder-missing</code></h3>
+<p><strong>Warning</strong></p>
+<p>The folder of the service’s log is missing, so the service cannot start again.</p>
+<h3 id="service.manager-failed"><code>service.manager-failed</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>The system’s service manager refused to install, start or remove the Nearhost service.</p>
+<h3 id="service.no-user-manager"><code>service.no-user-manager</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>There is no user service manager to run the Nearhost service.</p>
+<h3 id="service.node-version"><code>service.node-version</code></h3>
+<p><strong>Note</strong></p>
+<p>The service runs nearhost from a Node version’s folder, so changing the default Node version needs a new install.</p>
+<h3 id="service.not-installed"><code>service.not-installed</code></h3>
+<p><strong>Note</strong></p>
+<p>The Nearhost service is not installed, so Nearhost does not start at login.</p>
+<p>To start Nearhost at login, install the service:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">nearhost</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">service</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">install</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="nearhost service install"><div></div></button></div></figure></div>
+<h3 id="service.not-running"><code>service.not-running</code></h3>
+<p><strong>Warning</strong></p>
+<p>The Nearhost service is installed but not running.</p>
+<p>Start it:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">nearhost</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#82AAFF;--1:#3B61B0">-d</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="nearhost -d"><div></div></button></div></figure></div>
+<h3 id="service.not-signed-in"><code>service.not-signed-in</code></h3>
+<p><strong>Note</strong></p>
+<p>You are not signed in to Windows, so the service could not start Nearhost, and it was started directly.</p>
+<h3 id="service.other-copy"><code>service.other-copy</code></h3>
+<p><strong>Warning</strong></p>
+<p>The installed service runs another copy of nearhost than this one.</p>
+<h3 id="service.own-settings"><code>service.own-settings</code></h3>
+<p><strong>Note</strong></p>
+<p>A service is installed, but it runs with its own settings, so Nearhost was started directly with the ones given.</p>
+<h3 id="service.restarting"><code>service.restarting</code></h3>
+<p><strong>Warning</strong></p>
+<p>The service is starting Nearhost again after it stopped.</p>
+<h3 id="service.ssh-agent-changes"><code>service.ssh-agent-changes</code></h3>
+<p><strong>Warning</strong></p>
+<p>SSH_AUTH_SOCK points at an agent socket that changes at each login, so the service cannot use it.</p>
+<h3 id="service.ssh-agent-unset"><code>service.ssh-agent-unset</code></h3>
+<p><strong>Note</strong></p>
+<p>SSH_AUTH_SOCK is not set, so the service uses the agent the login session provides.</p>
+<h3 id="service.start-failed"><code>service.start-failed</code></h3>
+<p><strong>Warning</strong></p>
+<p>Starting Nearhost through its service failed, so it was started directly.</p>
+<h3 id="service.takes-over"><code>service.takes-over</code></h3>
+<p><strong>Note</strong></p>
+<p>Nearhost runs, started another way, and the installed service takes over at the next login.</p>
+<h3 id="service.unreadable"><code>service.unreadable</code></h3>
+<p><strong>Warning</strong></p>
+<p>The installed service’s definition cannot be read, as one edited by hand, so it is removed as it is.</p>
+<h3 id="service.unsupported"><code>service.unsupported</code></h3>
+<p><strong>Error</strong> · status 501</p>
+<p>The Nearhost service is not supported on this system.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="configyaml">config.yaml</h2><a class="sl-anchor-link" href="#configyaml"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “config.yaml”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/reference/config/">config.yaml</a>.</p>
+<h3 id="config.bad-alias"><code>config.bad-alias</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>A project’s main name is not a valid domain, so nearhost up does not start it.</p>
+<h3 id="config.invalid"><code>config.invalid</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The config file has a value Nearhost cannot use.</p>
+<h3 id="config.loopback-own-port"><code>config.loopback-own-port</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>A project’s loopback route is on a port Nearhost itself listens on, so it is not forwarded.</p>
+<h3 id="config.missing"><code>config.missing</code></h3>
+<p><strong>Warning</strong></p>
+<p>The config file named with –config does not exist yet.</p>
+<h3 id="config.no-home"><code>config.no-home</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>Nearhost cannot tell where its files are, as HOME (or XDG_CONFIG_HOME) is not set.</p>
+<h3 id="config.pattern-conflict"><code>config.pattern-conflict</code></h3>
+<p><strong>Warning</strong></p>
+<p>A project serves a host under another project’s pattern, and gets its requests.</p>
+<h3 id="config.unknown-keys"><code>config.unknown-keys</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The config file has keys Nearhost does not know, so saving it would lose them.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="the-hosts-file">The hosts file</h2><a class="sl-anchor-link" href="#the-hosts-file"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “The hosts file”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/concepts/the-hosts-file/">The hosts file</a>.</p>
+<h3 id="hosts.core-not-told"><code>hosts.core-not-told</code></h3>
+<p><strong>Warning</strong></p>
+<p>The hosts file is updated, but the running Nearhost could not be told.</p>
+<h3 id="hosts.dns-unchecked"><code>hosts.dns-unchecked</code></h3>
+<p><strong>Note</strong></p>
+<p>Nearhost could not ask DNS directly, so it did not check whether real-domain names resolve elsewhere.</p>
+<h3 id="hosts.helper-refused"><code>hosts.helper-refused</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The elevated hosts helper refused its input or report file.</p>
+<h3 id="hosts.needs-update"><code>hosts.needs-update</code></h3>
+<p><strong>Warning</strong> · status 409</p>
+<p>The hosts file does not yet list the names Nearhost serves.</p>
+<h3 id="hosts.overlap"><code>hosts.overlap</code></h3>
+<p><strong>Warning</strong></p>
+<p>Two host patterns overlap; a name both match goes to the more specific.</p>
+<h3 id="hosts.public"><code>hosts.public</code></h3>
+<p><strong>Warning</strong></p>
+<p>A name the project is served at is a real name, so the real site is out of reach while the project is enabled.</p>
+<h3 id="hosts.read-only"><code>hosts.read-only</code></h3>
+<p><strong>Error</strong> · status 403</p>
+<p>The hosts file is read-only, so Nearhost cannot update it.</p>
+<h3 id="hosts.unreadable"><code>hosts.unreadable</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>The hosts file cannot be read.</p>
+<h3 id="hosts.unresolved"><code>hosts.unresolved</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>A name the project is served at does not resolve to this machine and is not in the hosts file.</p>
+<h3 id="hosts.unresolved-pattern"><code>hosts.unresolved-pattern</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>A pattern the project is served at does not resolve to this machine.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="the-local-ca">The local CA</h2><a class="sl-anchor-link" href="#the-local-ca"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “The local CA”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/concepts/tls-and-the-proxy/#the-local-ca">The local CA</a>.</p>
+<h3 id="ca.browsers-not-trusted"><code>ca.browsers-not-trusted</code></h3>
+<p><strong>Warning</strong></p>
+<p>The browser trust stores (NSS) do not trust the local CA.</p>
+<h3 id="ca.firefox-roots-off"><code>ca.firefox-roots-off</code></h3>
+<p><strong>Warning</strong></p>
+<p>Firefox is set not to read Windows’ trusted roots, where the local CA is trusted.</p>
+<h3 id="ca.move-failed"><code>ca.move-failed</code></h3>
+<p><strong>Warning</strong></p>
+<p>Nearhost could not move its local CA to the data directory, or could not delete the old copy.</p>
+<h3 id="ca.not-created"><code>ca.not-created</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The local CA has not been created yet.</p>
+<p>Create the local CA and trust it:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">nearhost</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">trust</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="nearhost trust"><div></div></button></div></figure></div>
+<h3 id="ca.not-private"><code>ca.not-private</code></h3>
+<p><strong>Warning</strong></p>
+<p>Nearhost could not make the folder that holds its local CA private to the user.</p>
+<h3 id="ca.not-trusted"><code>ca.not-trusted</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The system trust store does not trust the local CA.</p>
+<p>Trust the local CA:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">nearhost</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">trust</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="nearhost trust"><div></div></button></div></figure></div>
+<h3 id="ca.old-copy"><code>ca.old-copy</code></h3>
+<p><strong>Warning</strong></p>
+<p>An old folder still holds a copy of the local CA’s private key.</p>
+<h3 id="ca.unreadable"><code>ca.unreadable</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>The local CA’s certificate cannot be read.</p>
+<h3 id="trust.no-sudo"><code>trust.no-sudo</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>sudo, which trusting or untrusting the local CA needs, is not installed.</p>
+<h3 id="trust.not-removed"><code>trust.not-removed</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The local CA was not removed from a trust store, and running untrust again can finish it.</p>
+<h3 id="trust.remains"><code>trust.remains</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>Something Nearhost cannot change still trusts the local CA.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="ssh-and-forwards">SSH and forwards</h2><a class="sl-anchor-link" href="#ssh-and-forwards"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “SSH and forwards”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/concepts/ssh-transport/">SSH transport</a>.</p>
+<h3 id="forward.failed"><code>forward.failed</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>A port could not be forwarded to or from a server.</p>
+<h3 id="forward.reconnecting"><code>forward.reconnecting</code></h3>
+<p><strong>Warning</strong></p>
+<p>A forwarded port is being connected again, and serves nothing until it is.</p>
+<h3 id="passthrough.closed"><code>passthrough.closed</code></h3>
+<p><strong>Warning</strong></p>
+<p>Nearhost closed a port it had opened for a coding agent, as the server or the port went away.</p>
+<h3 id="ssh.agent-missing"><code>ssh.agent-missing</code></h3>
+<p><strong>Note</strong></p>
+<p>The OpenSSH Authentication Agent is not installed on Windows.</p>
+<h3 id="ssh.agent-stopped"><code>ssh.agent-stopped</code></h3>
+<p><strong>Note</strong></p>
+<p>The OpenSSH Authentication Agent service on Windows is not running.</p>
+<h3 id="ssh.auth-failed"><code>ssh.auth-failed</code></h3>
+<p><strong>Error</strong> · status 403</p>
+<p>SSH refused to log in to a server.</p>
+<h3 id="ssh.config-conflict"><code>ssh.config-conflict</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The user’s SSH configuration for a server sets options Nearhost cannot keep out of its own connections.</p>
+<h3 id="ssh.not-found"><code>ssh.not-found</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>ssh cannot be run, from this shell’s PATH or that of Nearhost in the background, so Nearhost cannot reach servers.</p>
+<h3 id="ssh.other-vendor"><code>ssh.other-vendor</code></h3>
+<p><strong>Warning</strong></p>
+<p>The ssh Nearhost runs on Windows is not Microsoft’s OpenSSH.</p>
+<h3 id="ssh.socket-path-too-long"><code>ssh.socket-path-too-long</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The path of an SSH socket is longer than the system allows.</p>
+<h3 id="ssh.stale-master"><code>ssh.stale-master</code></h3>
+<p><strong>Warning</strong></p>
+<p>An SSH connection left by an earlier run could not be ended.</p>
+<h3 id="ssh.too-old"><code>ssh.too-old</code></h3>
+<p><strong>Warning</strong></p>
+<p>The ssh on PATH is older than the one Nearhost needs.</p>
+<h3 id="ssh.unreachable"><code>ssh.unreachable</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>A server cannot be reached over SSH.</p>
+<h3 id="ssh.version-unknown"><code>ssh.version-unknown</code></h3>
+<p><strong>Note</strong></p>
+<p>Nearhost could not read the version of the ssh on PATH.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="docker">Docker</h2><a class="sl-anchor-link" href="#docker"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Docker”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/guides/container-callbacks/">Callbacks from Docker containers</a>.</p>
+<h3 id="docker.ca"><code>docker.ca</code></h3>
+<p><strong>Warning</strong></p>
+<p>A container calls a name Nearhost serves and does not trust Nearhost’s root certificate.</p>
+<h3 id="docker.clients"><code>docker.clients</code></h3>
+<p><strong>Warning</strong></p>
+<p>A container calls a name Nearhost serves, and Nearhost does not accept requests from Docker’s network.</p>
+<h3 id="docker.compose-depth"><code>docker.compose-depth</code></h3>
+<p><strong>Warning</strong></p>
+<p>The Compose file nests or repeats merges too much to check.</p>
+<h3 id="docker.compose-file"><code>docker.compose-file</code></h3>
+<p><strong>Note</strong></p>
+<p>COMPOSE_FILE is set, and Nearhost checks only the Compose files Compose reads by default.</p>
+<h3 id="docker.compose-parse"><code>docker.compose-parse</code></h3>
+<p><strong>Warning</strong></p>
+<p>The Compose file is not valid YAML, so its services were not checked.</p>
+<h3 id="docker.host-gateway"><code>docker.host-gateway</code></h3>
+<p><strong>Warning</strong></p>
+<p>A container calls a name that resolves to itself or to the internet, not to Nearhost.</p>
+<h3 id="docker.networks-failed"><code>docker.networks-failed</code></h3>
+<p><strong>Warning</strong></p>
+<p>Nearhost could not start accepting requests from new Docker networks.</p>
+<h3 id="docker.unreachable"><code>docker.unreachable</code></h3>
+<p><strong>Warning</strong></p>
+<p>Docker did not answer, so requests from containers are not accepted yet.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="updates">Updates</h2><a class="sl-anchor-link" href="#updates"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Updates”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/reference/cli/#nearhost-update">nearhost update</a>.</p>
+<h3 id="update.available"><code>update.available</code></h3>
+<p><strong>Note</strong></p>
+<p>A newer release of Nearhost is available.</p>
+<p>Update it:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">nearhost</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">update</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="nearhost update"><div></div></button></div></figure></div>
+<h3 id="update.check-failed"><code>update.check-failed</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>Nearhost could not find out whether a newer release exists.</p>
+<h3 id="update.failed"><code>update.failed</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>The update ran, but the installed nearhost is not the new release.</p>
+<h3 id="update.next-homebrew"><code>update.next-homebrew</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>Betas are not published to Homebrew.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="the-interface">The interface</h2><a class="sl-anchor-link" href="#the-interface"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “The interface”</span></a></div>
+<h3 id="interface.address-too-long"><code>interface.address-too-long</code></h3>
+<p><strong>Warning</strong></p>
+<p>An address in the log is too long to show, so a click does not open it.</p>
+<h3 id="interface.answer-not-saved"><code>interface.answer-not-saved</code></h3>
+<p><strong>Warning</strong></p>
+<p>The quit box’s answer could not be saved, so it asks again next time.</p>
+<h3 id="interface.change-ignored"><code>interface.change-ignored</code></h3>
+<p><strong>Warning</strong></p>
+<p>A change to the config file could not be applied and was ignored.</p>
+<h3 id="interface.copy-failed"><code>interface.copy-failed</code></h3>
+<p><strong>Warning</strong></p>
+<p>The system’s clipboard tool failed on a copy; the terminal may still have copied it.</p>
+<h3 id="interface.flags-ignored"><code>interface.flags-ignored</code></h3>
+<p><strong>Note</strong></p>
+<p>Serve flags given to the interface do nothing to the Nearhost already running, which keeps its settings.</p>
+<h3 id="interface.log-missed"><code>interface.log-missed</code></h3>
+<p><strong>Note</strong></p>
+<p>The interface fell behind the running Nearhost, so some log lines were missed.</p>
+<h3 id="interface.no-terminal"><code>interface.no-terminal</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The interface needs a terminal, and there is none.</p>
+<p>Run it in the background:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">nearhost</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#82AAFF;--1:#3B61B0">-d</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="nearhost -d"><div></div></button></div></figure></div>
+<p>Or serve without the interface:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">nearhost</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">up</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="nearhost up"><div></div></button></div></figure></div>
+<h3 id="interface.nothing-to-copy"><code>interface.nothing-to-copy</code></h3>
+<p><strong>Warning</strong></p>
+<p>What the interface was asked to copy has nothing it can copy.</p>
+<h3 id="interface.open-failed"><code>interface.open-failed</code></h3>
+<p><strong>Warning</strong></p>
+<p>The interface could not open a link in the browser.</p>
+<h3 id="interface.password-cancelled"><code>interface.password-cancelled</code></h3>
+<p><strong>Error</strong> · status 403</p>
+<p>The password was cancelled, so what needed it was not done.</p>
+<h3 id="interface.prompt-declined"><code>interface.prompt-declined</code></h3>
+<p><strong>Error</strong> · status 403</p>
+<p>The Windows prompt was declined, so what needed it was not done.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="adding-and-exporting-projects">Adding and exporting projects</h2><a class="sl-anchor-link" href="#adding-and-exporting-projects"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Adding and exporting projects”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/getting-started/add-a-project/">Add a project</a>.</p>
+<h3 id="add.alias-taken"><code>add.alias-taken</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The name the project asks to be served at is already another project’s.</p>
+<h3 id="add.bad-alias"><code>add.bad-alias</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The domain the project would be served at is not one Nearhost can serve, so nothing was saved.</p>
+<h3 id="add.bad-config"><code>add.bad-config</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The config file cannot be read, so nothing is added to it.</p>
+<h3 id="add.bad-name"><code>add.bad-name</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The project’s name is not one Nearhost can use.</p>
+<h3 id="add.host-taken"><code>add.host-taken</code></h3>
+<p><strong>Note</strong></p>
+<p>A name the project would be served at is already another project’s, so it is left out.</p>
+<h3 id="add.lone-port"><code>add.lone-port</code></h3>
+<p><strong>Warning</strong></p>
+<p>Discovery found one port only, so nearhost add made it the web route.</p>
+<h3 id="add.name-taken"><code>add.name-taken</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>Another project already has the name the project would be added under.</p>
+<h3 id="add.needs-approval"><code>add.needs-approval</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The project asks for things that need approval, and there is nobody to ask.</p>
+<h3 id="add.no-directory"><code>add.no-directory</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>There is no directory at the path given to nearhost add.</p>
+<h3 id="add.no-web-port"><code>add.no-web-port</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>nearhost add could not tell which port serves the project, so nothing was saved.</p>
+<h3 id="add.relative-path"><code>add.relative-path</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>A project on a server was given a relative path, which Nearhost cannot find there.</p>
+<h3 id="add.server-changed"><code>add.server-changed</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The server was added meanwhile and is reached another way, so nothing was saved.</p>
+<h3 id="add.unknown-server"><code>add.unknown-server</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>The server named is not in the config.</p>
+<h3 id="discovery.incomplete"><code>discovery.incomplete</code></h3>
+<p><strong>Warning</strong></p>
+<p>Something discovery reads, such as a preset or a project file, could not be read, so it went on without it.</p>
+<h3 id="export.changed"><code>export.changed</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The project changed while it was exported, so the file written is not approved.</p>
+<h3 id="export.exists"><code>export.exists</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The project already has a .nearhostrc, and export does not replace one unasked.</p>
+<h3 id="export.no-project"><code>export.no-project</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>No Nearhost project contains the folder, or none has the name given.</p>
+<h3 id="export.replaced-pending"><code>export.replaced-pending</code></h3>
+<p><strong>Note</strong></p>
+<p>The .nearhostrc change that waited for approval was replaced with what is served now.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="presets">Presets</h2><a class="sl-anchor-link" href="#presets"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Presets”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/concepts/presets-and-registries/">Presets and registries</a>.</p>
+<h3 id="preset.local-file"><code>preset.local-file</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The preset is a local file, so there is no registry to update it from.</p>
+<h3 id="preset.not-enabled"><code>preset.not-enabled</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>The preset named is not enabled.</p>
+<h3 id="preset.not-updated"><code>preset.not-updated</code></h3>
+<p><strong>Warning</strong></p>
+<p>A preset could not be updated from its registry.</p>
+<h3 id="preset.registry-in-use"><code>preset.registry-in-use</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>Presets from the registry are enabled, so it cannot be removed.</p>
+<h3 id="preset.registry-not-trusted"><code>preset.registry-not-trusted</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>A registry’s index could not be fetched or checked, so it was not trusted and nothing was saved.</p>
+<h3 id="preset.registry-unknown"><code>preset.registry-unknown</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>No registry is trusted under the name given.</p>
+<h3 id="preset.registry-unreadable"><code>preset.registry-unreadable</code></h3>
+<p><strong>Warning</strong></p>
+<p>A trusted registry of presets cannot be read, so its presets are left out.</p>
+<h3 id="preset.unknown"><code>preset.unknown</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>No preset or registry has the name given.</p>
+<h3 id="preset.updates-failed"><code>preset.updates-failed</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>Some of the presets asked for could not be updated from their registries.</p>
+<h3 id="presets.note"><code>presets.note</code></h3>
+<p><strong>Note</strong></p>
+<p>A note from the preset that matched the project.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="project-checks">Project checks</h2><a class="sl-anchor-link" href="#project-checks"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Project checks”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/reference/cli/#project-checks">Project checks</a>.</p>
+<h3 id="doctor.checks-failed"><code>doctor.checks-failed</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>One or more of nearhost doctor’s checks failed.</p>
+<h3 id="doctor.not-checked"><code>doctor.not-checked</code></h3>
+<p><strong>Note</strong></p>
+<p>nearhost doctor could not run a check, and says what it did not check.</p>
+<h3 id="nearhostrc.gone"><code>nearhostrc.gone</code></h3>
+<p><strong>Warning</strong></p>
+<p>The project’s .nearhostrc is gone or cannot be read, and Nearhost still serves what it last said.</p>
+<h3 id="nearhostrc.invalid"><code>nearhostrc.invalid</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The project’s .nearhostrc cannot be read.</p>
+<h3 id="nearhostrc.not-applied"><code>nearhostrc.not-applied</code></h3>
+<p><strong>Warning</strong></p>
+<p>The project’s .nearhostrc has changed since Nearhost last read it.</p>
+<h3 id="nearhostrc.pending"><code>nearhostrc.pending</code></h3>
+<p><strong>Warning</strong></p>
+<p>The project’s .nearhostrc has changes that wait for approval.</p>
+<h3 id="nearhostrc.unset-variable"><code>nearhostrc.unset-variable</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The project’s .nearhostrc uses a variable that is not set.</p>
+<h3 id="nearhostrc.version"><code>nearhostrc.version</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The project’s .nearhostrc needs a newer Nearhost.</p>
+<h3 id="projects.none"><code>projects.none</code></h3>
+<p><strong>Note</strong></p>
+<p>There are no projects to list or serve yet.</p>
+<h3 id="projects.unchecked"><code>projects.unchecked</code></h3>
+<p><strong>Note</strong></p>
+<p>Nearhost could not run the project’s checks, for example because its server is not reachable.</p>
+<h3 id="routes.not-listening"><code>routes.not-listening</code></h3>
+<p><strong>Warning</strong></p>
+<p>Nothing listens on a port Nearhost serves for the project.</p>
+<h3 id="routes.stale-port"><code>routes.stale-port</code></h3>
+<p><strong>Note</strong></p>
+<p>A web route’s port matches nothing in the project’s files any more.</p>
+<h3 id="routes.unserved-host"><code>routes.unserved-host</code></h3>
+<p><strong>Warning</strong></p>
+<p>The project’s settings name a host that Nearhost does not serve.</p>
+<h3 id="routes.unserved-port"><code>routes.unserved-port</code></h3>
+<p><strong>Warning</strong></p>
+<p>A port in the project’s files looks like a web server, but the project has no route for it.</p>
+<h3 id="advice"><code>advice.&lt;id&gt;</code></h3>
+<p><strong>Warning</strong></p>
+<p>Advice from the preset that matched the project.</p>
+<p><code dir="auto">&lt;id&gt;</code> is the advisory’s id, so <code dir="auto">advice.vite-default-port</code> is the <code dir="auto">vite-default-port</code> advisory. See <a href="/pr-preview/pr-142/docs/reference/advisories/">Advisories</a> for each one and its fix.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="coding-agents">Coding agents</h2><a class="sl-anchor-link" href="#coding-agents"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Coding agents”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/coding-agents/how-it-works/">How agents reach Nearhost</a>.</p>
+<h3 id="agent.bad-path"><code>agent.bad-path</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>A path in an agent’s request is not one Nearhost takes, such as a relative or network path.</p>
+<h3 id="agent.bad-request"><code>agent.bad-request</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>An agent’s request, or a value in it, is not what the call takes.</p>
+<h3 id="agent.closed-while-opening"><code>agent.closed-while-opening</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The agent’s session closed while its passthrough opened, so the passthrough was closed again.</p>
+<h3 id="agent.doctor-busy"><code>agent.doctor-busy</code></h3>
+<p><strong>Error</strong> · status 429</p>
+<p>A doctor run for the agent’s server is already going, or started moments ago.</p>
+<h3 id="agent.doctor-failed"><code>agent.doctor-failed</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>The doctor could not check what an agent asked about.</p>
+<h3 id="agent.document-failed"><code>agent.document-failed</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>Nearhost could not read or show the document an agent asked to show.</p>
+<h3 id="agent.document-not-there"><code>agent.document-not-there</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>The document an agent asked to show is not there.</p>
+<h3 id="agent.grants-failed"><code>agent.grants-failed</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>Nearhost could not read the grants that let an agent’s requests open without asking.</p>
+<h3 id="agent.local-passthrough"><code>agent.local-passthrough</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>A passthrough was asked for on the laptop’s own socket, and passthroughs forward a server’s port.</p>
+<h3 id="agent.nearhostrc-unread"><code>agent.nearhostrc-unread</code></h3>
+<p><strong>Error</strong> · status 422</p>
+<p>A project’s .nearhostrc could not be taken into account when an agent asked to reload it.</p>
+<h3 id="agent.no-page"><code>agent.no-page</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>Nearhost’s page is not served, so it cannot show an agent’s document.</p>
+<h3 id="agent.no-project"><code>agent.no-project</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>No project in Nearhost holds the path the agent asked about.</p>
+<h3 id="agent.no-reviewer"><code>agent.no-reviewer</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>An agent’s request needs the user’s answer, and Nearhost has no page or window open to ask in.</p>
+<h3 id="agent.no-such-call"><code>agent.no-such-call</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>The agent API has no call at the path asked for, or this Nearhost does not have that call.</p>
+<h3 id="agent.no-token"><code>agent.no-token</code></h3>
+<p><strong>Error</strong> · status 401</p>
+<p>A request to the agent API’s loopback port came without its token, as from an older copy of the skill.</p>
+<h3 id="agent.not-a-directory"><code>agent.not-a-directory</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>The directory an agent asked the doctor about is not there.</p>
+<h3 id="agent.not-a-document"><code>agent.not-a-document</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>What an agent asked to show is not a document Nearhost can show.</p>
+<h3 id="agent.not-connected"><code>agent.not-connected</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>Nearhost is not connected to the agent’s server.</p>
+<h3 id="agent.passthrough-failed"><code>agent.passthrough-failed</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>A passthrough’s forward could not be opened or closed.</p>
+<h3 id="agent.port-held"><code>agent.port-held</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>Another agent or session has the port passed through, or waiting for approval.</p>
+<h3 id="agent.refused"><code>agent.refused</code></h3>
+<p><strong>Error</strong> · status 429</p>
+<p>The user said No to a request of the same kind from the agent’s machine moments ago, so this one is refused for now.</p>
+<h3 id="agent.reload-failed"><code>agent.reload-failed</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>Nearhost could not read a project’s .nearhostrc again for an agent.</p>
+<h3 id="agent.request-gone"><code>agent.request-gone</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>The proposal, passthrough or document request an agent asked about is not known; it may have ended long ago.</p>
+<h3 id="agent.token-revoked"><code>agent.token-revoked</code></h3>
+<p><strong>Error</strong> · status 401</p>
+<p>The token an agent sent was revoked or never existed.</p>
+<h3 id="agent.too-many-passthroughs"><code>agent.too-many-passthroughs</code></h3>
+<p><strong>Error</strong> · status 429</p>
+<p>The agent’s server has as many passthroughs open as it may.</p>
+<h3 id="agent.too-many-waiting"><code>agent.too-many-waiting</code></h3>
+<p><strong>Error</strong> · status 429</p>
+<p>The agent’s machine has as many requests waiting for the user as it may.</p>
+<h3 id="agents.allow-not-saved"><code>agents.allow-not-saved</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>A request was answered, but its Always allow could not be saved, so the agent is asked again next time.</p>
+<h3 id="agents.approval-waiting"><code>agents.approval-waiting</code></h3>
+<p><strong>Note</strong></p>
+<p>A coding agent asks for something that waits for approval in the interface.</p>
+<h3 id="agents.grants-off"><code>agents.grants-off</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>Grants cannot be read or changed, as the grants file cannot be read or Nearhost does not serve coding agents in this run.</p>
+<h3 id="agents.grants-pruned"><code>agents.grants-pruned</code></h3>
+<p><strong>Note</strong></p>
+<p>Grants of projects that are gone were removed.</p>
+<h3 id="agents.not-ready"><code>agents.not-ready</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>Coding agents on a server cannot reach Nearhost yet.</p>
+<h3 id="agents.path-too-long"><code>agents.path-too-long</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The socket coding agents use would have a path longer than the server allows.</p>
+<h3 id="agents.refused"><code>agents.refused</code></h3>
+<p><strong>Error</strong> · status 403</p>
+<p>The server’s SSH daemon refused to forward the socket coding agents use.</p>
+<h3 id="agents.unavailable"><code>agents.unavailable</code></h3>
+<p><strong>Warning</strong></p>
+<p>Coding agents on a server cannot reach Nearhost.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="documents">Documents</h2><a class="sl-anchor-link" href="#documents"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Documents”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/coding-agents/documents/">Documents</a>.</p>
+<h3 id="documents.changing"><code>documents.changing</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>The document’s folder kept changing while Nearhost checked it.</p>
+<h3 id="documents.method-not-allowed"><code>documents.method-not-allowed</code></h3>
+<p><strong>Error</strong> · status 405</p>
+<p>The document server was asked with a method it does not take.</p>
+<h3 id="documents.missing"><code>documents.missing</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>The document asked for is not there any more.</p>
+<h3 id="documents.not-connected"><code>documents.not-connected</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>Nearhost is not connected to the server that holds the document.</p>
+<h3 id="documents.not-found"><code>documents.not-found</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>The document server has nothing at the path asked for.</p>
+<h3 id="documents.open-failed"><code>documents.open-failed</code></h3>
+<p><strong>Warning</strong></p>
+<p>A document could not be opened in the browser; its address still works.</p>
+<h3 id="documents.unreadable"><code>documents.unreadable</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>The document could not be read.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="nearhosts-page">Nearhost’s page</h2><a class="sl-anchor-link" href="#nearhosts-page"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Nearhost’s page”</span></a></div>
+<p>See <a href="/pr-preview/pr-142/docs/guides/run-in-the-background/#nearhosts-page">Nearhost’s page</a>.</p>
+<h3 id="page.answer-failed"><code>page.answer-failed</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>The core could not take the answer given on the page.</p>
+<h3 id="page.answer-not-offered"><code>page.answer-not-offered</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The answer sent is not one the request offers.</p>
+<h3 id="page.change-answer-invalid"><code>page.change-answer-invalid</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The answer sent for a .nearhostrc change is not approve or decline for the change shown.</p>
+<h3 id="page.change-changed"><code>page.change-changed</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The .nearhostrc change changed again, so the answer was not for the change now waiting.</p>
+<h3 id="page.not-opened"><code>page.not-opened</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>The answer ended the request, as what it asked for could not be opened.</p>
+<h3 id="page.proposal-decline-only"><code>page.proposal-decline-only</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>A proposal can only be declined on the page; reviewing it needs Nearhost on this machine.</p>
+<h3 id="page.render-failed"><code>page.render-failed</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>Nearhost’s page could not be drawn.</p>
+<h3 id="page.request-ended"><code>page.request-ended</code></h3>
+<p><strong>Warning</strong> · status 409</p>
+<p>The request on the page has been answered or has ended.</p>
+<h3 id="proxy.app-not-answering"><code>proxy.app-not-answering</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>Nothing answered on the port a project’s app listens on.</p>
+<h3 id="proxy.forbidden"><code>proxy.forbidden</code></h3>
+<p><strong>Error</strong> · status 403</p>
+<p>A request to Nearhost’s page was refused.</p>
+<h3 id="proxy.forward-reconnecting"><code>proxy.forward-reconnecting</code></h3>
+<p><strong>Error</strong> · status 502</p>
+<p>The forward to a project’s server is down while Nearhost reconnects it.</p>
+<h3 id="proxy.locked"><code>proxy.locked</code></h3>
+<p><strong>Error</strong> · status 403</p>
+<p>Nearhost’s page must be opened from this machine first, to get its cookie.</p>
+<h3 id="proxy.method-not-allowed"><code>proxy.method-not-allowed</code></h3>
+<p><strong>Error</strong> · status 405</p>
+<p>A path of Nearhost’s page was asked with a method it does not take.</p>
+<h3 id="proxy.not-found"><code>proxy.not-found</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>Nearhost’s page at a project’s domain has nothing at the path asked for.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="networked-mode-and-paired-devices">Networked mode and paired devices</h2><a class="sl-anchor-link" href="#networked-mode-and-paired-devices"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “Networked mode and paired devices”</span></a></div>
+<h3 id="devices.unknown"><code>devices.unknown</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>No paired device has the name asked for.</p>
+<h3 id="network.apply-failed"><code>network.apply-failed</code></h3>
+<p><strong>Error</strong> · status 500</p>
+<p>Nearhost could not change how it serves to other devices on the network after the config changed.</p>
+<h3 id="network.cert"><code>network.cert</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>The certificate for Nearhost’s page on the network is missing or not the one the config asks for.</p>
+<h3 id="network.devices-unavailable"><code>network.devices-unavailable</code></h3>
+<p><strong>Warning</strong></p>
+<p>Nearhost could not open its list of paired devices, so no other device can pair or sign in.</p>
+<h3 id="network.dns"><code>network.dns</code></h3>
+<p><strong>Warning</strong></p>
+<p>The name of Nearhost’s page on the network does not point at this machine.</p>
+<h3 id="network.firewall"><code>network.firewall</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>The firewall does not let other devices reach Nearhost.</p>
+<h3 id="network.firewall-refused"><code>network.firewall-refused</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The elevated firewall helper refused a program other than the one running, or its input or report file.</p>
+<h3 id="network.no-page"><code>network.no-page</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>Networked mode needs Nearhost’s page, where devices pair, and the page is not served.</p>
+<h3 id="network.no-token"><code>network.no-token</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>Networked mode gets its certificate with a DNS token, and none is set.</p>
+<h3 id="network.not-listening"><code>network.not-listening</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>Networked mode is on, but Nearhost does not serve to the network yet, so no device could reach it.</p>
+<h3 id="network.off"><code>network.off</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>Something was asked that needs networked mode, and the config does not turn it on.</p>
+<h3 id="pair.bad-target"><code>pair.bad-target</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>A device asked to be signed in to an address outside the network domain.</p>
+<h3 id="pair.code-invalid"><code>pair.code-invalid</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>The pairing code typed on a device is wrong, has been used or has expired.</p>
+<p>Get a new code on the machine Nearhost runs on:</p>
+<div class="expressive-code"><figure class="frame is-terminal not-content"><figcaption class="header"><span class="title"></span><span class="sr-only">Terminal window</span></figcaption><pre data-language="sh"><code><div class="ec-line"><div class="code"><span style="--0:#82AAFF;--1:#3B61B0">nearhost</span><span style="--0:#D6DEEB;--1:#403F53"> </span><span style="--0:#ECC48D;--1:#3B61B0">pair</span></div></div></code></pre><div class="copy"><div aria-live="polite"></div><button title="Copy to clipboard" data-copied="Copied!" data-code="nearhost pair"><div></div></button></div></figure></div>
+<h3 id="pair.link-used"><code>pair.link-used</code></h3>
+<p><strong>Error</strong> · status 403</p>
+<p>The link that signs a paired device in to a site has been used or has expired.</p>
+<h3 id="pair.needed"><code>pair.needed</code></h3>
+<p><strong>Error</strong> · status 401</p>
+<p>A site on the network domain was asked for by a device that is not paired.</p>
+<h3 id="pair.too-many-tries"><code>pair.too-many-tries</code></h3>
+<p><strong>Error</strong> · status 429</p>
+<p>A device made too many wrong attempts to pair or sign in, so it must wait.</p>
+<h3 id="pair.unavailable"><code>pair.unavailable</code></h3>
+<p><strong>Error</strong> · status 503</p>
+<p>A site on the network domain needs a paired device, and Nearhost’s page, where devices pair, is not served.</p>
+<div class="sl-heading-wrapper level-h2"><h2 id="the-control-api">The control API</h2><a class="sl-anchor-link" href="#the-control-api"><span aria-hidden="true" class="sl-anchor-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m12.11 15.39-3.88 3.88a2.52 2.52 0 0 1-3.5 0 2.47 2.47 0 0 1 0-3.5l3.88-3.88a1 1 0 1 0-1.42-1.42l-3.88 3.89a4.48 4.48 0 0 0 6.33 6.33l3.89-3.88a1 1 0 0 0-1.42-1.42m8.58-12.08a4.49 4.49 0 0 0-6.33 0l-3.89 3.88a1 1 0 1 0 1.42 1.42l3.88-3.88a2.52 2.52 0 0 1 3.5 0 2.47 2.47 0 0 1 0 3.5l-3.88 3.88a1 1 0 0 0 0 1.42 1 1 0 0 0 1.42 0l3.88-3.89a4.49 4.49 0 0 0 0-6.33M8.83 15.17a1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.92-4.92a1 1 0 1 0-1.42-1.42l-4.92 4.92a1 1 0 0 0 0 1.42"></path></svg></span><span class="sr-only" data-pagefind-ignore>Section titled “The control API”</span></a></div>
+<h3 id="control.bad-request"><code>control.bad-request</code></h3>
+<p><strong>Error</strong> · status 400</p>
+<p>A request to the control API is not what the route takes.</p>
+<h3 id="control.method-not-allowed"><code>control.method-not-allowed</code></h3>
+<p><strong>Error</strong> · status 405</p>
+<p>A route of the control API was asked with a method it does not take.</p>
+<h3 id="control.no-route"><code>control.no-route</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>The control API has no route at the path asked for; the running Nearhost may be an older release.</p>
+<h3 id="control.not-found"><code>control.not-found</code></h3>
+<p><strong>Error</strong> · status 404</p>
+<p>The running Nearhost does not have what was asked for, such as a request it no longer keeps.</p>
+<h3 id="control.request-ended"><code>control.request-ended</code></h3>
+<p><strong>Error</strong> · status 409</p>
+<p>The request to answer has ended: the agent gave up on it, it expired, or someone answered it first.</p>
+<h3 id="control.unimplemented"><code>control.unimplemented</code></h3>
+<p><strong>Error</strong> · status 501</p>
+<p>The running Nearhost cannot do what was asked yet.</p>
+</div><footer class="sl-flex astro-ddtxxk7k"><div class="meta sl-flex astro-ddtxxk7k"><a href="https://github.com/nearhost/landing/edit/main/src/content/docs/docs/reference/errors.md" class="sl-flex print:hidden astro-qlekgd3o"><svg aria-hidden="true" class="astro-qlekgd3o astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.2em;"><path d="M22 7.24a1 1 0 0 0-.29-.71l-4.24-4.24a1 1 0 0 0-1.1-.22 1 1 0 0 0-.32.22l-2.83 2.83L2.29 16.05a1 1 0 0 0-.29.71V21a1 1 0 0 0 1 1h4.24a1 1 0 0 0 .76-.29l10.87-10.93L21.71 8c.1-.1.17-.2.22-.33a1 1 0 0 0 0-.24v-.14l.07-.05ZM6.83 20H4v-2.83l9.93-9.93 2.83 2.83L6.83 20ZM18.17 8.66l-2.83-2.83 1.42-1.41 2.82 2.82-1.41 1.42Z"/></svg>Edit page</a><p>Last updated: <time datetime="2026-11-26T18:06:28.000Z">Nov 26, 2026</time></p></div><div class="pagination-links print:hidden astro-b5raizh3" dir="ltr"><a href="/pr-preview/pr-142/docs/reference/advisories/" rel="prev" class="astro-b5raizh3"><svg aria-hidden="true" class="astro-b5raizh3 astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-b5raizh3">Previous<br class="astro-b5raizh3"><span class="link-title astro-b5raizh3">Advisories</span></span></a><a href="/pr-preview/pr-142/docs/troubleshooting/troubleshooting/" rel="next" class="astro-b5raizh3"><svg aria-hidden="true" class="astro-b5raizh3 astro-hkc32dio" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-b5raizh3">Next<br class="astro-b5raizh3"><span class="link-title astro-b5raizh3">Troubleshooting</span></span></a></div></footer><footer class="footer astro-ocqibz2a"><div class="inner astro-ocqibz2a"><div class="brand astro-ocqibz2a"><svg width="22" height="22" viewBox="0 0 64 64" aria-hidden="true" class="mark astro-4pt2nqzy"><path d="M14 56V32a18 18 0 0 1 36 0v24" fill="none" stroke="var(--nh-mark-arch)" stroke-width="11" stroke-linecap="round" class="astro-4pt2nqzy"></path><circle cx="32" cy="48" r="6" fill="var(--nh-mark-dot)" class="astro-4pt2nqzy"></circle></svg><span class="astro-ocqibz2a">nearhost · <span data-version class="astro-ocqibz2a">v0.16.0</span> · MIT licence</span></div><div class="links astro-ocqibz2a"><a href="/pr-preview/pr-142/docs/getting-started/introduction/" class="astro-ocqibz2a">Docs</a><a href="https://github.com/nearhost/nearhost" class="astro-ocqibz2a">GitHub</a><a href="https://github.com/nearhost/nearhost/releases" class="astro-ocqibz2a">Releases</a></div></div></footer></div></div></main></div></div></div></div></body></html>
