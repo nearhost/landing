@@ -64,6 +64,7 @@ export default defineConfig({
             `- [Clerk sign-in on a remote dev server](${twin('docs/guides/clerk-sign-in')})`,
             `- [Cognito sign-in on a remote dev server](${twin('docs/guides/cognito-sign-in')})`,
             `- [The iOS Simulator from another Mac](${twin('docs/guides/ios-simulator-from-another-mac')})`,
+            `- [ESP32 firmware in the browser](${twin('docs/guides/esp32-boards-in-the-browser')})`,
             '',
             docsIndex(fileURLToPath(new URL('./src/content/docs/', import.meta.url)), site),
           ].join('\n'),

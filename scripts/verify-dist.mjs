@@ -626,7 +626,7 @@ if (existsSync(notFound)) {
 }
 
 // 13. Each new guide exists, says which Nearhost it needs, and is listed in llms.txt.
-const newGuides = ['ios-simulator-from-another-mac'];
+const newGuides = ['ios-simulator-from-another-mac', 'esp32-boards-in-the-browser'];
 const llmsFile = join(dist, 'llms.txt');
 const llmsText = existsSync(llmsFile) ? readFileSync(llmsFile, 'utf8') : '';
 for (const slug of newGuides) {
