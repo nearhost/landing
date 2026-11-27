@@ -155,11 +155,16 @@ const tiles = ['pick', 'tile', 'tile', 'tile', 'tile', 'tile', 'tile', 'alarm'];
   .spin {
     color: #c75b4e;
   }
-  /* The prompt as sent, wrapped under its first word. */
   .you {
     background: #373737;
     margin-inline: -2ch;
-    padding-inline: 4ch 2ch;
+    padding-inline: 2ch;
+  }
+  /* The prompt as sent, wrapped under its first word. This outranks Terminal's .h2 indent,
+     which the bar's -2ch margin would otherwise pull onto the pane's edge. */
+  .cc .you {
+    padding-left: 4ch;
+    text-indent: -2ch;
   }
   /* A tool call's ⎿ line, wrapped under its command. */
   .h5 {
