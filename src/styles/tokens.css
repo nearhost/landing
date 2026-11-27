@@ -32,18 +32,18 @@
 }
 
 :root {
-  --nh-ground: #0f1210;
-  --nh-surface: #161a17;
-  --nh-raised: #1d221e;
-  --nh-line: #2a312b;
-  --nh-text: #ecefe8;
-  --nh-body: #c5ccc6;
-  --nh-muted: #a4ada5;
+  --nh-ground: #111013;
+  --nh-surface: #19171c;
+  --nh-raised: #231f27;
+  --nh-line: #2f2a33;
+  --nh-text: #f4eef2;
+  --nh-body: #d9ccd5;
+  --nh-muted: #b9a8b4;
   /* The quietest text colour that still reads at 4.5:1 on the ground, surface and raised. */
-  --nh-faint: #818a82;
-  --nh-accent: #d6f26b;
-  --nh-accent-ink: #0f1210;
-  --nh-mark-arch: var(--nh-accent);
+  --nh-faint: #a08f9b;
+  --nh-accent: #ff70c8;
+  --nh-accent-ink: #111013;
+  --nh-mark-chevron: var(--nh-accent);
   --nh-mark-dot: var(--nh-text);
 
   --nh-running: #7fdb8a;
@@ -67,16 +67,16 @@
 }
 
 :root[data-theme='light'] {
-  --nh-ground: #f4f5f1;
+  --nh-ground: #f6f4f6;
   --nh-surface: #ffffff;
-  --nh-raised: #e6e9e0;
-  --nh-line: #dde0d9;
-  --nh-text: #1b1f1c;
-  --nh-body: #3e463f;
-  --nh-muted: #5c645d;
-  --nh-faint: #626b63;
-  --nh-accent: #4a6200;
+  --nh-raised: #ebe7eb;
+  --nh-line: #ddd7dc;
+  --nh-text: #1e1820;
+  --nh-body: #40363f;
+  --nh-muted: #5b4f5a;
+  --nh-faint: #675b66;
+  --nh-accent: #b0156c;
   --nh-accent-ink: #ffffff;
-  --nh-mark-arch: var(--nh-text);
-  --nh-mark-dot: #d6f26b;
+  --nh-mark-chevron: var(--nh-text);
+  --nh-mark-dot: var(--nh-accent);
 }
