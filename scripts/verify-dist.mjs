@@ -155,6 +155,14 @@ if (existsSync(index)) {
   for (const question of faq?.mainEntity ?? []) {
     check(headings.includes(question.name), `FAQ "${question.name}" is not on the page`);
   }
+  check(
+    headings.includes('Can I use Nearhost from a tablet or phone?'),
+    'the FAQ must answer whether Nearhost works from a tablet or phone',
+  );
+  check(
+    /<meta name="description" content="[^"]*tablet or phone/.test(html),
+    'the home page description must mention a tablet or phone',
+  );
   // Both demos hold sample data that must not be quoted as real.
   check(
     /<div class="(?:[^"]*\s)?frame(?:\s[^"]*)?"[^>]*\sdata-nosnippet[\s=>]/.test(html) &&

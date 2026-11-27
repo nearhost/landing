@@ -13,6 +13,10 @@ const faqs = [
     a: 'Nearhost runs on macOS, Linux and Windows 11, on Apple silicon, Intel and ARM. The server can be any machine you reach with <code>ssh</code>: a desktop under the desk, a home server, a VPS or a VM. Linux needs one extra step to bind ports 80 and 443 and to trust the certificate in your browser. On Windows, a project inside WSL2 is added as a server you reach over SSH.',
   },
   {
+    q: 'Can I use Nearhost from a tablet or phone?',
+    a: "Yes, from 0.17.0. Run Nearhost's web app on a machine that stays on, such as a home server, and open it on your tablet or phone. It lists your projects, opens them in the browser, and lets you answer what coding agents ask, so you don't need a terminal.",
+  },
+  {
     q: 'Does it work with my framework?',
     a: 'Nearhost routes ports, so it works with any HTTP dev server, such as Laravel, Rails, Django, Next.js or Vite. It finds ports in <code>.env</code>, and presets add Docker Compose, Vite and Laravel Sail. For anything else, give it the web port.',
   },

@@ -1,5 +1,5 @@
 ---
-title: ESP32 firmware in the browser
+title: ESP32 firmware in the browser, with Preflash
 description: Use Preflash's browser page for an ESP-IDF project from your laptop or tablet, by opening the page on the machine that runs it through Nearhost.
 sidebar:
   order: 11
