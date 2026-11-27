@@ -1,0 +1,199 @@
+---
+// The three devices under the hero, standing on one desk: the terminal app on a laptop, the web
+// app on a tablet and a phone. The desk is drawn at 1300×520 and zoomed down in steps as the
+// figure narrows; below 720px a smaller arrangement of the same devices takes its place.
+import Laptop from './Laptop.astro';
+import Tablet from './Tablet.astro';
+import Phone from './Phone.astro';
+---
+
+<figure class="devices" data-hero-devices data-nosnippet>
+  <div class="inner">
+    <div class="desk">
+      <div class="pool" aria-hidden="true"></div>
+      <div class="line" aria-hidden="true"></div>
+      <div class="contact" aria-hidden="true"></div>
+      <div class="at-laptop">
+        <Laptop />
+      </div>
+      <div class="at-tablet">
+        <Tablet />
+      </div>
+      <div class="at-phone">
+        <Phone />
+      </div>
+    </div>
+    <div class="desk-small" aria-hidden="true">
+      <div class="small-laptop">
+        <Laptop />
+      </div>
+      <div class="small-tablet">
+        <Tablet />
+      </div>
+      <div class="small-phone">
+        <Phone />
+      </div>
+      <div class="small-line"></div>
+    </div>
+    <figcaption>
+      The terminal app on your laptop. New in 0.17, the web app on your tablet and phone: here a
+      tablet shows <code>preflash web</code> from a Mac in another room, and a phone reviews a
+      project Claude Code wants to add.
+    </figcaption>
+  </div>
+</figure>
+
+<style>
+  .devices {
+    --desk-line: color-mix(in srgb, var(--nh-line) 90%, var(--nh-text));
+    margin: 0;
+    padding-bottom: var(--nh-section);
+    container-type: inline-size;
+    /* Clip at the page edge, not the column, so the devices' shadows fade out instead of ending
+       on a hard line, and a zoomed desk may spill into the column's side padding. */
+    overflow-x: clip;
+  }
+  .inner {
+    margin: 0 auto;
+    max-width: 1340px;
+    padding: 24px 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .desk {
+    position: relative;
+    width: 1300px;
+    height: 520px;
+    flex-shrink: 0;
+  }
+  /* A soft pool of accent light on the desk, faded out before every edge. */
+  .pool {
+    position: absolute;
+    left: 150px;
+    right: 150px;
+    top: 318px;
+    height: 240px;
+    background: radial-gradient(
+      50% 50% at 50% 50%,
+      color-mix(in srgb, var(--nh-accent) 9%, transparent),
+      color-mix(in srgb, var(--nh-accent) 3%, transparent) 45%,
+      transparent 100%
+    );
+  }
+  .line {
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    top: 437px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--desk-line) 18%,
+      var(--desk-line) 82%,
+      transparent
+    );
+  }
+  .contact {
+    position: absolute;
+    left: 260px;
+    right: 260px;
+    top: 438px;
+    height: 40px;
+    background: radial-gradient(50% 50% at 50% 0%, rgba(0, 0, 0, 0.55), transparent 100%);
+  }
+  .at-laptop {
+    position: absolute;
+    left: 440px;
+    top: 0;
+  }
+  .at-tablet,
+  .at-phone {
+    position: absolute;
+    filter: drop-shadow(0 24px 40px rgba(0, 0, 0, 0.55));
+  }
+  .at-tablet {
+    left: 0;
+    top: 80px;
+  }
+  .at-phone {
+    left: 1108px;
+    top: 51px;
+  }
+  .desk-small {
+    display: none;
+    position: relative;
+    width: 342px;
+    height: 300px;
+    margin: 8px auto 20px;
+  }
+  .small-laptop,
+  .small-tablet,
+  .small-phone {
+    position: absolute;
+  }
+  .small-laptop {
+    left: 0;
+    top: 0;
+    zoom: 0.45;
+  }
+  .small-tablet {
+    left: -4px;
+    top: 128px;
+    zoom: 0.42;
+    filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.6));
+  }
+  .small-phone {
+    right: -4px;
+    top: 52px;
+    zoom: 0.62;
+    filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.6));
+  }
+  .small-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 299px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      var(--desk-line) 15%,
+      var(--desk-line) 85%,
+      transparent
+    );
+  }
+  figcaption {
+    max-width: 62ch;
+    text-align: center;
+    font-size: 15px;
+    color: var(--nh-muted);
+  }
+  figcaption code {
+    color: var(--nh-body);
+  }
+  @container (max-width: 1360px) {
+    .desk {
+      zoom: 0.86;
+    }
+  }
+  @container (max-width: 1140px) {
+    .desk {
+      zoom: 0.68;
+    }
+  }
+  @container (max-width: 900px) {
+    .desk {
+      zoom: 0.52;
+    }
+  }
+  @container (max-width: 720px) {
+    .desk {
+      display: none;
+    }
+    .desk-small {
+      display: block;
+    }
+  }
+</style>

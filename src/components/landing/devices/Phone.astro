@@ -1,0 +1,349 @@
+---
+// A phone in the web app: the sheet asking to add a project, over the overview. The screen is
+// drawn at 390×844 and scaled into the 172×371 display. It keeps its own colours in both themes.
+---
+
+<div
+  class="phone"
+  data-device="phone"
+  role="img"
+  aria-label="An iPhone running the Nearhost web app. Over the overview, a sheet asks: Add billing to Nearhost? Claude Code asked on leto. Buttons: Add billing, Decline."
+>
+  <div class="display">
+    <div class="screen">
+      <div class="overview">
+        <header class="top">
+          <svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true">
+            <path
+              d="M14 56V32a18 18 0 0 1 36 0v24"
+              fill="none"
+              stroke="#D6F26B"
+              stroke-width="11"
+              stroke-linecap="round"
+            ></path>
+            <circle cx="32" cy="48" r="6" fill="#ECEFE8"></circle>
+          </svg>
+          <span class="heading">Overview</span>
+          <span class="server">leto</span>
+        </header>
+        <div class="list">
+          <div class="waiting">
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              fill="none"
+              stroke="#F2C14E"
+              stroke-width="2"
+              stroke-linecap="round"
+            >
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 7v5l3 2"></path>
+            </svg>
+            <span class="waiting-text">
+              <b>Claude Code wants to add billing</b>
+              <br />
+              <span class="when">on leto · just now</span>
+            </span>
+          </div>
+          <span class="group">leto</span>
+          <div class="card">
+            <div class="item">
+              <span class="dot"></span>
+              <span>
+                <b>storefront</b>
+                <br />
+                <span class="host">storefront.lab.example.dev</span>
+              </span>
+            </div>
+            <div class="item">
+              <span class="dot idle"></span>
+              <span>
+                <b>preflash web</b> <span class="note">Claude Code passthrough</span>
+                <br />
+                <span class="host">7480.apollo.lab.example.dev</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="scrim"></div>
+
+      <div class="sheet">
+        <div class="grabber"></div>
+        <div>
+          <div class="ask">Add billing to Nearhost?</div>
+          <p class="why">
+            Claude Code, working in <span class="path">~/Code/billing</span> on leto, asked just
+            now. Nothing runs until you say yes.
+          </p>
+        </div>
+        <dl class="facts">
+          <dt>Address</dt>
+          <dd>billing.lab.example.dev</dd>
+          <dt>Serves</dt>
+          <dd>localhost:8000</dd>
+          <dt>Starts with</dt>
+          <dd>php artisan serve --port 8000</dd>
+        </dl>
+        <div class="choices">
+          <span class="yes">Add billing</span>
+          <span class="no">Decline</span>
+          <span class="always">Always allow Claude Code to add projects on leto</span>
+        </div>
+      </div>
+      <div class="island"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .phone {
+    width: 188px;
+    height: 387px;
+    box-sizing: border-box;
+    padding: 8px;
+    border-radius: 34px;
+    background: #1b1d1c;
+    border: 1px solid #3a3f3b;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+      0 1px 0 rgba(255, 255, 255, 0.05);
+    font-family: var(--nh-font-body);
+  }
+  .display {
+    position: relative;
+    width: 172px;
+    height: 371px;
+    overflow: hidden;
+    border-radius: 26px;
+    background: #0f1210;
+  }
+  .screen {
+    position: relative;
+    width: 390px;
+    height: 844px;
+    transform: scale(0.44);
+    transform-origin: 0 0;
+    overflow: hidden;
+    background: #0f1210;
+    color: #ecefe8;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  b {
+    font-weight: 600;
+  }
+  .overview {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 92px 20px 12px;
+  }
+  .heading {
+    flex: 1;
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+  }
+  .server {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid #2a312b;
+    background: #161a17;
+    font-size: 14px;
+  }
+  /* The connected dot. */
+  .server::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #7fdb8a;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #7fdb8a;
+  }
+  .dot.idle {
+    background: #a4ada5;
+  }
+  .list {
+    padding: 4px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .waiting {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 14px;
+    background: #2a2614;
+    border: 1px solid #5c4e1c;
+  }
+  .waiting-text {
+    flex: 1;
+    line-height: 1.35;
+  }
+  .when {
+    font-size: 13px;
+    color: #cfc7a8;
+  }
+  .group {
+    margin: 4px 4px 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #a4ada5;
+  }
+  .card {
+    background: #161a17;
+    border-radius: 14px;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.07);
+  }
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 64px;
+    padding: 0 14px;
+  }
+  .item + .item {
+    border-top: 1px solid #2a312b;
+  }
+  .note {
+    font-size: 13px;
+    color: #a4ada5;
+  }
+  .host {
+    font-family: var(--nh-font-mono);
+    font-size: 12px;
+    color: #a4ada5;
+  }
+  .scrim {
+    position: absolute;
+    inset: 0;
+    background: rgba(6, 8, 7, 0.72);
+  }
+  .sheet {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    box-sizing: border-box;
+    padding: 10px 20px 34px;
+    background: #161a17;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.07),
+      0 -8px 32px rgba(0, 0, 0, 0.25);
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .grabber {
+    align-self: center;
+    width: 40px;
+    height: 5px;
+    border-radius: 999px;
+    background: #2a312b;
+  }
+  .ask {
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  .why {
+    margin: 8px 0 0;
+    color: #a4ada5;
+    line-height: 1.5;
+  }
+  .path {
+    font-family: var(--nh-font-mono);
+    font-size: 13px;
+    color: #ecefe8;
+  }
+  .facts {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    border: 1px solid #2a312b;
+    border-radius: 14px;
+    overflow: hidden;
+    font-size: 14px;
+  }
+  .facts dt {
+    padding: 12px 14px;
+    color: #a4ada5;
+  }
+  .facts dd {
+    margin: 0;
+    padding: 12px 14px;
+    font-family: var(--nh-font-mono);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .facts dt:not(:nth-last-of-type(1)),
+  .facts dd:not(:nth-last-of-type(1)) {
+    border-bottom: 1px solid #2a312b;
+  }
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .yes,
+  .no {
+    height: 52px;
+    border-radius: 10px;
+    box-sizing: border-box;
+    font-weight: 600;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .yes {
+    background: #d6f26b;
+    color: #0f1210;
+  }
+  .no {
+    border: 1px solid #2a312b;
+  }
+  .always {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: #a4ada5;
+  }
+  .island {
+    position: absolute;
+    left: 50%;
+    top: 14px;
+    width: 120px;
+    height: 34px;
+    margin-left: -60px;
+    border-radius: 20px;
+    background: #000000;
+  }
+</style>

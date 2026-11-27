@@ -1,0 +1,468 @@
+---
+// A tablet in landscape in the web app's project frame, showing the preflash web passthrough.
+// The screen is drawn at 1194×834 and scaled into the 478×334 display. It keeps its own colours
+// in both themes.
+const tiles = [
+  ['Time', 'now'],
+  ['Motion', ''],
+  ['Power', ''],
+  ['Sound', ''],
+  ['Network', ''],
+  ['Update', ''],
+  ['Settings', ''],
+  ['Faults', 'fault'],
+];
+const log = [
+  ['I (312)', 'boot: ESP-IDF v5.4 2nd stage'],
+  ['I (341)', 'rtc: PCF85063 at 0x51'],
+  ['I (344)', 'imu: QMI8658 at 0x6B'],
+  ['I (350)', 'pmu: AXP2101 battery 82%'],
+  ['I (402)', 'wifi: connected, 192.168.4.2'],
+  ['I (518)', 'sntp: time set 09:41:02'],
+  ['I (612)', 'ui: clock face v2 ready'],
+];
+---
+
+<div
+  class="tablet"
+  data-device="tablet"
+  role="img"
+  aria-label="A tablet in landscape running the Nearhost web app. It shows the preflash web passthrough from apollo: the Preflash terminal app beside a simulated ESP32 panel with a clock at 09:41."
+>
+  <span class="camera" aria-hidden="true"></span>
+  <div class="display">
+    <div class="screen">
+      <header class="top">
+        <span class="back">
+          <svg
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="m15 5-7 7 7 7"></path>
+          </svg>
+        </span>
+        <div class="names">
+          <span class="name">preflash web · Claude Code</span>
+          <span class="kind">apollo · Passthrough</span>
+        </div>
+        <div class="fill"></div>
+        <div class="sizes">
+          <span class="size on">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              fill="none"
+              stroke="#ECEFE8"
+              stroke-width="1.5"
+            >
+              <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+            </svg>
+          </span>
+          <span class="size">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              fill="none"
+              stroke="#A4ADA5"
+              stroke-width="1.5"
+            >
+              <rect x="5" y="3" width="14" height="18" rx="2"></rect>
+            </svg>
+          </span>
+          <span class="size">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              fill="none"
+              stroke="#A4ADA5"
+              stroke-width="1.5"
+            >
+              <rect x="7" y="3" width="10" height="18" rx="2"></rect>
+            </svg>
+          </span>
+        </div>
+        <span class="reload">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            fill="none"
+            stroke="#ECEFE8"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5"></path>
+          </svg>
+        </span>
+        <span class="open">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"></path>
+          </svg>
+          Open in browser
+        </span>
+      </header>
+
+      <div class="address">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          fill="none"
+          stroke="#7FDB8A"
+          stroke-width="2"
+        >
+          <rect x="5" y="10" width="14" height="10" rx="2"></rect>
+          <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
+        </svg>
+        <span class="url">https://7480.apollo.lab.example.dev/</span>
+        <span class="fill"></span>
+        <span>Logins and file uploads work better in your browser.</span>
+      </div>
+
+      <div class="frame">
+        <div class="app">
+          <div class="term">
+            <div class="term-head">
+              <span>preflash · clock-face</span>
+              <span class="board">4B · 480×480</span>
+            </div>
+            {log.map(([time, line]) => (
+              <div>
+                <span class="faint">{time}</span> {line}
+              </div>
+            ))}
+            <div class="blank"></div>
+            <div>
+              <span class="prompt">›</span> <span class="bright">status</span>
+            </div>
+            <div>tasks 9 · heap 212 KB free · fps 30</div>
+            <div class="fill"></div>
+            <div class="term-keys">
+              <span>
+                <span class="bright">r</span> rebuild
+              </span>
+              <span>
+                <span class="bright">b</span> board
+              </span>
+              <span>
+                <span class="bright">h</span> hardware
+              </span>
+              <span>
+                <span class="bright">d</span> debug
+              </span>
+            </div>
+          </div>
+          <div class="sim">
+            <div class="panel">
+              <div class="panel-top">
+                <span>Thu 27 Nov</span>
+                <span>82%</span>
+              </div>
+              <div class="clock">09:41</div>
+              <div class="tiles">
+                {tiles.map(([label, kind]) => (
+                  <div class:list={['tile', kind]}>{label}</div>
+                ))}
+              </div>
+            </div>
+            <div class="buttons">
+              <span>BOOT</span>
+              <span>PWR</span>
+              <span>RST</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .tablet {
+    position: relative;
+    width: 502px;
+    height: 358px;
+    box-sizing: border-box;
+    padding: 12px;
+    border-radius: 26px;
+    background: #1b1d1c;
+    border: 1px solid #3a3f3b;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+      0 1px 0 rgba(255, 255, 255, 0.05);
+    font-family: var(--nh-font-body);
+  }
+  .camera {
+    position: absolute;
+    left: 50%;
+    top: 4px;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: #2a2e2c;
+  }
+  .display {
+    width: 478px;
+    height: 334px;
+    overflow: hidden;
+    border-radius: 14px;
+    background: #0f1210;
+  }
+  .screen {
+    width: 1194px;
+    height: 834px;
+    transform: scale(0.4);
+    transform-origin: 0 0;
+    display: flex;
+    flex-direction: column;
+    background: #0f1210;
+    color: #ecefe8;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .fill {
+    flex: 1;
+  }
+  .top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 120px;
+    padding: 56px 16px 0;
+    box-sizing: border-box;
+    background: #161a17;
+    border-bottom: 1px solid #2a312b;
+    flex-shrink: 0;
+  }
+  .back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    color: #ecefe8;
+  }
+  .names {
+    display: flex;
+    flex-direction: column;
+  }
+  .name {
+    font-weight: 600;
+    font-size: 16px;
+  }
+  .kind {
+    font-size: 12px;
+    color: #a4ada5;
+  }
+  .sizes {
+    display: flex;
+    gap: 2px;
+    padding: 4px;
+    border-radius: 14px;
+    background: #0f1210;
+    border: 1px solid #2a312b;
+  }
+  .size {
+    width: 40px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .size.on {
+    border-radius: 10px;
+    background: #2a312b;
+  }
+  .reload {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid #2a312b;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .open {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 16px;
+    border-radius: 10px;
+    background: #d6f26b;
+    color: #0f1210;
+    font-weight: 600;
+  }
+  .address {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 36px;
+    padding: 0 20px;
+    font-size: 13px;
+    color: #a4ada5;
+    flex-shrink: 0;
+  }
+  .url {
+    font-family: var(--nh-font-mono);
+    color: #ecefe8;
+  }
+  .frame {
+    flex: 1;
+    min-height: 0;
+    padding: 0 12px 28px;
+    display: flex;
+  }
+  .app {
+    flex: 1;
+    display: flex;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #2a312b;
+    background: #0c0e12;
+    max-height: 650px;
+  }
+  .term {
+    flex: 1;
+    min-width: 0;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-family: var(--nh-font-mono);
+    font-variant-ligatures: none;
+    font-size: 14px;
+    line-height: 22px;
+    color: #b9c0cc;
+    border-right: 1px solid #222832;
+  }
+  .term-head {
+    display: flex;
+    justify-content: space-between;
+    color: #f0f4ff;
+    font-weight: 600;
+    padding-bottom: 8px;
+  }
+  .board {
+    color: #7c8798;
+    font-weight: 400;
+  }
+  .faint {
+    color: #7c8798;
+  }
+  .prompt {
+    color: #8fb4ff;
+  }
+  .bright {
+    color: #f0f4ff;
+  }
+  .blank {
+    height: 14px;
+  }
+  .term-keys {
+    display: flex;
+    gap: 18px;
+    color: #7c8798;
+    font-size: 13px;
+  }
+  .sim {
+    width: 520px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background: #111419;
+  }
+  .panel {
+    width: 400px;
+    height: 400px;
+    box-sizing: border-box;
+    border-radius: 22px;
+    border: 14px solid #2a2e35;
+    background: #0a0f1a;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .panel-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #8fa3c4;
+  }
+  .clock {
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: 84px;
+    line-height: 1;
+    color: #f0f4ff;
+    text-align: center;
+    letter-spacing: -0.03em;
+  }
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    flex: 1;
+  }
+  .tile {
+    border-radius: 10px;
+    background: #22324a;
+    display: flex;
+    align-items: flex-end;
+    padding: 8px;
+    font-size: 12px;
+    color: #b8c6dd;
+  }
+  .tile.now {
+    background: #1f3b66;
+    color: #d8e4ff;
+  }
+  .tile.fault {
+    background: #4a2626;
+    color: #f2c9c4;
+  }
+  .buttons {
+    display: flex;
+    gap: 14px;
+  }
+  .buttons span {
+    width: 92px;
+    height: 34px;
+    border-radius: 8px;
+    background: #2a2e35;
+    color: #b8c6dd;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
