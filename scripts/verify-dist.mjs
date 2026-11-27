@@ -225,6 +225,23 @@ if (existsSync(index)) {
   );
   check(tabs.includes('codex'), 'the Codex scene is missing');
   check(tabs.includes('qwen'), 'the Qwen Code scene is missing');
+  // 0.17 adds a fourth scene: an agent on one server opens an app running on another.
+  check(
+    [...agents.matchAll(/role="tab"/g)].length === 4,
+    `the agent gallery must have exactly 4 scene tabs, found ${tabs.length}`,
+  );
+  check(
+    ['Preview another machine', 'New in 0.17', '--on apollo'].every((text) =>
+      decode(agents).includes(text),
+    ),
+    'the previews-from-another-machine scene is missing',
+  );
+  check(
+    decode(agents.match(/<div class="intro[\s"][\s\S]*?<\/div>/)?.[0] ?? '')
+      .replace(/\s+/g, ' ')
+      .includes('on your laptop or tablet'),
+    'the gallery intro must say "on your laptop or tablet"',
+  );
   check(
     decode(agents).includes(
       'An agent on mini wants to show docs/plans/2026-10-28-checkout.md (plan)',
