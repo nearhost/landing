@@ -2628,15 +2628,15 @@
 <style>
   /* The terminal keeps its own colours, whatever the site's theme. */
   .frame {
-    --ground: #0f1210;
-    --beacon: #d6f26b;
-    --text: #ecefe8;
-    --dim: #7c8479;
+    --ground: #111013;
+    --beacon: #ff70c8;
+    --text: #f4eef2;
+    --dim: #a08f9b;
     --amber: #f2b84b;
     --red: #f26b6b;
-    --line: #2a312b;
-    --selected: #1f261f;
-    --faint: #3a413b;
+    --line: #2f2a33;
+    --selected: #231f27;
+    --faint: #423c46;
     container-type: inline-size;
   }
   .term {
@@ -2666,8 +2666,8 @@
     align-items: center;
     height: 30px;
     padding: 0 12px;
-    background: #121513;
-    border-bottom: 1px solid #1e231f;
+    background: #19171c;
+    border-bottom: 1px solid #231f27;
     color: var(--dim);
     font-size: 11.5px;
   }
@@ -2679,7 +2679,7 @@
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: #2a312b;
+    background: #2f2a33;
   }
   .focus-hint {
     justify-self: end;
@@ -2872,7 +2872,7 @@
     min-height: var(--cell);
   }
   .rowbtn:hover:not(.sel) {
-    background: #151916;
+    background: #19171c;
   }
   .advice {
     display: flex;
@@ -2916,7 +2916,7 @@
     text-overflow: ellipsis;
     white-space: pre;
     background: var(--ground);
-    border: 1px solid #4a5449;
+    border: 1px solid #544e58;
     border-radius: 6px;
   }
   .narrowonly {
@@ -2985,8 +2985,8 @@
     display: flex;
     flex-direction: column;
     padding: calc(var(--cell) / 2) 2.5ch;
-    background: #121613;
-    border: 1px solid #4a5449;
+    background: #19171c;
+    border: 1px solid #544e58;
     border-radius: 6px;
   }
   /* A box with no steps, such as the quit box, is as tall as what it says. */
@@ -3023,7 +3023,7 @@
     background: none !important;
   }
   .dimmed :global(.hr) {
-    background: linear-gradient(#1c201d, #1c201d) 0 50% / 100% 1px no-repeat !important;
+    background: linear-gradient(#211d25, #211d25) 0 50% / 100% 1px no-repeat !important;
   }
   .b {
     color: var(--beacon);
