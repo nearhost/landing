@@ -1,0 +1,293 @@
+---
+// Scene 4: Claude Code on leto starts preflash web on apollo, the Mac with the board set up, and
+// asks Nearhost to open it from there with --on. The laptop lists the passthrough under apollo and
+// opens the panel. The step classes (from-1, at-1, …) are shown or hidden by the gallery's
+// data-step.
+import BrowserWindow from './BrowserWindow.astro';
+import NearhostWindow from './NearhostWindow.astro';
+import Scene from './Scene.astro';
+import Terminal from './Terminal.astro';
+
+// Claude Code's logo as it prints it, drawn as ClaudeScene draws it: block characters in three
+// rows, each cell split into quadrants (top left, top right, bottom left, bottom right).
+const quadrants: Record<string, number[]> = {
+  ' ': [],
+  '▐': [1, 3],
+  '▛': [0, 1, 2],
+  '█': [0, 1, 2, 3],
+  '▝': [1],
+  '▜': [0, 1, 3],
+  '▀': [0, 1],
+};
+const logoRows = [' ▐▛███▛█ ', '▝▜██████▀', ' ▝▝   ▝▝ '];
+const logo = logoRows.flatMap((row, y) =>
+  [...row].flatMap((ch, x) =>
+    quadrants[ch].map((q) => ({ x: x * 2 + (q % 2), y: y * 2 + Math.floor(q / 2) })),
+  ),
+);
+// The board's screen in preflash: eight tiles, the first one (Time) picked.
+const tiles = ['pick', 'tile', 'tile', 'tile', 'tile', 'tile', 'tile', 'alarm'];
+---
+
+<Scene where="On leto, over SSH">
+  <Terminal slot="terminal" title="claude on leto">
+    <!-- prettier-ignore -->
+    <div class="cc">
+      <div class="head">
+        <svg class="logo" viewBox="0 0 18 6" preserveAspectRatio="none" shape-rendering="crispEdges" aria-hidden="true">{logo.map((p) => <rect x={p.x} y={p.y} width="1" height="1" />)}</svg>
+        <div>
+          <div class="r hl"><b>Claude Code</b> <span class="grey">v2.1.301</span></div>
+          <div class="r hl grey">Opus 5.5 · Claude Max</div>
+          <div class="r hl grey">~/code/clock-face</div>
+        </div>
+      </div>
+      <div class="r"></div>
+      <div class="from-1">
+        <div class="w h2 you"><span class="grey">❯</span> <span class="white">Build the new clock face and let me try it in preflash. The board's set up on apollo.</span></div>
+        <div class="r"></div>
+      </div>
+      <div class="at-1">
+        <div class="r">  Starting preflash web on apollo</div>
+        <div class="r grey">  ⎿  Running…</div>
+        <div class="r"></div>
+        <div class="r"><span class="spin">✢ Flibbertigibbeting…</span> <span class="grey">(31s · esc to interrupt)</span></div>
+        <div class="r"></div>
+      </div>
+      <div class="from-2">
+        <div class="r grey">  Ran <b>2</b> shell commands</div>
+        <div class="r"></div>
+        <div class="w h2"><span class="white">⏺</span> preflash web is serving the 4B on port 7480 on apollo. I've asked Nearhost to open it from there. Review it in Nearhost on ecs@macbook.</div>
+        <div class="w h5 grey">  ⎿  $ sh ~/.claude/skills/nearhost/scripts/nearhost.sh passthrough 7480 <span class="nw">--on apollo</span> <span class="nw">--label "preflash web"</span></div>
+        <div class="r"></div>
+      </div>
+      <div class="at-2-3">
+        <div class="r">  Waiting for your answer in Nearhost</div>
+        <div class="w h5 grey">  ⎿  $ sh ~/.claude/skills/nearhost/scripts/nearhost.sh passthrough-wait 5be2c07a91d4f368 <span class="nw">--on apollo</span></div>
+        <div class="r"></div>
+        <div class="r"><span class="spin">✻ Percolating…</span> <span class="grey">(44s · esc to interrupt)</span></div>
+        <div class="r"></div>
+      </div>
+      <div class="from-4">
+        <div class="r grey">  Ran <b>1</b> shell command</div>
+        <div class="r"></div>
+        <div class="w h2"><span class="white">⏺</span> It's open at <span class="lav">http://localhost:7480</span>, listed under apollo in Nearhost. Tap the Time tile to try the new face.</div>
+        <div class="r"></div>
+        <div class="r grey">✻ Brewed for 52s</div>
+        <div class="r"></div>
+      </div>
+      <div class="hr"></div>
+      <div class="w"><span class="grey">❯</span> <span class="lav" data-typed></span><span class="caret"></span></div>
+      <div class="hr"></div>
+      <div class="r grey">  ? for shortcuts</div>
+    </div>
+  </Terminal>
+  <NearhostWindow slot="laptop">
+    <!-- prettier-ignore -->
+    <div class="nh">
+      <div class="prompt box">
+        <div class="r"><b>Browser preview</b></div>
+        <div class="w ask">An agent wants to open port 7480 on apollo on this laptop (preflash web).</div>
+        <div class="r"></div>
+        <div class="r"><span class="key">y</span><span class="dim"> yes · </span><span class="accent">n</span><span class="dim"> no</span></div>
+      </div>
+      <div class="side">
+        <div class="r spread"><span> <span class="dim">▾</span> apollo</span><span><span class="ok">●</span> connected</span></div>
+        <div class="r spread"><span>    <span class="ok">●</span> ios-app</span><span class="dim">running</span></div>
+        <div class="gap"></div>
+        <div class="r spread sel"><span><span class="accent">▌</span><span>passthroughs</span></span><span class="before-4 dim">none</span><span class="from-4 accent">● 1</span></div>
+        <div class="r spread"><span> documents</span><span class="dim">none</span></div>
+        <div class="from-4">
+          <div class="gap small"></div>
+          <div class="r accent">http://localhost:7480 <span class="text">preflash web</span></div>
+          <div class="r dim">from apollo, port 7480 · Claude Code · now</div>
+        </div>
+      </div>
+    </div>
+  </NearhostWindow>
+  <BrowserWindow slot="laptop" url="localhost:7480">
+    <div class="panel">
+      <div class="board" aria-hidden="true">
+        <div class="time">09:41</div>
+        <div class="tiles">
+          {tiles.map((t) => (
+            <i class={t} />
+          ))}
+        </div>
+      </div>
+      <div class="info">
+        <span class="name">preflash · 4B</span>
+        <span>ui: clock face v2</span>
+        <span>fps 30</span>
+      </div>
+    </div>
+  </BrowserWindow>
+</Scene>
+
+<style>
+  /* Claude Code's own colours, as its terminal session draws them. */
+  .cc {
+    padding: 2px 1ch 0;
+  }
+  .head {
+    display: flex;
+    gap: 3ch;
+    align-items: center;
+  }
+  .logo {
+    flex: none;
+    width: 9ch;
+    height: 3.9em;
+    fill: #d77757;
+  }
+  .hl {
+    min-height: 1.3em;
+    line-height: 1.3em;
+  }
+  .grey {
+    color: #999;
+  }
+  .white {
+    color: #fff;
+  }
+  .lav {
+    color: #b1b9f9;
+  }
+  .spin {
+    color: #c75b4e;
+  }
+  .you {
+    background: #373737;
+    margin-inline: -2ch;
+    padding-inline: 2ch;
+  }
+  /* The prompt as sent, wrapped under its first word. This outranks Terminal's .h2 indent,
+     which the bar's -2ch margin would otherwise pull onto the pane's edge. */
+  .cc .you {
+    padding-left: 4ch;
+    text-indent: -2ch;
+  }
+  /* A tool call's ⎿ line, wrapped under its command. */
+  .h5 {
+    padding-left: 7ch;
+    text-indent: -7ch;
+  }
+  .nw {
+    white-space: nowrap;
+  }
+  .hr {
+    margin-inline: -2ch;
+    height: 1.5em;
+    background: linear-gradient(#888, #888) 0 50% / 100% 1px no-repeat;
+  }
+
+  /* Nearhost: the passthrough's prompt, then the sidebar with apollo and the pinned rows. */
+  .nh {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 1ch 14px;
+  }
+  .box {
+    padding: 6px 1.5ch 8px;
+    background: #121613;
+    border: 1px solid #f2b84b;
+    border-radius: 6px;
+  }
+  .ask {
+    margin-top: 4px;
+  }
+  .side {
+    padding-top: 10px;
+    border-top: 1px solid #2a312b;
+  }
+  .spread {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .gap {
+    height: 1.2em;
+  }
+  .gap.small {
+    height: 0.6em;
+  }
+  .sel {
+    background: #1d221e;
+  }
+  .accent {
+    color: #d6f26b;
+  }
+  .dim {
+    color: #7c8479;
+  }
+  .ok {
+    color: #7fdb8a;
+  }
+  .text {
+    color: #ecefe8;
+  }
+  /* The passthrough is listed once you have said yes. */
+  :global([data-step='4']) .before-4 {
+    display: none;
+  }
+
+  /* preflash web: the board's screen with the new clock face, and what it is running. */
+  .panel {
+    flex: 1;
+    margin: -16px;
+    padding: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    background: #111419;
+  }
+  .board {
+    width: 150px;
+    height: 150px;
+    box-sizing: border-box;
+    padding: 9px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    background: #0a0f1a;
+    border: 7px solid #2a2e35;
+    border-radius: 12px;
+  }
+  .time {
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: 30px;
+    line-height: 1;
+    color: #f0f4ff;
+    text-align: center;
+  }
+  .tiles {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .tiles i {
+    border-radius: 4px;
+    background: #22324a;
+  }
+  .tiles i.pick {
+    background: #1f3b66;
+  }
+  .tiles i.alarm {
+    background: #4a2626;
+  }
+  .info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-family: var(--nh-font-mono);
+    font-size: 11px;
+    color: #8fa3c4;
+  }
+  .name {
+    color: #f0f4ff;
+  }
+</style>

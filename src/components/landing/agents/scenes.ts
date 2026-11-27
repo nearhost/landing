@@ -14,7 +14,7 @@ import { url } from '../../../lib/url';
 //   .key      the answer key, drawn pressed at 3
 // and puts exactly one [data-typed] in its prompt line, for the typed text.
 export interface Scene {
-  id: 'claude' | 'codex' | 'qwen';
+  id: 'claude' | 'codex' | 'qwen' | 'elsewhere';
   title: string;
   tag: string;
   caption: string;
@@ -31,7 +31,7 @@ export const scenes: Scene[] = [
     title: 'Add this project',
     tag: '/nearhost add',
     caption:
-      'Ask for /nearhost add. Nearhost opens the add form on your laptop, already filled in from the project’s .env and, with presets, its Compose and Vite config, and the agent gets the address once you save it.',
+      'Ask for /nearhost add. Nearhost opens the add form on your laptop, already filled in from the project’s .env and, with presets, its Compose and Vite config, and the agent gets the address once you save it. Away from the laptop, the request waits in the web app.',
     link: { text: 'Add a project from an agent', href: url(guide + 'add-a-project/') },
     prompt: '/nearhost add',
     perChar: 70,
@@ -41,7 +41,7 @@ export const scenes: Scene[] = [
     title: 'Open a browser preview',
     tag: 'New in 0.10',
     caption:
-      'When an agent on a server starts a preview, such as a brainstorming page, it asks Nearhost to forward that one port. Press y and the preview opens in your laptop’s browser until the session ends.',
+      'When an agent on a server starts a preview, such as a brainstorming page, it asks Nearhost to forward that one port. Press y and the preview opens in your browser until the session ends.',
     link: {
       text: 'Browser previews from a server',
       href: url(guide + 'browser-previews/'),
@@ -54,9 +54,22 @@ export const scenes: Scene[] = [
     title: 'Show a plan in your browser',
     tag: 'New in 0.11',
     caption:
-      'When an agent writes a plan or a spec on a server, it asks Nearhost to show it. Nearhost renders the markdown and opens it in your laptop’s browser, always as the file is now.',
+      'When an agent writes a plan or a spec on a server, it asks Nearhost to show it. Nearhost renders the markdown and opens it in your browser, always as the file is now.',
     link: { text: 'Documents from coding agents', href: url(guide + 'documents/') },
     prompt: 'Write a plan for the checkout refactor and open it for me to review',
+    perChar: 30,
+  },
+  {
+    id: 'elsewhere',
+    title: 'Preview another machine',
+    tag: 'New in 0.17',
+    caption:
+      'An agent on one server can open an app running on another with --on. Here Claude Code on leto starts preflash on apollo, the Mac with the board set up. Nearhost lists the passthrough under apollo, pinned in the sidebar, so you know where the app is.',
+    link: {
+      text: 'Previews from another machine',
+      href: url(guide + 'browser-previews/') + '#when-the-app-runs-on-another-machine',
+    },
+    prompt: "Build the new clock face and let me try it in preflash. The board's set up on apollo.",
     perChar: 30,
   },
 ];

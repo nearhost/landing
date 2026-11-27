@@ -1,11 +1,16 @@
 ---
 // One scene of the agent gallery: the agent's terminal on the server in 8 of 12 columns, and
-// what the laptop shows in the other 4. The columns stack below 900px.
+// what the laptop shows in the other 4. The columns stack below 900px. `where` names the machine
+// the agent runs on, above its terminal.
+interface Props {
+  where?: string;
+}
+const { where = 'On mini, over SSH' } = Astro.props;
 ---
 
 <div class="scene">
   <div class="term">
-    <div class="where">On mini, over SSH</div>
+    <div class="where">{where}</div>
     <slot name="terminal" />
   </div>
   <div class="laptop">
