@@ -23,7 +23,7 @@ import Phone from './Phone.astro';
         <Phone />
       </div>
     </div>
-    <div class="desk-small" aria-hidden="true">
+    <div class="desk-small">
       <div class="small-laptop">
         <Laptop />
       </div>
@@ -126,7 +126,8 @@ import Phone from './Phone.astro';
     position: relative;
     width: 342px;
     height: 300px;
-    margin: 8px auto 20px;
+    /* No auto margins: the column centres it, even when it is wider than the column. */
+    margin: 8px 0 20px;
   }
   .small-laptop,
   .small-tablet,
@@ -194,6 +195,12 @@ import Phone from './Phone.astro';
     }
     .desk-small {
       display: block;
+    }
+  }
+  /* The 342px arrangement fits a 390px phone; smaller phones get it at 274px. */
+  @container (max-width: 380px) {
+    .desk-small {
+      zoom: 0.8;
     }
   }
 </style>
