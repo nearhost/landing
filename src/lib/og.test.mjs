@@ -1,5 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { height, ogPath, renderOg, section, width } from './og.mjs';
 
 const pngSize = (png) => [png.readUInt32BE(16), png.readUInt32BE(20)];
@@ -31,5 +32,15 @@ test('draws the landing card and a docs card, one after the other, at 1200x630',
     const png = await renderOg(card);
     assert.ok(isPng(png), `${card.id} is not a PNG`);
     assert.deepEqual(pngSize(png), [width, height]);
+  }
+});
+
+test('draws the cards in magenta with the prompt mark and none of the old palette', async () => {
+  const source = await readFile(new URL('./og.mjs', import.meta.url), 'utf8');
+  assert.match(source, /#FF70C8/i);
+  assert.ok(source.includes('M13 17l15 15-15 15'), 'chevron path missing');
+  const old = `d6f26b 0f1210 161a17 1d221e 2a312b ecefe8 c5ccc6 a4ada5 818a82 f4f5f1 e6e9e0 dde0d9 1b1f1c 3e463f 5c645d 626b63 4a6200 181c19`;
+  for (const hex of old.split(' ')) {
+    assert.ok(!source.toLowerCase().includes(`#${hex}`), `old colour #${hex} remains`);
   }
 });
