@@ -2,7 +2,14 @@
 import TuiDemo from './TuiDemo.svelte';
 ---
 
-<section class="container wrap">
+<section id="demo" class="container wrap">
+  <div class="intro">
+    <h2>Try the terminal app.</h2>
+    <p>
+      The same screens and keys as the real one, running on made-up servers, projects and agent
+      requests.
+    </p>
+  </div>
   <TuiDemo client:visible />
   <p class="caption">
     Every key works. No servers were harmed. Click in and press <kbd>?</kbd>
@@ -11,7 +18,27 @@ import TuiDemo from './TuiDemo.svelte';
 
 <style>
   .wrap {
-    padding-bottom: 112px;
+    padding-block: 96px 112px;
+  }
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 720px;
+    margin-bottom: 40px;
+  }
+  h2 {
+    margin: 0;
+    font-family: var(--nh-font-display);
+    font-weight: 600;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1.05;
+    letter-spacing: var(--nh-track-display);
+  }
+  .intro p {
+    margin: 0;
+    color: var(--nh-body);
+    font-size: 18px;
   }
   .caption {
     margin: 16px 0 0;
