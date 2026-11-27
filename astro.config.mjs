@@ -49,8 +49,10 @@ export default defineConfig({
           description:
             'Nearhost is a terminal app for macOS, Linux and Windows 11 that opens a dev server running on another machine at a trusted https://name.test address on your laptop, or from the web app on a tablet or phone, over the SSH config you already have. It installs nothing on the server.',
           details: [
-            '- Nearhost is free and open source under MIT. Install it with `curl -fsSL https://nearhost.dev/install.sh | sh`, `brew install nearhost/tap/nearhost` or `npx @nearhost/cli`.',
-            '- It works with any HTTP dev server. It reads ports from `.env`, and presets add Docker Compose, Vite and Laravel Sail.',
+            '- Nearhost is free and open source under MIT. Install it with `curl -fsSL https://nearhost.dev/install.sh | sh`, `brew install nearhost/tap/nearhost` or `npx @nearhost/cli`, and on Windows with `irm https://nearhost.dev/install.ps1 | iex`.',
+            '- It works with any HTTP dev server. It reads ports from `.env`, and presets add Docker Compose, Vite and Laravel Sail. Tools that serve a page on a port work too, such as serve-sim for the iOS Simulator and Preflash for ESP32 boards.',
+            `- Coding agents on a server, such as Claude Code, Codex, Cursor and Gemini CLI, can ask Nearhost to add the project they work in, open a browser preview of a port they started, or show a plan they wrote, each after you allow it. Install the skill with \`npx skills add nearhost/nearhost -g\`. See [Coding agents](${twin('docs/coding-agents')}).`,
+            '- From 0.17.0, a web app on a machine that stays on lets you open projects and answer agents from a tablet or phone.',
             '- It is for your own machines and your own browser, not for sharing a page publicly; use a tunnel service such as ngrok for that.',
             '',
             `Start with [Introduction](${twin('docs/getting-started/introduction')}) and [Install](${twin('docs/getting-started/install')}). The guides cover:`,
