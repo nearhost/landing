@@ -5,7 +5,7 @@ sidebar:
   order: 4
 ---
 
-A project is a directory, on this machine or on a server, that runs an HTTP service. Nearhost reads the project's files to work out its ports, then serves it at an alias, `<name>.test` unless you choose another. The service can be anything that listens on a port.
+A project is a directory, on this machine or on a server, that runs an HTTP service. Nearhost reads the project's files to work out its ports, then serves it at an alias, `<name>.test` unless you choose another. The service can be anything that listens on a port. The [serve-sim](/docs/guides/ios-simulator-from-another-mac/) and [Preflash](/docs/guides/esp32-boards-in-the-browser/) guides show two tools that serve a page on a port.
 
 ## From the interface
 

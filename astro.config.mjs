@@ -47,7 +47,7 @@ export default defineConfig({
       plugins: [
         starlightLlmsTxt({
           description:
-            'Nearhost is a terminal app for macOS, Linux and Windows 11 that opens a dev server running on another machine at a trusted https://name.test address on your laptop, over the SSH config you already have. It installs nothing on the server.',
+            'Nearhost is a terminal app for macOS, Linux and Windows 11 that opens a dev server running on another machine at a trusted https://name.test address on your laptop, or from the web app on a tablet or phone, over the SSH config you already have. It installs nothing on the server.',
           details: [
             '- Nearhost is free and open source under MIT. Install it with `curl -fsSL https://nearhost.dev/install.sh | sh`, `brew install nearhost/tap/nearhost` or `npx @nearhost/cli`.',
             '- It works with any HTTP dev server. It reads ports from `.env`, and presets add Docker Compose, Vite and Laravel Sail.',
@@ -63,10 +63,10 @@ export default defineConfig({
             `- [WorkOS sign-in on a remote dev server](${twin('docs/guides/workos-sign-in')})`,
             `- [Clerk sign-in on a remote dev server](${twin('docs/guides/clerk-sign-in')})`,
             `- [Cognito sign-in on a remote dev server](${twin('docs/guides/cognito-sign-in')})`,
-            `- [The iOS Simulator from another Mac](${twin('docs/guides/ios-simulator-from-another-mac')})`,
-            `- [ESP32 firmware in the browser](${twin('docs/guides/esp32-boards-in-the-browser')})`,
+            `- [The iOS Simulator from another Mac, with serve-sim](${twin('docs/guides/ios-simulator-from-another-mac')})`,
+            `- [ESP32 firmware in the browser, with Preflash](${twin('docs/guides/esp32-boards-in-the-browser')})`,
             `- [Review Claude Code's plans in your browser](${twin('docs/guides/review-claude-code-plans')})`,
-            `- [See what an agent is building, live](${twin('docs/guides/agent-browser-previews')})`,
+            `- [Open a coding agent's localhost preview in your browser](${twin('docs/guides/agent-browser-previews')})`,
             '',
             docsIndex(fileURLToPath(new URL('./src/content/docs/', import.meta.url)), site),
           ].join('\n'),

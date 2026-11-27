@@ -13,6 +13,8 @@ A coding agent can ask Nearhost to add the project it is working in, can read wh
 - [Browser previews from a server](/docs/coding-agents/browser-previews/): the agent asks to forward its dev server's port, and the preview opens in your laptop's browser.
 - [Documents from coding agents](/docs/coding-agents/documents/): the agent asks to show a plan, spec or mockup it wrote, and Nearhost opens it in your browser.
 
+For step-by-step walk-throughs, see [Open a coding agent's localhost preview in your browser](/docs/guides/agent-browser-previews/) and [Review Claude Code's plans in your browser](/docs/guides/review-claude-code-plans/).
+
 An add waits for your yes in Nearhost. A browser preview or a document asks first too, unless you chose Always allow for it. You answer in the interface or, with none open, on Nearhost's page. See [Prompts and Always allow](/docs/coding-agents/prompts-and-always-allow/).
 
 ## Install the skill

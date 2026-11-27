@@ -1,5 +1,5 @@
 ---
-title: The iOS Simulator from another Mac
+title: The iOS Simulator from another Mac, with serve-sim
 description: Use the iOS Simulator on a Mac that has Xcode from your laptop or tablet, by streaming it with serve-sim and opening its page through Nearhost.
 sidebar:
   order: 10

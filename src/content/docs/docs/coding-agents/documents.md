@@ -5,6 +5,8 @@ sidebar:
   order: 5
 ---
 
+For a step-by-step walk-through, see [Review Claude Code's plans in your browser](/docs/guides/review-claude-code-plans/).
+
 With the [`nearhost` skill installed](/docs/coding-agents/#install-the-skill), when an agent writes a plan, spec, report or HTML mockup for you to read, it can ask Nearhost to show it. Nearhost serves the document at an address on your laptop and opens it in your browser. This works for an agent on the laptop and for one on a server Nearhost is connected to, so you no longer need a second terminal to read a path on a server. Markdown is shown as a page; HTML is served as written. Agents offer this only for documents they wrote for you, never for code or config files. You can also ask directly with `/nearhost open <path>` in Claude Code, or `$nearhost open <path>` in Codex. Needs Nearhost 0.11.0 or later; an older one answers without them, and the agent tells you to update it.
 
 1. The agent asks, and Nearhost opens a prompt over the interface, or, with no interface open, waits for your answer on its page, at a link the agent prints: `Claude Code on mini wants to show plans/2026-10-28-x.md`, with a line saying which folder Nearhost will serve.

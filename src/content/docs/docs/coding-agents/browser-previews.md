@@ -5,6 +5,8 @@ sidebar:
   order: 4
 ---
 
+For a step-by-step walk-through, see [Open a coding agent's localhost preview in your browser](/docs/guides/agent-browser-previews/).
+
 With the [`nearhost` skill installed](/docs/coding-agents/#install-the-skill), an agent on a server can start a dev server, but you cannot see it in your browser until its port is forwarded to your laptop. With a passthrough, the agent asks Nearhost to forward that one port for the rest of the session, and you approve it first. The preview then opens on your laptop. It works for any HTTP dev server, whatever it is built with, as long as the page loads everything from that one port. Needs Nearhost 0.10.0 or later; an older Nearhost answers without passthrough, and the agent tells you to update it.
 
 1. The agent asks for a port, and Nearhost opens a prompt over the interface, or, with no interface open, waits for your answer on its page, at a link the agent prints: `Claude Code on mini wants to open port 5173 on this laptop (browser preview).` If that port is in use on the laptop, the prompt says so and that it will open on another port; the agent reports the laptop URL once it opens.

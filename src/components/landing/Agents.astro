@@ -504,7 +504,11 @@ const tour = JSON.stringify(
     opacity: 0;
   }
   .stage[data-step='4'] :global(.prompt) {
-    opacity: 0.45;
+    opacity: 0.6;
+  }
+  /* At 0.6 the stock dim grey would fall under 4.5:1, so the dimmed prompt uses a lighter one. */
+  .stage[data-step='4'] :global(.prompt .dim) {
+    color: #c8d0c4;
   }
   .stage:not([data-step='4']) :global(.browser) {
     opacity: 0;

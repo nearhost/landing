@@ -1,5 +1,5 @@
 ---
-title: See what an agent is building, live
+title: Open a coding agent's localhost preview in your browser
 description: Open the dev server or page a coding agent on a server is running in your own browser while it works, after you allow it in Nearhost.
 sidebar:
   order: 13
