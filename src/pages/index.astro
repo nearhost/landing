@@ -2,6 +2,7 @@
 import Landing from '../layouts/Landing.astro';
 import Nav from '../components/landing/Nav.astro';
 import Hero from '../components/landing/Hero.astro';
+import HeroDevices from '../components/landing/devices/HeroDevices.astro';
 import TuiMock from '../components/landing/TuiMock.astro';
 import Problem from '../components/landing/Problem.astro';
 import Steps from '../components/landing/Steps.astro';
@@ -25,9 +26,10 @@ import { agentNote, siteUrl } from '../lib/markdown-twin.mjs';
     {agentNote(siteUrl(import.meta.env.BASE_URL))}
   </p>
   <Hero />
-  <TuiMock />
+  <HeroDevices />
   <Problem />
   <Agents />
+  <TuiMock />
   <Steps />
   <RequestPath />
   <Features />

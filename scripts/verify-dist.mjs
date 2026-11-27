@@ -180,11 +180,25 @@ if (existsSync(index)) {
     'the agents section must sit between the problem and the steps',
   );
   check(/<nav[\s\S]*?href="#agents"[\s\S]*?<\/nav>/.test(html), 'the nav must link to #agents');
+  // The hero shows the terminal app and the web app on three devices; the mock text is not
+  // quotable.
+  const devices = [...html.matchAll(/<[^>]+data-device="(laptop|tablet|phone)"[^>]*>/g)];
   check(
-    decode(html).includes(
-      'A coding agent on that machine can use it too: it asks to add the project, open a preview or show you a plan, and you say yes.',
-    ),
-    'the hero must mention coding agents',
+    devices.length >= 3 &&
+      ['laptop', 'tablet', 'phone'].every((d) => devices.some((m) => m[1] === d)),
+    'hero must show the laptop, tablet and phone',
+  );
+  check(
+    devices.every((m) => /role="img"/.test(m[0]) && /aria-label="[^"]{20,}"/.test(m[0])),
+    'each hero device needs role="img" and an aria-label',
+  );
+  check(
+    /<[^>]+data-hero-devices[^>]*data-nosnippet/.test(html),
+    'hero devices must be data-nosnippet',
+  );
+  check(
+    /from the web app on your tablet and phone/.test(html),
+    'hero paragraph must name the web app',
   );
   const agents = html.match(/<section id="agents"[\s\S]*?<\/section>/)?.[0] ?? '';
   const tabs = [...agents.matchAll(/role="tab"[^>]*aria-controls="agents-(\w+)"/g)].map(
